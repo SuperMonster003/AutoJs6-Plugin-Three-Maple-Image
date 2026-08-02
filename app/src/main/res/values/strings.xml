@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="action_back">Back</string>
+    <string name="action_open_external">Open with another app</string>
+    <string name="action_reset_zoom">Reset zoom</string>
+    <string name="action_share">Share</string>
     <string name="action_view_image">View image</string>
     <string name="app_name">AutoJs6 Plugin - Image Viewer</string>
+    <string name="error_cannot_read_image">The image could not be displayed</string>
+    <string name="error_no_external_viewer">No other image viewer is available</string>
+    <string name="image_content_description">Image preview</string>
+    <string name="metadata_loading">Reading image information...</string>
+    <string name="metadata_resolution">%1$d x %2$d px</string>
+    <string name="metadata_resolution_unknown">Unknown resolution</string>
+    <string name="metadata_summary">%1$s | %2$s | %3$s</string>
+    <string name="metadata_unavailable">Image information is unavailable</string>
     <string name="plugin_description">View images with zoom, metadata, sharing, and safe external fallback</string>
 </resources>

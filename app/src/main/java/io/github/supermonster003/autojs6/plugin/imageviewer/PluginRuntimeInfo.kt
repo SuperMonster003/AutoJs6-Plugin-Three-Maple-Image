@@ -22,10 +22,9 @@ internal object ImageViewerPlugin {
         "io.github.supermonster003.autojs6.plugin.imageviewer.ExplorerActionActivity"
     const val ACTION_PRIORITY = 100
 
-    val MIME_TYPES = arrayOf("image/*")
+    val MIME_TYPES = emptyArray<String>()
     val EXTENSIONS = arrayOf(
-        "avif", "bmp", "gif", "heic", "heif", "ico", "jpeg", "jpg", "jxl", "png",
-        "svg", "tif", "tiff", "webp",
+        "bmp", "gif", "jfif", "jpe", "jpeg", "jpg", "png", "webp",
     )
 }
 
