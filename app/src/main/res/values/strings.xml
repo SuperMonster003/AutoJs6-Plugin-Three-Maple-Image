@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_view_image">View image</string>
+    <string name="app_name">AutoJs6 Plugin - Image Viewer</string>
+    <string name="plugin_description">View images with zoom, metadata, sharing, and safe external fallback</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color_primary">#E88A00</color>
+    <color name="color_primary_dark">#A85A00</color>
+    <color name="color_secondary">#0097A7</color>
+    <color name="toolbar_text">#FFFFFFFF</color>
+    <color name="verification_match">#FF2E7D32</color>
+    <color name="verification_mismatch">#FFC62828</color>
+    <color name="window_background">#FFFFFFFF</color>
+</resources>
