@@ -1,0 +1,42 @@
+{
+  "$name": "Espanol",
+  "text_current_lowercase": "actual",
+  "text_plugin_synopsis": "Edicion y conversion seguras de imagenes para AutoJs6 Explorer",
+  "h3_languages_with_ascii": "Idiomas",
+  "p_languages_all_supported_for_readme": "El archivo README.md actual admite los siguientes idiomas",
+  "h3_introduction": "Introduccion",
+  "p_introduction": "El plugin AutoJs6 Image Tools proporciona acciones overflow independientes para editar y convertir una imagen en el Explorer principal. Lee el origen sin modificarlo y escribe solo en una transaccion de salida propiedad del host.",
+  "h3_functions": "Funciones",
+  "features": [
+    "Editar con recorte, rotacion, volteo, brillo, contraste, saturacion, temperatura de color, pincel, texto y deshacer.",
+    "Convertir a JPEG, PNG o WebP con calidad, cambio de tamano, bloqueo de proporcion y fondo JPEG.",
+    "Decodificar mediante ContentResolver y ParcelFileDescriptor sin rutas sin procesar ni BitmapFactory.decodeFile.",
+    "Codificar solo en el URI exacto de AutoJs6 y devolver solo el ID de transaccion cuando finaliza correctamente."
+  ],
+  "h3_supported_formats": "Formatos compatibles",
+  "p_supported_formats": "El plugin valida el contenido mediante la decodificacion de Android en lugar de confiar en la extension o el MIME declarado",
+  "h3_plugin_interface": "Interfaz del plugin",
+  "p_plugin_interface": "AutoJs6 descubre y ejecuta el plugin con las siguientes identidades",
+  "p_plugin_scope": "La version 1 registra dos acciones overflow del protocolo v3 solo en el Explorer principal. Cada accion acepta un origen de solo lectura y crea un archivo adyacente mediante la transaccion del host. El origen nunca se reemplaza.",
+  "p_plugin_packaging": "El plugin esta implementado por completo en la JVM y no contiene bibliotecas nativas. Declara `supportedAbis = emptyArray()` y se publica como un APK independiente del ABI. Requiere AutoJs6 build 5269 o posterior.",
+  "h3_security": "Seguridad",
+  "p_security": "El plugin no solicita permisos de almacenamiento ni red. Rechaza solicitudes que no sean v3, superficies no principales, acciones inesperadas, URI superiores, elementos ClipData adicionales, origen con escritura, URI no content, ID no validos, MIME de salida no admitidos y limites superiores a 256 MiB. El URI de salida nunca se devuelve.",
+  "h3_security_limits": "Limites de seguridad",
+  "security_limits": [
+    "Una imagen de entrada de solo lectura y un URI de salida exacto por accion.",
+    "Tamano maximo de entrada declarada y salida codificada: `{{ max_input_size }}`.",
+    "Salida limitada a JPEG, PNG o WebP.",
+    "Dimensiones, pixeles, muestreo, memoria, historial y bytes codificados estan limitados.",
+    "La cancelacion devuelve `RESULT_CANCELED`; el exito devuelve solo el ID coincidente."
+  ],
+  "h3_release_history": "Historial de versiones",
+  "h5_for_more_release_history": "Mas versiones",
+  "h3_build": "Compilacion",
+  "text_release_build": "Compilacion de lanzamiento",
+  "p_build_params": "Los parametros proceden de `version.properties`. El SDK minimo es 24 y el SDK objetivo es 36",
+  "h3_resource_layout": "Estructura de recursos",
+  "p_resource_layout": "`strings.xml` localiza los textos. `plugin_instruction.md` proporciona instrucciones. `.python/generate_markdown.py` genera README y registros desde fuentes JSON",
+  "h3_links": "Enlaces",
+  "text_link_autojs6_docs": "Documentacion de AutoJs6",
+  "text_link_android_secure_file_sharing": "Uso compartido seguro de archivos en Android"
+}

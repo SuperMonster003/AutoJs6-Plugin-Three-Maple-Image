@@ -1,0 +1,42 @@
+{
+  "$name": "English",
+  "text_current_lowercase": "current",
+  "text_plugin_synopsis": "Secure image editing and conversion for AutoJs6 Explorer",
+  "h3_languages_with_ascii": "Languages",
+  "p_languages_all_supported_for_readme": "The current README.md supports the following languages",
+  "h3_introduction": "Introduction",
+  "p_introduction": "The AutoJs6 Image Tools plugin provides independent edit and convert overflow actions for a single image in the main Explorer. It reads the source without modifying it and writes only to a host-owned output transaction.",
+  "h3_functions": "Features",
+  "features": [
+    "Edit images with crop, rotation, horizontal and vertical flip, brightness, contrast, saturation, color temperature, brush strokes, text, and undo.",
+    "Convert to JPEG, PNG, or WebP with quality control, percentage or custom resizing, aspect-ratio locking, and JPEG background selection.",
+    "Decode through ContentResolver and ParcelFileDescriptor without raw paths or BitmapFactory.decodeFile.",
+    "Encode only to the exact output URI supplied by AutoJs6 and report success by echoing only the output transaction ID."
+  ],
+  "h3_supported_formats": "Supported formats",
+  "p_supported_formats": "The plugin validates image contents through Android decoding rather than trusting an extension or declared MIME type",
+  "h3_plugin_interface": "Plugin interface",
+  "p_plugin_interface": "AutoJs6 discovers and executes the plugin with the following identities",
+  "p_plugin_scope": "Version 1 registers two protocol v3 overflow actions only on the main Explorer surface. Each action accepts one read-only source image and creates one new sibling through the host output transaction. The source is never replaced.",
+  "p_plugin_packaging": "The plugin is implemented entirely on the JVM and contains no native library. It declares `supportedAbis = emptyArray()` and is released as one ABI-independent APK. AutoJs6 host build 5269 or later is required.",
+  "h3_security": "Security",
+  "p_security": "The plugin requests no storage or network permission. It rejects non-v3 requests, non-main surfaces, unexpected actions, parent URIs, extra ClipData items, writable source grants, non-content URIs, malformed transaction IDs, unsupported output MIME types, and output limits above 256 MiB. The output URI is never returned to the caller.",
+  "h3_security_limits": "Safety limits",
+  "security_limits": [
+    "One read-only input image and one exact host-owned output URI per action.",
+    "Maximum declared input and encoded output size: `{{ max_input_size }}`.",
+    "Output is restricted to JPEG, PNG, or WebP.",
+    "Image dimensions, pixel count, decode sampling, conversion memory, history storage, and encoded byte count are bounded.",
+    "Cancellation returns `RESULT_CANCELED`; success returns only the matching transaction ID."
+  ],
+  "h3_release_history": "Release history",
+  "h5_for_more_release_history": "For more releases",
+  "h3_build": "Build",
+  "text_release_build": "Release build",
+  "p_build_params": "Build parameters come from `version.properties`. The current minimum SDK is 24 and the target SDK is 36",
+  "h3_resource_layout": "Resource layout",
+  "p_resource_layout": "`strings.xml` localizes plugin metadata and UI text. `plugin_instruction.md` provides instructions shown by the host. `.python/generate_markdown.py` generates localized README and changelog files from JSON sources",
+  "h3_links": "Links",
+  "text_link_autojs6_docs": "AutoJs6 documentation",
+  "text_link_android_secure_file_sharing": "Android secure file sharing"
+}

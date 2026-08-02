@@ -1,0 +1,21 @@
+******
+
+### Historial de versiones
+
+******
+
+# v1.0.0
+
+###### 2026/08/02
+
+* `Funcion` Plugin Image Tools con ID `image-tools`, acciones `edit-image` y `convert-image`, motor `explorer-action` y variante `default`
+* `Funcion` Acciones overflow del protocolo Explorer Action v3 con una imagen de solo lectura y transaccion create-sibling del host
+* `Funcion` Editor con recorte, rotacion, volteo, ajustes de color, pincel, texto y deshacer
+* `Funcion` Conversion JPEG, PNG y WebP con calidad, cambio de tamano, proporcion, fondo JPEG y limites de memoria
+* `Funcion` Entrada y salida con ContentResolver y ParcelFileDescriptor sin ruta sin procesar, escritura adyacente, URI arbitrario, almacenamiento o red
+* `Funcion` Implementacion JVM pura, ABI sin restricciones, un APK independiente y recursos, README y registros en 10 idiomas
+* `Mejora` Conservación de las sesiones del editor y del conversor durante los cambios de configuración, incluidos las herramientas de lienzo, los borradores de diálogo, las opciones, el historial de deshacer y las tareas en curso
+* `Mejora` Protección de las transacciones de salida del host mediante una reclamación persistente de un solo uso, guardas de actividad, corrutinas cancelables y entrega del resultado tras cerrar el writer
+* `Mejora` Validación reforzada de tipos MIME de salida, liberación de bitmaps, coherencia de recursos en inglés, tratamiento lint de puntos suspensivos y cierre del flujo de resumen de publicación
+* `Dependencia` Se añadió AndroidX ExifInterface 1.4.2 para analizar de forma segura los metadatos de imagen
+* `Dependencia` Se añadió Robolectric 4.16.1 para pruebas de ciclo de vida y transacciones persistentes

@@ -1,0 +1,16 @@
+{
+  "repo_url": "https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools",
+  "repo_slug": "SuperMonster003/AutoJs6-Plugin-Image-Tools",
+  "docs_autojs6_url": "https://docs.autojs6.com",
+  "plugin_action": "org.autojs.plugin.EXPLORER_ACTION",
+  "plugin_execute_action": "org.autojs.plugin.EXPLORER_ACTION_EXECUTE",
+  "plugin_id": "image-tools",
+  "plugin_engine": "explorer-action",
+  "plugin_variant": "default",
+  "explorer_action_id": "edit-image / convert-image",
+  "mime_type": "input: image/*; output: image/jpeg, image/png, image/webp",
+  "required_host_build": "5269",
+  "supported_abis": "unrestricted (supportedAbis = emptyArray())",
+  "supported_formats": "Input: Android-decodable images; output: JPEG, PNG, WebP",
+  "max_input_size": "256 MiB"
+}

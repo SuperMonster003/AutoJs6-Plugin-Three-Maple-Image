@@ -1,0 +1,29 @@
+{
+  "changelog_label_hint": "Consejo",
+  "changelog_label_feature": "Funcion",
+  "changelog_label_fix": "Correccion",
+  "changelog_label_improvement": "Mejora",
+  "changelog_label_dependency": "Dependencia",
+  "$data": {
+    "v1.0.0": {
+      "released_date": "2026/08/02",
+      "feature": [
+        "Plugin Image Tools con ID `image-tools`, acciones `edit-image` y `convert-image`, motor `explorer-action` y variante `default`",
+        "Acciones overflow del protocolo Explorer Action v3 con una imagen de solo lectura y transaccion create-sibling del host",
+        "Editor con recorte, rotacion, volteo, ajustes de color, pincel, texto y deshacer",
+        "Conversion JPEG, PNG y WebP con calidad, cambio de tamano, proporcion, fondo JPEG y limites de memoria",
+        "Entrada y salida con ContentResolver y ParcelFileDescriptor sin ruta sin procesar, escritura adyacente, URI arbitrario, almacenamiento o red",
+        "Implementacion JVM pura, ABI sin restricciones, un APK independiente y recursos, README y registros en 10 idiomas"
+      ],
+      "improvement": [
+        "Conservación de las sesiones del editor y del conversor durante los cambios de configuración, incluidos las herramientas de lienzo, los borradores de diálogo, las opciones, el historial de deshacer y las tareas en curso",
+        "Protección de las transacciones de salida del host mediante una reclamación persistente de un solo uso, guardas de actividad, corrutinas cancelables y entrega del resultado tras cerrar el writer",
+        "Validación reforzada de tipos MIME de salida, liberación de bitmaps, coherencia de recursos en inglés, tratamiento lint de puntos suspensivos y cierre del flujo de resumen de publicación"
+      ],
+      "dependency": [
+        "Se añadió AndroidX ExifInterface 1.4.2 para analizar de forma segura los metadatos de imagen",
+        "Se añadió Robolectric 4.16.1 para pruebas de ciclo de vida y transacciones persistentes"
+      ]
+    }
+  }
+}

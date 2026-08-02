@@ -1,0 +1,29 @@
+{
+  "changelog_label_hint": "힌트",
+  "changelog_label_feature": "기능",
+  "changelog_label_fix": "수정",
+  "changelog_label_improvement": "개선",
+  "changelog_label_dependency": "의존성",
+  "$data": {
+    "v1.0.0": {
+      "released_date": "2026/08/02",
+      "feature": [
+        "ID `image-tools`, 작업 `edit-image` 및 `convert-image`, 엔진 `explorer-action`, 변형 `default`인 Image Tools 플러그인",
+        "읽기 전용 이미지 하나와 호스트 소유 create-sibling 출력 트랜잭션을 사용하는 Explorer Action v3 overflow 작업",
+        "자르기, 회전, 뒤집기, 색상 조정, 브러시, 텍스트 및 실행 취소를 제공하는 이미지 편집기",
+        "품질, 크기 조정, 비율 잠금, JPEG 배경 및 메모리 제한을 제공하는 JPEG, PNG 및 WebP 변환",
+        "원시 경로, 직접 형제 쓰기, 임의 URI, 저장소 권한 또는 네트워크 권한이 없는 ContentResolver 및 ParcelFileDescriptor 입출력",
+        "순수 JVM 구현, ABI 제한 없음, ABI 독립 APK 하나 및 10개 언어 리소스, README, 변경 기록"
+      ],
+      "improvement": [
+        "구성 변경 시 캔버스 도구, 대화 상자 초안, 변환 옵션, 실행 취소 기록, 진행 중 작업을 포함한 편집기와 변환기 세션 유지",
+        "영구 단일 사용 claim, busy guard, 취소 가능한 코루틴, writer 종료 후 결과 전달로 호스트 출력 트랜잭션 보호",
+        "출력 MIME 검증, 비트맵 해제, 영어 리소스 일치, 줄임표 lint 처리, 릴리스 다이제스트 스트림 종료 강화"
+      ],
+      "dependency": [
+        "안전한 이미지 메타데이터 분석을 위해 AndroidX ExifInterface 1.4.2 추가",
+        "수명 주기 및 영구 트랜잭션 테스트를 위해 Robolectric 4.16.1 추가"
+      ]
+    }
+  }
+}

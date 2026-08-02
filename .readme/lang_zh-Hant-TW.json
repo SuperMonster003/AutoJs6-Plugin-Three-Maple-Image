@@ -1,0 +1,42 @@
+{
+  "$name": "繁體中文 (台灣)",
+  "text_current_lowercase": "目前",
+  "text_plugin_synopsis": "為 AutoJs6 Explorer 提供安全的影像編輯和轉換",
+  "h3_languages_with_ascii": "語言",
+  "p_languages_all_supported_for_readme": "目前 README.md 支援以下語言",
+  "h3_introduction": "簡介",
+  "p_introduction": "AutoJs6 Image Tools 外掛為主 Explorer 中的單一影像提供獨立的編輯和轉換 overflow 動作. 外掛唯讀來源檔案且不會修改來源檔案, 並且僅向主程式擁有的輸出交易寫入.",
+  "h3_functions": "功能",
+  "features": [
+    "透過裁切, 旋轉, 水平和垂直翻轉, 亮度, 對比, 飽和度, 色溫, 畫筆, 文字和復原編輯影像.",
+    "轉換為 JPEG, PNG 或 WebP, 並支援品質控制, 百分比或自訂縮放, 比例鎖定及 JPEG 背景選擇.",
+    "透過 ContentResolver 和 ParcelFileDescriptor 解碼, 不使用原始路徑或 BitmapFactory.decodeFile.",
+    "僅向 AutoJs6 提供的精確輸出 URI 編碼, 成功時僅回傳輸出交易 ID."
+  ],
+  "h3_supported_formats": "支援的格式",
+  "p_supported_formats": "外掛透過 Android 解碼驗證影像內容, 而不信任副檔名或宣告的 MIME 類型",
+  "h3_plugin_interface": "外掛介面",
+  "p_plugin_interface": "AutoJs6 透過以下識別發現並執行外掛",
+  "p_plugin_scope": "版本 1 僅在主 Explorer 頁面註冊兩個協定 v3 overflow 動作. 每個動作接收一個唯讀來源影像, 並透過主程式輸出交易建立一個新的同層檔案. 來源檔案不會被取代.",
+  "p_plugin_packaging": "外掛完全使用 JVM 實作且不包含原生程式庫. 外掛宣告 `supportedAbis = emptyArray()`, 並以一個 ABI 無關 APK 發佈. 需要 AutoJs6 主程式建置版本 5269 或更高版本.",
+  "h3_security": "安全性",
+  "p_security": "外掛不要求儲存或網路權限. 外掛拒絕非 v3 請求, 非主頁面, 非預期動作, 父 URI, 額外 ClipData 項目, 可寫來源授權, 非 content URI, 格式錯誤的交易 ID, 不支援的輸出 MIME 類型及超過 256 MiB 的輸出限制. 輸出 URI 不會回傳給呼叫端.",
+  "h3_security_limits": "安全限制",
+  "security_limits": [
+    "每個動作僅包含一個唯讀輸入影像和一個精確的主程式輸出 URI.",
+    "宣告的輸入和編碼輸出最大尺寸: `{{ max_input_size }}`.",
+    "輸出僅限 JPEG, PNG 或 WebP.",
+    "影像尺寸, 像素數, 解碼採樣, 轉換記憶體, 歷史儲存及編碼位元組數均有限制.",
+    "取消回傳 `RESULT_CANCELED`; 成功僅回傳相符的交易 ID."
+  ],
+  "h3_release_history": "版本歷史",
+  "h5_for_more_release_history": "更多版本",
+  "h3_build": "建置",
+  "text_release_build": "發佈建置",
+  "p_build_params": "建置參數來自 `version.properties`. 目前最低 SDK 為 24, 目標 SDK 為 36",
+  "h3_resource_layout": "資源配置",
+  "p_resource_layout": "`strings.xml` 本地化外掛中繼資料和介面文字. `plugin_instruction.md` 提供主程式顯示的說明. `.python/generate_markdown.py` 從 JSON 來源產生多語言 README 和更新日誌",
+  "h3_links": "連結",
+  "text_link_autojs6_docs": "AutoJs6 文件",
+  "text_link_android_secure_file_sharing": "Android 安全檔案共用"
+}
