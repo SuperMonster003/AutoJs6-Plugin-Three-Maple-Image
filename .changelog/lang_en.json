@@ -1,0 +1,24 @@
+{
+  "changelog_label_hint": "Hint",
+  "changelog_label_feature": "Feature",
+  "changelog_label_fix": "Fix",
+  "changelog_label_improvement": "Improvement",
+  "changelog_label_dependency": "Dependency",
+  "$data": {
+    "v1.0.0": {
+      "released_date": "2026/08/02",
+      "feature": [
+        "Image Viewer plugin with plugin ID `image-viewer`, action ID `view-image`, engine `explorer-action`, and variant `default`",
+        "Explorer Action protocol v2 primary image viewing for BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, and WEBP files",
+        "Fit-to-screen display with focal pinch zoom, panning, double-tap reset, and tap-to-hide controls",
+        "File name, MIME type, size, and decoded resolution metadata, plus sharing and safe external viewer fallback",
+        "Separate protected Explorer and public Android `ACTION_VIEW` gateways with temporary read-only URI access and an 8 TiB input limit",
+        "Pure JVM implementation with no native library, unrestricted ABIs declared by `supportedAbis = emptyArray()`, one ABI-independent APK, and required AutoJs6 host build 5269",
+        "Localized metadata, interface text, usage instructions, README files, and changelogs in Spanish, French, Russian, Arabic, Japanese, Korean, English, Simplified Chinese, Hong Kong Traditional Chinese, and Taiwan Traditional Chinese"
+      ],
+      "dependency": [
+        "Added Glide version 5.0.5"
+      ]
+    }
+  }
+}

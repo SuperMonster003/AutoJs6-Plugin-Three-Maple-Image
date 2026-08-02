@@ -1,0 +1,16 @@
+{
+  "repo_url": "https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer",
+  "repo_slug": "SuperMonster003/AutoJs6-Plugin-Image-Viewer",
+  "docs_autojs6_url": "https://docs.autojs6.com",
+  "plugin_action": "org.autojs.plugin.EXPLORER_ACTION",
+  "plugin_execute_action": "org.autojs.plugin.EXPLORER_ACTION_EXECUTE",
+  "plugin_id": "image-viewer",
+  "plugin_engine": "explorer-action",
+  "plugin_variant": "default",
+  "explorer_action_id": "view-image",
+  "mime_type": "Explorer: bmp/gif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*",
+  "required_host_build": "5269",
+  "supported_abis": "unrestricted (supportedAbis = emptyArray())",
+  "supported_formats": "BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, WEBP",
+  "max_input_size": "8 TiB"
+}

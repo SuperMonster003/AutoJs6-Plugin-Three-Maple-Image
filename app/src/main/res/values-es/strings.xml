@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="action_back">Atrás</string>
+    <string name="action_open_external">Abrir con otra aplicación</string>
+    <string name="action_reset_zoom">Restablecer zoom</string>
+    <string name="action_share">Compartir</string>
+    <string name="action_view_image">Ver imagen</string>
+    <string name="app_name">Plugin AutoJs6 - Visor de imágenes</string>
+    <string name="error_cannot_read_image">No se pudo mostrar la imagen</string>
+    <string name="error_no_external_viewer">No hay otro visor de imágenes disponible</string>
+    <string name="image_content_description">Vista previa de imagen</string>
+    <string name="metadata_loading" tools:ignore="TypographyEllipsis">Leyendo información de la imagen...</string>
+    <string name="metadata_resolution">%1$d x %2$d px</string>
+    <string name="metadata_resolution_unknown">Resolución desconocida</string>
+    <string name="metadata_summary">%1$s | %2$s | %3$s</string>
+    <string name="metadata_unavailable">La información de la imagen no está disponible</string>
+    <string name="plugin_description">Ver imágenes con zoom, metadatos, uso compartido y apertura externa segura</string>
+</resources>

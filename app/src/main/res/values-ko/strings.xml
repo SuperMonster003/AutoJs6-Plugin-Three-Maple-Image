@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="action_back">뒤로</string>
+    <string name="action_open_external">다른 앱으로 열기</string>
+    <string name="action_reset_zoom">확대 재설정</string>
+    <string name="action_share">공유</string>
+    <string name="action_view_image">이미지 보기</string>
+    <string name="app_name">AutoJs6 플러그인 - 이미지 뷰어</string>
+    <string name="error_cannot_read_image">이미지를 표시할 수 없습니다</string>
+    <string name="error_no_external_viewer">사용 가능한 다른 이미지 뷰어가 없습니다</string>
+    <string name="image_content_description">이미지 미리 보기</string>
+    <string name="metadata_loading" tools:ignore="TypographyEllipsis">이미지 정보를 읽는 중...</string>
+    <string name="metadata_resolution">%1$d x %2$d px</string>
+    <string name="metadata_resolution_unknown">알 수 없는 해상도</string>
+    <string name="metadata_summary">%1$s | %2$s | %3$s</string>
+    <string name="metadata_unavailable">이미지 정보를 사용할 수 없습니다</string>
+    <string name="plugin_description">확대, 메타데이터, 공유 및 안전한 외부 대체 기능으로 이미지 보기</string>
+</resources>

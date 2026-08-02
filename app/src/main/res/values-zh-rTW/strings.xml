@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="action_back">返回</string>
+    <string name="action_open_external">使用其他應用程式開啟</string>
+    <string name="action_reset_zoom">重設縮放</string>
+    <string name="action_share">分享</string>
+    <string name="action_view_image">檢視圖片</string>
+    <string name="app_name">AutoJs6 外掛程式 - 圖片檢視器</string>
+    <string name="error_cannot_read_image">無法顯示圖片</string>
+    <string name="error_no_external_viewer">沒有可用的其他圖片檢視器</string>
+    <string name="image_content_description">圖片預覽</string>
+    <string name="metadata_loading" tools:ignore="TypographyEllipsis">正在讀取圖片資訊...</string>
+    <string name="metadata_resolution">%1$d x %2$d px</string>
+    <string name="metadata_resolution_unknown">未知解析度</string>
+    <string name="metadata_summary">%1$s | %2$s | %3$s</string>
+    <string name="metadata_unavailable">圖片資訊無法使用</string>
+    <string name="plugin_description">透過縮放, 中繼資料, 分享和安全外部降級檢視圖片</string>
+</resources>
