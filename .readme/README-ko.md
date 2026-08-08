@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-viewer-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>AutoJs6 탐색기를 위한 확대, 메타데이터, 공유 및 외부 대체 기능이 있는 안전한 이미지 보기</p>
+  <p>파일 관리자 플러그인. 확대, 메타데이터, 공유 및 안전한 외부 대체 기능으로 이미지 보기</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -39,7 +39,7 @@
 
 ******
 
-AutoJs6 Image Viewer 플러그인은 AutoJs6 탐색기에서 지원되는 이미지를 여는 기본 작업을 제공합니다. 임시 읽기 전용 content URI를 전용 뷰어에서 열며 원본 파일을 변경하지 않습니다.
+Image Viewer는 파일 관리자에서 지원되는 이미지를 여는 기본 작업을 제공합니다. 임시 읽기 전용 content URI를 전용 뷰어에서 열며 원본 파일을 변경하지 않습니다.
 
 ******
 
@@ -71,7 +71,7 @@ BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 ******
 
-AutoJs6는 다음 식별자로 플러그인을 검색하고 실행합니다:
+호스트는 다음 식별자로 플러그인을 검색하고 실행합니다:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -82,12 +82,11 @@ variant: default
 Explorer action id: view-image
 MIME type: Explorer: bmp/gif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
-버전 1은 AutoJs6 기본 탐색기에서 이미지 기본 작업을 제공합니다. 이미지 편집, 변환, 파일 정보, 삭제, 이동 및 이름 바꾸기는 호스트 기능으로 유지됩니다. 플러그인이 없으면 호스트는 읽기 전용 외부 `ACTION_VIEW` 요청으로 대체합니다.
+버전 1은 파일 관리자에서 이미지 기본 작업을 제공합니다. 이미지 편집, 변환, 파일 정보, 삭제, 이동 및 이름 바꾸기는 호스트 기능으로 유지됩니다. 플러그인이 없으면 호스트는 읽기 전용 외부 `ACTION_VIEW` 요청으로 대체합니다.
 
-플러그인은 전부 JVM으로 구현되며 네이티브 라이브러리를 포함하지 않습니다. `supportedAbis = emptyArray()`를 선언하고 ABI 독립적인 단일 APK로 배포됩니다. AutoJs6 호스트 빌드 5269 이상이 필요합니다.
+호스트 빌드 5269 이상이 필요합니다.
 
 ******
 
@@ -116,6 +115,13 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `수정` 플러그인 센터 활성화를 막던 null 서비스 바인딩
+* `개선` 더 간결한 플러그인 이름, 설명 및 사용자 문서
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -125,7 +131,7 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 * `기능` 화면 맞춤 표시, 초점 핀치 확대, 이동, 두 번 탭하여 재설정 및 탭하여 컨트롤 숨기기
 * `기능` 파일 이름, MIME 유형, 크기 및 디코딩된 해상도 메타데이터와 공유 및 안전한 외부 뷰어 대체
 * `기능` 임시 읽기 전용 URI 접근과 8 TiB 입력 제한을 갖춘 보호된 탐색기와 공개 Android `ACTION_VIEW`용 분리 게이트웨이
-* `기능` 네이티브 라이브러리가 없는 순수 JVM 구현, `supportedAbis = emptyArray()`로 선언한 ABI 무제한, ABI 독립 단일 APK 및 AutoJs6 호스트 빌드 5269 요구 사항
+* `기능` 호스트 빌드 5269 이상 요구 사항
 * `기능` 스페인어, 프랑스어, 러시아어, 아랍어, 일본어, 한국어, 영어, 중국어 간체, 홍콩 중국어 번체 및 대만 중국어 번체로 현지화한 메타데이터, 인터페이스, 사용 안내, README 및 변경 기록
 * `의존성` Glide 버전 5.0.5 추가
 

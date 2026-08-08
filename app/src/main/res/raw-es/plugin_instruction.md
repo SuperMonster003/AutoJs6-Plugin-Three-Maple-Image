@@ -1,10 +1,10 @@
 # Visor de imágenes
 
-Image Viewer proporciona la acción principal de imagen en el Explorador de AutoJs6 para archivos BMP, GIF, JFIF, JPE, JPEG, JPG, PNG y WEBP.
+Image Viewer proporciona la acción principal de imagen en el gestor de archivos para archivos BMP, GIF, JFIF, JPE, JPEG, JPG, PNG y WEBP.
 
 El visor ajusta la imagen a la pantalla y admite zoom focal con pellizco, desplazamiento, restablecimiento con doble toque, metadatos, uso compartido y apertura con otra aplicación. Toque la imagen para ocultar o mostrar los controles.
 
-El plugin requiere AutoJs6 compilación 5269+. Está implementado completamente en JVM y no depende de la ABI del dispositivo.
+Se requiere la compilación 5269 o posterior del anfitrión.
 
 Límites de seguridad y privacidad:
 

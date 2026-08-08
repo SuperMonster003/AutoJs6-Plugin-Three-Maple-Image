@@ -1,10 +1,10 @@
 # 圖像檢視器
 
-Image Viewer 為 AutoJs6 檔案瀏覽器中的 BMP, GIF, JFIF, JPE, JPEG, JPG, PNG 和 WEBP 檔案提供圖像主要動作.
+Image Viewer 為檔案管理器中的 BMP, GIF, JFIF, JPE, JPEG, JPG, PNG 和 WEBP 檔案提供圖像主要動作.
 
 檢視器將圖像配合螢幕顯示, 並支援焦點捏合縮放, 平移, 雙擊重設, 中繼資料, 分享和使用其他應用程式開啟. 點擊圖像可以隱藏或顯示控制項.
 
-外掛程式需要 AutoJs6 主程式組建版本 5269 或更新版本. 外掛程式完全使用 JVM 實作, 與裝置 ABI 無關.
+需要主程式組建版本 5269 或更新版本.
 
 安全和私隱限制:
 

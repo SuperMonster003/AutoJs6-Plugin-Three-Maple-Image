@@ -2,9 +2,18 @@
   "changelog_label_hint": "提示",
   "changelog_label_feature": "新增",
   "changelog_label_fix": "修復",
-  "changelog_label_improvement": "改善",
+  "changelog_label_improvement": "優化",
   "changelog_label_dependency": "相依性",
   "$data": {
+    "v1.0.1": {
+      "released_date": "2026/08/08",
+      "fix": [
+        "外掛程式中心啟用時因服務傳回空繫結而失敗的問題"
+      ],
+      "improvement": [
+        "更簡潔的外掛程式名稱, 描述和使用者文件"
+      ]
+    },
     "v1.0.0": {
       "released_date": "2026/08/02",
       "feature": [
@@ -13,7 +22,7 @@
         "配合螢幕顯示, 焦點捏合縮放, 平移, 雙擊重設和點選隱藏控制項",
         "檔案名稱, MIME 類型, 大小和解碼解析度中繼資料, 以及分享和安全外部檢視器降級",
         "互相分離的受保護檔案瀏覽器入口和公開 Android `ACTION_VIEW` 入口, 暫時唯讀 URI 存取和 8 TiB 輸入上限",
-        "純 JVM 實作且不包含原生程式庫, 透過 `supportedAbis = emptyArray()` 宣告 ABI 無限制, 發行單一 ABI 無關 APK, 要求 AutoJs6 主程式建置版本 5269",
+        "主程式建置版本 5269 或更新版本",
         "外掛程式中繼資料, 介面文字, 使用說明, README 和 CHANGELOG 的多語言資源: 西班牙文/法文/俄文/阿拉伯文/日文/韓文/英文/簡體中文/香港繁體/台灣繁體"
       ],
       "dependency": [

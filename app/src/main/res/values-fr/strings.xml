@@ -5,7 +5,7 @@
     <string name="action_reset_zoom">Réinitialiser le zoom</string>
     <string name="action_share">Partager</string>
     <string name="action_view_image">Afficher l\'image</string>
-    <string name="app_name">Plugin AutoJs6 - Visionneuse d\'images</string>
+    <string name="app_name">Visionneuse d\'images</string>
     <string name="error_cannot_read_image">L\'image n\'a pas pu être affichée</string>
     <string name="error_no_external_viewer">Aucune autre visionneuse d\'images n\'est disponible</string>
     <string name="image_content_description">Aperçu de l\'image</string>
@@ -14,5 +14,5 @@
     <string name="metadata_resolution_unknown">Résolution inconnue</string>
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_unavailable">Les informations de l\'image ne sont pas disponibles</string>
-    <string name="plugin_description">Afficher des images avec zoom, métadonnées, partage et ouverture externe sécurisée</string>
+    <string name="plugin_description">Plugin de gestionnaire de fichiers. Affichage des images avec zoom, métadonnées, partage et ouverture externe sécurisée</string>
 </resources>

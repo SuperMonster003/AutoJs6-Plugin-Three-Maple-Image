@@ -5,7 +5,7 @@
     <string name="action_reset_zoom">重設縮放</string>
     <string name="action_share">分享</string>
     <string name="action_view_image">檢視圖片</string>
-    <string name="app_name">AutoJs6 外掛程式 - 圖片檢視器</string>
+    <string name="app_name">圖片檢視器</string>
     <string name="error_cannot_read_image">無法顯示圖片</string>
     <string name="error_no_external_viewer">沒有可用的其他圖片檢視器</string>
     <string name="image_content_description">圖片預覽</string>
@@ -14,5 +14,5 @@
     <string name="metadata_resolution_unknown">未知解析度</string>
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_unavailable">圖片資訊無法使用</string>
-    <string name="plugin_description">透過縮放, 中繼資料, 分享和安全外部降級檢視圖片</string>
+    <string name="plugin_description">檔案管理器外掛程式. 支援縮放, 中繼資料, 分享和安全外部開啟的圖片檢視器</string>
 </resources>

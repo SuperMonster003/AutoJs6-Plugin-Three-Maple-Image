@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-viewer-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>AutoJs6 Explorer向けのズーム, メタデータ, 共有, 外部フォールバックを備えた安全な画像表示</p>
+  <p>ファイルマネージャープラグイン. ズーム, メタデータ, 共有, 安全な外部フォールバックで画像を表示</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -39,7 +39,7 @@
 
 ******
 
-AutoJs6 Image Viewerプラグインは, AutoJs6 Explorerで対応画像を表示するための主要アクションを提供します. 一時的な読み取り専用content URIを専用ビューアーで開き, 元ファイルを変更しません.
+Image Viewer はファイルマネージャーで対応画像を表示するための主要アクションを提供します. 一時的な読み取り専用 content URI を専用ビューアーで開き, 元ファイルを変更しません.
 
 ******
 
@@ -71,7 +71,7 @@ BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 ******
 
-AutoJs6は次の識別子でプラグインを検出して実行します:
+ホストは次の識別子でプラグインを検出して実行します:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -82,12 +82,11 @@ variant: default
 Explorer action id: view-image
 MIME type: Explorer: bmp/gif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
-バージョン1はAutoJs6のメインExplorerで画像の主要アクションを提供します. 画像編集, 変換, ファイル情報, 削除, 移動, 名前変更はホスト機能のままです. プラグインがない場合, ホストは読み取り専用の外部 `ACTION_VIEW` にフォールバックします.
+バージョン 1 はファイルマネージャーで画像の主要アクションを提供します. 画像編集, 変換, ファイル情報, 削除, 移動, 名前変更はホスト機能のままです. プラグインがない場合, ホストは読み取り専用の外部 `ACTION_VIEW` にフォールバックします.
 
-プラグインは完全にJVMで実装され, ネイティブライブラリを含みません. `supportedAbis = emptyArray()` を宣言し, ABIに依存しない単一APKとして公開されます. AutoJs6ホストのビルド5269以降が必要です.
+ホストのビルド 5269 以降が必要です.
 
 ******
 
@@ -116,6 +115,13 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `修正` プラグインセンターでの有効化を妨げていたサービスの null バインディング
+* `改善` より簡潔なプラグイン名, 説明, ユーザードキュメント
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -125,7 +131,7 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 * `機能` 画面に合わせた表示, 焦点を保つピンチズーム, パン, ダブルタップでのリセット, タップでの操作部表示切替
 * `機能` ファイル名, MIMEタイプ, サイズ, デコードされた解像度のメタデータ, 共有, 安全な外部ビューアーへのフォールバック
 * `機能` 一時的な読み取り専用URIアクセスと8 TiBの入力上限を持つ, 保護されたExplorer用と公開Android `ACTION_VIEW` 用の分離ゲートウェイ
-* `機能` ネイティブライブラリを含まない純粋なJVM実装, `supportedAbis = emptyArray()` によるABI無制限, ABIに依存しない単一APK, AutoJs6ホストビルド5269の要件
+* `機能` ホストビルド 5269 以降の要件
 * `機能` スペイン語, フランス語, ロシア語, アラビア語, 日本語, 韓国語, 英語, 簡体字中国語, 香港繁体字中国語, 台湾繁体字中国語のメタデータ, UI, 使用説明, README, 変更履歴
 * `依存関係` Glide バージョン 5.0.5 を追加
 

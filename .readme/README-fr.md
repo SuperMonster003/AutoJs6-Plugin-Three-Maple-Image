@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-viewer-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>Affichage sécurisé des images avec zoom, métadonnées, partage et ouverture externe pour l'explorateur AutoJs6</p>
+  <p>Plugin de gestionnaire de fichiers. Affichage des images avec zoom, métadonnées, partage et ouverture externe sécurisée</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -39,7 +39,7 @@ Le fichier README.md actuel prend en charge les langues suivantes:
 
 ******
 
-Le plugin AutoJs6 Image Viewer fournit l'action principale d'affichage des images prises en charge dans l'explorateur AutoJs6. Il ouvre un content URI temporaire en lecture seule dans une visionneuse dédiée sans modifier le fichier source.
+Image Viewer fournit l'action principale d'affichage des images prises en charge dans le gestionnaire de fichiers. Il ouvre un content URI temporaire en lecture seule dans une visionneuse dédiée sans modifier le fichier source.
 
 ******
 
@@ -71,7 +71,7 @@ BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 ******
 
-AutoJs6 découvre et exécute le plugin avec les identités suivantes:
+L'hôte découvre et exécute le plugin avec les identités suivantes:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -82,12 +82,11 @@ variant: default
 Explorer action id: view-image
 MIME type: Explorer: bmp/gif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
-La version 1 fournit l'action principale pour les images dans l'explorateur AutoJs6. La modification, la conversion, les informations, la suppression, le déplacement et le renommage restent des fonctions de l'hôte. Sans le plugin, l'hôte utilise une requête externe `ACTION_VIEW` en lecture seule.
+La version 1 fournit l'action principale pour les images dans le gestionnaire de fichiers. La modification, la conversion, les informations, la suppression, le déplacement et le renommage restent des fonctions de l'hôte. Sans le plugin, l'hôte utilise une requête externe `ACTION_VIEW` en lecture seule.
 
-Le plugin est entièrement implémenté sur la JVM et ne contient aucune bibliothèque native. Il déclare `supportedAbis = emptyArray()` et est publié sous la forme d'un APK unique indépendant de l'ABI. La version 5269 ou ultérieure de l'hôte AutoJs6 est requise.
+La version 5269 ou ultérieure de l'hôte est requise.
 
 ******
 
@@ -116,6 +115,13 @@ Le plugin ne demande aucune autorisation de stockage ou de réseau. L'hôte acco
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `Correctif` Liaison de service nulle qui empêchait l'activation dans le centre de plugins
+* `Amélioration` Nom, description et documentation utilisateur plus clairs
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -125,7 +131,7 @@ Le plugin ne demande aucune autorisation de stockage ou de réseau. L'hôte acco
 * `Fonctionnalité` Adaptation à l'écran avec zoom focal par pincement, déplacement, réinitialisation par double appui et commandes masquables par appui
 * `Fonctionnalité` Métadonnées de nom, type MIME, taille et résolution décodée, avec partage et ouverture externe sécurisée
 * `Fonctionnalité` Passerelles distinctes pour l'explorateur protégé et Android `ACTION_VIEW` public avec accès URI temporaire en lecture seule et limite de 8 TiB
-* `Fonctionnalité` Implémentation JVM pure sans bibliothèque native, ABI sans restriction via `supportedAbis = emptyArray()`, un APK indépendant de l'ABI et version hôte AutoJs6 5269 requise
+* `Fonctionnalité` Version 5269 ou ultérieure de l'hôte requise
 * `Fonctionnalité` Métadonnées, interface, instructions, README et historiques localisés en espagnol, français, russe, arabe, japonais, coréen, anglais, chinois simplifié, chinois traditionnel de Hong Kong et chinois traditionnel de Taïwan
 * `Dépendance` Ajout de Glide version 5.0.5
 

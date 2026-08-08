@@ -1,10 +1,10 @@
 # 图像查看器
 
-Image Viewer 为 AutoJs6 文件浏览器中的 BMP, GIF, JFIF, JPE, JPEG, JPG, PNG 和 WEBP 文件提供图像主要动作.
+Image Viewer 为文件管理器中的 BMP, GIF, JFIF, JPE, JPEG, JPG, PNG 和 WEBP 文件提供图像主要动作.
 
 查看器将图像适应屏幕, 并支持焦点捏合缩放, 平移, 双击重置, 元数据, 分享和使用其他应用打开. 点击图像可以隐藏或显示控件.
 
-插件需要 AutoJs6 构建版本 5269 或更高版本. 插件完全使用 JVM 实现, 与设备 ABI 无关.
+需要宿主构建版本 5269 或更高版本.
 
 安全和隐私限制:
 

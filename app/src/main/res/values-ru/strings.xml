@@ -5,7 +5,7 @@
     <string name="action_reset_zoom">Сбросить масштаб</string>
     <string name="action_share">Отправить</string>
     <string name="action_view_image">Просмотреть изображение</string>
-    <string name="app_name">Плагин AutoJs6 - Просмотр изображений</string>
+    <string name="app_name">Просмотр изображений</string>
     <string name="error_cannot_read_image">Не удалось показать изображение</string>
     <string name="error_no_external_viewer">Другого средства просмотра изображений нет</string>
     <string name="image_content_description">Предпросмотр изображения</string>
@@ -14,5 +14,5 @@
     <string name="metadata_resolution_unknown">Неизвестное разрешение</string>
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_unavailable">Сведения об изображении недоступны</string>
-    <string name="plugin_description">Просмотр изображений с масштабированием, метаданными, отправкой и безопасным внешним открытием</string>
+    <string name="plugin_description">Плагин файлового менеджера. Просмотр изображений с масштабированием, метаданными, отправкой и безопасным внешним открытием</string>
 </resources>

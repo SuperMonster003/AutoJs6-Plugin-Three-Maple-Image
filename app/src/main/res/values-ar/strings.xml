@@ -5,7 +5,7 @@
     <string name="action_reset_zoom">اعادة ضبط التكبير</string>
     <string name="action_share">مشاركة</string>
     <string name="action_view_image">عرض الصورة</string>
-    <string name="app_name">ملحق AutoJs6 - عارض الصور</string>
+    <string name="app_name">عارض الصور</string>
     <string name="error_cannot_read_image">تعذر عرض الصورة</string>
     <string name="error_no_external_viewer">لا يتوفر عارض صور اخر</string>
     <string name="image_content_description">معاينة الصورة</string>
@@ -14,5 +14,5 @@
     <string name="metadata_resolution_unknown">دقة غير معروفة</string>
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_unavailable">معلومات الصورة غير متاحة</string>
-    <string name="plugin_description">عرض الصور مع التكبير والبيانات والمشاركة والفتح الخارجي الامن</string>
+    <string name="plugin_description">ملحق مدير الملفات. عرض الصور مع التكبير والبيانات الوصفية والمشاركة والفتح الخارجي الآمن</string>
 </resources>

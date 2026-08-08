@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-viewer-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>Visualización segura de imágenes con zoom, metadatos, uso compartido y apertura externa para el Explorador de AutoJs6</p>
+  <p>Complemento del gestor de archivos. Visualización de imágenes con zoom, metadatos, uso compartido y apertura externa segura</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -39,7 +39,7 @@ El README.md actual admite los siguientes idiomas:
 
 ******
 
-El plugin AutoJs6 Image Viewer proporciona la acción principal para ver imágenes compatibles en el Explorador de AutoJs6. Abre un content URI temporal de solo lectura en un visor específico sin modificar el archivo de origen.
+Image Viewer proporciona la acción principal para ver imágenes compatibles en el gestor de archivos. Abre un content URI temporal de solo lectura en un visor específico sin modificar el archivo de origen.
 
 ******
 
@@ -71,7 +71,7 @@ BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 ******
 
-AutoJs6 descubre y ejecuta el plugin con las siguientes identidades:
+El anfitrión descubre y ejecuta el complemento con las siguientes identidades:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -82,12 +82,11 @@ variant: default
 Explorer action id: view-image
 MIME type: Explorer: bmp/gif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
-La versión 1 proporciona la acción principal de imagen en el Explorador de AutoJs6. La edición, conversión, información, eliminación, movimiento y cambio de nombre siguen siendo funciones del host. Sin el plugin, el host usa una solicitud externa `ACTION_VIEW` de solo lectura.
+La versión 1 proporciona la acción principal de imagen en el gestor de archivos. La edición, conversión, información, eliminación, movimiento y cambio de nombre siguen siendo funciones del anfitrión. Sin el complemento, el anfitrión usa una solicitud externa `ACTION_VIEW` de solo lectura.
 
-El plugin está implementado completamente en JVM y no contiene bibliotecas nativas. Declara `supportedAbis = emptyArray()` y se publica como un único APK independiente de ABI. Requiere la compilación 5269 o posterior del host AutoJs6.
+Se requiere la compilación 5269 o posterior del anfitrión.
 
 ******
 
@@ -116,6 +115,13 @@ El plugin no solicita permisos de almacenamiento ni de red. El host concede acce
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `Corrección` Enlace de servicio nulo que impedía la activación en el centro de complementos
+* `Mejora` Nombre, descripción y documentación de usuario más claros
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -125,7 +131,7 @@ El plugin no solicita permisos de almacenamiento ni de red. El host concede acce
 * `Función` Ajuste a pantalla con zoom focal mediante pellizco, desplazamiento, restablecimiento con doble toque y controles ocultables con un toque
 * `Función` Metadatos de nombre, tipo MIME, tamaño y resolución decodificada, además de uso compartido y apertura externa segura
 * `Función` Puertas separadas para el Explorador protegido y Android `ACTION_VIEW` público con acceso URI temporal de solo lectura y límite de 8 TiB
-* `Función` Implementación JVM pura sin biblioteca nativa, ABI sin restricciones mediante `supportedAbis = emptyArray()`, un APK independiente de ABI y compilación de host AutoJs6 5269 requerida
+* `Función` Compilación 5269 o posterior del anfitrión requerida
 * `Función` Metadatos, interfaz, instrucciones, README y registros de cambios localizados en español, francés, ruso, árabe, japonés, coreano, inglés, chino simplificado, chino tradicional de Hong Kong y chino tradicional de Taiwán
 * `Dependencia` Añadido Glide versión 5.0.5
 

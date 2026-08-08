@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-viewer-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>为 AutoJs6 文件浏览器提供带缩放, 元数据, 分享和外部降级的安全图像查看功能</p>
+  <p>文件管理器插件. 支持缩放, 元数据, 分享和安全外部打开的图像查看器</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -39,7 +39,7 @@
 
 ******
 
-AutoJs6 图像查看器插件为文件浏览器中的受支持图像提供主要查看动作. 插件通过临时只读 content URI 在专用查看器中打开图像, 不会修改源文件.
+Image Viewer 为文件管理器中的受支持图像提供主要查看动作. 插件通过临时只读 content URI 在专用查看器中打开图像, 不会修改源文件.
 
 ******
 
@@ -71,7 +71,7 @@ BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 ******
 
-AutoJs6 使用以下标识发现并执行插件:
+宿主通过以下标识发现并执行插件:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -82,12 +82,11 @@ variant: default
 Explorer action id: view-image
 MIME type: Explorer: bmp/gif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
-版本 1 提供 AutoJs6 主文件浏览器中的图像主要动作. 图像编辑, 转换, 文件信息, 删除, 移动和重命名仍由宿主提供. 缺少插件时, 宿主降级为只读外部 `ACTION_VIEW` 请求.
+版本 1 提供文件管理器中的图像主要动作. 图像编辑, 转换, 文件信息, 删除, 移动和重命名仍由宿主提供. 缺少插件时, 宿主降级为只读外部 `ACTION_VIEW` 请求.
 
-插件完全使用 JVM 实现, 不包含原生库. 插件声明 `supportedAbis = emptyArray()`, 并以单一 ABI 无关 APK 发布. 需要 AutoJs6 宿主构建版本 5269 或更高版本.
+需要宿主构建版本 5269 或更高版本.
 
 ******
 
@@ -116,6 +115,13 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `修复` 插件中心启用时因服务返回空绑定而失败的问题
+* `优化` 更简洁的插件名称, 描述和用户文档
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -125,7 +131,7 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 * `新增` 适应屏幕显示, 焦点捏合缩放, 平移, 双击重置和点击隐藏控件
 * `新增` 文件名, MIME 类型, 大小和解码分辨率元数据, 以及分享和安全外部查看器降级
 * `新增` 相互分离的受保护文件浏览器入口和公共 Android `ACTION_VIEW` 入口, 临时只读 URI 访问和 8 TiB 输入上限
-* `新增` 纯 JVM 实现且不包含原生库, 通过 `supportedAbis = emptyArray()` 声明 ABI 无限制, 发布单一 ABI 无关 APK, 要求 AutoJs6 宿主构建版本 5269
+* `新增` 宿主构建版本 5269 或更高版本
 * `新增` 插件元数据, 界面文本, 使用说明, README 和 CHANGELOG 的多语言资源: 西班牙语/法语/俄语/阿拉伯语/日语/韩语/英语/简体中文/香港繁体/台湾繁体
 * `依赖` 附加 Glide 版本 5.0.5
 

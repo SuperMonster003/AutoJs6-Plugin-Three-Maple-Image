@@ -5,7 +5,7 @@
     <string name="action_reset_zoom">ズームをリセット</string>
     <string name="action_share">共有</string>
     <string name="action_view_image">画像を表示</string>
-    <string name="app_name">AutoJs6プラグイン - 画像ビューアー</string>
+    <string name="app_name">画像ビューアー</string>
     <string name="error_cannot_read_image">画像を表示できませんでした</string>
     <string name="error_no_external_viewer">ほかの画像ビューアーを利用できません</string>
     <string name="image_content_description">画像プレビュー</string>
@@ -14,5 +14,5 @@
     <string name="metadata_resolution_unknown">解像度不明</string>
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_unavailable">画像情報を利用できません</string>
-    <string name="plugin_description">ズーム, メタデータ, 共有, 安全な外部フォールバックで画像を表示</string>
+    <string name="plugin_description">ファイルマネージャープラグイン. ズーム, メタデータ, 共有, 安全な外部フォールバックで画像を表示</string>
 </resources>

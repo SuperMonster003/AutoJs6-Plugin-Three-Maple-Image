@@ -1,10 +1,10 @@
 # Image Viewer
 
-Image Viewer supplies the primary image action in AutoJs6 Explorer for BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, and WEBP files.
+Image Viewer supplies the primary image action in the file manager for BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, and WEBP files.
 
 The viewer fits the image to the screen and supports focal pinch zoom, panning, double-tap reset, metadata, sharing, and opening with another app. Tap the image to hide or show the controls.
 
-The plugin requires AutoJs6 build 5269+. It is implemented entirely on the JVM and is independent of device ABI.
+Host build 5269 or later is required.
 
 Safety and privacy limits:
 

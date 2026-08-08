@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-viewer-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>為 AutoJs6 檔案瀏覽器提供含縮放, 中繼資料, 分享和外部降級的安全圖片檢視功能</p>
+  <p>檔案管理器外掛程式. 支援縮放, 中繼資料, 分享和安全外部開啟的圖片檢視器</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -39,7 +39,7 @@
 
 ******
 
-AutoJs6 圖片檢視器外掛程式為檔案瀏覽器中的支援圖片提供主要檢視動作. 外掛程式透過暫時唯讀 content URI 在專用檢視器中開啟圖片, 不會修改來源檔案.
+Image Viewer 為檔案管理器中的支援圖片提供主要檢視動作. 外掛程式透過暫時唯讀 content URI 在專用檢視器中開啟圖片, 不會修改來源檔案.
 
 ******
 
@@ -71,7 +71,7 @@ BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 ******
 
-AutoJs6 使用以下識別資訊探索和執行外掛程式:
+主程式透過以下識別資訊探索和執行外掛程式:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -82,12 +82,11 @@ variant: default
 Explorer action id: view-image
 MIME type: Explorer: bmp/gif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
-版本 1 提供 AutoJs6 主檔案瀏覽器中的圖片主要動作. 圖片編輯, 轉換, 檔案資訊, 刪除, 移動和重新命名仍由主程式提供. 缺少外掛程式時, 主程式降級為唯讀外部 `ACTION_VIEW` 要求.
+版本 1 提供檔案管理器中的圖片主要動作. 圖片編輯, 轉換, 檔案資訊, 刪除, 移動和重新命名仍由主程式提供. 缺少外掛程式時, 主程式降級為唯讀外部 `ACTION_VIEW` 要求.
 
-外掛程式完全使用 JVM 實作, 不包含原生程式庫. 外掛程式宣告 `supportedAbis = emptyArray()`, 並以單一 ABI 無關 APK 發行. 需要 AutoJs6 主程式建置版本 5269 或更新版本.
+需要主程式建置版本 5269 或更新版本.
 
 ******
 
@@ -116,6 +115,13 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `修復` 外掛程式中心啟用時因服務傳回空繫結而失敗的問題
+* `優化` 更簡潔的外掛程式名稱, 描述和使用者文件
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -125,7 +131,7 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 * `新增` 配合螢幕顯示, 焦點捏合縮放, 平移, 雙擊重設和點選隱藏控制項
 * `新增` 檔案名稱, MIME 類型, 大小和解碼解析度中繼資料, 以及分享和安全外部檢視器降級
 * `新增` 互相分離的受保護檔案瀏覽器入口和公開 Android `ACTION_VIEW` 入口, 暫時唯讀 URI 存取和 8 TiB 輸入上限
-* `新增` 純 JVM 實作且不包含原生程式庫, 透過 `supportedAbis = emptyArray()` 宣告 ABI 無限制, 發行單一 ABI 無關 APK, 要求 AutoJs6 主程式建置版本 5269
+* `新增` 主程式建置版本 5269 或更新版本
 * `新增` 外掛程式中繼資料, 介面文字, 使用說明, README 和 CHANGELOG 的多語言資源: 西班牙文/法文/俄文/阿拉伯文/日文/韓文/英文/簡體中文/香港繁體/台灣繁體
 * `相依性` 附加 Glide 版本 5.0.5
 

@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-viewer-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>عرض امن للصور مع التكبير والبيانات والمشاركة والفتح الخارجي في مستكشف AutoJs6</p>
+  <p>ملحق مدير الملفات. عرض الصور مع التكبير والبيانات الوصفية والمشاركة والفتح الخارجي الآمن</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -39,7 +39,7 @@
 
 ******
 
-يوفر ملحق AutoJs6 Image Viewer الاجراء الرئيسي لعرض الصور المدعومة في مستكشف AutoJs6. يفتح content URI مؤقتا للقراءة فقط في عارض مخصص من دون تعديل الملف المصدر.
+يوفر Image Viewer الإجراء الرئيسي لعرض الصور المدعومة في مدير الملفات. يفتح content URI مؤقتا للقراءة فقط في عارض مخصص من دون تعديل الملف المصدر.
 
 ******
 
@@ -71,7 +71,7 @@ BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 ******
 
-يكتشف AutoJs6 الملحق وينفذه بالمعرفات التالية:
+يكتشف المضيف الملحق وينفذه بالمعرفات التالية:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -82,12 +82,11 @@ variant: default
 Explorer action id: view-image
 MIME type: Explorer: bmp/gif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
-يوفر الاصدار 1 اجراء الصور الرئيسي في مستكشف AutoJs6. يبقى تعديل الصور وتحويلها ومعلومات الملف والحذف والنقل واعادة التسمية من وظائف المضيف. عند غياب الملحق يرجع المضيف الى طلب `ACTION_VIEW` خارجي للقراءة فقط.
+يوفر الإصدار 1 إجراء الصور الرئيسي في مدير الملفات. يبقى تعديل الصور وتحويلها ومعلومات الملف والحذف والنقل وإعادة التسمية من وظائف المضيف. عند غياب الملحق يرجع المضيف إلى طلب `ACTION_VIEW` خارجي للقراءة فقط.
 
-تم تنفيذ الملحق بالكامل على JVM ولا يحتوي على مكتبات اصلية. يعلن `supportedAbis = emptyArray()` وينشر كملف APK واحد مستقل عن ABI. يتطلب بناء المضيف AutoJs6 رقم 5269 او احدث.
+يتطلب الملحق بناء المضيف 5269 أو أحدث.
 
 ******
 
@@ -116,6 +115,13 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `إصلاح` ربط الخدمة الفارغ الذي منع التفعيل في مركز الملحقات
+* `تحسين` اسم ووصف ووثائق مستخدم أكثر وضوحا
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -125,7 +131,7 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 * `ميزة` ملاءمة الشاشة مع تكبير بالقرص حول نقطة التركيز وتحريك واعادة ضبط بالنقر المزدوج واخفاء عناصر التحكم بالنقر
 * `ميزة` بيانات الاسم ونوع MIME والحجم والدقة التي تم فك ترميزها مع المشاركة والفتح الخارجي الامن
 * `ميزة` بوابتان منفصلتان للمستكشف المحمي وAndroid `ACTION_VIEW` العام مع وصول URI مؤقت للقراءة فقط وحد 8 TiB
-* `ميزة` تنفيذ JVM خالص من دون مكتبة اصلية وABI بلا قيود عبر `supportedAbis = emptyArray()` وAPK واحد مستقل عن ABI ومتطلب بناء المضيف AutoJs6 رقم 5269
+* `ميزة` متطلب بناء المضيف 5269 أو أحدث
 * `ميزة` بيانات وواجهة وتعليمات وملفات README وسجلات تغييرات مترجمة الى الاسبانية والفرنسية والروسية والعربية واليابانية والكورية والانجليزية والصينية المبسطة والصينية التقليدية لهونغ كونغ والصينية التقليدية لتايوان
 * `تبعية` إضافة Glide الإصدار 5.0.5
 

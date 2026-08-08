@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-viewer-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>Secure image viewing with zoom, metadata, sharing, and external fallback for AutoJs6 Explorer</p>
+  <p>File manager plugin. View images with zoom, metadata, sharing, and safe external fallback</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -39,7 +39,7 @@ The current README.md supports the following languages:
 
 ******
 
-The AutoJs6 Image Viewer plugin provides the primary image-viewing action for supported files in AutoJs6 Explorer. It opens a temporary read-only content URI in a focused viewer without changing the source file.
+Image Viewer provides the primary image-viewing action for supported files in the file manager. It opens a temporary read-only content URI in a focused viewer without changing the source file.
 
 ******
 
@@ -71,7 +71,7 @@ BMP, GIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 ******
 
-AutoJs6 discovers and executes the plugin with the following identities:
+The host discovers and executes the plugin with the following identities:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -82,12 +82,11 @@ variant: default
 Explorer action id: view-image
 MIME type: Explorer: bmp/gif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
-Version 1 supplies the primary image action in the main AutoJs6 Explorer. Image editing, conversion, file information, deletion, moving, and renaming remain host features. Without the plugin, the host falls back to a read-only external `ACTION_VIEW` request.
+Version 1 supplies the primary image action in the file manager. Image editing, conversion, file information, deletion, moving, and renaming remain host features. Without the plugin, the host falls back to a read-only external `ACTION_VIEW` request.
 
-The plugin is implemented entirely on the JVM and contains no native library. It declares `supportedAbis = emptyArray()` and is released as one ABI-independent APK. AutoJs6 host build 5269 or later is required.
+Host build 5269 or later is required.
 
 ******
 
@@ -116,6 +115,13 @@ The plugin requests no storage or network permission. The host grants temporary 
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `Fix` Null service binding that prevented activation in Plugin Center
+* `Improvement` Clearer plugin name, description, and user documentation
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -125,7 +131,7 @@ The plugin requests no storage or network permission. The host grants temporary 
 * `Feature` Fit-to-screen display with focal pinch zoom, panning, double-tap reset, and tap-to-hide controls
 * `Feature` File name, MIME type, size, and decoded resolution metadata, plus sharing and safe external viewer fallback
 * `Feature` Separate protected Explorer and public Android `ACTION_VIEW` gateways with temporary read-only URI access and an 8 TiB input limit
-* `Feature` Pure JVM implementation with no native library, unrestricted ABIs declared by `supportedAbis = emptyArray()`, one ABI-independent APK, and required AutoJs6 host build 5269
+* `Feature` Host build 5269 or later required
 * `Feature` Localized metadata, interface text, usage instructions, README files, and changelogs in Spanish, French, Russian, Arabic, Japanese, Korean, English, Simplified Chinese, Hong Kong Traditional Chinese, and Taiwan Traditional Chinese
 * `Dependency` Added Glide version 5.0.5
 

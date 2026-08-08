@@ -1,10 +1,10 @@
 # Visionneuse d'images
 
-Image Viewer fournit l'action principale pour les images BMP, GIF, JFIF, JPE, JPEG, JPG, PNG et WEBP dans l'explorateur AutoJs6.
+Image Viewer fournit l'action principale pour les images BMP, GIF, JFIF, JPE, JPEG, JPG, PNG et WEBP dans le gestionnaire de fichiers.
 
 La visionneuse adapte l'image à l'écran et prend en charge le zoom focal par pincement, le déplacement, la réinitialisation par double appui, les métadonnées, le partage et l'ouverture avec une autre application. Appuyez sur l'image pour masquer ou afficher les commandes.
 
-Le plugin nécessite AutoJs6 version 5269+. Il est entièrement implémenté sur la JVM et ne dépend pas de l'ABI de l'appareil.
+La version 5269 ou ultérieure de l'hôte est requise.
 
 Limites de sécurité et de confidentialité:
 
