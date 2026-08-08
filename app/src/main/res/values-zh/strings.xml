@@ -3,7 +3,7 @@
   <string name="action_convert_image">转换图像</string>
   <string name="action_edit_image">编辑图像</string>
   <string name="apk_info_format">格式</string>
-  <string name="app_name">AutoJs6 插件 - 图像工具</string>
+  <string name="app_name">图像工具</string>
   <string name="dialog_button_cancel">取消</string>
   <string name="dialog_button_confirm">确定</string>
   <string name="dialog_button_convert">转换</string>
@@ -34,7 +34,7 @@
   <string name="image_editor_text_hint">输入文字</string>
   <string name="image_editor_text_position_help">拖动文字选择位置</string>
   <string name="image_editor_text_size_percent">文字大小: %1$d%%</string>
-  <string name="plugin_description">通过安全的 Explorer 输出事务编辑和转换图像</string>
+  <string name="plugin_description">文件管理器插件. 安全编辑和转换图像</string>
   <string name="text_cannot_read_file">无法读取文件</string>
   <string name="text_color_palette">调色盘</string>
   <string name="text_done">完成</string>

@@ -3,7 +3,7 @@
   <string name="action_convert_image">이미지 변환</string>
   <string name="action_edit_image">이미지 편집</string>
   <string name="apk_info_format">형식</string>
-  <string name="app_name">AutoJs6 Plugin - Image Tools</string>
+  <string name="app_name">이미지 도구</string>
   <string name="dialog_button_cancel">취소</string>
   <string name="dialog_button_confirm">확인</string>
   <string name="dialog_button_convert">변환</string>
@@ -34,7 +34,7 @@
   <string name="image_editor_text_hint">텍스트 입력</string>
   <string name="image_editor_text_position_help">텍스트를 드래그하여 위치를 지정하세요</string>
   <string name="image_editor_text_size_percent">텍스트 크기: %1$d%%</string>
-  <string name="plugin_description">안전한 Explorer 출력 트랜잭션을 통해 이미지 편집 및 변환</string>
+  <string name="plugin_description">파일 관리자 플러그인. 안전하게 이미지 편집 및 변환</string>
   <string name="text_cannot_read_file">파일을 읽을 수 없다</string>
   <string name="text_color_palette">색상 팔레트</string>
   <string name="text_done">완료</string>

@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-tools-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>Edicion y conversion seguras de imagenes para AutoJs6 Explorer</p>
+  <p>Complemento del gestor de archivos. Editar y convertir imágenes de forma segura</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Tools?label=Release"/></a>
@@ -26,8 +26,8 @@ El archivo README.md actual admite los siguientes idiomas:
 - [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-HK.md)
 - [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-TW.md)
 - [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-en.md)
-- [Francais [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
-- Espanol [es] # actual
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
+- Español [es] # actual
 - [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ja.md)
 - [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ko.md)
 - [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ru.md)
@@ -35,11 +35,11 @@ El archivo README.md actual admite los siguientes idiomas:
 
 ******
 
-### Introduccion
+### Introducción
 
 ******
 
-El plugin AutoJs6 Image Tools proporciona acciones overflow independientes para editar y convertir una imagen en el Explorer principal. Lee el origen sin modificarlo y escribe solo en una transaccion de salida propiedad del host.
+Image Tools proporciona acciones independientes para editar y convertir una imagen en el gestor de archivos. Lee el origen sin modificarlo y escribe solo en una transacción de salida propiedad del host.
 
 ******
 
@@ -47,10 +47,10 @@ El plugin AutoJs6 Image Tools proporciona acciones overflow independientes para 
 
 ******
 
-- Editar con recorte, rotacion, volteo, brillo, contraste, saturacion, temperatura de color, pincel, texto y deshacer.
-- Convertir a JPEG, PNG o WebP con calidad, cambio de tamano, bloqueo de proporcion y fondo JPEG.
+- Editar con recorte, rotación, volteo, brillo, contraste, saturación, temperatura de color, pincel, texto y deshacer.
+- Convertir a JPEG, PNG o WebP con calidad, cambio de tamaño, bloqueo de proporción y fondo JPEG.
 - Decodificar mediante ContentResolver y ParcelFileDescriptor sin rutas sin procesar ni BitmapFactory.decodeFile.
-- Codificar solo en el URI exacto de AutoJs6 y devolver solo el ID de transaccion cuando finaliza correctamente.
+- Codificar solo en el URI exacto proporcionado por el host y devolver solo el ID de transacción cuando finaliza correctamente.
 
 ******
 
@@ -58,7 +58,7 @@ El plugin AutoJs6 Image Tools proporciona acciones overflow independientes para 
 
 ******
 
-El plugin valida el contenido mediante la decodificacion de Android en lugar de confiar en la extension o el MIME declarado:
+El plugin valida el contenido mediante la decodificación de Android en lugar de confiar en la extensión o el MIME declarado:
 
 ```text
 Input: Android-decodable images; output: JPEG, PNG, WebP
@@ -70,7 +70,7 @@ Input: Android-decodable images; output: JPEG, PNG, WebP
 
 ******
 
-AutoJs6 descubre y ejecuta el plugin con las siguientes identidades:
+El host descubre y ejecuta el complemento con las siguientes identidades:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -81,12 +81,11 @@ variant: default
 Explorer action id: edit-image / convert-image
 MIME type: input: image/*; output: image/jpeg, image/png, image/webp
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
-La version 1 registra dos acciones overflow del protocolo v3 solo en el Explorer principal. Cada accion acepta un origen de solo lectura y crea un archivo adyacente mediante la transaccion del host. El origen nunca se reemplaza.
+La versión 1 registra dos acciones overflow del protocolo v3 solo en el Explorer principal. Cada acción acepta un origen de solo lectura y crea un archivo adyacente mediante la transacción del host. El origen nunca se reemplaza.
 
-El plugin esta implementado por completo en la JVM y no contiene bibliotecas nativas. Declara `supportedAbis = emptyArray()` y se publica como un APK independiente del ABI. Requiere AutoJs6 build 5269 o posterior.
+Se requiere la compilación 5269 o posterior del host.
 
 ******
 
@@ -94,19 +93,19 @@ El plugin esta implementado por completo en la JVM y no contiene bibliotecas nat
 
 ******
 
-El plugin no solicita permisos de almacenamiento ni red. Rechaza solicitudes que no sean v3, superficies no principales, acciones inesperadas, URI superiores, elementos ClipData adicionales, origen con escritura, URI no content, ID no validos, MIME de salida no admitidos y limites superiores a 256 MiB. El URI de salida nunca se devuelve.
+El plugin no solicita permisos de almacenamiento ni red. Rechaza solicitudes que no sean v3, superficies no principales, acciones inesperadas, URI superiores, elementos ClipData adicionales, origen con escritura, URI no content, ID no válidos, MIME de salida no admitidos y límites superiores a 256 MiB. El URI de salida nunca se devuelve.
 
 ******
 
-### Limites de seguridad
+### Límites de seguridad
 
 ******
 
-- Una imagen de entrada de solo lectura y un URI de salida exacto por accion.
-- Tamano maximo de entrada declarada y salida codificada: `256 MiB`.
+- Una imagen de entrada de solo lectura y un URI de salida exacto por acción.
+- Tamaño máximo de entrada declarada y salida codificada: `256 MiB`.
 - Salida limitada a JPEG, PNG o WebP.
-- Dimensiones, pixeles, muestreo, memoria, historial y bytes codificados estan limitados.
-- La cancelacion devuelve `RESULT_CANCELED`; el exito devuelve solo el ID coincidente.
+- Dimensiones, píxeles, muestreo, memoria, historial y bytes codificados están limitados.
+- La cancelación devuelve `RESULT_CANCELED`; el éxito devuelve solo el ID coincidente.
 
 ******
 
@@ -114,29 +113,36 @@ El plugin no solicita permisos de almacenamiento ni red. Rechaza solicitudes que
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `Corrección` Devolver un enlace válido al servicio Explorer Action al activarlo desde el centro de complementos
+* `Mejora` Acortar el nombre y la descripción del complemento y hacer más natural la documentación de usuario
+
 # v1.0.0
 
 ###### 2026/08/02
 
-* `Funcion` Plugin Image Tools con ID `image-tools`, acciones `edit-image` y `convert-image`, motor `explorer-action` y variante `default`
-* `Funcion` Acciones overflow del protocolo Explorer Action v3 con una imagen de solo lectura y transaccion create-sibling del host
-* `Funcion` Editor con recorte, rotacion, volteo, ajustes de color, pincel, texto y deshacer
-* `Funcion` Conversion JPEG, PNG y WebP con calidad, cambio de tamano, proporcion, fondo JPEG y limites de memoria
-* `Funcion` Entrada y salida con ContentResolver y ParcelFileDescriptor sin ruta sin procesar, escritura adyacente, URI arbitrario, almacenamiento o red
-* `Funcion` Implementacion JVM pura, ABI sin restricciones, un APK independiente y recursos, README y registros en 10 idiomas
+* `Función` Plugin Image Tools con ID `image-tools`, acciones `edit-image` y `convert-image`, motor `explorer-action` y variante `default`
+* `Función` Acciones overflow del protocolo Explorer Action v3 con una imagen de solo lectura y transaccion create-sibling del host
+* `Función` Editor con recorte, rotacion, volteo, ajustes de color, pincel, texto y deshacer
+* `Función` Conversion JPEG, PNG y WebP con calidad, cambio de tamano, proporcion, fondo JPEG y limites de memoria
+* `Función` Entrada y salida con ContentResolver y ParcelFileDescriptor sin ruta sin procesar, escritura adyacente, URI arbitrario, almacenamiento o red
+* `Función` Metadatos, interfaz, instrucciones, README y registros localizados en 10 idiomas
 * `Mejora` Conservación de las sesiones del editor y del conversor durante los cambios de configuración, incluidos las herramientas de lienzo, los borradores de diálogo, las opciones, el historial de deshacer y las tareas en curso
 * `Mejora` Protección de las transacciones de salida del host mediante una reclamación persistente de un solo uso, guardas de actividad, corrutinas cancelables y entrega del resultado tras cerrar el writer
 * `Mejora` Validación reforzada de tipos MIME de salida, liberación de bitmaps, coherencia de recursos en inglés, tratamiento lint de puntos suspensivos y cierre del flujo de resumen de publicación
 * `Dependencia` Se añadió AndroidX ExifInterface 1.4.2 para analizar de forma segura los metadatos de imagen
 * `Dependencia` Se añadió Robolectric 4.16.1 para pruebas de ciclo de vida y transacciones persistentes
 
-##### Mas versiones
+##### Más versiones
 
 * [CHANGELOG-es.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/assets/doc/CHANGELOG-es.md)
 
 ******
 
-### Compilacion
+### Compilación
 
 ******
 
@@ -144,13 +150,13 @@ El plugin no solicita permisos de almacenamiento ni red. Rechaza solicitudes que
 .\gradlew.bat :app:assembleDebug
 ```
 
-Compilacion de lanzamiento:
+Compilación de lanzamiento:
 
 ```powershell
 .\gradlew.bat :app:assembleRelease
 ```
 
-Los parametros proceden de `version.properties`. El SDK minimo es 24 y el SDK objetivo es 36.
+Los parámetros proceden de `version.properties`. El SDK mínimo es 24 y el SDK objetivo es 36.
 
 ******
 
@@ -175,5 +181,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 ******
 
-- Documentacion de AutoJs6: https://docs.autojs6.com
+- Documentación de AutoJs6: https://docs.autojs6.com
 - Uso compartido seguro de archivos en Android: https://developer.android.com/training/secure-file-sharing

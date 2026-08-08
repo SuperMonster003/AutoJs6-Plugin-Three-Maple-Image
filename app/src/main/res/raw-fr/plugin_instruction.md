@@ -1,15 +1,15 @@
 # Outils d'image
 
-Image Tools fournit les actions overflow `Modifier l'image` et `Convertir l'image` dans AutoJs6 Explorer.
+Image Tools fournit les actions `Modifier l'image` et `Convertir l'image` dans le gestionnaire de fichiers.
 
-L'editeur prend en charge le recadrage, la rotation, les retournements, la luminosite, le contraste, la saturation, la temperature de couleur, le pinceau, le texte et l'annulation. Le convertisseur prend en charge JPEG, PNG et WebP, la qualite, le redimensionnement, le verrouillage du ratio et le fond JPEG.
+L'éditeur prend en charge le recadrage, la rotation, les retournements, la luminosité, le contraste, la saturation, la température de couleur, le pinceau, le texte et l'annulation. Le convertisseur prend en charge JPEG, PNG et WebP, la qualité, le redimensionnement, le verrouillage du ratio et le fond JPEG.
 
-Le plugin necessite AutoJs6 build 5269+. Il est entierement implemente sur la JVM et ne depend pas de l'ABI.
+Le plugin nécessite la version 5269 ou ultérieure de l'hôte.
 
-Limites de securite et de confidentialite:
+Limites de sécurité et de confidentialité:
 
 - La source est ouverte uniquement via un URI `content` exact en lecture seule.
-- La sortie est encodee uniquement vers l'URI exact de transaction appartenant a l'hote.
-- Le plugin n'ecrit jamais a cote de la source et ne renvoie aucun URI arbitraire.
-- La sortie est limitee a JPEG, PNG ou WebP et a 256 MiB.
-- Le plugin ne demande aucune autorisation de stockage ou de reseau.
+- La sortie est encodée uniquement vers l'URI exact de transaction appartenant à l'hôte.
+- Le plugin n'écrit jamais à côté de la source et ne renvoie aucun URI arbitraire.
+- La sortie est limitée à JPEG, PNG ou WebP et à 256 MiB.
+- Le plugin ne demande aucune autorisation de stockage ou de réseau.

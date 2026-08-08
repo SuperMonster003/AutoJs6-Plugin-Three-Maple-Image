@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-tools-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>Безопасное редактирование и преобразование изображений для AutoJs6 Explorer</p>
+  <p>Плагин файлового менеджера. Безопасное редактирование и преобразование изображений</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Tools?label=Release"/></a>
@@ -26,8 +26,8 @@
 - [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-HK.md)
 - [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-TW.md)
 - [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-en.md)
-- [Francais [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
-- [Espanol [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
+- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
 - [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ja.md)
 - [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ko.md)
 - Русский [ru] # текущий
@@ -39,7 +39,7 @@
 
 ******
 
-Плагин AutoJs6 Image Tools предоставляет независимые действия overflow для редактирования и преобразования одного изображения в основном Explorer. Он читает источник без изменений и пишет только в выходную транзакцию хоста.
+Image Tools предоставляет независимые действия для редактирования и преобразования одного изображения в файловом менеджере. Он читает источник без изменений и пишет только в выходную транзакцию хоста.
 
 ******
 
@@ -50,7 +50,7 @@
 - Редактирование с обрезкой, поворотом, отражением, яркостью, контрастом, насыщенностью, цветовой температурой, кистью, текстом и отменой.
 - Преобразование в JPEG, PNG или WebP с качеством, изменением размера, фиксацией пропорций и фоном JPEG.
 - Декодирование через ContentResolver и ParcelFileDescriptor без необработанных путей и BitmapFactory.decodeFile.
-- Кодирование только в точный URI от AutoJs6 и возврат только ID транзакции при успехе.
+- Кодирование только в точный URI от хоста и возврат только ID транзакции при успехе.
 
 ******
 
@@ -70,7 +70,7 @@ Input: Android-decodable images; output: JPEG, PNG, WebP
 
 ******
 
-AutoJs6 обнаруживает и запускает плагин со следующими идентификаторами:
+Хост обнаруживает и запускает плагин со следующими идентификаторами:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -81,12 +81,11 @@ variant: default
 Explorer action id: edit-image / convert-image
 MIME type: input: image/*; output: image/jpeg, image/png, image/webp
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
 Версия 1 регистрирует два действия overflow протокола v3 только в основном Explorer. Каждое действие принимает один источник только для чтения и создает новый соседний файл через транзакцию хоста. Источник не заменяется.
 
-Плагин полностью реализован на JVM и не содержит нативной библиотеки. Он объявляет `supportedAbis = emptyArray()` и выпускается как один ABI-независимый APK. Требуется AutoJs6 build 5269 или новее.
+Требуется сборка хоста 5269 или новее.
 
 ******
 
@@ -114,6 +113,13 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `Исправление` Возврат корректной привязки к службе Explorer Action при включении в центре плагинов
+* `Улучшение` Более краткие название и описание плагина и более естественная пользовательская документация
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -123,7 +129,7 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 * `Функция` Редактор с обрезкой, поворотом, отражением, настройками цвета, кистью, текстом и отменой
 * `Функция` Преобразование JPEG, PNG и WebP с качеством, размером, пропорциями, фоном JPEG и ограничениями памяти
 * `Функция` Ввод и вывод через ContentResolver и ParcelFileDescriptor без сырых путей, прямой записи, произвольных URI, хранилища или сети
-* `Функция` Чистая JVM реализация, ABI без ограничений, один независимый APK и ресурсы, README и журналы на 10 языках
+* `Функция` Локализованные метаданные плагина, текст интерфейса, инструкции, README и журналы на 10 языках
 * `Улучшение` Сохранение сеансов редактора и конвертера при изменении конфигурации, включая инструменты холста, черновики диалогов, параметры, историю отмены и выполняемые задачи
 * `Улучшение` Защита выходных транзакций хоста с помощью постоянного одноразового claim, блокировок занятости, отменяемых корутин и возврата результата после закрытия writer
 * `Улучшение` Усилена проверка выходных типов MIME, освобождение bitmap, согласованность английских ресурсов, обработка многоточия lint и закрытие потока дайджеста выпуска

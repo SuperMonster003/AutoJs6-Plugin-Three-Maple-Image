@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-tools-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>為 AutoJs6 Explorer 提供安全的影像編輯和轉換</p>
+  <p>檔案管理器外掛程式. 安全編輯及轉換影像</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Tools?label=Release"/></a>
@@ -26,8 +26,8 @@
 - [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-HK.md)
 - 繁體中文 (台灣) [zh-Hant-TW] # 目前
 - [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-en.md)
-- [Francais [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
-- [Espanol [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
+- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
 - [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ja.md)
 - [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ko.md)
 - [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ru.md)
@@ -39,7 +39,7 @@
 
 ******
 
-AutoJs6 Image Tools 外掛為主 Explorer 中的單一影像提供獨立的編輯和轉換 overflow 動作. 外掛唯讀來源檔案且不會修改來源檔案, 並且僅向主程式擁有的輸出交易寫入.
+影像工具為檔案管理器中的單一影像提供獨立的編輯和轉換動作. 外掛唯讀來源檔案且不會修改來源檔案, 並且僅向主程式擁有的輸出交易寫入.
 
 ******
 
@@ -50,7 +50,7 @@ AutoJs6 Image Tools 外掛為主 Explorer 中的單一影像提供獨立的編�
 - 透過裁切, 旋轉, 水平和垂直翻轉, 亮度, 對比, 飽和度, 色溫, 畫筆, 文字和復原編輯影像.
 - 轉換為 JPEG, PNG 或 WebP, 並支援品質控制, 百分比或自訂縮放, 比例鎖定及 JPEG 背景選擇.
 - 透過 ContentResolver 和 ParcelFileDescriptor 解碼, 不使用原始路徑或 BitmapFactory.decodeFile.
-- 僅向 AutoJs6 提供的精確輸出 URI 編碼, 成功時僅回傳輸出交易 ID.
+- 僅向主程式提供的精確輸出 URI 編碼, 成功時僅回傳輸出交易 ID.
 
 ******
 
@@ -70,7 +70,7 @@ Input: Android-decodable images; output: JPEG, PNG, WebP
 
 ******
 
-AutoJs6 透過以下識別發現並執行外掛:
+主程式透過以下識別發現並執行外掛:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -81,12 +81,11 @@ variant: default
 Explorer action id: edit-image / convert-image
 MIME type: input: image/*; output: image/jpeg, image/png, image/webp
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
 版本 1 僅在主 Explorer 頁面註冊兩個協定 v3 overflow 動作. 每個動作接收一個唯讀來源影像, 並透過主程式輸出交易建立一個新的同層檔案. 來源檔案不會被取代.
 
-外掛完全使用 JVM 實作且不包含原生程式庫. 外掛宣告 `supportedAbis = emptyArray()`, 並以一個 ABI 無關 APK 發佈. 需要 AutoJs6 主程式建置版本 5269 或更高版本.
+需要主程式建置版本 5269 或更高版本.
 
 ******
 
@@ -114,21 +113,28 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `修復` 在外掛中心啟用時回傳有效的 Explorer Action 服務綁定
+* `優化` 精簡外掛名稱和描述, 並讓使用者文件表達更自然
+
 # v1.0.0
 
 ###### 2026/08/02
 
-* `功能` Image Tools 外掛, 外掛 ID 為 `image-tools`, 動作 ID 為 `edit-image` 和 `convert-image`, 引擎為 `explorer-action`, 變體為 `default`
-* `功能` Explorer Action 協定 v3 overflow 動作, 使用單一唯讀影像輸入和主程式擁有的 create-sibling 輸出交易
-* `功能` 影像編輯器支援裁切, 旋轉, 翻轉, 亮度, 對比, 飽和度, 色溫, 畫筆, 文字和復原
-* `功能` JPEG, PNG 和 WebP 轉換支援品質, 縮放, 比例鎖定, JPEG 背景及記憶體限制
-* `功能` 透過 ContentResolver 和 ParcelFileDescriptor 處理輸入輸出, 不使用原始路徑, 直接同層寫入, 任意結果 URI, 儲存權限或網路權限
-* `功能` 純 JVM 實作, ABI 無限制, 單一 ABI 無關 APK, 並提供 10 種語言的資源, README 和更新日誌
-* `改善` 在設定變更期間保留編輯器和轉換器工作階段, 包括畫布工具, 對話框草稿, 轉換選項, 復原歷史和執行中的工作
-* `改善` 透過持久單次宣告, 動作忙碌保護, 可取消協程和 writer 關閉後的結果回傳保護主程式輸出交易
-* `改善` 強化輸出 MIME 類型驗證, 點陣圖回收, 英文資源一致性, 省略號 lint 處理和發布摘要串流清理
-* `依賴` 附加 AndroidX ExifInterface 1.4.2, 用於安全解析影像中繼資料
-* `依賴` 附加 Robolectric 4.16.1, 用於生命週期和持久交易測試
+* `新增` Image Tools 外掛, 外掛 ID 為 `image-tools`, 動作 ID 為 `edit-image` 和 `convert-image`, 引擎為 `explorer-action`, 變體為 `default`
+* `新增` Explorer Action 協定 v3 overflow 動作, 使用單一唯讀影像輸入和主程式擁有的 create-sibling 輸出交易
+* `新增` 影像編輯器支援裁切, 旋轉, 翻轉, 亮度, 對比, 飽和度, 色溫, 畫筆, 文字和復原
+* `新增` JPEG, PNG 和 WebP 轉換支援品質, 縮放, 比例鎖定, JPEG 背景及記憶體限制
+* `新增` 透過 ContentResolver 和 ParcelFileDescriptor 處理輸入輸出, 不使用原始路徑, 直接同層寫入, 任意結果 URI, 儲存權限或網路權限
+* `新增` 10 種語言的外掛中繼資料, 介面文字, 使用說明, README 和更新日誌
+* `優化` 在設定變更期間保留編輯器和轉換器工作階段, 包括畫布工具, 對話框草稿, 轉換選項, 復原歷史和執行中的工作
+* `優化` 透過持久單次宣告, 動作忙碌保護, 可取消協程和 writer 關閉後的結果回傳保護主程式輸出交易
+* `優化` 強化輸出 MIME 類型驗證, 點陣圖回收, 英文資源一致性, 省略號 lint 處理和發布摘要串流清理
+* `相依性` 附加 AndroidX ExifInterface 1.4.2, 用於安全解析影像中繼資料
+* `相依性` 附加 Robolectric 4.16.1, 用於生命週期和持久交易測試
 
 ##### 更多版本
 

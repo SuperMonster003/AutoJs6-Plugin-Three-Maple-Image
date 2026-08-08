@@ -3,7 +3,7 @@
   <string name="action_convert_image">Преобразовать изображение</string>
   <string name="action_edit_image">Редактировать изображение</string>
   <string name="apk_info_format">Формат</string>
-  <string name="app_name">Плагин AutoJs6 - Инструменты изображений</string>
+  <string name="app_name">Инструменты изображений</string>
   <string name="dialog_button_cancel">Отменить</string>
   <string name="dialog_button_confirm">OK</string>
   <string name="dialog_button_convert">Преобразовать</string>
@@ -34,7 +34,7 @@
   <string name="image_editor_text_hint">Введите текст</string>
   <string name="image_editor_text_position_help">Перетащите текст, чтобы выбрать его положение</string>
   <string name="image_editor_text_size_percent">Размер текста: %1$d%%</string>
-  <string name="plugin_description">Редактирование и преобразование изображений через безопасные выходные транзакции Explorer</string>
+  <string name="plugin_description">Плагин файлового менеджера. Безопасное редактирование и преобразование изображений</string>
   <string name="text_cannot_read_file">Невозможно прочитать файл</string>
   <string name="text_color_palette">Цветовая палитра</string>
   <string name="text_done">Готово</string>

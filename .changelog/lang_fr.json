@@ -1,10 +1,19 @@
 {
-  "changelog_label_hint": "Conseil",
-  "changelog_label_feature": "Fonction",
-  "changelog_label_fix": "Correction",
-  "changelog_label_improvement": "Amelioration",
-  "changelog_label_dependency": "Dependance",
+  "changelog_label_hint": "Note",
+  "changelog_label_feature": "Fonctionnalité",
+  "changelog_label_fix": "Correctif",
+  "changelog_label_improvement": "Amélioration",
+  "changelog_label_dependency": "Dépendance",
   "$data": {
+    "v1.0.1": {
+      "released_date": "2026/08/08",
+      "fix": [
+        "Renvoyer une liaison de service Explorer Action valide lors de l'activation depuis le centre des plugins"
+      ],
+      "improvement": [
+        "Raccourcir le nom et la description du plugin et rendre la documentation utilisateur plus naturelle"
+      ]
+    },
     "v1.0.0": {
       "released_date": "2026/08/02",
       "feature": [
@@ -13,7 +22,7 @@
         "Editeur avec recadrage, rotation, retournement, reglages de couleur, pinceau, texte et annulation",
         "Conversion JPEG, PNG et WebP avec qualite, redimensionnement, ratio, fond JPEG et limites de memoire",
         "Entrees et sorties ContentResolver et ParcelFileDescriptor sans chemin brut, ecriture voisine directe, URI arbitraire, stockage ou reseau",
-        "Implementation JVM pure, ABI sans restriction, un APK independant et ressources, README et journaux dans 10 langues"
+        "Métadonnées, interface, instructions, README et journaux localisés dans 10 langues"
       ],
       "improvement": [
         "Conservation des sessions de l'éditeur et du convertisseur lors des changements de configuration, y compris les outils de canevas, les brouillons de dialogue, les options, l'historique d'annulation et les tâches en cours",

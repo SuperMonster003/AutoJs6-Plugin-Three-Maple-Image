@@ -3,7 +3,7 @@
   <string name="action_convert_image">画像を変換</string>
   <string name="action_edit_image">画像を編集</string>
   <string name="apk_info_format">形式</string>
-  <string name="app_name">AutoJs6 Plugin - Image Tools</string>
+  <string name="app_name">画像ツール</string>
   <string name="dialog_button_cancel">取消</string>
   <string name="dialog_button_confirm">OK</string>
   <string name="dialog_button_convert">変換</string>
@@ -34,7 +34,7 @@
   <string name="image_editor_text_hint">テキストを入力</string>
   <string name="image_editor_text_position_help">テキストをドラッグして位置を指定してください</string>
   <string name="image_editor_text_size_percent">テキストサイズ: %1$d%%</string>
-  <string name="plugin_description">安全な Explorer 出力トランザクションを使用して画像を編集および変換</string>
+  <string name="plugin_description">ファイルマネージャープラグイン. 画像を安全に編集および変換</string>
   <string name="text_cannot_read_file">ファイルを読めません</string>
   <string name="text_color_palette">カラーパレット</string>
   <string name="text_done">完了</string>

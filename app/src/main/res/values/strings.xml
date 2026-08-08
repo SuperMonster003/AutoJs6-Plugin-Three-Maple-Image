@@ -3,7 +3,7 @@
     <string name="action_convert_image">Convert image</string>
     <string name="action_edit_image">Edit image</string>
     <string name="apk_info_format">Format</string>
-    <string name="app_name">AutoJs6 Plugin - Image Tools</string>
+    <string name="app_name">Image Tools</string>
     <string name="dialog_button_cancel">Cancel</string>
     <string name="dialog_button_confirm">OK</string>
     <string name="dialog_button_convert">Convert</string>
@@ -34,7 +34,7 @@
     <string name="image_editor_text_hint">Enter text</string>
     <string name="image_editor_text_position_help">Drag the text to choose its position</string>
     <string name="image_editor_text_size_percent">Text size: %1$d%%</string>
-    <string name="plugin_description">Edit and convert images through secure Explorer output transactions</string>
+    <string name="plugin_description">File manager plugin. Edit and convert images securely</string>
     <string name="text_cannot_read_file">Cannot read image</string>
     <string name="text_color_palette">Color palette</string>
     <string name="text_done">Done</string>

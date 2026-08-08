@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-tools-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>تحرير الصور وتحويلها بأمان في AutoJs6 Explorer</p>
+  <p>ملحق مدير الملفات. تحرير الصور وتحويلها بأمان</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Tools?label=Release"/></a>
@@ -26,8 +26,8 @@
 - [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-HK.md)
 - [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-TW.md)
 - [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-en.md)
-- [Francais [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
-- [Espanol [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
+- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
 - [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ja.md)
 - [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ko.md)
 - [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ru.md)
@@ -39,7 +39,7 @@
 
 ******
 
-يوفر ملحق AutoJs6 Image Tools إجرائي overflow مستقلين لتحرير صورة واحدة وتحويلها في Explorer الرئيسي. يقرأ المصدر من دون تعديله ويكتب فقط إلى معاملة إخراج يملكها المضيف.
+يوفر Image Tools إجراءين مستقلين لتحرير صورة واحدة وتحويلها في مدير الملفات. يقرأ المصدر من دون تعديله ويكتب فقط إلى معاملة إخراج يملكها المضيف.
 
 ******
 
@@ -50,7 +50,7 @@
 - تحرير الصور بالاقتصاص والتدوير والقلب والسطوع والتباين والتشبع وحرارة اللون والفرشاة والنص والتراجع.
 - التحويل إلى JPEG أو PNG أو WebP مع الجودة وتغيير الحجم وقفل النسبة وخلفية JPEG.
 - فك الترميز عبر ContentResolver و ParcelFileDescriptor من دون مسار خام أو BitmapFactory.decodeFile.
-- الترميز فقط إلى URI الدقيق الذي يقدمه AutoJs6 وإرجاع معرف المعاملة فقط عند النجاح.
+- الترميز فقط إلى URI الدقيق الذي يقدمه المضيف وإرجاع معرف المعاملة فقط عند النجاح.
 
 ******
 
@@ -70,7 +70,7 @@ Input: Android-decodable images; output: JPEG, PNG, WebP
 
 ******
 
-يكتشف AutoJs6 الملحق وينفذه بالهويات التالية:
+يكتشف المضيف الملحق وينفذه بالهويات التالية:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -81,12 +81,11 @@ variant: default
 Explorer action id: edit-image / convert-image
 MIME type: input: image/*; output: image/jpeg, image/png, image/webp
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
 يسجل الإصدار 1 إجرائي overflow ببروتوكول v3 في Explorer الرئيسي فقط. يقبل كل إجراء مصدرا واحدا للقراءة فقط وينشئ ملفا مجاورا جديدا عبر معاملة المضيف. لا يستبدل المصدر.
 
-تم تنفيذ الملحق بالكامل على JVM ولا يحتوي على مكتبة أصلية. يعلن `supportedAbis = emptyArray()` ويصدر كملف APK واحد مستقل عن ABI. يتطلب AutoJs6 build 5269 أو أحدث.
+يتطلب الإصدار 5269 أو أحدث من المضيف.
 
 ******
 
@@ -114,6 +113,13 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `إصلاح` إرجاع ارتباط صالح بخدمة Explorer Action عند التمكين من مركز المكونات الإضافية
+* `تحسين` اختصار اسم المكون الإضافي ووصفه وصياغة وثائق المستخدم بلغة أكثر طبيعية
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -123,12 +129,12 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 * `ميزة` محرر مع الاقتصاص والتدوير والقلب وضبط اللون والفرشاة والنص والتراجع
 * `ميزة` تحويل JPEG و PNG و WebP مع الجودة والحجم وقفل النسبة وخلفية JPEG وحدود الذاكرة
 * `ميزة` إدخال وإخراج ContentResolver و ParcelFileDescriptor بلا مسار خام أو كتابة مباشرة أو URI عشوائي أو إذن تخزين أو شبكة
-* `ميزة` تنفيذ JVM خالص و ABI بلا قيود وملف APK مستقل وموارد و README وسجلات بعشر لغات
+* `ميزة` بيانات الملحق ونصوص الواجهة والتعليمات وملفات README وسجلات التغيير المترجمة إلى 10 لغات
 * `تحسين` الاحتفاظ بجلسات المحرر والمحول عند تغييرات الإعداد, بما يشمل أدوات اللوحة ومسودات مربعات الحوار وخيارات التحويل وسجل التراجع والمهام الجارية
 * `تحسين` حماية معاملات إخراج المضيف عبر claim دائم للاستخدام مرة واحدة وحواجز الانشغال وcoroutines قابلة للإلغاء وإرجاع النتيجة بعد إغلاق writer
 * `تحسين` تعزيز التحقق من أنواع MIME الناتجة وتحرير bitmap واتساق الموارد الإنجليزية ومعالجة الحذف lint وإغلاق تدفق ملخص الإصدار
-* `اعتماد` إضافة AndroidX ExifInterface 1.4.2 لتحليل بيانات تعريف الصور بأمان
-* `اعتماد` إضافة Robolectric 4.16.1 لاختبارات دورة الحياة والمعاملات الدائمة
+* `تبعية` إضافة AndroidX ExifInterface 1.4.2 لتحليل بيانات تعريف الصور بأمان
+* `تبعية` إضافة Robolectric 4.16.1 لاختبارات دورة الحياة والمعاملات الدائمة
 
 ##### إصدارات أخرى
 

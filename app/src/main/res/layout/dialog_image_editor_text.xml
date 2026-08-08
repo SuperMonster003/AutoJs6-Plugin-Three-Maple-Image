@@ -18,7 +18,7 @@
         android:inputType="textCapSentences|textMultiLine"
         android:maxLines="4"
         android:minLines="2"
-        tools:text="AutoJs6" />
+        tools:text="Image Tools" />
 
     <TextView
         android:id="@+id/text_size_label"

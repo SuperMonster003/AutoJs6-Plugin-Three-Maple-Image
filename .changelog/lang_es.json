@@ -1,10 +1,19 @@
 {
-  "changelog_label_hint": "Consejo",
-  "changelog_label_feature": "Funcion",
-  "changelog_label_fix": "Correccion",
+  "changelog_label_hint": "Aviso",
+  "changelog_label_feature": "Función",
+  "changelog_label_fix": "Corrección",
   "changelog_label_improvement": "Mejora",
   "changelog_label_dependency": "Dependencia",
   "$data": {
+    "v1.0.1": {
+      "released_date": "2026/08/08",
+      "fix": [
+        "Devolver un enlace válido al servicio Explorer Action al activarlo desde el centro de complementos"
+      ],
+      "improvement": [
+        "Acortar el nombre y la descripción del complemento y hacer más natural la documentación de usuario"
+      ]
+    },
     "v1.0.0": {
       "released_date": "2026/08/02",
       "feature": [
@@ -13,7 +22,7 @@
         "Editor con recorte, rotacion, volteo, ajustes de color, pincel, texto y deshacer",
         "Conversion JPEG, PNG y WebP con calidad, cambio de tamano, proporcion, fondo JPEG y limites de memoria",
         "Entrada y salida con ContentResolver y ParcelFileDescriptor sin ruta sin procesar, escritura adyacente, URI arbitrario, almacenamiento o red",
-        "Implementacion JVM pura, ABI sin restricciones, un APK independiente y recursos, README y registros en 10 idiomas"
+        "Metadatos, interfaz, instrucciones, README y registros localizados en 10 idiomas"
       ],
       "improvement": [
         "Conservación de las sesiones del editor y del conversor durante los cambios de configuración, incluidos las herramientas de lienzo, los borradores de diálogo, las opciones, el historial de deshacer y las tareas en curso",

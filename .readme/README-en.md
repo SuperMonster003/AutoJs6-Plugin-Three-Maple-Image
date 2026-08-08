@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-tools-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>Secure image editing and conversion for AutoJs6 Explorer</p>
+  <p>File manager plugin. Edit and convert images securely</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Tools?label=Release"/></a>
@@ -26,8 +26,8 @@ The current README.md supports the following languages:
 - [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-HK.md)
 - [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-TW.md)
 - English [en] # current
-- [Francais [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
-- [Espanol [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
+- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
 - [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ja.md)
 - [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ko.md)
 - [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ru.md)
@@ -39,7 +39,7 @@ The current README.md supports the following languages:
 
 ******
 
-The AutoJs6 Image Tools plugin provides independent edit and convert overflow actions for a single image in the main Explorer. It reads the source without modifying it and writes only to a host-owned output transaction.
+Image Tools provides independent edit and convert actions for a single image in the file manager. It reads the source without modifying it and writes only to a host-owned output transaction.
 
 ******
 
@@ -50,7 +50,7 @@ The AutoJs6 Image Tools plugin provides independent edit and convert overflow ac
 - Edit images with crop, rotation, horizontal and vertical flip, brightness, contrast, saturation, color temperature, brush strokes, text, and undo.
 - Convert to JPEG, PNG, or WebP with quality control, percentage or custom resizing, aspect-ratio locking, and JPEG background selection.
 - Decode through ContentResolver and ParcelFileDescriptor without raw paths or BitmapFactory.decodeFile.
-- Encode only to the exact output URI supplied by AutoJs6 and report success by echoing only the output transaction ID.
+- Encode only to the exact output URI supplied by the host and report success by echoing only the output transaction ID.
 
 ******
 
@@ -70,7 +70,7 @@ Input: Android-decodable images; output: JPEG, PNG, WebP
 
 ******
 
-AutoJs6 discovers and executes the plugin with the following identities:
+The host discovers and executes the plugin with the following identities:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -81,12 +81,11 @@ variant: default
 Explorer action id: edit-image / convert-image
 MIME type: input: image/*; output: image/jpeg, image/png, image/webp
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
 Version 1 registers two protocol v3 overflow actions only on the main Explorer surface. Each action accepts one read-only source image and creates one new sibling through the host output transaction. The source is never replaced.
 
-The plugin is implemented entirely on the JVM and contains no native library. It declares `supportedAbis = emptyArray()` and is released as one ABI-independent APK. AutoJs6 host build 5269 or later is required.
+Host build 5269 or later is required.
 
 ******
 
@@ -114,6 +113,13 @@ The plugin requests no storage or network permission. It rejects non-v3 requests
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `Fix` Return a valid Explorer Action service binding when enabled from Plugin Center
+* `Improvement` Use a shorter plugin name and description with more natural user documentation
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -123,7 +129,7 @@ The plugin requests no storage or network permission. It rejects non-v3 requests
 * `Feature` Image editor with crop, rotation, flip, brightness, contrast, saturation, color temperature, brush, text, and undo
 * `Feature` JPEG, PNG, and WebP conversion with quality, resizing, aspect-ratio locking, JPEG background, and memory limits
 * `Feature` ContentResolver and ParcelFileDescriptor input and output without raw paths, direct sibling writes, arbitrary result URIs, storage permission, or network permission
-* `Feature` Pure JVM implementation with unrestricted ABIs, one ABI-independent APK, and localized resources, README files, and changelogs in 10 languages
+* `Feature` Localized plugin metadata, interface text, instructions, README files, and changelogs in 10 languages
 * `Improvement` Retained editor and converter sessions across configuration changes, including canvas tools, dialog drafts, conversion options, undo history, and in-flight work
 * `Improvement` Protected host output transactions with a persistent single-use claim, busy guards, cancellation-safe coroutines, and result delivery after the writer closes
 * `Improvement` Hardened output MIME validation, bitmap cleanup, English resource parity, ellipsis lint handling, and release digest stream cleanup

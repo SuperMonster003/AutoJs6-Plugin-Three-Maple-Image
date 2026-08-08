@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-tools-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>為 AutoJs6 Explorer 提供安全的圖像編輯和轉換</p>
+  <p>檔案管理器外掛程式. 安全編輯及轉換圖像</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Tools?label=Release"/></a>
@@ -26,8 +26,8 @@
 - 繁體中文 (香港) [zh-Hant-HK] # 目前
 - [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-TW.md)
 - [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-en.md)
-- [Francais [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
-- [Espanol [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
+- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
 - [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ja.md)
 - [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ko.md)
 - [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ru.md)
@@ -39,7 +39,7 @@
 
 ******
 
-AutoJs6 Image Tools 插件為主 Explorer 中的單個圖像提供獨立的編輯和轉換 overflow 動作. 插件唯讀來源檔案且不會修改來源檔案, 並且僅向宿主擁有的輸出事務寫入.
+圖像工具為檔案管理器中的單個圖像提供獨立的編輯和轉換動作. 插件唯讀來源檔案且不會修改來源檔案, 並且僅向主程式擁有的輸出事務寫入.
 
 ******
 
@@ -50,7 +50,7 @@ AutoJs6 Image Tools 插件為主 Explorer 中的單個圖像提供獨立的編�
 - 透過裁剪, 旋轉, 水平和垂直翻轉, 亮度, 對比度, 飽和度, 色溫, 畫筆, 文字和復原編輯圖像.
 - 轉換為 JPEG, PNG 或 WebP, 並支援品質控制, 百分比或自訂縮放, 比例鎖定及 JPEG 背景選擇.
 - 透過 ContentResolver 和 ParcelFileDescriptor 解碼, 不使用原始路徑或 BitmapFactory.decodeFile.
-- 僅向 AutoJs6 提供的精確輸出 URI 編碼, 成功時僅回傳輸出事務 ID.
+- 僅向主程式提供的精確輸出 URI 編碼, 成功時僅回傳輸出事務 ID.
 
 ******
 
@@ -70,7 +70,7 @@ Input: Android-decodable images; output: JPEG, PNG, WebP
 
 ******
 
-AutoJs6 透過以下標識發現並執行插件:
+主程式透過以下標識發現並執行插件:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -81,12 +81,11 @@ variant: default
 Explorer action id: edit-image / convert-image
 MIME type: input: image/*; output: image/jpeg, image/png, image/webp
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
 版本 1 僅在主 Explorer 頁面註冊兩個協議 v3 overflow 動作. 每個動作接收一個唯讀來源圖像, 並透過宿主輸出事務建立一個新的同級檔案. 來源檔案不會被替換.
 
-插件完全使用 JVM 實現且不包含原生程式庫. 插件宣告 `supportedAbis = emptyArray()`, 並以一個 ABI 無關 APK 發佈. 需要 AutoJs6 宿主構建版本 5269 或更高版本.
+需要主程式構建版本 5269 或更高版本.
 
 ******
 
@@ -114,19 +113,26 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `修復` 在插件中心啟用時傳回有效的 Explorer Action 服務綁定
+* `優化` 精簡插件名稱和描述, 並使用戶文件表達更自然
+
 # v1.0.0
 
 ###### 2026/08/02
 
-* `功能` Image Tools 插件, 插件 ID 為 `image-tools`, 動作 ID 為 `edit-image` 和 `convert-image`, 引擎為 `explorer-action`, 變體為 `default`
-* `功能` Explorer Action 協議 v3 overflow 動作, 使用單個唯讀圖像輸入和宿主擁有的 create-sibling 輸出事務
-* `功能` 圖像編輯器支援裁剪, 旋轉, 翻轉, 亮度, 對比度, 飽和度, 色溫, 畫筆, 文字和復原
-* `功能` JPEG, PNG 和 WebP 轉換支援品質, 縮放, 比例鎖定, JPEG 背景及記憶體限制
-* `功能` 透過 ContentResolver 和 ParcelFileDescriptor 處理輸入輸出, 不使用原始路徑, 直接同級寫入, 任意結果 URI, 儲存權限或網絡權限
-* `功能` 純 JVM 實現, ABI 無限制, 單個 ABI 無關 APK, 並提供 10 種語言的資源, README 和更新日誌
-* `改進` 在設定變更期間保留編輯器和轉換器工作階段, 包括畫布工具, 對話框草稿, 轉換選項, 復原歷史和正在執行的工作
-* `改進` 透過持久單次宣告, 動作忙碌保護, 可取消協程和 writer 關閉後的結果回傳保護主程式輸出交易
-* `改進` 強化輸出 MIME 類型驗證, 點陣圖回收, 英文資源一致性, 省略號 lint 處理和發佈摘要串流清理
+* `新增` Image Tools 插件, 插件 ID 為 `image-tools`, 動作 ID 為 `edit-image` 和 `convert-image`, 引擎為 `explorer-action`, 變體為 `default`
+* `新增` Explorer Action 協議 v3 overflow 動作, 使用單個唯讀圖像輸入和宿主擁有的 create-sibling 輸出事務
+* `新增` 圖像編輯器支援裁剪, 旋轉, 翻轉, 亮度, 對比度, 飽和度, 色溫, 畫筆, 文字和復原
+* `新增` JPEG, PNG 和 WebP 轉換支援品質, 縮放, 比例鎖定, JPEG 背景及記憶體限制
+* `新增` 透過 ContentResolver 和 ParcelFileDescriptor 處理輸入輸出, 不使用原始路徑, 直接同級寫入, 任意結果 URI, 儲存權限或網絡權限
+* `新增` 10 種語言的插件元資料, 介面文字, 使用說明, README 和更新日誌
+* `優化` 在設定變更期間保留編輯器和轉換器工作階段, 包括畫布工具, 對話框草稿, 轉換選項, 復原歷史和正在執行的工作
+* `優化` 透過持久單次宣告, 動作忙碌保護, 可取消協程和 writer 關閉後的結果回傳保護主程式輸出交易
+* `優化` 強化輸出 MIME 類型驗證, 點陣圖回收, 英文資源一致性, 省略號 lint 處理和發佈摘要串流清理
 * `依賴` 附加 AndroidX ExifInterface 1.4.2, 用於安全解析圖像中繼資料
 * `依賴` 附加 Robolectric 4.16.1, 用於生命週期和持久交易測試
 

@@ -1,10 +1,19 @@
 {
   "changelog_label_hint": "提示",
-  "changelog_label_feature": "功能",
+  "changelog_label_feature": "新增",
   "changelog_label_fix": "修復",
-  "changelog_label_improvement": "改進",
+  "changelog_label_improvement": "優化",
   "changelog_label_dependency": "依賴",
   "$data": {
+    "v1.0.1": {
+      "released_date": "2026/08/08",
+      "fix": [
+        "在插件中心啟用時傳回有效的 Explorer Action 服務綁定"
+      ],
+      "improvement": [
+        "精簡插件名稱和描述, 並使用戶文件表達更自然"
+      ]
+    },
     "v1.0.0": {
       "released_date": "2026/08/02",
       "feature": [
@@ -13,7 +22,7 @@
         "圖像編輯器支援裁剪, 旋轉, 翻轉, 亮度, 對比度, 飽和度, 色溫, 畫筆, 文字和復原",
         "JPEG, PNG 和 WebP 轉換支援品質, 縮放, 比例鎖定, JPEG 背景及記憶體限制",
         "透過 ContentResolver 和 ParcelFileDescriptor 處理輸入輸出, 不使用原始路徑, 直接同級寫入, 任意結果 URI, 儲存權限或網絡權限",
-        "純 JVM 實現, ABI 無限制, 單個 ABI 無關 APK, 並提供 10 種語言的資源, README 和更新日誌"
+        "10 種語言的插件元資料, 介面文字, 使用說明, README 和更新日誌"
       ],
       "improvement": [
         "在設定變更期間保留編輯器和轉換器工作階段, 包括畫布工具, 對話框草稿, 轉換選項, 復原歷史和正在執行的工作",

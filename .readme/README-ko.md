@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-tools-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>AutoJs6 Explorer를 위한 안전한 이미지 편집 및 변환</p>
+  <p>파일 관리자 플러그인. 안전하게 이미지 편집 및 변환</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Tools?label=Release"/></a>
@@ -26,8 +26,8 @@
 - [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-HK.md)
 - [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-TW.md)
 - [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-en.md)
-- [Francais [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
-- [Espanol [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
+- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
 - [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ja.md)
 - 한국어 [ko] # 현재
 - [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ru.md)
@@ -39,7 +39,7 @@
 
 ******
 
-AutoJs6 Image Tools 플러그인은 기본 Explorer의 단일 이미지에 독립적인 편집 및 변환 overflow 작업을 제공합니다. 원본을 변경하지 않고 읽으며 호스트 소유 출력 트랜잭션에만 씁니다.
+Image Tools는 파일 관리자의 단일 이미지에 독립적인 편집 및 변환 작업을 제공합니다. 원본을 변경하지 않고 읽으며 호스트 소유 출력 트랜잭션에만 씁니다.
 
 ******
 
@@ -50,7 +50,7 @@ AutoJs6 Image Tools 플러그인은 기본 Explorer의 단일 이미지에 독�
 - 자르기, 회전, 뒤집기, 밝기, 대비, 채도, 색온도, 브러시, 텍스트 및 실행 취소로 편집합니다.
 - 품질, 크기 조정, 종횡비 잠금 및 JPEG 배경을 지정해 JPEG, PNG 또는 WebP로 변환합니다.
 - 원시 경로나 BitmapFactory.decodeFile 없이 ContentResolver와 ParcelFileDescriptor로 디코딩합니다.
-- AutoJs6가 제공한 정확한 URI에만 인코딩하고 성공 시 트랜잭션 ID만 반환합니다.
+- 호스트가 제공한 정확한 URI에만 인코딩하고 성공 시 트랜잭션 ID만 반환합니다.
 
 ******
 
@@ -70,7 +70,7 @@ Input: Android-decodable images; output: JPEG, PNG, WebP
 
 ******
 
-AutoJs6는 다음 식별자로 플러그인을 검색하고 실행합니다:
+호스트는 다음 식별자로 플러그인을 검색하고 실행합니다:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -81,12 +81,11 @@ variant: default
 Explorer action id: edit-image / convert-image
 MIME type: input: image/*; output: image/jpeg, image/png, image/webp
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
 버전 1은 기본 Explorer에만 프로토콜 v3 overflow 작업 두 개를 등록합니다. 각 작업은 읽기 전용 원본 하나를 받고 호스트 출력 트랜잭션을 통해 새 형제 파일을 만듭니다. 원본은 교체되지 않습니다.
 
-JVM으로만 구현되고 네이티브 라이브러리가 없습니다. `supportedAbis = emptyArray()`를 선언하고 ABI 독립 APK 하나로 배포합니다. AutoJs6 빌드 5269 이상이 필요합니다.
+호스트 빌드 5269 이상이 필요합니다.
 
 ******
 
@@ -114,6 +113,13 @@ JVM으로만 구현되고 네이티브 라이브러리가 없습니다. `support
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `수정` 플러그인 센터에서 활성화할 때 유효한 Explorer Action 서비스 바인딩 반환
+* `개선` 플러그인 이름과 설명을 간결하게 하고 사용자 문서를 더 자연스럽게 정리
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -123,7 +129,7 @@ JVM으로만 구현되고 네이티브 라이브러리가 없습니다. `support
 * `기능` 자르기, 회전, 뒤집기, 색상 조정, 브러시, 텍스트 및 실행 취소를 제공하는 이미지 편집기
 * `기능` 품질, 크기 조정, 비율 잠금, JPEG 배경 및 메모리 제한을 제공하는 JPEG, PNG 및 WebP 변환
 * `기능` 원시 경로, 직접 형제 쓰기, 임의 URI, 저장소 권한 또는 네트워크 권한이 없는 ContentResolver 및 ParcelFileDescriptor 입출력
-* `기능` 순수 JVM 구현, ABI 제한 없음, ABI 독립 APK 하나 및 10개 언어 리소스, README, 변경 기록
+* `기능` 10개 언어로 현지화된 플러그인 메타데이터, 인터페이스 텍스트, 안내, README, 변경 기록
 * `개선` 구성 변경 시 캔버스 도구, 대화 상자 초안, 변환 옵션, 실행 취소 기록, 진행 중 작업을 포함한 편집기와 변환기 세션 유지
 * `개선` 영구 단일 사용 claim, busy guard, 취소 가능한 코루틴, writer 종료 후 결과 전달로 호스트 출력 트랜잭션 보호
 * `개선` 출력 MIME 검증, 비트맵 해제, 영어 리소스 일치, 줄임표 lint 처리, 릴리스 다이제스트 스트림 종료 강화

@@ -1,10 +1,19 @@
 {
   "changelog_label_hint": "提示",
-  "changelog_label_feature": "功能",
+  "changelog_label_feature": "新增",
   "changelog_label_fix": "修复",
-  "changelog_label_improvement": "改进",
+  "changelog_label_improvement": "优化",
   "changelog_label_dependency": "依赖",
   "$data": {
+    "v1.0.1": {
+      "released_date": "2026/08/08",
+      "fix": [
+        "在插件中心启用时返回有效的 Explorer Action 服务绑定"
+      ],
+      "improvement": [
+        "精简插件名称和描述, 并使用户文档表述更自然"
+      ]
+    },
     "v1.0.0": {
       "released_date": "2026/08/02",
       "feature": [
@@ -13,7 +22,7 @@
         "图像编辑器支持裁剪, 旋转, 翻转, 亮度, 对比度, 饱和度, 色温, 画笔, 文字和撤销",
         "JPEG, PNG 和 WebP 转换支持质量, 缩放, 比例锁定, JPEG 背景及内存限制",
         "通过 ContentResolver 和 ParcelFileDescriptor 处理输入输出, 不使用原始路径, 直接同级写入, 任意结果 URI, 存储权限或网络权限",
-        "纯 JVM 实现, ABI 无限制, 单个 ABI 无关 APK, 并提供 10 种语言的资源, README 和更新日志"
+        "10 种语言的插件元数据, 界面文本, 使用说明, README 和更新日志"
       ],
       "improvement": [
         "在配置变更期间保留编辑器和转换器会话, 包括画布工具, 对话框草稿, 转换选项, 撤销历史和正在执行的任务",

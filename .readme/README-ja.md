@@ -2,10 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="autojs6-plugin-image-tools-ic-launcher" border="0" width="128" />
+    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>AutoJs6 Explorer向けの安全な画像編集と変換</p>
+  <p>ファイルマネージャープラグイン. 画像を安全に編集および変換</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Tools?label=Release"/></a>
@@ -26,8 +26,8 @@
 - [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-HK.md)
 - [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-zh-Hant-TW.md)
 - [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-en.md)
-- [Francais [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
-- [Espanol [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-fr.md)
+- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-es.md)
 - 日本語 [ja] # 現在
 - [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ko.md)
 - [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/.readme/README-ru.md)
@@ -39,7 +39,7 @@
 
 ******
 
-AutoJs6 Image ToolsプラグインはメインExplorerの単一画像に独立した編集と変換のoverflowアクションを提供します. ソースを変更せず読み取り, ホスト所有の出力トランザクションにのみ書き込みます.
+Image Toolsはファイルマネージャー内の単一画像に独立した編集と変換のアクションを提供します. ソースを変更せず読み取り, ホスト所有の出力トランザクションにのみ書き込みます.
 
 ******
 
@@ -50,7 +50,7 @@ AutoJs6 Image ToolsプラグインはメインExplorerの単一画像に独立�
 - 切り抜き, 回転, 反転, 明るさ, コントラスト, 彩度, 色温度, ブラシ, テキスト, 元に戻す操作で編集します.
 - 品質, 拡大縮小, 縦横比固定, JPEG背景を指定してJPEG, PNG, WebPへ変換します.
 - 生のパスやBitmapFactory.decodeFileを使わずContentResolverとParcelFileDescriptorでデコードします.
-- AutoJs6が提供した正確なURIにのみエンコードし, 成功時はトランザクションIDだけを返します.
+- ホストが提供した正確なURIにのみエンコードし, 成功時はトランザクションIDだけを返します.
 
 ******
 
@@ -70,7 +70,7 @@ Input: Android-decodable images; output: JPEG, PNG, WebP
 
 ******
 
-AutoJs6は次の識別情報でプラグインを検出して実行します:
+ホストは次の識別情報でプラグインを検出して実行します:
 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
@@ -81,12 +81,11 @@ variant: default
 Explorer action id: edit-image / convert-image
 MIME type: input: image/*; output: image/jpeg, image/png, image/webp
 required host build: 5269
-supported ABIs: unrestricted (supportedAbis = emptyArray())
 ```
 
 バージョン1はメインExplorerだけにプロトコルv3のoverflowアクションを2つ登録します. 各アクションは読み取り専用ソースを受け取り, ホストの出力トランザクションで新しい同階層ファイルを作成します. ソースは置換しません.
 
-完全にJVMで実装されネイティブライブラリを含みません. `supportedAbis = emptyArray()`を宣言しABI非依存APKを1つ公開します. AutoJs6ビルド5269以降が必要です.
+ホストビルド5269以降が必要です.
 
 ******
 
@@ -114,6 +113,13 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 
 ******
 
+# v1.0.1
+
+###### 2026/08/08
+
+* `修正` プラグインセンターで有効化したときに有効な Explorer Action サービスバインディングを返す
+* `改善` プラグイン名と説明を簡潔にし, ユーザー向けドキュメントをより自然な表現に調整
+
 # v1.0.0
 
 ###### 2026/08/02
@@ -123,7 +129,7 @@ supported ABIs: unrestricted (supportedAbis = emptyArray())
 * `機能` 切り抜き, 回転, 反転, 色調整, ブラシ, テキスト, 元に戻す操作を備えた画像エディター
 * `機能` 品質, 拡大縮小, 比率固定, JPEG背景, メモリ制限を備えたJPEG, PNG, WebP変換
 * `機能` 生のパス, 直接同階層書き込み, 任意URI, ストレージ権限, ネットワーク権限を使わないContentResolverとParcelFileDescriptor入出力
-* `機能` 純粋なJVM実装, ABI制限なし, ABI非依存APK 1つ, 10言語のリソース, README, 変更履歴
+* `機能` 10言語にローカライズされたプラグインメタデータ, UIテキスト, 説明, README, 変更履歴
 * `改善` 構成変更時にキャンバスツール, ダイアログ下書き, 変換オプション, 元に戻す履歴, 実行中タスクを含むエディターとコンバーターのセッションを保持
 * `改善` 永続的な単回 claim, ビジーガード, キャンセル可能なコルーチン, writer 終了後の結果返却によりホスト出力トランザクションを保護
 * `改善` 出力 MIME 検証, ビットマップ解放, 英語リソースの整合性, 省略記号 lint 処理, リリースダイジェストストリームの終了を強化

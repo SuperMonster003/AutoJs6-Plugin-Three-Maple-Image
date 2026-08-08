@@ -10,7 +10,6 @@
   "explorer_action_id": "edit-image / convert-image",
   "mime_type": "input: image/*; output: image/jpeg, image/png, image/webp",
   "required_host_build": "5269",
-  "supported_abis": "unrestricted (supportedAbis = emptyArray())",
   "supported_formats": "Input: Android-decodable images; output: JPEG, PNG, WebP",
   "max_input_size": "256 MiB"
 }
