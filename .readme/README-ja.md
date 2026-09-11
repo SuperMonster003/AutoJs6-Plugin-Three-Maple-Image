@@ -135,6 +135,12 @@ required host build: 5269
 * `機能` スペイン語, フランス語, ロシア語, アラビア語, 日本語, 韓国語, 英語, 簡体字中国語, 香港繁体字中国語, 台湾繁体字中国語のメタデータ, UI, 使用説明, README, 変更履歴
 * `依存関係` Glide バージョン 5.0.5 を追加
 
+# v1.2.0
+
+###### 2026/09/11
+
+* `改善` 意図しないネイティブ依存関係をビルド時に拒否し, JSON レポートを生成
+
 ##### その他のリリース
 
 * [CHANGELOG-ja.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/assets/doc/CHANGELOG-ja.md)
@@ -182,3 +188,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - AutoJs6ドキュメント: https://docs.autojs6.com
 - Androidの安全なファイル共有: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)

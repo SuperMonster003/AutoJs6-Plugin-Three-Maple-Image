@@ -135,6 +135,12 @@ required host build: 5269
 * `ميزة` بيانات وواجهة وتعليمات وملفات README وسجلات تغييرات مترجمة الى الاسبانية والفرنسية والروسية والعربية واليابانية والكورية والانجليزية والصينية المبسطة والصينية التقليدية لهونغ كونغ والصينية التقليدية لتايوان
 * `تبعية` إضافة Glide الإصدار 5.0.5
 
+# v1.2.0
+
+###### 2026/09/11
+
+* `تحسين` التحقق أثناء البناء لمنع إدخال تبعيات أصلية غير مقصودة, مع تقرير JSON
+
 ##### لمزيد من الاصدارات
 
 * [CHANGELOG-ar.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/assets/doc/CHANGELOG-ar.md)
@@ -182,3 +188,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - وثائق AutoJs6: https://docs.autojs6.com
 - مشاركة الملفات الامنة في Android: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)

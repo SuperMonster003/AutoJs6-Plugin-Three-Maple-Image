@@ -28,6 +28,12 @@
       "dependency": [
         "附加 Glide 版本 5.0.5"
       ]
+    },
+    "v1.2.0": {
+      "released_date": "2026/09/11",
+      "improvement": [
+        "构建阶段阻止意外引入原生依赖, 并输出 JSON 校验报告"
+      ]
     }
   }
 }

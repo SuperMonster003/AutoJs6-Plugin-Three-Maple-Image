@@ -23,3 +23,9 @@
 * `Feature` Host build 5269 or later required
 * `Feature` Localized metadata, interface text, usage instructions, README files, and changelogs in Spanish, French, Russian, Arabic, Japanese, Korean, English, Simplified Chinese, Hong Kong Traditional Chinese, and Taiwan Traditional Chinese
 * `Dependency` Added Glide version 5.0.5
+
+# v1.2.0
+
+###### 2026/09/11
+
+* `Improvement` Build verification rejects accidental native dependencies and produces a JSON report

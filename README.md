@@ -135,6 +135,12 @@ required host build: 5269
 * `新增` 插件元数据, 界面文本, 使用说明, README 和 CHANGELOG 的多语言资源: 西班牙语/法语/俄语/阿拉伯语/日语/韩语/英语/简体中文/香港繁体/台湾繁体
 * `依赖` 附加 Glide 版本 5.0.5
 
+# v1.2.0
+
+###### 2026/09/11
+
+* `优化` 构建阶段阻止意外引入原生依赖, 并输出 JSON 校验报告
+
 ##### 查看更多版本
 
 * [CHANGELOG-zh-Hans.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/assets/doc/CHANGELOG-zh-Hans.md)
@@ -182,3 +188,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - AutoJs6 文档: https://docs.autojs6.com
 - Android 安全文件共享: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)

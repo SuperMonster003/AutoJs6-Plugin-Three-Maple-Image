@@ -28,6 +28,12 @@
       "dependency": [
         "Añadido Glide versión 5.0.5"
       ]
+    },
+    "v1.2.0": {
+      "released_date": "2026/09/11",
+      "improvement": [
+        "La verificación de compilación rechaza dependencias nativas accidentales y genera un informe JSON"
+      ]
     }
   }
 }

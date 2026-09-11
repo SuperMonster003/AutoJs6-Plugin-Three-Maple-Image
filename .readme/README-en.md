@@ -135,6 +135,12 @@ The plugin requests no storage or network permission. The host grants temporary 
 * `Feature` Localized metadata, interface text, usage instructions, README files, and changelogs in Spanish, French, Russian, Arabic, Japanese, Korean, English, Simplified Chinese, Hong Kong Traditional Chinese, and Taiwan Traditional Chinese
 * `Dependency` Added Glide version 5.0.5
 
+# v1.2.0
+
+###### 2026/09/11
+
+* `Improvement` Build verification rejects accidental native dependencies and produces a JSON report
+
 ##### For more releases
 
 * [CHANGELOG-en.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/assets/doc/CHANGELOG-en.md)
@@ -182,3 +188,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - AutoJs6 documentation: https://docs.autojs6.com
 - Android secure file sharing: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)

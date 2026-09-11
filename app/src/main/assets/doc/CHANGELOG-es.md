@@ -23,3 +23,9 @@
 * `Función` Compilación 5269 o posterior del anfitrión requerida
 * `Función` Metadatos, interfaz, instrucciones, README y registros de cambios localizados en español, francés, ruso, árabe, japonés, coreano, inglés, chino simplificado, chino tradicional de Hong Kong y chino tradicional de Taiwán
 * `Dependencia` Añadido Glide versión 5.0.5
+
+# v1.2.0
+
+###### 2026/09/11
+
+* `Mejora` La verificación de compilación rechaza dependencias nativas accidentales y genera un informe JSON

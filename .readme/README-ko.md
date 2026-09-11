@@ -135,6 +135,12 @@ required host build: 5269
 * `기능` 스페인어, 프랑스어, 러시아어, 아랍어, 일본어, 한국어, 영어, 중국어 간체, 홍콩 중국어 번체 및 대만 중국어 번체로 현지화한 메타데이터, 인터페이스, 사용 안내, README 및 변경 기록
 * `의존성` Glide 버전 5.0.5 추가
 
+# v1.2.0
+
+###### 2026/09/11
+
+* `개선` 빌드 시 의도하지 않은 네이티브 의존성을 거부하고 JSON 보고서 생성
+
 ##### 더 많은 릴리스
 
 * [CHANGELOG-ko.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/assets/doc/CHANGELOG-ko.md)
@@ -182,3 +188,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - AutoJs6 문서: https://docs.autojs6.com
 - Android 보안 파일 공유: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)

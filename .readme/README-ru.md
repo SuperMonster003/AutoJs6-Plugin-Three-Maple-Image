@@ -135,6 +135,12 @@ required host build: 5269
 * `Функция` Локализованные метаданные, интерфейс, инструкции, README и журналы изменений на испанском, французском, русском, арабском, японском, корейском, английском, упрощенном китайском, традиционном китайском Гонконга и традиционном китайском Тайваня
 * `Зависимость` Добавлена зависимость Glide версии 5.0.5
 
+# v1.2.0
+
+###### 2026/09/11
+
+* `Улучшение` Проверка сборки отклоняет непреднамеренные нативные зависимости и создает отчет JSON
+
 ##### Другие выпуски
 
 * [CHANGELOG-ru.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/assets/doc/CHANGELOG-ru.md)
@@ -182,3 +188,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - Документация AutoJs6: https://docs.autojs6.com
 - Безопасная передача файлов Android: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)

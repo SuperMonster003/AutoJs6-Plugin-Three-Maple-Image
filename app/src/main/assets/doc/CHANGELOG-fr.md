@@ -23,3 +23,9 @@
 * `Fonctionnalité` Version 5269 ou ultérieure de l'hôte requise
 * `Fonctionnalité` Métadonnées, interface, instructions, README et historiques localisés en espagnol, français, russe, arabe, japonais, coréen, anglais, chinois simplifié, chinois traditionnel de Hong Kong et chinois traditionnel de Taïwan
 * `Dépendance` Ajout de Glide version 5.0.5
+
+# v1.2.0
+
+###### 2026/09/11
+
+* `Amélioration` La vérification de compilation rejette les dépendances natives involontaires et produit un rapport JSON
