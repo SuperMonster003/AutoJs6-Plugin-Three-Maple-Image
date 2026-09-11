@@ -26,3 +26,9 @@
 * `Amélioration` Validation renforcée des types MIME de sortie, libération des bitmaps, cohérence des ressources anglaises, gestion lint des points de suspension et fermeture du flux de résumé de publication
 * `Dépendance` Ajout d'AndroidX ExifInterface 1.4.2 pour l'analyse sécurisée des métadonnées d'image
 * `Dépendance` Ajout de Robolectric 4.16.1 pour les tests du cycle de vie et des transactions persistantes
+
+# v1.1.0
+
+###### 2026/09/11
+
+* `Amélioration` La vérification de compilation rejette les dépendances natives involontaires et produit un rapport JSON

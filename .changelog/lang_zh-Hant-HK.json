@@ -33,6 +33,12 @@
         "附加 AndroidX ExifInterface 1.4.2, 用於安全解析圖像中繼資料",
         "附加 Robolectric 4.16.1, 用於生命週期和持久交易測試"
       ]
+    },
+    "v1.1.0": {
+      "released_date": "2026/09/11",
+      "improvement": [
+        "建置階段阻止意外引入原生相依套件, 並輸出 JSON 校驗報告"
+      ]
     }
   }
 }

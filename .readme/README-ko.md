@@ -136,6 +136,12 @@ required host build: 5269
 * `의존성` 안전한 이미지 메타데이터 분석을 위해 AndroidX ExifInterface 1.4.2 추가
 * `의존성` 수명 주기 및 영구 트랜잭션 테스트를 위해 Robolectric 4.16.1 추가
 
+# v1.1.0
+
+###### 2026/09/11
+
+* `개선` 빌드 시 의도하지 않은 네이티브 의존성을 거부하고 JSON 보고서 생성
+
 ##### 추가 릴리스
 
 * [CHANGELOG-ko.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/assets/doc/CHANGELOG-ko.md)
@@ -183,3 +189,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - AutoJs6 문서: https://docs.autojs6.com
 - Android 보안 파일 공유: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/16kb.md)

@@ -136,6 +136,12 @@ The plugin requests no storage or network permission. It rejects non-v3 requests
 * `Dependency` Added AndroidX ExifInterface 1.4.2 for secure image metadata parsing
 * `Dependency` Added Robolectric 4.16.1 for lifecycle and persistent transaction tests
 
+# v1.1.0
+
+###### 2026/09/11
+
+* `Improvement` Build verification rejects accidental native dependencies and produces a JSON report
+
 ##### For more releases
 
 * [CHANGELOG-en.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/assets/doc/CHANGELOG-en.md)
@@ -183,3 +189,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - AutoJs6 documentation: https://docs.autojs6.com
 - Android secure file sharing: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/16kb.md)

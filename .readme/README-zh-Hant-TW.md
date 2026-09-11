@@ -136,6 +136,12 @@ required host build: 5269
 * `相依性` 附加 AndroidX ExifInterface 1.4.2, 用於安全解析影像中繼資料
 * `相依性` 附加 Robolectric 4.16.1, 用於生命週期和持久交易測試
 
+# v1.1.0
+
+###### 2026/09/11
+
+* `優化` 建置階段阻止意外引入原生相依套件, 並輸出 JSON 校驗報告
+
 ##### 更多版本
 
 * [CHANGELOG-zh-Hant-TW.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/assets/doc/CHANGELOG-zh-Hant-TW.md)
@@ -183,3 +189,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - AutoJs6 文件: https://docs.autojs6.com
 - Android 安全檔案共用: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/16kb.md)

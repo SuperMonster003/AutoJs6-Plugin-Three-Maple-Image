@@ -33,6 +33,12 @@
         "Ajout d'AndroidX ExifInterface 1.4.2 pour l'analyse sécurisée des métadonnées d'image",
         "Ajout de Robolectric 4.16.1 pour les tests du cycle de vie et des transactions persistantes"
       ]
+    },
+    "v1.1.0": {
+      "released_date": "2026/09/11",
+      "improvement": [
+        "La vérification de compilation rejette les dépendances natives involontaires et produit un rapport JSON"
+      ]
     }
   }
 }

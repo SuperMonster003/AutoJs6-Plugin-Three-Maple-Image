@@ -26,3 +26,9 @@
 * `Improvement` Hardened output MIME validation, bitmap cleanup, English resource parity, ellipsis lint handling, and release digest stream cleanup
 * `Dependency` Added AndroidX ExifInterface 1.4.2 for secure image metadata parsing
 * `Dependency` Added Robolectric 4.16.1 for lifecycle and persistent transaction tests
+
+# v1.1.0
+
+###### 2026/09/11
+
+* `Improvement` Build verification rejects accidental native dependencies and produces a JSON report

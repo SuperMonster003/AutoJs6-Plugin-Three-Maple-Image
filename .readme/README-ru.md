@@ -136,6 +136,12 @@ required host build: 5269
 * `Зависимость` Добавлен AndroidX ExifInterface 1.4.2 для безопасного анализа метаданных изображений
 * `Зависимость` Добавлен Robolectric 4.16.1 для тестов жизненного цикла и постоянных транзакций
 
+# v1.1.0
+
+###### 2026/09/11
+
+* `Улучшение` Проверка сборки отклоняет непреднамеренные нативные зависимости и создает отчет JSON
+
 ##### Другие выпуски
 
 * [CHANGELOG-ru.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/assets/doc/CHANGELOG-ru.md)
@@ -183,3 +189,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - Документация AutoJs6: https://docs.autojs6.com
 - Безопасный обмен файлами Android: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/16kb.md)

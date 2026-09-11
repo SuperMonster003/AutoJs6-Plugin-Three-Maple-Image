@@ -136,6 +136,12 @@ required host build: 5269
 * `تبعية` إضافة AndroidX ExifInterface 1.4.2 لتحليل بيانات تعريف الصور بأمان
 * `تبعية` إضافة Robolectric 4.16.1 لاختبارات دورة الحياة والمعاملات الدائمة
 
+# v1.1.0
+
+###### 2026/09/11
+
+* `تحسين` التحقق أثناء البناء لمنع إدخال تبعيات أصلية غير مقصودة, مع تقرير JSON
+
 ##### إصدارات أخرى
 
 * [CHANGELOG-ar.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/assets/doc/CHANGELOG-ar.md)
@@ -183,3 +189,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - توثيق AutoJs6: https://docs.autojs6.com
 - مشاركة الملفات الآمنة في Android: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/16kb.md)

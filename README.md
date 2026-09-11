@@ -136,6 +136,12 @@ required host build: 5269
 * `依赖` 附加 AndroidX ExifInterface 1.4.2, 用于安全解析图像元数据
 * `依赖` 附加 Robolectric 4.16.1, 用于生命周期和持久事务测试
 
+# v1.1.0
+
+###### 2026/09/11
+
+* `优化` 构建阶段阻止意外引入原生依赖, 并输出 JSON 校验报告
+
 ##### 更多版本
 
 * [CHANGELOG-zh-Hans.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/assets/doc/CHANGELOG-zh-Hans.md)
@@ -183,3 +189,5 @@ app/src/main/res/raw-*/plugin_instruction.md
 
 - AutoJs6 文档: https://docs.autojs6.com
 - Android 安全文件共享: https://developer.android.com/training/secure-file-sharing
+
+[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/16kb.md)
