@@ -2,41 +2,91 @@
   "$name": "Español",
   "text_current_lowercase": "actual",
   "text_plugin_synopsis": "Complemento del gestor de archivos. Editar y convertir imágenes de forma segura",
-  "h3_languages_with_ascii": "Idiomas",
-  "p_languages_all_supported_for_readme": "El archivo README.md actual admite los siguientes idiomas",
+  "h3_languages_with_ascii": "Idiomas (Languages)",
+  "p_languages_all_supported_for_readme": "El README.md actual admite los siguientes idiomas",
   "h3_introduction": "Introducción",
-  "p_introduction": "Image Tools proporciona acciones independientes para editar y convertir una imagen en el gestor de archivos. Lee el origen sin modificarlo y escribe solo en una transacción de salida propiedad del host.",
-  "h3_functions": "Funciones",
-  "features": [
-    "Editar con recorte, rotación, volteo, brillo, contraste, saturación, temperatura de color, pincel, texto y deshacer.",
-    "Convertir a JPEG, PNG o WebP con calidad, cambio de tamaño, bloqueo de proporción y fondo JPEG.",
-    "Decodificar mediante ContentResolver y ParcelFileDescriptor sin rutas sin procesar ni BitmapFactory.decodeFile.",
-    "Codificar solo en el URI exacto proporcionado por el host y devolver solo el ID de transacción cuando finaliza correctamente."
+  "p_introduction": "Image Tools es un complemento de procesamiento de imágenes para el gestor de archivos de AutoJs6. Una vez activado, cada archivo de imagen del gestor de archivos muestra dos acciones en su menú secundario: `Editar imagen` abre un editor con lienzo y barra de herramientas para retoques cotidianos (recorte, rotación, ajustes de color, dibujo), mientras que `Convertir imagen` abre un diálogo que guarda la imagen como JPEG, PNG o WebP, con la opción de cambiar el tamaño por el camino.",
+  "p_introduction_secure": "El resultado se guarda siempre como un archivo nuevo junto al original (su nombre lleva el sufijo `edited` o `converted`). El archivo original permanece en solo lectura todo el tiempo y nunca se modifica, sobrescribe ni elimina. El complemento no solicita permisos de almacenamiento ni de red y solo puede acceder al único archivo de entrada y al único destino de salida autorizados por el anfitrión.",
+  "h3_functions": "Puntos destacados",
+  "highlights": [
+    "El editor ofrece preajustes de recorte; rotación de 90 grados y rotación precisa de -45° a +45°; volteo horizontal y vertical; brillo, contraste, saturación y temperatura de color; pinceles y texto con estilo, con vista previa en vivo durante el ajuste.",
+    "Los tipos de pincel incluyen lápiz, resaltador, mosaico para privacidad y borrador, y recuerdan el color y el grosor; el texto admite varias líneas, tamaño, color, contorno, sombra y posición mediante arrastre.",
+    "Deshacer y rehacer conservan hasta 8 instantáneas dentro de un presupuesto de 192 MiB; `Restaurar original` también es reversible y salir con cambios sin guardar exige confirmación.",
+    "El diálogo de guardado del editor puede seguir el formato de origen o elegir JPEG, PNG o WebP, ajustar la calidad con pérdida y activar WebP sin pérdida en Android 11+; el anfitrión publica un archivo nuevo junto al original sin sobrescribirlo.",
+    "El conversor admite JPEG / PNG / WebP, calidad 1-100 (92 por defecto), tamaño objetivo para JPEG y WebP con pérdida, WebP sin pérdida en Android 11+ y optimización automática de PNG indexado cuando la imagen tiene como máximo 256 colores.",
+    "Cuatro modos de tamaño cubren `Original`, `Porcentaje` (1-1000), `Personalizado` con bloqueo de proporción y `Lado largo` (1920 px por defecto, sin ampliar); JPEG puede rellenar la transparencia con blanco o negro.",
+    "El diálogo previsualiza la resolución y el tamaño estimado en tiempo real. La conservación segura de EXIF está desactivada por defecto; al activarla conserva campos de cámara limitados, normaliza la orientación y siempre elimina GPS y vistas previas incrustadas.",
+    "Los cambios de configuración conservan el lienzo, los borradores, el historial de deshacer/rehacer y las tareas en curso; cada acción sigue usando una entrada de solo lectura y una transacción de salida vecina, de un solo uso y propiedad del anfitrión."
   ],
+  "h3_screenshots": "Capturas de pantalla",
+  "text_screenshot_file_menu_action": "Acciones del menú del archivo",
+  "text_screenshot_editor": "Editor de imágenes",
+  "text_screenshot_converter_dialog": "Opciones de conversión JPEG",
+  "h3_usage": "Instalación y uso",
+  "p_usage_prerequisites": "Antes de empezar, confirme los siguientes requisitos",
+  "p_usage_steps_intro": "Desde la instalación hasta la primera imagen procesada hay 4 pasos",
+  "usage_steps": [
+    "Descargue e instale el APK del complemento. El complemento no tiene icono de inicio; tras la instalación queda gestionado por completo por AutoJs6.",
+    "Abra AutoJs6, entre en el `Centro de plugins`, localice `Herramientas de imagen` y actívelo.",
+    "En el gestor de archivos de AutoJs6, localice cualquier archivo de imagen (por ejemplo `photo.jpg`) y abra su menú secundario.",
+    "Seleccione `Editar imagen` para entrar en el editor, o `Convertir imagen` para abrir el diálogo de conversión."
+  ],
+  "p_usage_editor_tips": "La barra del editor ofrece `Recortar`, `Girar a la izquierda`, `Girar a la derecha`, `Rotación precisa`, `Voltear horizontalmente`, `Voltear verticalmente`, `Brillo`, `Contraste`, `Saturación`, `Temperatura de color`, `Pincel` y `Texto`. El recorte incluye proporciones libres, fijas y la original; la rotación precisa abarca de -45° a +45°. Los pinceles son lápiz, resaltador, mosaico y borrador; el texto admite varias líneas, contorno y sombra. La barra superior ofrece `Deshacer`, `Rehacer` y `Guardar`, y el menú adicional `Restaurar original`. `Guardar` abre un diálogo para seguir el formato de origen o elegir JPEG / PNG / WebP, fijar calidad con pérdida y activar WebP sin pérdida en Android 11+. El anfitrión publica un archivo vecino nuevo con sufijo `edited`; se eliminan los metadatos de origen y nunca se sobrescribe el original.",
+  "p_usage_converter_tips": "El diálogo de conversión ofrece JPEG / PNG / WebP (PNG por defecto), calidad 1-100 (92 por defecto), WebP sin pérdida en Android 11+ y `Tamaño de archivo objetivo`, que selecciona automáticamente la calidad para JPEG o WebP con pérdida. `Cambiar tamaño` ofrece `Original`, `Porcentaje` (1-1000), `Lado largo` (1920 px por defecto, sin ampliar) y `Personalizado` con bloqueo opcional de proporción. JPEG puede rellenar la transparencia con blanco o negro; PNG usa automáticamente una paleta indexada si el resultado tiene como máximo 256 colores. `Conservar metadatos EXIF seguros` está desactivado por defecto y siempre elimina GPS, vistas previas incrustadas y metadatos que no pueden inspeccionarse con seguridad. El diálogo muestra resolución, tamaño estimado y sufijo. `Convertir` pide al anfitrión publicar un archivo vecino con sufijo `converted`; `Cancelar` o atrás no crea ningún archivo.",
   "h3_supported_formats": "Formatos compatibles",
-  "p_supported_formats": "El plugin valida el contenido mediante la decodificación de Android en lugar de confiar en la extensión o el MIME declarado",
-  "h3_plugin_interface": "Interfaz del plugin",
-  "p_plugin_interface": "El host descubre y ejecuta el complemento con las siguientes identidades",
-  "p_plugin_scope": "La versión 1 registra dos acciones overflow del protocolo v3 solo en el Explorer principal. Cada acción acepta un origen de solo lectura y crea un archivo adyacente mediante la transacción del host. El origen nunca se reemplaza.",
-  "p_plugin_packaging": "Se requiere la compilación 5269 o posterior del host.",
-  "h3_security": "Seguridad",
-  "p_security": "El plugin no solicita permisos de almacenamiento ni red. Rechaza solicitudes que no sean v3, superficies no principales, acciones inesperadas, URI superiores, elementos ClipData adicionales, origen con escritura, URI no content, ID no válidos, MIME de salida no admitidos y límites superiores a 256 MiB. El URI de salida nunca se devuelve.",
-  "h3_security_limits": "Límites de seguridad",
-  "security_limits": [
-    "Una imagen de entrada de solo lectura y un URI de salida exacto por acción.",
-    "Tamaño máximo de entrada declarada y salida codificada: `{{ max_input_size }}`.",
-    "Salida limitada a JPEG, PNG o WebP.",
-    "Dimensiones, píxeles, muestreo, memoria, historial y bytes codificados están limitados.",
-    "La cancelación devuelve `RESULT_CANCELED`; el éxito devuelve solo el ID coincidente."
+  "p_supported_formats": "El gestor de archivos muestra las acciones del complemento para archivos con las siguientes extensiones (y cualquier tipo MIME `image/*`)",
+  "p_supported_formats_note": "El complemento identifica las imágenes por su contenido y no confía en las extensiones: que un archivo se abra depende de que Android pueda decodificarlo. Los archivos animados como GIF y WebP animado se procesan solo con su primer fotograma; los archivos de entrada y salida tienen cada uno un límite de {{ limit_io_size }}.",
+  "h3_faq": "Preguntas frecuentes",
+  "faq": [
+    {
+      "question": "El menú del archivo no muestra `Editar imagen` y `Convertir imagen`?",
+      "answer": "Compruebe en orden: que el código de versión de AutoJs6 sea al menos {{ required_host_build }}; que el complemento esté activado en el `Centro de plugins`; y que la extensión del archivo o su tipo MIME figure en la lista compatible. Si falla cualquiera de las tres condiciones, las acciones no aparecen."
+    },
+    {
+      "question": "Al abrir aparece `No se puede leer la información de la imagen` o la pantalla se cierra al instante?",
+      "answer": "Causas habituales: el archivo está dañado o no es una imagen real (el complemento comprueba el contenido, así que renombrar la extensión no sirve); el sistema no puede decodificar el formato (HEIC / HEIF no suele estar disponible antes de Android 9); el archivo supera {{ limit_io_size }}; o la llamada no procede del gestor de archivos de AutoJs6. Por motivos de seguridad, el complemento rechaza las invocaciones de cualquier otro origen."
+    },
+    {
+      "question": "Dónde se guarda el resultado? Sobrescribe el original?",
+      "answer": "Nunca sobrescribe. El anfitrión publica el resultado como un archivo nuevo junto al original con el sufijo `edited` o `converted` y resuelve automáticamente los conflictos de nombre; el archivo original permanece en solo lectura para el complemento en todo momento."
+    },
+    {
+      "question": "Convertir una imagen grande avisa de memoria insuficiente o de demasiados píxeles?",
+      "answer": "El tamaño de salida tiene tres límites: ningún lado puede superar {{ limit_max_dimension }}, el total no puede superar los 40 millones de píxeles ({{ limit_max_pixels }}), y todo debe caber en el presupuesto de memoria del dispositivo. Si el original supera los límites, cambie `Cambiar tamaño` a `Porcentaje`, `Lado largo` o `Personalizado` para reducir la salida; ante problemas de memoria, cerrar otras aplicaciones o bajar más la resolución suele bastar."
+    },
+    {
+      "question": "Por qué una imagen editada sale con menor resolución?",
+      "answer": "Para que la edición sea fluida y estable, las imágenes por encima del presupuesto de píxeles de edición (hasta unos 16 MP, según la memoria del dispositivo) se submuestrean antes de entrar en el editor, y el resultado guardado coincide con el lienzo de edición. Si solo necesita cambiar el formato o el tamaño sin retocar píxeles, use `Convertir imagen`: decodifica con precisión al tamaño de salida y no está sujeto a este presupuesto."
+    },
+    {
+      "question": "Puede procesar varias imágenes a la vez, o guardar el resultado en otro directorio?",
+      "answer": "Todavía no. El protocolo explorer-action v3 solo admite acciones sobre un archivo con salida adyacente, y el complemento no puede elegir por sí mismo el destino de salida. Las acciones multiarchivo y los modos de salida adicionales dependen de versiones futuras del protocolo y se siguen en la hoja de ruta."
+    }
   ],
+  "h3_security": "Seguridad",
+  "p_security_intro": "El complemento se construye sobre el principio de denegación por defecto. Todas las medidas siguientes están siempre activas y no pueden desactivarse",
+  "security_points": [
+    "El archivo original es estrictamente de solo lectura: el complemento abre la entrada únicamente mediante un content URI de solo lectura y de un solo uso concedido por el anfitrión, no recibe rutas del sistema de archivos y no solicita permisos de almacenamiento ni de red.",
+    "La salida se escribe solo en el destino exacto creado de antemano por el anfitrión, y al terminar con éxito el complemento devuelve únicamente el ID de la transacción; no puede elegir, crear ni devolver ningún otro URI.",
+    "Cada transacción de salida es de un solo uso: los ID consumidos se registran de forma persistente, y las solicitudes repetidas o reproducidas se rechazan de inmediato.",
+    "Cada invocación se valida por completo: cualquier discrepancia en versión de protocolo, superficie de origen, ID de acción, modo de concesión, tipo MIME, nombre visible o ID de transacción aborta la ejecución, y las concesiones de escritura sobre el original también se rechazan.",
+    "La entrada y la salida están limitadas a {{ limit_io_size }} cada una, la resolución de salida a {{ limit_max_dimension }} por lado y {{ limit_max_pixels }} en total, y el número de bytes codificados se controla durante la escritura.",
+    "La salida recién codificada elimina los metadatos del original de forma predeterminada. La conservación opcional de EXIF seguro usa una lista permitida limitada; la orientación se normaliza y la ubicación GPS, las vistas previas incrustadas y los metadatos que no se pueden inspeccionar de forma segura siempre se eliminan."
+  ],
+  "h3_plugin_interface": "Interfaz del complemento (para desarrolladores)",
+  "p_plugin_interface": "El anfitrión descubre e invoca el complemento con las siguientes identidades",
+  "p_plugin_scope": "La implementación actual se basa en el protocolo explorer-action v3: dos acciones de menú secundario para un único archivo de imagen en la superficie principal del gestor de archivos, cada una con una entrada de solo lectura y un archivo nuevo escrito mediante una transacción de salida create-sibling propiedad del anfitrión, devolviendo solo el ID de transacción al terminar con éxito. Las acciones multiarchivo y de directorio dependen de versiones futuras del protocolo y se siguen en la hoja de ruta.",
+  "h3_roadmap": "Hoja de ruta",
+  "p_roadmap_status": "Las capacidades completadas y los planes futuros se mantienen como una lista verificable en ROADMAP.md. Los elementos sin marcar expresan una intención y no describen capacidades actuales.",
+  "text_open_roadmap": "Abrir el ROADMAP.md verificable",
   "h3_release_history": "Historial de versiones",
-  "h5_for_more_release_history": "Más versiones",
+  "h5_for_more_release_history": "Historial completo",
   "h3_build": "Compilación",
-  "text_release_build": "Compilación de lanzamiento",
-  "p_build_params": "Los parámetros proceden de `version.properties`. El SDK mínimo es 24 y el SDK objetivo es 36",
+  "text_release_build": "Compilación Release",
+  "p_build_params": "Los parámetros de compilación provienen de `version.properties`. El SDK mínimo actual es 24 y el SDK de destino es 36",
   "h3_resource_layout": "Estructura de recursos",
-  "p_resource_layout": "`strings.xml` localiza los textos. `plugin_instruction.md` proporciona instrucciones. `.python/generate_markdown.py` genera README y registros desde fuentes JSON",
+  "p_resource_layout": "`strings.xml` localiza la información del complemento y la interfaz del editor y del conversor. Los archivos README, CHANGELOG y `plugin_instruction.md` del anfitrión se generan desde fuentes JSON y plantillas Markdown con `.python/generate_markdown.py`: para modificar la documentación, edite las fuentes de `.readme` y `.changelog` y vuelva a ejecutar el script en lugar de editar los archivos Markdown generados",
   "h3_links": "Enlaces",
   "text_link_autojs6_docs": "Documentación de AutoJs6",
-  "text_link_android_secure_file_sharing": "Uso compartido seguro de archivos en Android"
+  "text_link_android_secure_file_sharing": "Compartición segura de archivos en Android"
 }

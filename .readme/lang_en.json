@@ -5,37 +5,87 @@
   "h3_languages_with_ascii": "Languages",
   "p_languages_all_supported_for_readme": "The current README.md supports the following languages",
   "h3_introduction": "Introduction",
-  "p_introduction": "Image Tools provides independent edit and convert actions for a single image in the file manager. It reads the source without modifying it and writes only to a host-owned output transaction.",
-  "h3_functions": "Features",
-  "features": [
-    "Edit images with crop, rotation, horizontal and vertical flip, brightness, contrast, saturation, color temperature, brush strokes, text, and undo.",
-    "Convert to JPEG, PNG, or WebP with quality control, percentage or custom resizing, aspect-ratio locking, and JPEG background selection.",
-    "Decode through ContentResolver and ParcelFileDescriptor without raw paths or BitmapFactory.decodeFile.",
-    "Encode only to the exact output URI supplied by the host and report success by echoing only the output transaction ID."
+  "p_introduction": "Image Tools is an image processing plugin for the AutoJs6 file manager. Once enabled, every image file in the file manager gains two actions in its overflow menu: `Edit image` opens an editor with a canvas and a toolbar for everyday touch-ups such as cropping, rotating, color adjustments, and doodling, while `Convert image` opens a dialog that saves the image as JPEG, PNG, or WebP, optionally resizing it along the way.",
+  "p_introduction_secure": "The result is always saved as a new file next to the source (its name carries an `edited` or `converted` suffix). The source file stays read-only the whole time and is never modified, overwritten, or deleted. The plugin requests no storage or network permissions and can only touch the single input file and single output slot authorized by the host.",
+  "h3_functions": "Highlights",
+  "highlights": [
+    "The editor offers crop presets; 90-degree and fine -45° to +45° rotation; horizontal and vertical flip; brightness, contrast, saturation, and color temperature; brushes and styled text, with live preview while adjusting.",
+    "Brush types include pen, highlighter, privacy-preserving mosaic, and eraser with remembered color and width; text supports multiline content, size, color, outline, shadow, and drag placement.",
+    "Undo and redo keep up to 8 history snapshots within a 192 MiB budget; `Restore original` is reversible, and leaving with unsaved changes requires confirmation.",
+    "The editor save dialog can follow the source format or choose JPEG, PNG, or WebP, adjust lossy quality, and enable lossless WebP on Android 11+; the host publishes a new sibling instead of overwriting the source.",
+    "The converter supports JPEG / PNG / WebP, quality 1-100 (default 92), target file size for JPEG and lossy WebP, lossless WebP on Android 11+, and automatic indexed PNG optimization when the image has at most 256 colors.",
+    "Four sizing modes cover `Original`, `Percentage` (1-1000), `Custom` with aspect-ratio locking, and `Long edge` (1920 px by default and never upscales); JPEG can fill transparency with white or black.",
+    "The dialog previews resolution and estimated size in real time. Safe EXIF preservation is off by default; when enabled it keeps bounded camera fields, normalizes orientation, and always removes GPS and embedded previews.",
+    "Configuration changes preserve the canvas, dialog drafts, undo/redo history, and running tasks; each action still uses one read-only input and one host-owned single-use sibling-output transaction."
   ],
-  "h3_supported_formats": "Supported formats",
-  "p_supported_formats": "The plugin validates image contents through Android decoding rather than trusting an extension or declared MIME type",
-  "h3_plugin_interface": "Plugin interface",
-  "p_plugin_interface": "The host discovers and executes the plugin with the following identities",
-  "p_plugin_scope": "Version 1 registers two protocol v3 overflow actions only on the main Explorer surface. Each action accepts one read-only source image and creates one new sibling through the host output transaction. The source is never replaced.",
-  "p_plugin_packaging": "Host build 5269 or later is required.",
+  "h3_screenshots": "Screenshots",
+  "text_screenshot_file_menu_action": "File menu actions",
+  "text_screenshot_editor": "Image editor",
+  "text_screenshot_converter_dialog": "JPEG conversion options",
+  "h3_usage": "Installation and Usage",
+  "p_usage_prerequisites": "Before starting, confirm the following requirements",
+  "p_usage_steps_intro": "It takes 4 steps from installation to your first processed image",
+  "usage_steps": [
+    "Download and install the plugin APK. The plugin has no launcher icon; after installation it is managed entirely by AutoJs6.",
+    "Open AutoJs6, enter the `Plugin center`, locate `Image Tools`, and enable it.",
+    "In the AutoJs6 file manager, locate any image file (such as `photo.jpg`) and open its overflow menu.",
+    "Select `Edit image` to enter the editor, or `Convert image` to open the conversion dialog."
+  ],
+  "p_usage_editor_tips": "The editor toolbar offers `Crop`, `Rotate left`, `Rotate right`, `Fine rotation`, `Flip horizontally`, `Flip vertically`, `Brightness`, `Contrast`, `Saturation`, `Color temperature`, `Brush`, and `Text`. Crop includes free, fixed, and original-ratio presets; fine rotation covers -45° to +45°. Brush types are pen, highlighter, mosaic, and eraser; text supports multiline content, outline, and shadow. The top bar provides `Undo`, `Redo`, and `Save`, while the overflow menu provides `Restore original`. `Save` opens a dialog that can follow the source format or choose JPEG / PNG / WebP, set lossy quality, and enable lossless WebP on Android 11+. The host publishes a new sibling file with an `edited` suffix; source metadata is stripped and the original is never overwritten.",
+  "p_usage_converter_tips": "The conversion dialog offers JPEG / PNG / WebP (PNG by default), quality 1-100 (default 92), lossless WebP on Android 11+, and a `Target file size` mode that selects quality automatically for JPEG or lossy WebP. `Resize` provides `Original`, `Percentage` (1-1000), `Long edge` (1920 px by default and never upscales), and `Custom` with optional aspect-ratio locking. JPEG can fill transparency with white or black; PNG automatically uses an indexed palette when the result has at most 256 colors. `Preserve safe EXIF metadata` is off by default and always removes GPS, embedded previews, and metadata that cannot be safely inspected. The dialog previews resolution, estimated size, and suffix. `Convert` asks the host to publish a new sibling with a `converted` suffix; `Cancel` or back creates no file.",
+  "h3_supported_formats": "Supported Formats",
+  "p_supported_formats": "The file manager shows the plugin actions for files with the following extensions (and any `image/*` MIME type)",
+  "p_supported_formats_note": "The plugin identifies images by content and does not trust extensions: whether a file opens depends on whether Android can decode it. Animated files such as GIF and animated WebP are processed as their first frame only; input and output files are each capped at {{ limit_io_size }}.",
+  "h3_faq": "FAQ",
+  "faq": [
+    {
+      "question": "The file menu does not show `Edit image` and `Convert image`?",
+      "answer": "Check the following in order: the AutoJs6 version code is at least {{ required_host_build }}; the plugin is enabled in the `Plugin center`; and the file extension or MIME type is in the supported list. If any of the three fails, the menu actions will not appear."
+    },
+    {
+      "question": "Opening fails with `Unable to read image information` or the screen flashes and closes?",
+      "answer": "Common causes: the file is corrupted or not a real image (the plugin checks content, so renaming the extension does not help); the system cannot decode the format (for example, HEIC / HEIF is generally unsupported below Android 9); the file exceeds {{ limit_io_size }}; or the call did not come from the AutoJs6 file manager. For security reasons the plugin rejects invocations from any other source."
+    },
+    {
+      "question": "Where is the result saved? Does it overwrite the original?",
+      "answer": "It never overwrites. The host publishes the result as a new file next to the source with an `edited` or `converted` suffix and resolves any name clashes automatically; the source file remains read-only to the plugin throughout."
+    },
+    {
+      "question": "Converting a large image reports insufficient memory or too many pixels?",
+      "answer": "Output size is bounded three ways: no side may exceed {{ limit_max_dimension }}, the total may not exceed 40 million pixels ({{ limit_max_pixels }}), and it must fit the device memory budget. If the source exceeds the limits, switch `Resize` to `Percentage`, `Long edge`, or `Custom` to shrink the output; for memory issues, closing other apps or lowering the resolution further usually resolves it."
+    },
+    {
+      "question": "Why does an edited image come out at a lower resolution?",
+      "answer": "To keep editing smooth and stable, images above the editing pixel budget (up to about 16 MP, depending on device memory) are downsampled before entering the editor, and the saved result matches the editing canvas. If you only need to change the format or size without touching pixels, use `Convert image` instead: it decodes precisely at the output size and is not subject to this budget."
+    },
+    {
+      "question": "Can it process multiple images at once, or save the result to another directory?",
+      "answer": "Not yet. Explorer-action protocol v3 supports only single-file actions with sibling output, and the plugin cannot choose the output location by itself. Multi-select actions and additional output modes depend on future protocol versions and are tracked on the roadmap."
+    }
+  ],
   "h3_security": "Security",
-  "p_security": "The plugin requests no storage or network permission. It rejects non-v3 requests, non-main surfaces, unexpected actions, parent URIs, extra ClipData items, writable source grants, non-content URIs, malformed transaction IDs, unsupported output MIME types, and output limits above 256 MiB. The output URI is never returned to the caller.",
-  "h3_security_limits": "Safety limits",
-  "security_limits": [
-    "One read-only input image and one exact host-owned output URI per action.",
-    "Maximum declared input and encoded output size: `{{ max_input_size }}`.",
-    "Output is restricted to JPEG, PNG, or WebP.",
-    "Image dimensions, pixel count, decode sampling, conversion memory, history storage, and encoded byte count are bounded.",
-    "Cancellation returns `RESULT_CANCELED`; success returns only the matching transaction ID."
+  "p_security_intro": "The plugin is built on a deny-by-default principle. All of the following measures are always on and cannot be disabled",
+  "security_points": [
+    "The source file is strictly read-only: the plugin opens the input solely through a one-time read-only content URI granted by the host, receives no filesystem paths, and requests no storage or network permissions.",
+    "Output goes only to the exact slot pre-created by the host, and on success the plugin returns nothing but the transaction ID; it cannot choose, create, or return any other URI.",
+    "Every output transaction is single-use: consumed transaction IDs are recorded persistently, and replayed or duplicated requests are rejected outright.",
+    "Every invocation is fully validated: a mismatch in protocol version, source surface, action ID, grant mode, MIME type, display name, or transaction ID aborts execution, and writable grants on the source are rejected as well.",
+    "Input and output are each capped at {{ limit_io_size }}, the output resolution at {{ limit_max_dimension }} per side and {{ limit_max_pixels }} in total, and the encoded byte count is enforced while writing.",
+    "Freshly encoded output strips source metadata by default. Optional safe EXIF preservation uses a bounded allowlist; orientation is normalized, while GPS location, embedded previews, and metadata that cannot be safely inspected are always removed."
   ],
-  "h3_release_history": "Release history",
-  "h5_for_more_release_history": "For more releases",
+  "h3_plugin_interface": "Plugin Interface (for Developers)",
+  "p_plugin_interface": "The host discovers and invokes the plugin with the following identities",
+  "p_plugin_scope": "The current implementation targets explorer-action protocol v3: two overflow menu actions for a single image file on the main file manager surface, each taking one read-only input and writing one new file through a host-owned create-sibling output transaction, returning only the transaction ID on success. Multi-select and directory-level actions depend on future protocol versions and are tracked on the roadmap.",
+  "h3_roadmap": "Roadmap",
+  "p_roadmap_status": "Completed capabilities and upcoming plans are maintained as a checkable list in ROADMAP.md. Unchecked items express intent and do not describe current abilities.",
+  "text_open_roadmap": "Open the checkable ROADMAP.md",
+  "h3_release_history": "Release History",
+  "h5_for_more_release_history": "Full history",
   "h3_build": "Build",
   "text_release_build": "Release build",
   "p_build_params": "Build parameters come from `version.properties`. The current minimum SDK is 24 and the target SDK is 36",
-  "h3_resource_layout": "Resource layout",
-  "p_resource_layout": "`strings.xml` localizes plugin metadata and UI text. `plugin_instruction.md` provides instructions shown by the host. `.python/generate_markdown.py` generates localized README and changelog files from JSON sources",
+  "h3_resource_layout": "Resource Layout",
+  "p_resource_layout": "`strings.xml` localizes the plugin metadata and the editor and converter UI. README, CHANGELOG, and host-side `plugin_instruction.md` files are all generated from JSON sources and Markdown templates by `.python/generate_markdown.py`: to change the docs, edit the sources under `.readme` and `.changelog` and rerun the script instead of editing generated Markdown files",
   "h3_links": "Links",
   "text_link_autojs6_docs": "AutoJs6 documentation",
   "text_link_android_secure_file_sharing": "Android secure file sharing"

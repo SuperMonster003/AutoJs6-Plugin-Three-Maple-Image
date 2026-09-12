@@ -2,41 +2,91 @@
   "$name": "繁體中文 (台灣)",
   "text_current_lowercase": "目前",
   "text_plugin_synopsis": "檔案管理器外掛程式. 安全編輯及轉換影像",
-  "h3_languages_with_ascii": "語言",
+  "h3_languages_with_ascii": "語言 (Languages)",
   "p_languages_all_supported_for_readme": "目前 README.md 支援以下語言",
   "h3_introduction": "簡介",
-  "p_introduction": "影像工具為檔案管理器中的單一影像提供獨立的編輯和轉換動作. 外掛唯讀來源檔案且不會修改來源檔案, 並且僅向主程式擁有的輸出交易寫入.",
-  "h3_functions": "功能",
-  "features": [
-    "透過裁切, 旋轉, 水平和垂直翻轉, 亮度, 對比, 飽和度, 色溫, 畫筆, 文字和復原編輯影像.",
-    "轉換為 JPEG, PNG 或 WebP, 並支援品質控制, 百分比或自訂縮放, 比例鎖定及 JPEG 背景選擇.",
-    "透過 ContentResolver 和 ParcelFileDescriptor 解碼, 不使用原始路徑或 BitmapFactory.decodeFile.",
-    "僅向主程式提供的精確輸出 URI 編碼, 成功時僅回傳輸出交易 ID."
+  "p_introduction": "Image Tools (影像工具) 是 AutoJs6 檔案管理器的影像處理外掛. 啟用後, 檔案管理器中每個影像檔案的更多選單都會出現 `編輯影像` 和 `轉換影像` 兩個動作: 前者開啟一個帶畫布和工具列的編輯器, 完成裁切, 旋轉, 調色, 塗鴉等日常修改; 後者彈出轉換對話框, 把影像另存為 JPEG, PNG 或 WebP, 並可順便縮放尺寸.",
+  "p_introduction_secure": "處理結果永遠儲存為來源檔案旁邊的新檔案 (檔名帶 `edited` 或 `converted` 後綴), 來源檔案全程唯讀, 不會被修改, 覆寫或刪除. 外掛不申請儲存和網路權限, 每次只能存取宿主授權的一個輸入檔案和一個輸出位置.",
+  "h3_functions": "功能亮點",
+  "highlights": [
+    "編輯器提供裁切比例預設; 90 度旋轉與 -45° 至 +45° 微調旋轉; 水平和垂直翻轉; 亮度, 對比度, 飽和度和色溫; 畫筆與樣式文字, 調節過程即時預覽.",
+    "畫筆類型包括畫筆, 螢光筆, 隱私馬賽克和橡皮擦, 並記憶顏色與線寬; 文字支援多行內容, 大小, 顏色, 描邊, 陰影與拖曳定位.",
+    "撤銷和重做在 192 MiB 預算內保留最多 8 個歷史快照; `恢復原圖` 本身也可撤銷, 有未儲存修改時退出會要求確認.",
+    "編輯器儲存對話框可沿用來源格式或選擇 JPEG, PNG, WebP, 調整有損品質, 並在 Android 11+ 啟用無損 WebP; 宿主發佈同層新檔案, 不會覆寫來源檔案.",
+    "轉換器支援 JPEG / PNG / WebP, 品質 1-100 (預設 92), JPEG 與有損 WebP 的目標檔案大小, Android 11+ 無損 WebP, 以及不超過 256 色時的自動索引 PNG 最佳化.",
+    "四種尺寸模式包括 `原始`, `百分比` (1-1000), 可鎖定長寬比的 `自訂`, 以及預設 1920 px 且不會放大的 `長邊限制`; JPEG 可用白色或黑色填充透明區域.",
+    "對話框即時預覽解析度與預估大小. 安全 EXIF 保留預設關閉; 開啟後只保留有界相機欄位, 正規化方向, 並一律移除 GPS 與內嵌預覽.",
+    "設定變更會保留畫布, 對話框草稿, 撤銷/重做歷史與執行中的工作; 每個動作仍只使用一個唯讀輸入和一個宿主擁有的一次性同層輸出交易."
   ],
+  "h3_screenshots": "介面截圖",
+  "text_screenshot_file_menu_action": "檔案選單動作",
+  "text_screenshot_editor": "影像編輯器",
+  "text_screenshot_converter_dialog": "JPEG 轉換選項",
+  "h3_usage": "安裝與使用",
+  "p_usage_prerequisites": "開始前請確認以下環境要求",
+  "p_usage_steps_intro": "從安裝到處理第一張影像共 4 步",
+  "usage_steps": [
+    "下載並安裝本外掛 APK. 外掛沒有獨立桌面圖示, 安裝後統一由 AutoJs6 管理.",
+    "開啟 AutoJs6, 進入 `外掛中心`, 找到 `影像工具` 並啟用.",
+    "在 AutoJs6 檔案管理器中定位任意影像檔案 (如 `photo.jpg`), 展開該檔案的更多選單.",
+    "點選 `編輯影像` 進入編輯器, 或點選 `轉換影像` 開啟轉換對話框."
+  ],
+  "p_usage_editor_tips": "編輯器工具列提供 `裁切`, `向左旋轉`, `向右旋轉`, `微調旋轉`, `水平翻轉`, `垂直翻轉`, `亮度`, `對比度`, `飽和度`, `色溫`, `畫筆` 與 `文字`. 裁切包含自由, 固定與原圖比例預設; 微調旋轉範圍為 -45° 至 +45°. 畫筆類型包括畫筆, 螢光筆, 馬賽克和橡皮擦; 文字支援多行, 描邊與陰影. 頂端列提供 `撤銷`, `重做` 與 `儲存`, 更多選單提供 `恢復原圖`. `儲存` 會開啟對話框, 可沿用來源格式或選擇 JPEG / PNG / WebP, 設定有損品質, 並在 Android 11+ 啟用無損 WebP. 宿主以 `edited` 後綴發佈同層新檔案; 來源中繼資料會被移除, 原檔案永不覆寫.",
+  "p_usage_converter_tips": "轉換對話框提供 JPEG / PNG / WebP (預設 PNG), 品質 1-100 (預設 92), Android 11+ 無損 WebP, 以及為 JPEG 或有損 WebP 自動選擇品質的 `目標檔案大小`. `調整尺寸` 提供 `原始`, `百分比` (1-1000), 預設 1920 px 且不會放大的 `長邊限制`, 以及可選長寬比鎖定的 `自訂`. JPEG 可用白色或黑色填充透明區域; PNG 結果不超過 256 色時自動使用索引調色盤. `保留安全的 EXIF 中繼資料` 預設關閉, 並一律移除 GPS, 內嵌預覽與無法安全檢查的中繼資料. 對話框即時預覽解析度, 預估大小與後綴. `轉換` 請求宿主以 `converted` 後綴發佈同層新檔案; `取消` 或返回不會產生檔案.",
   "h3_supported_formats": "支援的格式",
-  "p_supported_formats": "外掛透過 Android 解碼驗證影像內容, 而不信任副檔名或宣告的 MIME 類型",
-  "h3_plugin_interface": "外掛介面",
-  "p_plugin_interface": "主程式透過以下識別發現並執行外掛",
-  "p_plugin_scope": "版本 1 僅在主 Explorer 頁面註冊兩個協定 v3 overflow 動作. 每個動作接收一個唯讀來源影像, 並透過主程式輸出交易建立一個新的同層檔案. 來源檔案不會被取代.",
-  "p_plugin_packaging": "需要主程式建置版本 5269 或更高版本.",
-  "h3_security": "安全性",
-  "p_security": "外掛不要求儲存或網路權限. 外掛拒絕非 v3 請求, 非主頁面, 非預期動作, 父 URI, 額外 ClipData 項目, 可寫來源授權, 非 content URI, 格式錯誤的交易 ID, 不支援的輸出 MIME 類型及超過 256 MiB 的輸出限制. 輸出 URI 不會回傳給呼叫端.",
-  "h3_security_limits": "安全限制",
-  "security_limits": [
-    "每個動作僅包含一個唯讀輸入影像和一個精確的主程式輸出 URI.",
-    "宣告的輸入和編碼輸出最大尺寸: `{{ max_input_size }}`.",
-    "輸出僅限 JPEG, PNG 或 WebP.",
-    "影像尺寸, 像素數, 解碼採樣, 轉換記憶體, 歷史儲存及編碼位元組數均有限制.",
-    "取消回傳 `RESULT_CANCELED`; 成功僅回傳相符的交易 ID."
+  "p_supported_formats": "檔案管理器會為以下副檔名 (以及任何 `image/*` MIME 類型) 的檔案顯示外掛動作",
+  "p_supported_formats_note": "外掛按檔案內容識別影像, 不信任副檔名: 能否開啟取決於 Android 系統能否解碼該檔案. GIF 與動態 WebP 等動圖僅處理第一影格; 輸入與輸出檔案的大小上限均為 {{ limit_io_size }}.",
+  "h3_faq": "常見問題",
+  "faq": [
+    {
+      "question": "檔案的選單裡沒有出現 `編輯影像` 和 `轉換影像`?",
+      "answer": "請依序檢查: AutoJs6 版本代碼是否不低於 {{ required_host_build }}; 外掛是否已在 `外掛中心` 啟用; 副檔名或 MIME 類型是否在支援清單中. 三者任一不滿足, 選單動作都不會出現."
+    },
+    {
+      "question": "開啟時提示 `無法讀取圖片資訊` 或頁面一閃而過?",
+      "answer": "常見原因: 檔案損壞或並非真實影像 (外掛按內容識別, 僅改副檔名無效); 系統無法解碼該格式 (如 Android 9 以下通常不支援 HEIC / HEIF); 檔案超過 {{ limit_io_size }}; 或呼叫並非來自 AutoJs6 檔案管理器. 出於安全考量, 外掛會拒絕其他來源的呼叫."
+    },
+    {
+      "question": "處理結果儲存在哪裡? 會覆寫原圖嗎?",
+      "answer": "永遠不會覆寫. 結果由宿主以帶 `edited` 或 `converted` 後綴的新檔案發佈在來源檔案旁邊, 檔名衝突由宿主自動規避; 來源檔案對外掛全程唯讀."
+    },
+    {
+      "question": "轉換大圖時提示記憶體不足或像素數超限?",
+      "answer": "輸出尺寸有三重限制: 單邊不超過 {{ limit_max_dimension }}, 總像素不超過 4000 萬 ({{ limit_max_pixels }}), 且需在裝置記憶體預算之內. 來源影像超限時, 請在 `調整尺寸` 中改用 `百分比`, `長邊限制` 或 `自訂` 縮小輸出; 記憶體不足時關閉其他應用或進一步降低解析度通常即可解決."
+    },
+    {
+      "question": "編輯後儲存的影像解析度為什麼變低了?",
+      "answer": "為保證編輯流暢與穩定, 超過編輯像素預算 (最高約 16 MP, 視裝置記憶體而定) 的影像會先降取樣再進入編輯器, 儲存結果即編輯畫布的解析度. 若只需改格式或縮放而無需逐筆修改, 請改用 `轉換影像`, 它按輸出尺寸精確解碼, 不受此預算限制."
+    },
+    {
+      "question": "能一次處理多張影像, 或把結果儲存到其他目錄嗎?",
+      "answer": "暫時不能. explorer-action 協定 v3 只支援單檔案動作與同層輸出, 外掛也無法自選輸出位置. 多選動作與更多輸出方式依賴宿主協定的後續版本, 已列入開發路線圖追蹤."
+    }
   ],
-  "h3_release_history": "版本歷史",
-  "h5_for_more_release_history": "更多版本",
+  "h3_security": "安全",
+  "p_security_intro": "外掛按預設拒絕原則建置, 以下措施全部預設開啟且無法關閉",
+  "security_points": [
+    "來源檔案嚴格唯讀: 外掛僅憑宿主授予的一次性唯讀 content URI 開啟輸入, 不接收檔案系統路徑, 也不申請儲存或網路權限.",
+    "輸出只寫入宿主預先建立的精確輸出位置, 成功時僅向宿主回傳交易 ID, 外掛無法自行選擇, 建立或返回任何其他 URI.",
+    "每個輸出交易一次性有效: 已使用的交易 ID 被持久記錄, 重放或重複的請求會被直接拒絕.",
+    "每次呼叫都經過完整校驗: 協定版本, 來源頁面, 動作 ID, 授權模式, MIME 類型, 檔名與交易 ID 任一不符即拒絕執行, 對來源檔案的可寫授權同樣會被拒絕.",
+    "輸入與輸出大小均限制在 {{ limit_io_size }} 以內, 輸出尺寸不超過單邊 {{ limit_max_dimension }} 與總像素 {{ limit_max_pixels }}, 編碼位元組數即時封頂.",
+    "重新編碼的輸出預設移除來源中繼資料. 可選的安全 EXIF 保留採用有界白名單; 方向會正規化, GPS 位置, 內嵌預覽與無法安全檢查的中繼資料一律移除."
+  ],
+  "h3_plugin_interface": "外掛介面 (面向開發者)",
+  "p_plugin_interface": "宿主透過以下標識發現並呼叫外掛",
+  "p_plugin_scope": "目前實作基於 explorer-action 協定 v3: 在檔案管理器主頁面為單個影像檔案提供兩個更多選單動作, 每個動作接收一個唯讀輸入, 經宿主擁有的 create-sibling 輸出交易寫出一個新檔案, 成功時僅回傳交易 ID. 多選與目錄級動作依賴協定後續版本, 相關計畫見開發路線圖.",
+  "h3_roadmap": "開發路線圖",
+  "p_roadmap_status": "已完成能力與後續計畫以可勾選清單維護在 ROADMAP.md 中. 未勾選條目表示規劃意向, 不代表目前版本能力.",
+  "text_open_roadmap": "檢視可勾選的 ROADMAP.md",
+  "h3_release_history": "版本記錄",
+  "h5_for_more_release_history": "完整記錄",
   "h3_build": "建置",
-  "text_release_build": "發佈建置",
-  "p_build_params": "建置參數來自 `version.properties`. 目前最低 SDK 為 24, 目標 SDK 為 36",
-  "h3_resource_layout": "資源配置",
-  "p_resource_layout": "`strings.xml` 本地化外掛中繼資料和介面文字. `plugin_instruction.md` 提供主程式顯示的說明. `.python/generate_markdown.py` 從 JSON 來源產生多語言 README 和更新日誌",
-  "h3_links": "連結",
+  "text_release_build": "Release 建置",
+  "p_build_params": "建置參數來自 `version.properties`, 目前最低 SDK 為 24, 目標 SDK 為 36",
+  "h3_resource_layout": "資源結構",
+  "p_resource_layout": "`strings.xml` 提供外掛資訊與編輯器, 轉換器介面的本地化. README, CHANGELOG 與宿主側 `plugin_instruction.md` 均由 `.python/generate_markdown.py` 依據 JSON 來源與 Markdown 範本生成: 修改文件時請編輯 `.readme` 與 `.changelog` 下的來源檔案並重新執行指令碼, 不要直接編輯生成的 Markdown 檔案",
+  "h3_links": "相關連結",
   "text_link_autojs6_docs": "AutoJs6 文件",
-  "text_link_android_secure_file_sharing": "Android 安全檔案共用"
+  "text_link_android_secure_file_sharing": "Android 安全檔案共享"
 }

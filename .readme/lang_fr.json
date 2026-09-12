@@ -2,41 +2,91 @@
   "$name": "Français",
   "text_current_lowercase": "actuel",
   "text_plugin_synopsis": "Plugin de gestionnaire de fichiers. Modifier et convertir des images en toute sécurité",
-  "h3_languages_with_ascii": "Langues",
+  "h3_languages_with_ascii": "Langues (Languages)",
   "p_languages_all_supported_for_readme": "Le fichier README.md actuel prend en charge les langues suivantes",
   "h3_introduction": "Introduction",
-  "p_introduction": "Image Tools fournit des actions indépendantes pour modifier et convertir une seule image dans le gestionnaire de fichiers. Il lit la source sans la modifier et écrit uniquement dans une transaction de sortie appartenant à l'hôte.",
-  "h3_functions": "Fonctions",
-  "features": [
-    "Modifier avec recadrage, rotation, retournement, luminosité, contraste, saturation, température de couleur, pinceau, texte et annulation.",
-    "Convertir en JPEG, PNG ou WebP avec qualité, redimensionnement, verrouillage du ratio et fond JPEG.",
-    "Décoder via ContentResolver et ParcelFileDescriptor sans chemin brut ni BitmapFactory.decodeFile.",
-    "Encoder uniquement vers l'URI exact fourni par l'hôte et renvoyer uniquement l'ID de transaction en cas de succès."
+  "p_introduction": "Image Tools est un plugin de traitement d'images pour le gestionnaire de fichiers d'AutoJs6. Une fois activé, chaque fichier image du gestionnaire de fichiers propose deux actions dans son menu secondaire: `Modifier l'image` ouvre un éditeur avec un canevas et une barre d'outils pour les retouches courantes (recadrage, rotation, réglages de couleur, dessin), tandis que `Convertir l'image` ouvre une boîte de dialogue qui enregistre l'image en JPEG, PNG ou WebP, avec un redimensionnement optionnel.",
+  "p_introduction_secure": "Le résultat est toujours enregistré comme un nouveau fichier à côté de la source (son nom porte le suffixe `edited` ou `converted`). Le fichier source reste en lecture seule du début à la fin et n'est jamais modifié, écrasé ni supprimé. Le plugin ne demande aucune permission de stockage ni de réseau et ne peut accéder qu'au seul fichier d'entrée et au seul emplacement de sortie autorisés par l'hôte.",
+  "h3_functions": "Points forts",
+  "highlights": [
+    "L'éditeur propose des préréglages de recadrage; des rotations à 90 degrés et une rotation précise de -45° à +45°; des retournements horizontal et vertical; luminosité, contraste, saturation et température de couleur; pinceaux et texte stylé, avec aperçu en direct pendant le réglage.",
+    "Les pinceaux comprennent stylo, surligneur, mosaïque de confidentialité et gomme, avec mémorisation de la couleur et de l'épaisseur; le texte accepte plusieurs lignes, taille, couleur, contour, ombre et placement par glissement.",
+    "Annuler et rétablir conservent jusqu'à 8 instantanés dans un budget de 192 MiB; `Restaurer l'original` est lui-même réversible et quitter avec des modifications non enregistrées exige une confirmation.",
+    "Le dialogue d'enregistrement peut conserver le format source ou choisir JPEG, PNG ou WebP, régler la qualité avec perte et activer WebP sans perte sous Android 11+; l'hôte publie un nouveau fichier voisin sans écraser la source.",
+    "Le convertisseur prend en charge JPEG / PNG / WebP, la qualité 1-100 (92 par défaut), une taille cible pour JPEG et WebP avec perte, WebP sans perte sous Android 11+, et l'optimisation PNG indexée automatique lorsque l'image compte au plus 256 couleurs.",
+    "Quatre modes de taille couvrent `Original`, `Pourcentage` (1-1000), `Personnalisé` avec verrouillage des proportions et `Côté long` (1920 px par défaut, sans agrandissement); JPEG peut remplir la transparence en blanc ou noir.",
+    "Le dialogue prévisualise la résolution et la taille estimée en temps réel. La conservation EXIF sûre est désactivée par défaut; activée, elle garde des champs d'appareil bornés, normalise l'orientation et supprime toujours le GPS et les aperçus intégrés.",
+    "Les changements de configuration conservent le canevas, les brouillons, l'historique annuler/rétablir et les tâches en cours; chaque action utilise toujours une entrée en lecture seule et une transaction de sortie voisine, à usage unique et appartenant à l'hôte."
   ],
+  "h3_screenshots": "Captures d'écran",
+  "text_screenshot_file_menu_action": "Actions du menu du fichier",
+  "text_screenshot_editor": "Éditeur d'images",
+  "text_screenshot_converter_dialog": "Options de conversion JPEG",
+  "h3_usage": "Installation et utilisation",
+  "p_usage_prerequisites": "Avant de commencer, vérifiez les prérequis suivants",
+  "p_usage_steps_intro": "Il faut 4 étapes entre l'installation et la première image traitée",
+  "usage_steps": [
+    "Téléchargez et installez l'APK du plugin. Le plugin n'a pas d'icône de lanceur; après l'installation, il est entièrement géré par AutoJs6.",
+    "Ouvrez AutoJs6, accédez au `Centre des plugins`, repérez `Outils d'image` et activez-le.",
+    "Dans le gestionnaire de fichiers d'AutoJs6, localisez un fichier image (par exemple `photo.jpg`) et ouvrez son menu secondaire.",
+    "Sélectionnez `Modifier l'image` pour entrer dans l'éditeur, ou `Convertir l'image` pour ouvrir la boîte de dialogue de conversion."
+  ],
+  "p_usage_editor_tips": "La barre de l'éditeur propose `Recadrer`, `Tourner à gauche`, `Tourner à droite`, `Rotation précise`, `Retourner horizontalement`, `Retourner verticalement`, `Luminosité`, `Contraste`, `Saturation`, `Température de couleur`, `Pinceau` et `Texte`. Le recadrage comprend des proportions libres, fixes et d'origine; la rotation précise va de -45° à +45°. Les pinceaux sont stylo, surligneur, mosaïque et gomme; le texte accepte plusieurs lignes, contour et ombre. La barre supérieure fournit `Annuler`, `Rétablir` et `Enregistrer`, et le menu supplémentaire `Restaurer l'original`. `Enregistrer` ouvre un dialogue pour conserver le format source ou choisir JPEG / PNG / WebP, régler la qualité avec perte et activer WebP sans perte sous Android 11+. L'hôte publie un nouveau fichier voisin suffixé `edited`; les métadonnées source sont supprimées et l'original n'est jamais écrasé.",
+  "p_usage_converter_tips": "Le dialogue de conversion propose JPEG / PNG / WebP (PNG par défaut), la qualité 1-100 (92 par défaut), WebP sans perte sous Android 11+ et `Taille de fichier cible`, qui choisit automatiquement la qualité pour JPEG ou WebP avec perte. `Redimensionner` offre `Original`, `Pourcentage` (1-1000), `Côté long` (1920 px par défaut, sans agrandissement) et `Personnalisé` avec verrouillage facultatif des proportions. JPEG peut remplir la transparence en blanc ou noir; PNG utilise automatiquement une palette indexée si le résultat compte au plus 256 couleurs. `Conserver les métadonnées EXIF sûres` est désactivé par défaut et supprime toujours le GPS, les aperçus intégrés et les métadonnées impossibles à inspecter sûrement. Le dialogue affiche résolution, taille estimée et suffixe. `Convertir` demande à l'hôte de publier un fichier voisin suffixé `converted`; `Annuler` ou retour ne crée aucun fichier.",
   "h3_supported_formats": "Formats pris en charge",
-  "p_supported_formats": "Le plugin valide le contenu par décodage Android au lieu de faire confiance à l'extension ou au type MIME déclaré",
-  "h3_plugin_interface": "Interface du plugin",
-  "p_plugin_interface": "L'hôte découvre et exécute le plugin avec les identités suivantes",
-  "p_plugin_scope": "La version 1 enregistre deux actions overflow du protocole v3 uniquement dans l'Explorer principal. Chaque action accepte une source en lecture seule et crée un nouveau fichier voisin via la transaction de l'hôte. La source n'est jamais remplacée.",
-  "p_plugin_packaging": "La version 5269 ou ultérieure de l'hôte est requise.",
-  "h3_security": "Sécurité",
-  "p_security": "Le plugin ne demande aucune autorisation de stockage ou de réseau. Il rejette les requêtes non v3, les surfaces non principales, les actions inattendues, les URI parents, les éléments ClipData supplémentaires, les sources inscriptibles, les URI non content, les ID invalides, les MIME de sortie non pris en charge et les limites supérieures à 256 MiB. L'URI de sortie n'est jamais renvoyé.",
-  "h3_security_limits": "Limites de sécurité",
-  "security_limits": [
-    "Une image source en lecture seule et un URI de sortie exact par action.",
-    "Taille maximale de l'entrée déclarée et de la sortie encodée: `{{ max_input_size }}`.",
-    "Sortie limitée à JPEG, PNG ou WebP.",
-    "Dimensions, pixels, échantillonnage, mémoire, historique et octets encodés sont limités.",
-    "L'annulation renvoie `RESULT_CANCELED`; le succès renvoie uniquement l'ID correspondant."
+  "p_supported_formats": "Le gestionnaire de fichiers affiche les actions du plugin pour les fichiers portant les extensions suivantes (et tout type MIME `image/*`)",
+  "p_supported_formats_note": "Le plugin identifie les images par leur contenu et ne fait pas confiance aux extensions: l'ouverture dépend de la capacité d'Android à décoder le fichier. Les fichiers animés comme les GIF et les WebP animés sont traités sur leur première image uniquement; les fichiers d'entrée et de sortie sont chacun plafonnés à {{ limit_io_size }}.",
+  "h3_faq": "Questions fréquentes",
+  "faq": [
+    {
+      "question": "Le menu du fichier n'affiche pas `Modifier l'image` et `Convertir l'image`?",
+      "answer": "Vérifiez dans l'ordre: le code de version d'AutoJs6 est au moins {{ required_host_build }}; le plugin est activé dans le `Centre des plugins`; l'extension du fichier ou son type MIME figure dans la liste prise en charge. Si l'une des trois conditions manque, les actions n'apparaissent pas."
+    },
+    {
+      "question": "L'ouverture échoue avec `Impossible de lire les informations de l'image` ou l'écran se ferme aussitôt?",
+      "answer": "Causes courantes: le fichier est corrompu ou n'est pas une vraie image (le plugin vérifie le contenu, renommer l'extension ne sert à rien); le système ne peut pas décoder le format (HEIC / HEIF est généralement non pris en charge avant Android 9); le fichier dépasse {{ limit_io_size }}; ou l'appel ne provient pas du gestionnaire de fichiers d'AutoJs6. Pour des raisons de sécurité, le plugin rejette les appels de toute autre origine."
+    },
+    {
+      "question": "Où le résultat est-il enregistré? Écrase-t-il l'original?",
+      "answer": "Il n'écrase jamais rien. L'hôte publie le résultat comme un nouveau fichier à côté de la source avec le suffixe `edited` ou `converted` et résout automatiquement les conflits de noms; le fichier source reste en lecture seule pour le plugin du début à la fin."
+    },
+    {
+      "question": "La conversion d'une grande image signale une mémoire insuffisante ou trop de pixels?",
+      "answer": "La taille de sortie est bornée de trois façons: aucun côté ne peut dépasser {{ limit_max_dimension }}, le total ne peut pas dépasser 40 millions de pixels ({{ limit_max_pixels }}), et le tout doit tenir dans le budget mémoire de l'appareil. Si la source dépasse les limites, passez `Redimensionner` sur `Pourcentage`, `Côté long` ou `Personnalisé` pour réduire la sortie; en cas de problème de mémoire, fermer d'autres applications ou réduire encore la résolution suffit généralement."
+    },
+    {
+      "question": "Pourquoi une image éditée ressort-elle avec une résolution plus basse?",
+      "answer": "Pour garder l'édition fluide et stable, les images au-dessus du budget de pixels d'édition (jusqu'à environ 16 MP selon la mémoire de l'appareil) sont sous-échantillonnées avant d'entrer dans l'éditeur, et le résultat enregistré correspond au canevas d'édition. Si vous voulez seulement changer le format ou la taille sans retoucher les pixels, utilisez `Convertir l'image`: il décode précisément à la taille de sortie et n'est pas soumis à ce budget."
+    },
+    {
+      "question": "Peut-il traiter plusieurs images à la fois, ou enregistrer le résultat dans un autre dossier?",
+      "answer": "Pas encore. Le protocole explorer-action v3 ne prend en charge que les actions sur un seul fichier avec une sortie voisine, et le plugin ne peut pas choisir lui-même l'emplacement de sortie. Les actions multi-fichiers et les modes de sortie supplémentaires dépendent des versions futures du protocole et sont suivis dans la feuille de route."
+    }
   ],
+  "h3_security": "Sécurité",
+  "p_security_intro": "Le plugin applique le principe du refus par défaut. Toutes les mesures suivantes sont toujours actives et ne peuvent pas être désactivées",
+  "security_points": [
+    "Le fichier source est strictement en lecture seule: le plugin ouvre l'entrée uniquement via un content URI en lecture seule à usage unique accordé par l'hôte, ne reçoit aucun chemin du système de fichiers et ne demande aucune permission de stockage ni de réseau.",
+    "La sortie n'est écrite que dans l'emplacement exact pré-créé par l'hôte, et en cas de succès le plugin ne renvoie que l'identifiant de transaction; il ne peut choisir, créer ni renvoyer aucun autre URI.",
+    "Chaque transaction de sortie est à usage unique: les identifiants consommés sont enregistrés de façon persistante, et les requêtes rejouées ou dupliquées sont rejetées d'emblée.",
+    "Chaque appel est entièrement validé: toute discordance de version de protocole, de surface d'origine, d'identifiant d'action, de mode d'autorisation, de type MIME, de nom d'affichage ou d'identifiant de transaction interrompt l'exécution, et les autorisations en écriture sur la source sont également rejetées.",
+    "L'entrée et la sortie sont chacune plafonnées à {{ limit_io_size }}, la résolution de sortie à {{ limit_max_dimension }} par côté et {{ limit_max_pixels }} au total, et le nombre d'octets encodés est contrôlé pendant l'écriture.",
+    "La sortie fraîchement encodée supprime les métadonnées de la source par défaut. La conservation EXIF sûre et facultative utilise une liste limitée; l'orientation est normalisée, tandis que la position GPS, les aperçus intégrés et les métadonnées impossibles à contrôler en toute sécurité sont toujours supprimés."
+  ],
+  "h3_plugin_interface": "Interface du plugin (pour les développeurs)",
+  "p_plugin_interface": "L'hôte détecte et invoque le plugin avec les identités suivantes",
+  "p_plugin_scope": "L'implémentation actuelle vise le protocole explorer-action v3: deux actions de menu secondaire pour un seul fichier image sur la surface principale du gestionnaire de fichiers, chacune prenant une entrée en lecture seule et écrivant un nouveau fichier via une transaction de sortie create-sibling détenue par l'hôte, en ne renvoyant que l'identifiant de transaction en cas de succès. Les actions multi-fichiers et au niveau des dossiers dépendent des versions futures du protocole et sont suivies dans la feuille de route.",
+  "h3_roadmap": "Feuille de route",
+  "p_roadmap_status": "Les capacités achevées et les projets à venir sont tenus sous forme de liste cochable dans ROADMAP.md. Les cases non cochées expriment une intention et ne décrivent pas les capacités actuelles.",
+  "text_open_roadmap": "Ouvrir le ROADMAP.md cochable",
   "h3_release_history": "Historique des versions",
-  "h5_for_more_release_history": "Autres versions",
-  "h3_build": "Construction",
-  "text_release_build": "Construction de publication",
-  "p_build_params": "Les paramètres proviennent de `version.properties`. Le SDK minimal est 24 et le SDK cible est 36",
+  "h5_for_more_release_history": "Historique complet",
+  "h3_build": "Compilation",
+  "text_release_build": "Compilation Release",
+  "p_build_params": "Les paramètres de compilation proviennent de `version.properties`. Le SDK minimum actuel est 24 et le SDK cible est 36",
   "h3_resource_layout": "Organisation des ressources",
-  "p_resource_layout": "`strings.xml` localise les textes. `plugin_instruction.md` fournit les instructions. `.python/generate_markdown.py` génère les README et journaux depuis les sources JSON",
+  "p_resource_layout": "`strings.xml` localise les informations du plugin et l'interface de l'éditeur et du convertisseur. Les fichiers README, CHANGELOG et `plugin_instruction.md` côté hôte sont générés depuis des sources JSON et des modèles Markdown par `.python/generate_markdown.py`: pour modifier la documentation, éditez les sources sous `.readme` et `.changelog` puis relancez le script au lieu de modifier les fichiers Markdown générés",
   "h3_links": "Liens",
   "text_link_autojs6_docs": "Documentation AutoJs6",
-  "text_link_android_secure_file_sharing": "Partage sécurisé de fichiers Android"
+  "text_link_android_secure_file_sharing": "Partage de fichiers sécurisé Android"
 }

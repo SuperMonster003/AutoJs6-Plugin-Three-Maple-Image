@@ -8,15 +8,19 @@ import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
-import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.graphics.withClip
+import androidx.core.graphics.withRotation
+import androidx.core.graphics.withScale
+import androidx.core.graphics.withTranslation
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 internal class ImageEditingView @JvmOverloads constructor(
     context: Context,
@@ -26,32 +30,28 @@ internal class ImageEditingView @JvmOverloads constructor(
 
     sealed interface CanvasState {
         data object Normal : CanvasState
-        data class Crop(val selection: RectF) : CanvasState
+        data class Rotation(val degrees: Float) : CanvasState
+        data class Crop(
+            val selection: RectF,
+            val aspectRatioPreset: CropAspectRatioPreset,
+        ) : CanvasState
         data class Brush(
+            val tool: BrushTool,
             val color: Int,
             val widthOnScreen: Float,
+            val mosaicBlockSizeOnScreen: Float,
             val strokes: List<ImageEditingEngine.BrushStroke>,
         ) : CanvasState
         data class Text(val spec: ImageEditingEngine.TextSpec) : CanvasState
     }
 
-    private enum class Mode { NORMAL, CROP, BRUSH, TEXT }
-
-    private enum class CropHandle {
-        LEFT,
-        TOP,
-        RIGHT,
-        BOTTOM,
-        TOP_LEFT,
-        TOP_RIGHT,
-        BOTTOM_LEFT,
-        BOTTOM_RIGHT,
-        MOVE,
-    }
+    private enum class Mode { NORMAL, ROTATION, CROP, BRUSH, TEXT }
 
     private data class MutableStroke(
+        val tool: BrushTool,
         val color: Int,
         val width: Float,
+        val mosaicBlockSize: Int,
         val points: MutableList<ImageEditingEngine.Point>,
     )
 
@@ -65,11 +65,16 @@ internal class ImageEditingView @JvmOverloads constructor(
     private var bitmap: Bitmap? = null
     private var mode = Mode.NORMAL
     private var imageScale = 1f
-    private var cropHandle: CropHandle? = null
+    private var rotationPreviewDegrees = 0f
+    private var cropHandle: CropResizeHandle? = null
+    private var cropAspectRatioPreset = CropAspectRatioPreset.FREE
     private var touchStartX = 0f
     private var touchStartY = 0f
+    private var brushTool = BrushTool.PEN
     private var brushColor = Color.RED
     private var brushWidthOnScreen = dp(8f)
+    private var mosaicBlockSizeOnScreen = dp(12f)
+    private var mosaicBitmapCache: MosaicBitmapCache? = null
     private var textSpec: ImageEditingEngine.TextSpec? = null
 
     fun setBitmap(value: Bitmap?) {
@@ -84,40 +89,91 @@ internal class ImageEditingView @JvmOverloads constructor(
         invalidate()
     }
 
-    fun beginCrop() {
+    fun beginRotation(degrees: Float = 0f) {
+        val source = bitmap ?: return
+        ImageRotationGeometry.coverScale(source.width, source.height, degrees)
+        clearToolState()
+        mode = Mode.ROTATION
+        rotationPreviewDegrees = degrees
+        invalidate()
+    }
+
+    fun updateRotationPreview(degrees: Float) {
+        val source = bitmap ?: return
+        if (mode != Mode.ROTATION || rotationPreviewDegrees == degrees) return
+        ImageRotationGeometry.coverScale(source.width, source.height, degrees)
+        rotationPreviewDegrees = degrees
+        invalidate()
+    }
+
+    fun rotationPreviewDegrees(): Float = rotationPreviewDegrees
+
+    fun beginCrop(aspectRatioPreset: CropAspectRatioPreset = CropAspectRatioPreset.FREE) {
         val source = bitmap ?: return
         clearToolState()
         mode = Mode.CROP
         cropRect.set(0f, 0f, source.width.toFloat(), source.height.toFloat())
+        cropAspectRatioPreset = aspectRatioPreset
+        applyCropAspectRatio(source)
         invalidate()
     }
 
-    fun cropSelection(): Rect? = if (mode == Mode.CROP) {
-        Rect(
-            cropRect.left.toInt(),
-            cropRect.top.toInt(),
-            cropRect.right.toInt(),
-            cropRect.bottom.toInt(),
-        )
-    } else {
-        null
+    fun updateCropAspectRatio(aspectRatioPreset: CropAspectRatioPreset) {
+        val source = bitmap ?: return
+        if (mode != Mode.CROP || cropAspectRatioPreset == aspectRatioPreset) return
+        cropAspectRatioPreset = aspectRatioPreset
+        cropHandle = null
+        applyCropAspectRatio(source)
+        invalidate()
     }
 
-    fun beginBrush(color: Int, widthOnScreen: Float) {
+    fun cropAspectRatioPreset(): CropAspectRatioPreset = cropAspectRatioPreset
+
+    fun cropSelection(): Rect? {
+        if (mode != Mode.CROP) return null
+        val source = bitmap ?: return null
+        val left = cropRect.left.roundToInt().coerceIn(0, source.width - 1)
+        val top = cropRect.top.roundToInt().coerceIn(0, source.height - 1)
+        val right = cropRect.right.roundToInt().coerceIn(left + 1, source.width)
+        val bottom = cropRect.bottom.roundToInt().coerceIn(top + 1, source.height)
+        return Rect(left, top, right, bottom)
+    }
+
+    fun beginBrush(
+        tool: BrushTool,
+        color: Int,
+        widthOnScreen: Float,
+        mosaicBlockSizeOnScreen: Float,
+    ) {
         clearToolState()
         mode = Mode.BRUSH
+        brushTool = tool
         brushColor = color
         brushWidthOnScreen = widthOnScreen
+        this.mosaicBlockSizeOnScreen = mosaicBlockSizeOnScreen
         invalidate()
     }
 
-    fun updateBrush(color: Int = brushColor, widthOnScreen: Float = brushWidthOnScreen) {
+    fun updateBrush(
+        tool: BrushTool = brushTool,
+        color: Int = brushColor,
+        widthOnScreen: Float = brushWidthOnScreen,
+        mosaicBlockSizeOnScreen: Float = this.mosaicBlockSizeOnScreen,
+    ) {
+        brushTool = tool
         brushColor = color
         brushWidthOnScreen = widthOnScreen
+        this.mosaicBlockSizeOnScreen = mosaicBlockSizeOnScreen
     }
 
     fun brushStrokes(): List<ImageEditingEngine.BrushStroke> = strokes.map { stroke ->
-        ImageEditingEngine.BrushStroke(stroke.color, stroke.width, stroke.points.toList())
+        ImageEditingEngine.BrushStroke(
+            tool = stroke.tool,
+            color = stroke.color,
+            width = stroke.width,
+            mosaicBlockSize = stroke.mosaicBlockSize,
+            points = stroke.points.toList(),
+        )
     }
 
     fun beginText(spec: ImageEditingEngine.TextSpec) {
@@ -131,8 +187,15 @@ internal class ImageEditingView @JvmOverloads constructor(
 
     fun captureCanvasState(): CanvasState = when (mode) {
         Mode.NORMAL -> CanvasState.Normal
-        Mode.CROP -> CanvasState.Crop(RectF(cropRect))
-        Mode.BRUSH -> CanvasState.Brush(brushColor, brushWidthOnScreen, brushStrokes())
+        Mode.ROTATION -> CanvasState.Rotation(rotationPreviewDegrees)
+        Mode.CROP -> CanvasState.Crop(RectF(cropRect), cropAspectRatioPreset)
+        Mode.BRUSH -> CanvasState.Brush(
+            brushTool,
+            brushColor,
+            brushWidthOnScreen,
+            mosaicBlockSizeOnScreen,
+            brushStrokes(),
+        )
         Mode.TEXT -> textSpec?.let(CanvasState::Text) ?: CanvasState.Normal
     }
 
@@ -140,16 +203,29 @@ internal class ImageEditingView @JvmOverloads constructor(
         clearToolState()
         when (state) {
             CanvasState.Normal -> Unit
+            is CanvasState.Rotation -> {
+                mode = Mode.ROTATION
+                rotationPreviewDegrees = state.degrees
+            }
             is CanvasState.Crop -> {
                 mode = Mode.CROP
                 cropRect.set(state.selection)
+                cropAspectRatioPreset = state.aspectRatioPreset
             }
             is CanvasState.Brush -> {
                 mode = Mode.BRUSH
+                brushTool = state.tool
                 brushColor = state.color
                 brushWidthOnScreen = state.widthOnScreen
+                mosaicBlockSizeOnScreen = state.mosaicBlockSizeOnScreen
                 strokes += state.strokes.map { stroke ->
-                    MutableStroke(stroke.color, stroke.width, stroke.points.toMutableList())
+                    MutableStroke(
+                        stroke.tool,
+                        stroke.color,
+                        stroke.width,
+                        stroke.mosaicBlockSize,
+                        stroke.points.toMutableList(),
+                    )
                 }
             }
             is CanvasState.Text -> {
@@ -163,7 +239,15 @@ internal class ImageEditingView @JvmOverloads constructor(
     fun clearToolState() {
         mode = Mode.NORMAL
         bitmapPaint.colorFilter = null
+        rotationPreviewDegrees = 0f
         cropHandle = null
+        cropAspectRatioPreset = CropAspectRatioPreset.FREE
+        brushTool = BrushTool.PEN
+        brushColor = Color.RED
+        brushWidthOnScreen = dp(8f)
+        mosaicBlockSizeOnScreen = dp(12f)
+        mosaicBitmapCache?.close()
+        mosaicBitmapCache = null
         strokes.clear()
         currentStroke = null
         textSpec = null
@@ -179,8 +263,13 @@ internal class ImageEditingView @JvmOverloads constructor(
         super.onDraw(canvas)
         val source = bitmap ?: return
         if (imageRect.isEmpty) updateImageRect()
-        canvas.drawBitmap(source, null, imageRect, bitmapPaint)
+        if (mode == Mode.ROTATION) {
+            drawRotationPreview(canvas, source)
+        } else {
+            canvas.drawBitmap(source, null, imageRect, bitmapPaint)
+        }
         when (mode) {
+            Mode.ROTATION -> Unit
             Mode.CROP -> drawCropOverlay(canvas)
             Mode.BRUSH -> drawBrushStrokes(canvas)
             Mode.TEXT -> drawTextOverlay(canvas)
@@ -192,6 +281,7 @@ internal class ImageEditingView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (bitmap == null || mode == Mode.NORMAL) return false
         return when (mode) {
+            Mode.ROTATION -> false
             Mode.CROP -> handleCropTouch(event)
             Mode.BRUSH -> handleBrushTouch(event)
             Mode.TEXT -> handleTextTouch(event)
@@ -216,6 +306,31 @@ internal class ImageEditingView @JvmOverloads constructor(
         val left = (width - drawnWidth) / 2f
         val top = (height - drawnHeight) / 2f
         imageRect.set(left, top, left + drawnWidth, top + drawnHeight)
+    }
+
+    private fun applyCropAspectRatio(source: Bitmap) {
+        val aspectRatio = cropAspectRatioPreset.aspectRatio(source.width, source.height) ?: return
+        cropRect.set(
+            CropSelectionGeometry.fitAspectRatio(
+                selection = cropRect.toCropSelection(),
+                aspectRatio = aspectRatio,
+            ),
+        )
+    }
+
+    private fun drawRotationPreview(canvas: Canvas, source: Bitmap) {
+        val scale = ImageRotationGeometry.coverScale(
+            sourceWidth = source.width,
+            sourceHeight = source.height,
+            degrees = rotationPreviewDegrees,
+        )
+        canvas.withClip(imageRect) {
+            withRotation(rotationPreviewDegrees, imageRect.centerX(), imageRect.centerY()) {
+                withScale(scale, scale, imageRect.centerX(), imageRect.centerY()) {
+                    drawBitmap(source, null, imageRect, bitmapPaint)
+                }
+            }
+        }
     }
 
     private fun drawCropOverlay(canvas: Canvas) {
@@ -249,50 +364,30 @@ internal class ImageEditingView @JvmOverloads constructor(
     }
 
     private fun drawBrushStrokes(canvas: Canvas) {
+        val source = bitmap ?: return
         strokes.forEach { stroke ->
-            if (stroke.points.isEmpty()) return@forEach
-            overlayPaint.color = stroke.color
-            overlayPaint.style = Paint.Style.STROKE
-            overlayPaint.strokeCap = Paint.Cap.ROUND
-            overlayPaint.strokeJoin = Paint.Join.ROUND
-            overlayPaint.strokeWidth = stroke.width * imageScale
-            if (stroke.points.size == 1) {
-                val point = bitmapPointToView(stroke.points.first())
-                canvas.drawCircle(point.x, point.y, overlayPaint.strokeWidth / 2f, overlayPaint.apply { style = Paint.Style.FILL })
-            } else {
-                val first = bitmapPointToView(stroke.points.first())
-                val path = Path().apply {
-                    moveTo(first.x, first.y)
-                    for (index in 1 until stroke.points.size) {
-                        val point = stroke.points[index]
-                        val mapped = bitmapPointToView(point)
-                        lineTo(mapped.x, mapped.y)
-                    }
-                }
-                canvas.drawPath(path, overlayPaint)
-            }
+            BrushStrokeRenderer.draw(
+                canvas = canvas,
+                source = source,
+                destination = imageRect,
+                tool = stroke.tool,
+                color = stroke.color,
+                width = stroke.width,
+                mosaicBlockSize = stroke.mosaicBlockSize,
+                points = stroke.points,
+                mosaicBitmap = { blockSize -> mosaicBitmap(source, blockSize) },
+            )
         }
     }
 
     private fun drawTextOverlay(canvas: Canvas) {
         val spec = textSpec ?: return
-        overlayPaint.color = spec.color
-        overlayPaint.style = Paint.Style.FILL
-        overlayPaint.textSize = spec.size * imageScale
-        overlayPaint.isAntiAlias = true
-        val lines = spec.text.lines().ifEmpty { listOf(spec.text) }
-        val metrics = overlayPaint.fontMetrics
-        val lineHeight = (metrics.descent - metrics.ascent) * TEXT_LINE_SPACING
-        val blockHeight = lineHeight * lines.size
-        val center = bitmapPointToView(ImageEditingEngine.Point(spec.centerX, spec.centerY))
-        val firstBaseline = center.y - blockHeight / 2f - metrics.ascent
-        lines.forEachIndexed { index, line ->
-            canvas.drawText(
-                line,
-                center.x - overlayPaint.measureText(line) / 2f,
-                firstBaseline + index * lineHeight,
-                overlayPaint,
-            )
+        canvas.withClip(imageRect) {
+            withTranslation(imageRect.left, imageRect.top) {
+                withScale(imageScale, imageScale) {
+                    StyledTextRenderer.draw(this, spec)
+                }
+            }
         }
     }
 
@@ -323,7 +418,7 @@ internal class ImageEditingView @JvmOverloads constructor(
         return false
     }
 
-    private fun resolveCropHandle(x: Float, y: Float): CropHandle? {
+    private fun resolveCropHandle(x: Float, y: Float): CropResizeHandle? {
         val tolerance = dp(CROP_HIT_SLOP_DP) / imageScale
         val withinHorizontalSpan = x in (cropRect.left - tolerance)..(cropRect.right + tolerance)
         val withinVerticalSpan = y in (cropRect.top - tolerance)..(cropRect.bottom + tolerance)
@@ -332,15 +427,15 @@ internal class ImageEditingView @JvmOverloads constructor(
         val nearTop = withinHorizontalSpan && abs(y - cropRect.top) <= tolerance
         val nearBottom = withinHorizontalSpan && abs(y - cropRect.bottom) <= tolerance
         return when {
-            nearLeft && nearTop -> CropHandle.TOP_LEFT
-            nearRight && nearTop -> CropHandle.TOP_RIGHT
-            nearLeft && nearBottom -> CropHandle.BOTTOM_LEFT
-            nearRight && nearBottom -> CropHandle.BOTTOM_RIGHT
-            nearLeft -> CropHandle.LEFT
-            nearRight -> CropHandle.RIGHT
-            nearTop -> CropHandle.TOP
-            nearBottom -> CropHandle.BOTTOM
-            cropRect.contains(x, y) -> CropHandle.MOVE
+            nearLeft && nearTop -> CropResizeHandle.TOP_LEFT
+            nearRight && nearTop -> CropResizeHandle.TOP_RIGHT
+            nearLeft && nearBottom -> CropResizeHandle.BOTTOM_LEFT
+            nearRight && nearBottom -> CropResizeHandle.BOTTOM_RIGHT
+            nearLeft -> CropResizeHandle.LEFT
+            nearRight -> CropResizeHandle.RIGHT
+            nearTop -> CropResizeHandle.TOP
+            nearBottom -> CropResizeHandle.BOTTOM
+            cropRect.contains(x, y) -> CropResizeHandle.MOVE
             else -> null
         }
     }
@@ -348,23 +443,40 @@ internal class ImageEditingView @JvmOverloads constructor(
     private fun updateCrop(deltaX: Float, deltaY: Float) {
         val source = bitmap ?: return
         val desiredMinSize = max(MIN_CROP_BITMAP_SIZE, dp(MIN_CROP_SCREEN_SIZE_DP) / imageScale)
+        val handle = cropHandle ?: return
+        val aspectRatio = cropAspectRatioPreset.aspectRatio(source.width, source.height)
+        if (aspectRatio != null) {
+            cropRect.set(
+                CropSelectionGeometry.resizeLocked(
+                    selection = cropStartRect.toCropSelection(),
+                    handle = handle,
+                    deltaX = deltaX,
+                    deltaY = deltaY,
+                    boundsWidth = source.width.toFloat(),
+                    boundsHeight = source.height.toFloat(),
+                    aspectRatio = aspectRatio,
+                    minimumSide = desiredMinSize,
+                ),
+            )
+            return
+        }
         val minWidth = min(desiredMinSize, cropStartRect.width())
         val minHeight = min(desiredMinSize, cropStartRect.height())
-        when (cropHandle) {
-            CropHandle.LEFT, CropHandle.TOP_LEFT, CropHandle.BOTTOM_LEFT ->
+        when (handle) {
+            CropResizeHandle.LEFT, CropResizeHandle.TOP_LEFT, CropResizeHandle.BOTTOM_LEFT ->
                 cropRect.left = (cropStartRect.left + deltaX).coerceIn(0f, cropStartRect.right - minWidth)
-            CropHandle.RIGHT, CropHandle.TOP_RIGHT, CropHandle.BOTTOM_RIGHT ->
+            CropResizeHandle.RIGHT, CropResizeHandle.TOP_RIGHT, CropResizeHandle.BOTTOM_RIGHT ->
                 cropRect.right = (cropStartRect.right + deltaX).coerceIn(cropStartRect.left + minWidth, source.width.toFloat())
             else -> Unit
         }
-        when (cropHandle) {
-            CropHandle.TOP, CropHandle.TOP_LEFT, CropHandle.TOP_RIGHT ->
+        when (handle) {
+            CropResizeHandle.TOP, CropResizeHandle.TOP_LEFT, CropResizeHandle.TOP_RIGHT ->
                 cropRect.top = (cropStartRect.top + deltaY).coerceIn(0f, cropStartRect.bottom - minHeight)
-            CropHandle.BOTTOM, CropHandle.BOTTOM_LEFT, CropHandle.BOTTOM_RIGHT ->
+            CropResizeHandle.BOTTOM, CropResizeHandle.BOTTOM_LEFT, CropResizeHandle.BOTTOM_RIGHT ->
                 cropRect.bottom = (cropStartRect.bottom + deltaY).coerceIn(cropStartRect.top + minHeight, source.height.toFloat())
             else -> Unit
         }
-        if (cropHandle == CropHandle.MOVE) {
+        if (handle == CropResizeHandle.MOVE) {
             val movedLeft = (cropStartRect.left + deltaX).coerceIn(0f, source.width - cropStartRect.width())
             val movedTop = (cropStartRect.top + deltaY).coerceIn(0f, source.height - cropStartRect.height())
             cropRect.set(movedLeft, movedTop, movedLeft + cropStartRect.width(), movedTop + cropStartRect.height())
@@ -377,9 +489,13 @@ internal class ImageEditingView @JvmOverloads constructor(
                 val point = viewToBitmap(event.x, event.y) ?: return false
                 parent?.requestDisallowInterceptTouchEvent(true)
                 val stroke = MutableStroke(
-                    brushColor,
-                    brushWidthOnScreen / imageScale,
-                    mutableListOf(point),
+                    tool = brushTool,
+                    color = brushColor,
+                    width = brushWidthOnScreen / imageScale,
+                    mosaicBlockSize = (mosaicBlockSizeOnScreen / imageScale)
+                        .roundToInt()
+                        .coerceAtLeast(MosaicBitmapCache.MIN_MOSAIC_BLOCK_SIZE),
+                    points = mutableListOf(point),
                 )
                 strokes += stroke
                 currentStroke = stroke
@@ -463,10 +579,12 @@ internal class ImageEditingView @JvmOverloads constructor(
         )
     }
 
-    private fun bitmapPointToView(point: ImageEditingEngine.Point) = ImageEditingEngine.Point(
-        imageRect.left + point.x * imageScale,
-        imageRect.top + point.y * imageScale,
-    )
+    private fun mosaicBitmap(source: Bitmap, blockSize: Int): Bitmap {
+        val cache = mosaicBitmapCache ?: MosaicBitmapCache(source, MOSAIC_PREVIEW_CACHE_SIZE).also {
+            mosaicBitmapCache = it
+        }
+        return cache.bitmap(blockSize)
+    }
 
     private fun bitmapRectToView(rect: RectF) = RectF(
         imageRect.left + rect.left * imageScale,
@@ -475,6 +593,12 @@ internal class ImageEditingView @JvmOverloads constructor(
         imageRect.top + rect.bottom * imageScale,
     )
 
+    private fun RectF.toCropSelection() = CropSelection(left, top, right, bottom)
+
+    private fun RectF.set(selection: CropSelection) {
+        set(selection.left, selection.top, selection.right, selection.bottom)
+    }
+
     private fun dp(value: Float): Float = value * resources.displayMetrics.density
 
     private companion object {
@@ -482,8 +606,8 @@ internal class ImageEditingView @JvmOverloads constructor(
         const val MIN_CROP_SCREEN_SIZE_DP = 48f
         const val MIN_CROP_BITMAP_SIZE = 8f
         const val MIN_BRUSH_POINT_DISTANCE_DP = 1.5f
+        const val MOSAIC_PREVIEW_CACHE_SIZE = 4
         const val CROP_SHADE_COLOR = 0x99000000.toInt()
         const val GRID_ALPHA = 140
-        const val TEXT_LINE_SPACING = 1.12f
     }
 }

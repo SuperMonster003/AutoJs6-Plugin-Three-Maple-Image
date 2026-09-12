@@ -6,8 +6,11 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
 import android.graphics.Paint
-import android.graphics.Path
 import android.graphics.Rect
+import android.graphics.RectF
+import androidx.core.graphics.withRotation
+import androidx.core.graphics.withScale
+import androidx.core.graphics.withTranslation
 import kotlin.math.max
 
 internal object ImageEditingEngine {
@@ -22,8 +25,10 @@ internal object ImageEditingEngine {
     data class Point(val x: Float, val y: Float)
 
     data class BrushStroke(
+        val tool: BrushTool,
         val color: Int,
         val width: Float,
+        val mosaicBlockSize: Int,
         val points: List<Point>,
     )
 
@@ -33,7 +38,19 @@ internal object ImageEditingEngine {
         val size: Float,
         val centerX: Float,
         val centerY: Float,
-    )
+        val outlineEnabled: Boolean = false,
+        val shadowEnabled: Boolean = false,
+        val rotationDegrees: Float = 0f,
+    ) {
+        init {
+            require(text.isNotEmpty()) { "Text must not be empty" }
+            require(size > 0f && size.isFinite()) { "Text size must be positive and finite" }
+            require(centerX.isFinite() && centerY.isFinite()) { "Text center must be finite" }
+            require(rotationDegrees.isFinite() && rotationDegrees in -180f..180f) {
+                "Text rotation must be between -180 and 180 degrees"
+            }
+        }
+    }
 
     fun transform(
         source: Bitmap,
@@ -48,6 +65,38 @@ internal object ImageEditingEngine {
             }
         }
         return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+    }
+
+    fun rotateAndCrop(
+        source: Bitmap,
+        rotation: Float,
+        maxPixelCount: Long = ImageBitmapIO.editingPixelBudget(),
+    ): Bitmap {
+        val plan = ImageRotationGeometry.plan(
+            sourceWidth = source.width,
+            sourceHeight = source.height,
+            degrees = rotation,
+            maxPixelCount = maxPixelCount,
+        )
+        val target = blankBitmapLike(source, plan.outputWidth, plan.outputHeight)
+        return try {
+            Canvas(target).withTranslation(plan.outputWidth / 2f, plan.outputHeight / 2f) {
+                withRotation(plan.degrees) {
+                    withScale(plan.coverScale, plan.coverScale) {
+                        drawBitmap(
+                            source,
+                            -source.width / 2f,
+                            -source.height / 2f,
+                            Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG or Paint.DITHER_FLAG),
+                        )
+                    }
+                }
+            }
+            target
+        } catch (error: Throwable) {
+            target.recycle()
+            throw error
+        }
     }
 
     fun crop(source: Bitmap, selection: Rect): Bitmap {
@@ -121,60 +170,35 @@ internal object ImageEditingEngine {
 
     fun applyBrush(source: Bitmap, strokes: List<BrushStroke>): Bitmap {
         val target = mutableCopy(source)
+        val mosaicCache = MosaicBitmapCache(source, maxEntries = 1)
         return try {
             val canvas = Canvas(target)
             strokes.forEach { stroke ->
-                if (stroke.points.isEmpty()) return@forEach
-                val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = stroke.color
-                    style = Paint.Style.STROKE
-                    strokeCap = Paint.Cap.ROUND
-                    strokeJoin = Paint.Join.ROUND
-                    strokeWidth = stroke.width.coerceAtLeast(1f)
-                }
-                if (stroke.points.size == 1) {
-                    val point = stroke.points.first()
-                    canvas.drawCircle(point.x, point.y, paint.strokeWidth / 2f, paint.apply { style = Paint.Style.FILL })
-                } else {
-                    val path = Path().apply {
-                        moveTo(stroke.points.first().x, stroke.points.first().y)
-                        for (index in 1 until stroke.points.size) {
-                            val point = stroke.points[index]
-                            lineTo(point.x, point.y)
-                        }
-                    }
-                    canvas.drawPath(path, paint)
-                }
+                BrushStrokeRenderer.draw(
+                    canvas = canvas,
+                    source = source,
+                    destination = RectF(0f, 0f, source.width.toFloat(), source.height.toFloat()),
+                    tool = stroke.tool,
+                    color = stroke.color,
+                    width = stroke.width,
+                    mosaicBlockSize = stroke.mosaicBlockSize,
+                    points = stroke.points,
+                    mosaicBitmap = mosaicCache::bitmap,
+                )
             }
             target
         } catch (error: Throwable) {
             target.recycle()
             throw error
+        } finally {
+            mosaicCache.close()
         }
     }
 
     fun addText(source: Bitmap, spec: TextSpec): Bitmap {
         val target = mutableCopy(source)
         return try {
-            val canvas = Canvas(target)
-            val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG).apply {
-                color = spec.color
-                textSize = spec.size.coerceAtLeast(1f)
-                style = Paint.Style.FILL
-            }
-            val lines = spec.text.lines().ifEmpty { listOf(spec.text) }
-            val metrics = paint.fontMetrics
-            val lineHeight = (metrics.descent - metrics.ascent) * TEXT_LINE_SPACING
-            val blockHeight = lineHeight * lines.size
-            val firstBaseline = spec.centerY - blockHeight / 2f - metrics.ascent
-            lines.forEachIndexed { index, line ->
-                canvas.drawText(
-                    line,
-                    spec.centerX - paint.measureText(line) / 2f,
-                    firstBaseline + index * lineHeight,
-                    paint,
-                )
-            }
+            StyledTextRenderer.draw(Canvas(target), spec)
             target
         } catch (error: Throwable) {
             target.recycle()
@@ -192,5 +216,4 @@ internal object ImageEditingEngine {
         }
 
     private const val MIN_CROP_SIZE = 1
-    private const val TEXT_LINE_SPACING = 1.12f
 }

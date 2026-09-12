@@ -5,39 +5,52 @@
   "changelog_label_improvement": "Improvement",
   "changelog_label_dependency": "Dependency",
   "$data": {
+    "v1.1.0": {
+      "released_date": "2026/09/12",
+      "feature": [
+        "Symmetric undo / redo, reversible Restore original, crop aspect-ratio presets, and -45° to +45° fine rotation without changing the output dimensions",
+        "Expanded drawing with Pen, Highlighter, Mosaic, and Eraser tools, plus draggable multiline text with outline, shadow, and rotation",
+        "Editor save choices for source format / JPEG / PNG / WebP, adjustable lossy quality, and lossless WebP on Android 11+",
+        "Converter lossless WebP, indexed PNG for images with up to 256 colors, target file size for JPEG / lossy WebP, and a long-edge resize mode that never upscales",
+        "Optional safe EXIF preservation while always removing GPS, embedded previews, and opaque metadata and normalizing orientation"
+      ],
+      "fix": [
+        "Valid images being rejected when BitmapFactory bounds-only inspection correctly returned no bitmap",
+        "Unreadable editor tool labels in dark mode"
+      ],
+      "improvement": [
+        "Expanded state restoration, memory / output-limit enforcement, and regression coverage to 23 suites / 99 tests",
+        "Updated all 10-language README files and host instructions from shared sources and added three privacy-safe real-device screenshots",
+        "Build verification rejects accidental native dependencies and produces a JSON report"
+      ]
+    },
     "v1.0.1": {
       "released_date": "2026/08/08",
       "fix": [
-        "Return a valid Explorer Action service binding when enabled from Plugin Center"
+        "Plugin could not be enabled from the AutoJs6 plugin center because the service returned an empty binding (onNullBinding)"
       ],
       "improvement": [
-        "Use a shorter plugin name and description with more natural user documentation"
+        "Shortened the plugin name and description and unified the wording of user documentation across languages"
       ]
     },
     "v1.0.0": {
       "released_date": "2026/08/02",
       "feature": [
-        "Image Tools plugin with plugin ID `image-tools`, action IDs `edit-image` and `convert-image`, engine `explorer-action`, and variant `default`",
-        "Explorer Action protocol v3 overflow actions with one read-only image input and host-owned create-sibling output transactions",
-        "Image editor with crop, rotation, flip, brightness, contrast, saturation, color temperature, brush, text, and undo",
-        "JPEG, PNG, and WebP conversion with quality, resizing, aspect-ratio locking, JPEG background, and memory limits",
-        "ContentResolver and ParcelFileDescriptor input and output without raw paths, direct sibling writes, arbitrary result URIs, storage permission, or network permission",
-        "Localized plugin metadata, interface text, instructions, README files, and changelogs in 10 languages"
+        "First release of Image Tools: two overflow menu actions, `Edit image` and `Convert image`, for a single image in the AutoJs6 file manager, with results saved as a new file next to the source while the source stays read-only",
+        "Editor with crop, rotation, flip, brightness, contrast, saturation, color temperature, brush, text, and up to 8 undo steps, with EXIF orientation applied automatically",
+        "Converter with JPEG / PNG / WebP output: adjustable quality 1-100, three resize modes (Original / Percentage / Custom), aspect-ratio locking, JPEG background color selection, and live output size estimation",
+        "Recognition of bmp / gif / heic / heif / jpg / jpeg / png / webp extensions and all `image/*` MIME types",
+        "Plugin service registered on explorer-action protocol v3: single-use read-only input paired with host-owned output transactions, with no storage or network permissions requested",
+        "Plugin metadata, interface, instructions, README, and changelog in 10 languages: Simplified Chinese, Traditional Chinese (Hong Kong / Taiwan), English, French, Spanish, Japanese, Korean, Russian, and Arabic"
       ],
       "improvement": [
-        "Retained editor and converter sessions across configuration changes, including canvas tools, dialog drafts, conversion options, undo history, and in-flight work",
-        "Protected host output transactions with a persistent single-use claim, busy guards, cancellation-safe coroutines, and result delivery after the writer closes",
-        "Hardened output MIME validation, bitmap cleanup, English resource parity, ellipsis lint handling, and release digest stream cleanup"
+        "Preserved editor and converter sessions across configuration changes such as screen rotation, including canvas tools, dialog drafts, conversion options, undo history, and in-flight work",
+        "Guarded output writes with single-use transaction claims, action busy protection, and cancellation-safe coroutines to prevent duplicate submissions and leftover partial files",
+        "Hardened output MIME validation, bitmap memory recycling, and multi-language resource consistency"
       ],
       "dependency": [
-        "Added AndroidX ExifInterface 1.4.2 for secure image metadata parsing",
-        "Added Robolectric 4.16.1 for lifecycle and persistent transaction tests"
-      ]
-    },
-    "v1.1.0": {
-      "released_date": "2026/09/11",
-      "improvement": [
-        "Build verification rejects accidental native dependencies and produces a JSON report"
+        "Appended AndroidX ExifInterface 1.4.2 for safely reading image orientation metadata",
+        "Appended Robolectric 4.16.1 for unit tests of lifecycle and output transactions"
       ]
     }
   }

@@ -16,7 +16,7 @@
 
 ******
 
-### Langues
+### Langues (Languages)
 
 ******
 
@@ -39,18 +39,76 @@ Le fichier README.md actuel prend en charge les langues suivantes:
 
 ******
 
-Image Tools fournit des actions indépendantes pour modifier et convertir une seule image dans le gestionnaire de fichiers. Il lit la source sans la modifier et écrit uniquement dans une transaction de sortie appartenant à l'hôte.
+Image Tools est un plugin de traitement d'images pour le gestionnaire de fichiers d'AutoJs6. Une fois activé, chaque fichier image du gestionnaire de fichiers propose deux actions dans son menu secondaire: `Modifier l'image` ouvre un éditeur avec un canevas et une barre d'outils pour les retouches courantes (recadrage, rotation, réglages de couleur, dessin), tandis que `Convertir l'image` ouvre une boîte de dialogue qui enregistre l'image en JPEG, PNG ou WebP, avec un redimensionnement optionnel.
+
+Le résultat est toujours enregistré comme un nouveau fichier à côté de la source (son nom porte le suffixe `edited` ou `converted`). Le fichier source reste en lecture seule du début à la fin et n'est jamais modifié, écrasé ni supprimé. Le plugin ne demande aucune permission de stockage ni de réseau et ne peut accéder qu'au seul fichier d'entrée et au seul emplacement de sortie autorisés par l'hôte.
 
 ******
 
-### Fonctions
+### Points forts
 
 ******
 
-- Modifier avec recadrage, rotation, retournement, luminosité, contraste, saturation, température de couleur, pinceau, texte et annulation.
-- Convertir en JPEG, PNG ou WebP avec qualité, redimensionnement, verrouillage du ratio et fond JPEG.
-- Décoder via ContentResolver et ParcelFileDescriptor sans chemin brut ni BitmapFactory.decodeFile.
-- Encoder uniquement vers l'URI exact fourni par l'hôte et renvoyer uniquement l'ID de transaction en cas de succès.
+- L'éditeur propose des préréglages de recadrage; des rotations à 90 degrés et une rotation précise de -45° à +45°; des retournements horizontal et vertical; luminosité, contraste, saturation et température de couleur; pinceaux et texte stylé, avec aperçu en direct pendant le réglage.
+- Les pinceaux comprennent stylo, surligneur, mosaïque de confidentialité et gomme, avec mémorisation de la couleur et de l'épaisseur; le texte accepte plusieurs lignes, taille, couleur, contour, ombre et placement par glissement.
+- Annuler et rétablir conservent jusqu'à 8 instantanés dans un budget de 192 MiB; `Restaurer l'original` est lui-même réversible et quitter avec des modifications non enregistrées exige une confirmation.
+- Le dialogue d'enregistrement peut conserver le format source ou choisir JPEG, PNG ou WebP, régler la qualité avec perte et activer WebP sans perte sous Android 11+; l'hôte publie un nouveau fichier voisin sans écraser la source.
+- Le convertisseur prend en charge JPEG / PNG / WebP, la qualité 1-100 (92 par défaut), une taille cible pour JPEG et WebP avec perte, WebP sans perte sous Android 11+, et l'optimisation PNG indexée automatique lorsque l'image compte au plus 256 couleurs.
+- Quatre modes de taille couvrent `Original`, `Pourcentage` (1-1000), `Personnalisé` avec verrouillage des proportions et `Côté long` (1920 px par défaut, sans agrandissement); JPEG peut remplir la transparence en blanc ou noir.
+- Le dialogue prévisualise la résolution et la taille estimée en temps réel. La conservation EXIF sûre est désactivée par défaut; activée, elle garde des champs d'appareil bornés, normalise l'orientation et supprime toujours le GPS et les aperçus intégrés.
+- Les changements de configuration conservent le canevas, les brouillons, l'historique annuler/rétablir et les tâches en cours; chaque action utilise toujours une entrée en lecture seule et une transaction de sortie voisine, à usage unique et appartenant à l'hôte.
+
+******
+
+### Captures d'écran
+
+******
+
+<table>
+  <tr>
+    <td align="center" valign="top" width="33%">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/images/screenshots/file-menu-action.png?raw=true" alt="Actions du menu du fichier" width="300" />
+      <br />
+      <sub>Actions du menu du fichier</sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/images/screenshots/editor.png?raw=true" alt="Éditeur d'images" width="300" />
+      <br />
+      <sub>Éditeur d'images</sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/images/screenshots/converter-dialog.png?raw=true" alt="Options de conversion JPEG" width="300" />
+      <br />
+      <sub>Options de conversion JPEG</sub>
+    </td>
+  </tr>
+</table>
+
+******
+
+### Installation et utilisation
+
+******
+
+Avant de commencer, vérifiez les prérequis suivants:
+
+```text
+host app: AutoJs6 (org.autojs.autojs6)
+minimum host build: 5269
+minimum android: 7.0 (API 24)
+plugin package: io.github.supermonster003.autojs6.plugin.imagetools
+```
+
+Il faut 4 étapes entre l'installation et la première image traitée:
+
+1. Téléchargez et installez l'APK du plugin. Le plugin n'a pas d'icône de lanceur; après l'installation, il est entièrement géré par AutoJs6.
+2. Ouvrez AutoJs6, accédez au `Centre des plugins`, repérez `Outils d'image` et activez-le.
+3. Dans le gestionnaire de fichiers d'AutoJs6, localisez un fichier image (par exemple `photo.jpg`) et ouvrez son menu secondaire.
+4. Sélectionnez `Modifier l'image` pour entrer dans l'éditeur, ou `Convertir l'image` pour ouvrir la boîte de dialogue de conversion.
+
+La barre de l'éditeur propose `Recadrer`, `Tourner à gauche`, `Tourner à droite`, `Rotation précise`, `Retourner horizontalement`, `Retourner verticalement`, `Luminosité`, `Contraste`, `Saturation`, `Température de couleur`, `Pinceau` et `Texte`. Le recadrage comprend des proportions libres, fixes et d'origine; la rotation précise va de -45° à +45°. Les pinceaux sont stylo, surligneur, mosaïque et gomme; le texte accepte plusieurs lignes, contour et ombre. La barre supérieure fournit `Annuler`, `Rétablir` et `Enregistrer`, et le menu supplémentaire `Restaurer l'original`. `Enregistrer` ouvre un dialogue pour conserver le format source ou choisir JPEG / PNG / WebP, régler la qualité avec perte et activer WebP sans perte sous Android 11+. L'hôte publie un nouveau fichier voisin suffixé `edited`; les métadonnées source sont supprimées et l'original n'est jamais écrasé.
+
+Le dialogue de conversion propose JPEG / PNG / WebP (PNG par défaut), la qualité 1-100 (92 par défaut), WebP sans perte sous Android 11+ et `Taille de fichier cible`, qui choisit automatiquement la qualité pour JPEG ou WebP avec perte. `Redimensionner` offre `Original`, `Pourcentage` (1-1000), `Côté long` (1920 px par défaut, sans agrandissement) et `Personnalisé` avec verrouillage facultatif des proportions. JPEG peut remplir la transparence en blanc ou noir; PNG utilise automatiquement une palette indexée si le résultat compte au plus 256 couleurs. `Conserver les métadonnées EXIF sûres` est désactivé par défaut et supprime toujours le GPS, les aperçus intégrés et les métadonnées impossibles à inspecter sûrement. Le dialogue affiche résolution, taille estimée et suffixe. `Convertir` demande à l'hôte de publier un fichier voisin suffixé `converted`; `Annuler` ou retour ne crée aucun fichier.
 
 ******
 
@@ -58,34 +116,44 @@ Image Tools fournit des actions indépendantes pour modifier et convertir une se
 
 ******
 
-Le plugin valide le contenu par décodage Android au lieu de faire confiance à l'extension ou au type MIME déclaré:
+Le gestionnaire de fichiers affiche les actions du plugin pour les fichiers portant les extensions suivantes (et tout type MIME `image/*`):
 
 ```text
-Input: Android-decodable images; output: JPEG, PNG, WebP
+input:  bmp, gif, heic, heif, jpg, jpeg, png, webp (image/*)
+output: JPEG (jpg), PNG (png), WebP (webp)
 ```
+
+Le plugin identifie les images par leur contenu et ne fait pas confiance aux extensions: l'ouverture dépend de la capacité d'Android à décoder le fichier. Les fichiers animés comme les GIF et les WebP animés sont traités sur leur première image uniquement; les fichiers d'entrée et de sortie sont chacun plafonnés à 256 MiB.
 
 ******
 
-### Interface du plugin
+### Questions fréquentes
 
 ******
 
-L'hôte découvre et exécute le plugin avec les identités suivantes:
+**Le menu du fichier n'affiche pas `Modifier l'image` et `Convertir l'image`?**
 
-```text
-service action: org.autojs.plugin.EXPLORER_ACTION
-execute action: org.autojs.plugin.EXPLORER_ACTION_EXECUTE
-plugin id: image-tools
-engine: explorer-action
-variant: default
-Explorer action id: edit-image / convert-image
-MIME type: input: image/*; output: image/jpeg, image/png, image/webp
-required host build: 5269
-```
+Vérifiez dans l'ordre: le code de version d'AutoJs6 est au moins 5269; le plugin est activé dans le `Centre des plugins`; l'extension du fichier ou son type MIME figure dans la liste prise en charge. Si l'une des trois conditions manque, les actions n'apparaissent pas.
 
-La version 1 enregistre deux actions overflow du protocole v3 uniquement dans l'Explorer principal. Chaque action accepte une source en lecture seule et crée un nouveau fichier voisin via la transaction de l'hôte. La source n'est jamais remplacée.
+**L'ouverture échoue avec `Impossible de lire les informations de l'image` ou l'écran se ferme aussitôt?**
 
-La version 5269 ou ultérieure de l'hôte est requise.
+Causes courantes: le fichier est corrompu ou n'est pas une vraie image (le plugin vérifie le contenu, renommer l'extension ne sert à rien); le système ne peut pas décoder le format (HEIC / HEIF est généralement non pris en charge avant Android 9); le fichier dépasse 256 MiB; ou l'appel ne provient pas du gestionnaire de fichiers d'AutoJs6. Pour des raisons de sécurité, le plugin rejette les appels de toute autre origine.
+
+**Où le résultat est-il enregistré? Écrase-t-il l'original?**
+
+Il n'écrase jamais rien. L'hôte publie le résultat comme un nouveau fichier à côté de la source avec le suffixe `edited` ou `converted` et résout automatiquement les conflits de noms; le fichier source reste en lecture seule pour le plugin du début à la fin.
+
+**La conversion d'une grande image signale une mémoire insuffisante ou trop de pixels?**
+
+La taille de sortie est bornée de trois façons: aucun côté ne peut dépasser 16384 px, le total ne peut pas dépasser 40 millions de pixels (40 MP), et le tout doit tenir dans le budget mémoire de l'appareil. Si la source dépasse les limites, passez `Redimensionner` sur `Pourcentage`, `Côté long` ou `Personnalisé` pour réduire la sortie; en cas de problème de mémoire, fermer d'autres applications ou réduire encore la résolution suffit généralement.
+
+**Pourquoi une image éditée ressort-elle avec une résolution plus basse?**
+
+Pour garder l'édition fluide et stable, les images au-dessus du budget de pixels d'édition (jusqu'à environ 16 MP selon la mémoire de l'appareil) sont sous-échantillonnées avant d'entrer dans l'éditeur, et le résultat enregistré correspond au canevas d'édition. Si vous voulez seulement changer le format ou la taille sans retoucher les pixels, utilisez `Convertir l'image`: il décode précisément à la taille de sortie et n'est pas soumis à ce budget.
+
+**Peut-il traiter plusieurs images à la fois, ou enregistrer le résultat dans un autre dossier?**
+
+Pas encore. Le protocole explorer-action v3 ne prend en charge que les actions sur un seul fichier avec une sortie voisine, et le plugin ne peut pas choisir lui-même l'emplacement de sortie. Les actions multi-fichiers et les modes de sortie supplémentaires dépendent des versions futures du protocole et sont suivis dans la feuille de route.
 
 ******
 
@@ -93,19 +161,46 @@ La version 5269 ou ultérieure de l'hôte est requise.
 
 ******
 
-Le plugin ne demande aucune autorisation de stockage ou de réseau. Il rejette les requêtes non v3, les surfaces non principales, les actions inattendues, les URI parents, les éléments ClipData supplémentaires, les sources inscriptibles, les URI non content, les ID invalides, les MIME de sortie non pris en charge et les limites supérieures à 256 MiB. L'URI de sortie n'est jamais renvoyé.
+Le plugin applique le principe du refus par défaut. Toutes les mesures suivantes sont toujours actives et ne peuvent pas être désactivées:
+
+- Le fichier source est strictement en lecture seule: le plugin ouvre l'entrée uniquement via un content URI en lecture seule à usage unique accordé par l'hôte, ne reçoit aucun chemin du système de fichiers et ne demande aucune permission de stockage ni de réseau.
+- La sortie n'est écrite que dans l'emplacement exact pré-créé par l'hôte, et en cas de succès le plugin ne renvoie que l'identifiant de transaction; il ne peut choisir, créer ni renvoyer aucun autre URI.
+- Chaque transaction de sortie est à usage unique: les identifiants consommés sont enregistrés de façon persistante, et les requêtes rejouées ou dupliquées sont rejetées d'emblée.
+- Chaque appel est entièrement validé: toute discordance de version de protocole, de surface d'origine, d'identifiant d'action, de mode d'autorisation, de type MIME, de nom d'affichage ou d'identifiant de transaction interrompt l'exécution, et les autorisations en écriture sur la source sont également rejetées.
+- L'entrée et la sortie sont chacune plafonnées à 256 MiB, la résolution de sortie à 16384 px par côté et 40 MP au total, et le nombre d'octets encodés est contrôlé pendant l'écriture.
+- La sortie fraîchement encodée supprime les métadonnées de la source par défaut. La conservation EXIF sûre et facultative utilise une liste limitée; l'orientation est normalisée, tandis que la position GPS, les aperçus intégrés et les métadonnées impossibles à contrôler en toute sécurité sont toujours supprimés.
 
 ******
 
-### Limites de sécurité
+### Interface du plugin (pour les développeurs)
 
 ******
 
-- Une image source en lecture seule et un URI de sortie exact par action.
-- Taille maximale de l'entrée déclarée et de la sortie encodée: `256 MiB`.
-- Sortie limitée à JPEG, PNG ou WebP.
-- Dimensions, pixels, échantillonnage, mémoire, historique et octets encodés sont limités.
-- L'annulation renvoie `RESULT_CANCELED`; le succès renvoie uniquement l'ID correspondant.
+L'hôte détecte et invoque le plugin avec les identités suivantes:
+
+```text
+service action: org.autojs.plugin.EXPLORER_ACTION
+execute action: org.autojs.plugin.EXPLORER_ACTION_EXECUTE
+plugin id: image-tools
+engine: explorer-action
+variant: default
+explorer action ids: edit-image / convert-image
+input MIME types: image/*
+output MIME types: image/jpeg, image/png, image/webp
+required host build: 5269
+```
+
+L'implémentation actuelle vise le protocole explorer-action v3: deux actions de menu secondaire pour un seul fichier image sur la surface principale du gestionnaire de fichiers, chacune prenant une entrée en lecture seule et écrivant un nouveau fichier via une transaction de sortie create-sibling détenue par l'hôte, en ne renvoyant que l'identifiant de transaction en cas de succès. Les actions multi-fichiers et au niveau des dossiers dépendent des versions futures du protocole et sont suivies dans la feuille de route.
+
+******
+
+### Feuille de route
+
+******
+
+Les capacités achevées et les projets à venir sont tenus sous forme de liste cochable dans ROADMAP.md. Les cases non cochées expriment une intention et ne décrivent pas les capacités actuelles.
+
+- [Ouvrir le ROADMAP.md cochable](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/ROADMAP.md)
 
 ******
 
@@ -113,42 +208,51 @@ Le plugin ne demande aucune autorisation de stockage ou de réseau. Il rejette l
 
 ******
 
-# v1.0.1
+#### v1.1.0
+
+###### 2026/09/12
+
+* `Fonctionnalité` Ajout d'un historique symétrique Annuler / Rétablir, de la restauration réversible de l'original, de formats de recadrage prédéfinis et d'une rotation fine de -45° à +45° sans modifier les dimensions de sortie
+* `Fonctionnalité` Extension du dessin avec Stylo, Surligneur, Mosaïque et Gomme, ainsi que du texte multiligne déplaçable avec contour, ombre et rotation
+* `Fonctionnalité` Ajout dans l'éditeur des formats Source / JPEG / PNG / WebP, de la qualité avec perte réglable et du WebP sans perte sous Android 11+
+* `Fonctionnalité` Ajout au convertisseur du WebP sans perte, du PNG indexé jusqu'à 256 couleurs, d'une taille de fichier cible pour JPEG / WebP avec perte et d'un redimensionnement par côté long sans agrandissement
+* `Fonctionnalité` Ajout de la conservation facultative des EXIF sûres, avec suppression systématique du GPS, des aperçus intégrés et des métadonnées opaques, puis normalisation de l'orientation
+* `Correctif` Correction du rejet d'images valides lorsque l'inspection des seules limites par BitmapFactory ne renvoyait correctement aucun bitmap
+* `Correctif` Correction des libellés d'outils illisibles dans l'éditeur en mode sombre
+* `Amélioration` Extension de la restauration d'état, des limites mémoire / sortie et de la couverture de régression à 23 suites / 99 tests
+* `Amélioration` Mise à jour des README et instructions hôte en 10 langues depuis des sources partagées, avec trois captures réelles sans données personnelles
+* `Amélioration` La vérification de compilation rejette les dépendances natives involontaires et produit un rapport JSON
+
+#### v1.0.1
 
 ###### 2026/08/08
 
-* `Correctif` Renvoyer une liaison de service Explorer Action valide lors de l'activation depuis le centre des plugins
-* `Amélioration` Raccourcir le nom et la description du plugin et rendre la documentation utilisateur plus naturelle
+* `Correctif` Le plugin ne pouvait pas être activé depuis le centre des plugins AutoJs6 car le service renvoyait une liaison vide (onNullBinding)
+* `Amélioration` Nom et description du plugin raccourcis et formulation de la documentation utilisateur unifiée entre les langues
 
-# v1.0.0
+#### v1.0.0
 
 ###### 2026/08/02
 
-* `Fonctionnalité` Plugin Image Tools avec ID `image-tools`, actions `edit-image` et `convert-image`, moteur `explorer-action` et variante `default`
-* `Fonctionnalité` Actions overflow du protocole Explorer Action v3 avec une image en lecture seule et une transaction create-sibling appartenant a l hote
-* `Fonctionnalité` Editeur avec recadrage, rotation, retournement, reglages de couleur, pinceau, texte et annulation
-* `Fonctionnalité` Conversion JPEG, PNG et WebP avec qualite, redimensionnement, ratio, fond JPEG et limites de memoire
-* `Fonctionnalité` Entrees et sorties ContentResolver et ParcelFileDescriptor sans chemin brut, ecriture voisine directe, URI arbitraire, stockage ou reseau
-* `Fonctionnalité` Métadonnées, interface, instructions, README et journaux localisés dans 10 langues
-* `Amélioration` Conservation des sessions de l'éditeur et du convertisseur lors des changements de configuration, y compris les outils de canevas, les brouillons de dialogue, les options, l'historique d'annulation et les tâches en cours
-* `Amélioration` Protection des transactions de sortie de l'hôte par une revendication persistante à usage unique, des gardes d'activité, des coroutines annulables et le retour du résultat après la fermeture du writer
-* `Amélioration` Validation renforcée des types MIME de sortie, libération des bitmaps, cohérence des ressources anglaises, gestion lint des points de suspension et fermeture du flux de résumé de publication
-* `Dépendance` Ajout d'AndroidX ExifInterface 1.4.2 pour l'analyse sécurisée des métadonnées d'image
-* `Dépendance` Ajout de Robolectric 4.16.1 pour les tests du cycle de vie et des transactions persistantes
+* `Fonctionnalité` Première version d'Image Tools : deux actions de menu contextuel, `Modifier l'image` et `Convertir l'image`, pour une image unique dans le gestionnaire de fichiers AutoJs6, le résultat étant enregistré comme nouveau fichier à côté de la source qui reste en lecture seule
+* `Fonctionnalité` Éditeur avec recadrage, rotation, retournement, luminosité, contraste, saturation, température de couleur, pinceau, texte et jusqu'à 8 étapes d'annulation, avec application automatique de l'orientation EXIF
+* `Fonctionnalité` Convertisseur avec sortie JPEG / PNG / WebP : qualité réglable de 1 à 100, trois modes de redimensionnement (Original / Pourcentage / Personnalisé), verrouillage des proportions, choix de la couleur de fond JPEG et estimation en direct de la taille de sortie
+* `Fonctionnalité` Reconnaissance des extensions bmp / gif / heic / heif / jpg / jpeg / png / webp et de tous les types MIME `image/*`
+* `Fonctionnalité` Service du plugin enregistré sur le protocole explorer-action v3 : entrée en lecture seule à usage unique associée à des transactions de sortie détenues par l'hôte, sans demande de permission de stockage ni de réseau
+* `Fonctionnalité` Métadonnées du plugin, interface, instructions, README et journal des modifications en 10 langues : chinois simplifié, chinois traditionnel (Hong Kong / Taïwan), anglais, français, espagnol, japonais, coréen, russe et arabe
+* `Amélioration` Sessions de l'éditeur et du convertisseur préservées lors des changements de configuration comme la rotation de l'écran, y compris les outils du canevas, les brouillons de dialogues, les options de conversion, l'historique d'annulation et les tâches en cours
+* `Amélioration` Écritures de sortie protégées par des déclarations de transaction à usage unique, une protection contre les actions simultanées et des coroutines sûres à l'annulation, évitant les soumissions en double et les fichiers partiels résiduels
+* `Amélioration` Validation MIME de sortie, recyclage mémoire des bitmaps et cohérence des ressources multilingues renforcés
+* `Dépendance` Ajout d'AndroidX ExifInterface 1.4.2 pour lire en toute sécurité les métadonnées d'orientation des images
+* `Dépendance` Ajout de Robolectric 4.16.1 pour les tests unitaires du cycle de vie et des transactions de sortie
 
-# v1.1.0
-
-###### 2026/09/11
-
-* `Amélioration` La vérification de compilation rejette les dépendances natives involontaires et produit un rapport JSON
-
-##### Autres versions
+##### Historique complet
 
 * [CHANGELOG-fr.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/assets/doc/CHANGELOG-fr.md)
 
 ******
 
-### Construction
+### Compilation
 
 ******
 
@@ -156,13 +260,13 @@ Le plugin ne demande aucune autorisation de stockage ou de réseau. Il rejette l
 .\gradlew.bat :app:assembleDebug
 ```
 
-Construction de publication:
+Compilation Release:
 
 ```powershell
 .\gradlew.bat :app:assembleRelease
 ```
 
-Les paramètres proviennent de `version.properties`. Le SDK minimal est 24 et le SDK cible est 36.
+Les paramètres de compilation proviennent de `version.properties`. Le SDK minimum actuel est 24 et le SDK cible est 36.
 
 ******
 
@@ -172,6 +276,7 @@ Les paramètres proviennent de `version.properties`. Le SDK minimal est 24 et le
 
 ```text
 .readme/lang_*.json
+.readme/template_plugin_instruction.md
 .changelog/lang_*.json
 .python/generate_markdown.py
 app/src/main/assets/doc/CHANGELOG-*.md
@@ -179,7 +284,7 @@ app/src/main/res/values-*/strings.xml
 app/src/main/res/raw-*/plugin_instruction.md
 ```
 
-`strings.xml` localise les textes. `plugin_instruction.md` fournit les instructions. `.python/generate_markdown.py` génère les README et journaux depuis les sources JSON.
+`strings.xml` localise les informations du plugin et l'interface de l'éditeur et du convertisseur. Les fichiers README, CHANGELOG et `plugin_instruction.md` côté hôte sont générés depuis des sources JSON et des modèles Markdown par `.python/generate_markdown.py`: pour modifier la documentation, éditez les sources sous `.readme` et `.changelog` puis relancez le script au lieu de modifier les fichiers Markdown générés.
 
 ******
 
@@ -188,6 +293,7 @@ app/src/main/res/raw-*/plugin_instruction.md
 ******
 
 - Documentation AutoJs6: https://docs.autojs6.com
-- Partage sécurisé de fichiers Android: https://developer.android.com/training/secure-file-sharing
+- Partage de fichiers sécurisé Android: https://developer.android.com/training/secure-file-sharing
 
-[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/16kb.md)
+
+[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/16kb.md)

@@ -13,6 +13,17 @@
         android:id="@+id/action_undo"
         android:icon="@drawable/ic_undo_white_48dp"
         android:title="@string/text_undo"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_redo"
+        android:icon="@drawable/ic_redo_white_24dp"
+        android:title="@string/text_redo"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_restore_original"
+        android:title="@string/image_editor_restore_original"
+        app:showAsAction="never" />
 
 </menu>

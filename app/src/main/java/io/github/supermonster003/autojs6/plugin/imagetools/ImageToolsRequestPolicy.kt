@@ -30,74 +30,76 @@ internal data class ImageToolsRequest(
 /** Strictly validates the v3 read-only input and host-owned output transaction. */
 internal object ImageToolsRequestPolicy {
 
-    fun resolve(context: Context, intent: Intent?, expectedActionId: String): ImageToolsRequest? = try {
-        intent ?: return null
-        if (expectedActionId !in SUPPORTED_ACTION_IDS) return null
-        if (intent.action != ExplorerActionPluginActions.EXECUTE) return null
-        if (intent.getStringExtra(ExplorerActionIntentExtras.ACTION_ID) != expectedActionId) return null
-        if (
-            intent.getIntExtra(ExplorerActionIntentExtras.PROTOCOL_VERSION, Int.MIN_VALUE) !=
-            ExplorerActionProtocol.VERSION
-        ) return null
-        if (
-            intent.getStringExtra(ExplorerActionIntentExtras.SOURCE_SURFACE) !=
-            ExplorerActionIntentValues.SOURCE_SURFACE_MAIN
-        ) return null
-        if (!hasExactReadOnlyIntentGrant(intent)) return null
-        if (intent.hasExtra(ExplorerActionIntentExtras.PARENT_URI)) return null
+    fun resolve(context: Context, intent: Intent?, expectedActionId: String): ImageToolsRequest? {
+        return try {
+            intent ?: return null
+            if (expectedActionId !in SUPPORTED_ACTION_IDS) return null
+            if (intent.action != ExplorerActionPluginActions.EXECUTE) return null
+            if (intent.getStringExtra(ExplorerActionIntentExtras.ACTION_ID) != expectedActionId) return null
+            if (
+                intent.getIntExtra(ExplorerActionIntentExtras.PROTOCOL_VERSION, Int.MIN_VALUE) !=
+                ExplorerActionProtocol.VERSION
+            ) return null
+            if (
+                intent.getStringExtra(ExplorerActionIntentExtras.SOURCE_SURFACE) !=
+                ExplorerActionIntentValues.SOURCE_SURFACE_MAIN
+            ) return null
+            if (!hasExactReadOnlyIntentGrant(intent)) return null
+            if (intent.hasExtra(ExplorerActionIntentExtras.PARENT_URI)) return null
 
-        val inputUri = intent.data?.takeIf(::isPlainContentUri) ?: return null
-        val outputUri = intent.parcelableUriExtra(ExplorerActionIntentExtras.OUTPUT_URI)
-            ?.takeIf(::isPlainContentUri)
-            ?: return null
-        if (inputUri == outputUri) return null
-        if (!hasExactInputClip(intent.clipData, inputUri)) return null
-        if (!hasExpectedPermissions(context, inputUri, outputUri)) return null
+            val inputUri = intent.data?.takeIf(::isPlainContentUri) ?: return null
+            val outputUri = intent.parcelableUriExtra(ExplorerActionIntentExtras.OUTPUT_URI)
+                ?.takeIf(::isPlainContentUri)
+                ?: return null
+            if (inputUri == outputUri) return null
+            if (!hasExactInputClip(intent.clipData, inputUri)) return null
+            if (!hasExpectedPermissions(context, inputUri, outputUri)) return null
 
-        val transactionId = intent.getStringExtra(ExplorerActionIntentExtras.OUTPUT_TRANSACTION_ID)
-            ?.takeIf(::isUuid)
-            ?: return null
-        val displayName = validateDisplayName(
-            intent.getStringExtra(ExplorerActionIntentExtras.DISPLAY_NAME),
-        ) ?: return null
-        if (!intent.hasExtra(ExplorerActionIntentExtras.SIZE)) return null
-        val declaredSize = intent.getLongExtra(ExplorerActionIntentExtras.SIZE, -1L)
-            .takeIf { it in 1L..MAX_INPUT_BYTES }
-            ?: return null
-        val declaredMimeType = normalizeMimeType(intent.type)
-            ?.takeIf {
-                it.startsWith("image/") ||
-                    it == GENERIC_BINARY_MIME ||
-                    it == GLOBAL_WILDCARD_MIME
-            }
-            ?: return null
-        val allowedOutputMimeTypes = normalizeOutputMimeTypes(
-            intent.getStringArrayListExtra(ExplorerActionIntentExtras.OUTPUT_MIME_TYPES),
-        )
-            ?: return null
-        val maxOutputBytes = intent.getLongExtra(ExplorerActionIntentExtras.MAX_OUTPUT_BYTES, -1L)
-            .takeIf { it in 1L..ImageToolsPlugin.MAX_OUTPUT_BYTES }
-            ?: return null
-        val expectedSuffix = if (expectedActionId == ImageToolsPlugin.EDIT_ACTION_ID) "edited" else "converted"
-        val outputNameSuffix = intent.getStringExtra(ExplorerActionIntentExtras.OUTPUT_NAME_SUFFIX)
-            ?.takeIf { it == expectedSuffix }
-            ?: return null
+            val transactionId = intent.getStringExtra(ExplorerActionIntentExtras.OUTPUT_TRANSACTION_ID)
+                ?.takeIf(::isUuid)
+                ?: return null
+            val displayName = validateDisplayName(
+                intent.getStringExtra(ExplorerActionIntentExtras.DISPLAY_NAME),
+            ) ?: return null
+            if (!intent.hasExtra(ExplorerActionIntentExtras.SIZE)) return null
+            val declaredSize = intent.getLongExtra(ExplorerActionIntentExtras.SIZE, -1L)
+                .takeIf { it in 1L..MAX_INPUT_BYTES }
+                ?: return null
+            val declaredMimeType = normalizeMimeType(intent.type)
+                ?.takeIf {
+                    it.startsWith("image/") ||
+                        it == GENERIC_BINARY_MIME ||
+                        it == GLOBAL_WILDCARD_MIME
+                }
+                ?: return null
+            val allowedOutputMimeTypes = normalizeOutputMimeTypes(
+                intent.getStringArrayListExtra(ExplorerActionIntentExtras.OUTPUT_MIME_TYPES),
+            )
+                ?: return null
+            val maxOutputBytes = intent.getLongExtra(ExplorerActionIntentExtras.MAX_OUTPUT_BYTES, -1L)
+                .takeIf { it in 1L..ImageToolsPlugin.MAX_OUTPUT_BYTES }
+                ?: return null
+            val expectedSuffix = if (expectedActionId == ImageToolsPlugin.EDIT_ACTION_ID) "edited" else "converted"
+            val outputNameSuffix = intent.getStringExtra(ExplorerActionIntentExtras.OUTPUT_NAME_SUFFIX)
+                ?.takeIf { it == expectedSuffix }
+                ?: return null
 
-        if (!canOpenInput(context.contentResolver, inputUri)) return null
-        ImageToolsRequest(
-            actionId = expectedActionId,
-            inputUri = inputUri,
-            outputUri = outputUri,
-            transactionId = transactionId,
-            displayName = displayName,
-            declaredSize = declaredSize,
-            declaredMimeType = declaredMimeType,
-            allowedOutputMimeTypes = allowedOutputMimeTypes,
-            maxOutputBytes = maxOutputBytes,
-            outputNameSuffix = outputNameSuffix,
-        )
-    } catch (_: RuntimeException) {
-        null
+            if (!canOpenInput(context.contentResolver, inputUri)) return null
+            ImageToolsRequest(
+                actionId = expectedActionId,
+                inputUri = inputUri,
+                outputUri = outputUri,
+                transactionId = transactionId,
+                displayName = displayName,
+                declaredSize = declaredSize,
+                declaredMimeType = declaredMimeType,
+                allowedOutputMimeTypes = allowedOutputMimeTypes,
+                maxOutputBytes = maxOutputBytes,
+                outputNameSuffix = outputNameSuffix,
+            )
+        } catch (_: RuntimeException) {
+            null
+        }
     }
 
     internal fun hasExactReadOnlyIntentGrant(intent: Intent): Boolean {

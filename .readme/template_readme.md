@@ -2,7 +2,7 @@
 
 <div align="center">
   <p>
-    <img src="{{ repo_url }}/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
+    <img src="{{ repo_url }}/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="{{ icon_alt }}" border="0" width="128" />
   </p>
 
   <p>{{ text_plugin_synopsis }}</p>
@@ -32,13 +32,64 @@
 
 {{ p_introduction }}
 
+{{ p_introduction_secure }}
+
 ******
 
 ### {{ h3_functions }}
 
 ******
 
-{{ placeholder_features }}
+{{ placeholder_highlights }}
+
+******
+
+### {{ h3_screenshots }}
+
+******
+
+<table>
+  <tr>
+    <td align="center" valign="top" width="33%">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/file-menu-action.png?raw=true" alt="{{ text_screenshot_file_menu_action }}" width="300" />
+      <br />
+      <sub>{{ text_screenshot_file_menu_action }}</sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/editor.png?raw=true" alt="{{ text_screenshot_editor }}" width="300" />
+      <br />
+      <sub>{{ text_screenshot_editor }}</sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/converter-dialog.png?raw=true" alt="{{ text_screenshot_converter_dialog }}" width="300" />
+      <br />
+      <sub>{{ text_screenshot_converter_dialog }}</sub>
+    </td>
+  </tr>
+</table>
+
+******
+
+### {{ h3_usage }}
+
+******
+
+{{ p_usage_prerequisites }}:
+
+```text
+host app: AutoJs6 ({{ host_package }})
+minimum host build: {{ required_host_build }}
+minimum android: {{ min_android }}
+plugin package: {{ plugin_package }}
+```
+
+{{ p_usage_steps_intro }}:
+
+{{ placeholder_usage_steps }}
+
+{{ p_usage_editor_tips }}
+
+{{ p_usage_converter_tips }}
 
 ******
 
@@ -51,6 +102,26 @@
 ```text
 {{ supported_formats }}
 ```
+
+{{ p_supported_formats_note }}
+
+******
+
+### {{ h3_faq }}
+
+******
+
+{{ placeholder_faq }}
+
+******
+
+### {{ h3_security }}
+
+******
+
+{{ p_security_intro }}:
+
+{{ placeholder_security_points }}
 
 ******
 
@@ -66,30 +137,23 @@ execute action: {{ plugin_execute_action }}
 plugin id: {{ plugin_id }}
 engine: {{ plugin_engine }}
 variant: {{ plugin_variant }}
-Explorer action id: {{ explorer_action_id }}
-MIME type: {{ mime_type }}
+explorer action ids: {{ explorer_action_ids }}
+input MIME types: {{ input_mime_types }}
+output MIME types: {{ output_mime_types }}
 required host build: {{ required_host_build }}
 ```
 
 {{ p_plugin_scope }}
 
-{{ p_plugin_packaging }}
+******
+
+### {{ h3_roadmap }}
 
 ******
 
-### {{ h3_security }}
+{{ p_roadmap_status }}
 
-******
-
-{{ p_security }}
-
-******
-
-### {{ h3_security_limits }}
-
-******
-
-{{ placeholder_security_limits }}
+- [{{ text_open_roadmap }}]({{ repo_url }}/blob/master/ROADMAP.md)
 
 ******
 
@@ -129,6 +193,7 @@ required host build: {{ required_host_build }}
 
 ```text
 .readme/lang_*.json
+.readme/template_plugin_instruction.md
 .changelog/lang_*.json
 .python/generate_markdown.py
 app/src/main/assets/doc/CHANGELOG-*.md
@@ -145,6 +210,7 @@ app/src/main/res/raw-*/plugin_instruction.md
 ******
 
 - {{ text_link_autojs6_docs }}: {{ docs_autojs6_url }}
-- {{ text_link_android_secure_file_sharing }}: https://developer.android.com/training/secure-file-sharing
+- {{ text_link_android_secure_file_sharing }}: {{ android_secure_file_sharing_url }}
 
-[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/16kb.md)
+
+[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/docs/16kb.md)

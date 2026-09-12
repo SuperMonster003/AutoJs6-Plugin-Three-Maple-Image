@@ -1,15 +1,23 @@
 {
   "repo_url": "https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools",
   "repo_slug": "SuperMonster003/AutoJs6-Plugin-Image-Tools",
+  "icon_alt": "image-tools-ic-launcher",
   "docs_autojs6_url": "https://docs.autojs6.com",
+  "android_secure_file_sharing_url": "https://developer.android.com/training/secure-file-sharing",
   "plugin_action": "org.autojs.plugin.EXPLORER_ACTION",
   "plugin_execute_action": "org.autojs.plugin.EXPLORER_ACTION_EXECUTE",
   "plugin_id": "image-tools",
   "plugin_engine": "explorer-action",
   "plugin_variant": "default",
-  "explorer_action_id": "edit-image / convert-image",
-  "mime_type": "input: image/*; output: image/jpeg, image/png, image/webp",
+  "explorer_action_ids": "edit-image / convert-image",
+  "input_mime_types": "image/*",
+  "output_mime_types": "image/jpeg, image/png, image/webp",
+  "host_package": "org.autojs.autojs6",
+  "plugin_package": "io.github.supermonster003.autojs6.plugin.imagetools",
   "required_host_build": "5269",
-  "supported_formats": "Input: Android-decodable images; output: JPEG, PNG, WebP",
-  "max_input_size": "256 MiB"
+  "min_android": "7.0 (API 24)",
+  "limit_io_size": "256 MiB",
+  "limit_max_dimension": "16384 px",
+  "limit_max_pixels": "40 MP",
+  "supported_formats": "input:  bmp, gif, heic, heif, jpg, jpeg, png, webp (image/*)\noutput: JPEG (jpg), PNG (png), WebP (webp)"
 }

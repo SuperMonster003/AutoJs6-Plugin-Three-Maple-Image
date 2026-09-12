@@ -9,6 +9,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import androidx.exifinterface.media.ExifInterface
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.FilterOutputStream
 import java.io.IOException
 import java.io.OutputStream
@@ -20,6 +23,8 @@ internal object ImageBitmapIO {
         val displaySize: ImagePixelSize,
         val mimeType: String,
         val orientation: Int,
+        val pngPaletteColorCount: Int? = null,
+        val preservableExifMetadata: PreservedExifMetadata = PreservedExifMetadata.EMPTY,
     )
 
     class OutputLimitExceededException(val limitBytes: Long) :
@@ -35,14 +40,29 @@ internal object ImageBitmapIO {
             ?.lowercase()
             ?.takeIf { it.startsWith("image/") }
             ?: throw IOException("Input is not a recognized image")
-        val orientation = readExifOrientation(resolver, uri)
+        val exifSnapshot = ExifMetadataPolicy.read(resolver, uri)
+        val orientation = exifSnapshot.orientation
         val rawSize = ImagePixelSize(bounds.outWidth, bounds.outHeight)
         val displaySize = if (orientation.swapsDimensions()) {
             ImagePixelSize(bounds.outHeight, bounds.outWidth)
         } else {
             rawSize
         }
-        return SourceInfo(rawSize, displaySize, detectedMimeType, orientation)
+        val pngPaletteColorCount = if (detectedMimeType == ImageOutputFormat.PNG.mimeType) {
+            runCatching {
+                resolver.openInputStream(uri)?.use(PngSourceMetadata::paletteColorCount)
+            }.getOrNull()
+        } else {
+            null
+        }
+        return SourceInfo(
+            rawSize,
+            displaySize,
+            detectedMimeType,
+            orientation,
+            pngPaletteColorCount,
+            exifSnapshot.preservableMetadata,
+        )
     }
 
     fun decodeForEditing(resolver: ContentResolver, uri: Uri): Bitmap {
@@ -128,43 +148,293 @@ internal object ImageBitmapIO {
         bitmap: Bitmap,
         options: ImageConversionOptions,
         maxOutputBytes: Long,
+        temporaryDirectory: File? = null,
+    ): ImageOutputWriteResult {
+        validateOutput(bitmap, options, maxOutputBytes)
+        val targetFileSizeResult = options.targetFileSizeBytes?.let {
+            selectTargetFileSize(bitmap, options, maxOutputBytes, temporaryDirectory)
+        }
+        val encodingOptions = targetFileSizeResult?.let { result ->
+            options.copy(quality = result.quality, targetFileSizeBytes = null)
+        } ?: options
+        val pngPalettePlan = preparePngPalettePlan(bitmap, encodingOptions)
+        val encodedBitmap = prepareBitmapForEncoding(bitmap, encodingOptions)
+        var stagedFile: File? = null
+        try {
+            if (encodingOptions.preservedExifMetadata?.isEmpty == false) {
+                stagedFile = stageEncodedOutput(
+                    bitmap = encodedBitmap,
+                    options = encodingOptions,
+                    maxOutputBytes = maxOutputBytes,
+                    pngPalettePlan = pngPalettePlan,
+                    temporaryDirectory = requireTemporaryDirectory(temporaryDirectory),
+                )
+            }
+            val descriptor = resolver.openFileDescriptor(outputUri, ImageToolsPlugin.OUTPUT_OPEN_MODE)
+                ?: throw IOException("Unable to open host output transaction")
+            val encodedBytes = ParcelFileDescriptor.AutoCloseOutputStream(descriptor).use { output ->
+                stagedFile?.let { file -> copyStagedOutput(file, output, maxOutputBytes) }
+                    ?: encodePreparedOutput(
+                        encodedBitmap,
+                        encodingOptions,
+                        output,
+                        maxOutputBytes,
+                        pngPalettePlan,
+                    )
+            }
+            return ImageOutputWriteResult(
+                encodedBytes = encodedBytes,
+                quality = encodingOptions.quality,
+                targetFileSizeResult = targetFileSizeResult?.copy(encodedBytes = encodedBytes),
+            )
+        } finally {
+            stagedFile?.delete()
+            if (encodedBitmap !== bitmap) encodedBitmap.recycle()
+        }
+    }
+
+    internal fun encodeOutput(
+        bitmap: Bitmap,
+        options: ImageConversionOptions,
+        output: OutputStream,
+        maxOutputBytes: Long,
+        temporaryDirectory: File? = null,
+    ): ImageOutputWriteResult {
+        validateOutput(bitmap, options, maxOutputBytes)
+        val targetFileSizeResult = options.targetFileSizeBytes?.let {
+            selectTargetFileSize(bitmap, options, maxOutputBytes, temporaryDirectory)
+        }
+        val encodingOptions = targetFileSizeResult?.let { result ->
+            options.copy(quality = result.quality, targetFileSizeBytes = null)
+        } ?: options
+        val pngPalettePlan = preparePngPalettePlan(bitmap, encodingOptions)
+        val encodedBitmap = prepareBitmapForEncoding(bitmap, encodingOptions)
+        var stagedFile: File? = null
+        try {
+            val encodedBytes = if (encodingOptions.preservedExifMetadata?.isEmpty == false) {
+                stagedFile = stageEncodedOutput(
+                    bitmap = encodedBitmap,
+                    options = encodingOptions,
+                    maxOutputBytes = maxOutputBytes,
+                    pngPalettePlan = pngPalettePlan,
+                    temporaryDirectory = requireTemporaryDirectory(temporaryDirectory),
+                )
+                copyStagedOutput(requireNotNull(stagedFile), output, maxOutputBytes)
+            } else {
+                encodePreparedOutput(
+                    encodedBitmap,
+                    encodingOptions,
+                    output,
+                    maxOutputBytes,
+                    pngPalettePlan,
+                )
+            }
+            return ImageOutputWriteResult(
+                encodedBytes = encodedBytes,
+                quality = encodingOptions.quality,
+                targetFileSizeResult = targetFileSizeResult?.copy(encodedBytes = encodedBytes),
+            )
+        } finally {
+            stagedFile?.delete()
+            if (encodedBitmap !== bitmap) encodedBitmap.recycle()
+        }
+    }
+
+    internal fun selectTargetFileSize(
+        bitmap: Bitmap,
+        options: ImageConversionOptions,
+        maxOutputBytes: Long,
+        temporaryDirectory: File? = null,
+    ): ImageTargetFileSizeResult {
+        validateOutput(bitmap, options, maxOutputBytes)
+        val targetBytes = requireNotNull(options.targetFileSizeBytes) {
+            "Target file size mode is not enabled"
+        }
+        require(targetBytes <= maxOutputBytes) { "Target file size exceeds the host output limit" }
+        require(
+            ImageOutputEncodingPolicy.supportsTargetFileSize(
+                format = options.format,
+                webpLosslessRequested = options.webpLossless,
+                sdkInt = Build.VERSION.SDK_INT,
+            ),
+        ) { "Target file size mode requires JPEG or lossy WebP output" }
+
+        val encodedBitmap = prepareBitmapForEncoding(bitmap, options)
+        try {
+            val minimumQuality = ImageConversionOptions.MIN_QUALITY
+            val maximumQuality = ImageOutputEncodingPolicy.maximumLossyQuality(
+                format = options.format,
+                sdkInt = Build.VERSION.SDK_INT,
+            )
+            return ImageTargetFileSizeSearch.search(
+                targetBytes = targetBytes,
+                minQuality = minimumQuality,
+                maxQuality = maximumQuality,
+            ) { quality ->
+                try {
+                    measurePreparedOutput(
+                        bitmap = encodedBitmap,
+                        options = options.copy(quality = quality, targetFileSizeBytes = null),
+                        maxOutputBytes = maxOutputBytes,
+                        pngPalettePlan = null,
+                        temporaryDirectory = temporaryDirectory,
+                    )
+                } catch (error: OutputLimitExceededException) {
+                    if (quality == minimumQuality) throw error
+                    maxOutputBytes + 1L
+                }
+            }
+        } finally {
+            if (encodedBitmap !== bitmap) encodedBitmap.recycle()
+        }
+    }
+
+    private fun measurePreparedOutput(
+        bitmap: Bitmap,
+        options: ImageConversionOptions,
+        maxOutputBytes: Long,
+        pngPalettePlan: PngOutputOptimizer.PalettePlan?,
+        temporaryDirectory: File?,
+    ): Long {
+        if (options.preservedExifMetadata?.isEmpty != false) {
+            return encodePreparedOutput(
+                bitmap = bitmap,
+                options = options,
+                output = DISCARDING_OUTPUT_STREAM,
+                maxOutputBytes = maxOutputBytes,
+                pngPalettePlan = pngPalettePlan,
+            )
+        }
+        val stagedFile = stageEncodedOutput(
+            bitmap = bitmap,
+            options = options,
+            maxOutputBytes = maxOutputBytes,
+            pngPalettePlan = pngPalettePlan,
+            temporaryDirectory = requireTemporaryDirectory(temporaryDirectory),
+        )
+        return try {
+            stagedFile.length()
+        } finally {
+            stagedFile.delete()
+        }
+    }
+
+    private fun stageEncodedOutput(
+        bitmap: Bitmap,
+        options: ImageConversionOptions,
+        maxOutputBytes: Long,
+        pngPalettePlan: PngOutputOptimizer.PalettePlan?,
+        temporaryDirectory: File,
+    ): File {
+        val stagedFile = File.createTempFile(
+            "image-tools-output-",
+            ".${options.format.extension}",
+            temporaryDirectory,
+        )
+        try {
+            FileOutputStream(stagedFile).use { output ->
+                encodePreparedOutput(bitmap, options, output, maxOutputBytes, pngPalettePlan)
+            }
+            ExifMetadataPolicy.applyTo(stagedFile, requireNotNull(options.preservedExifMetadata))
+            val finalBytes = stagedFile.length()
+            if (finalBytes <= 0L) throw IOException("Unable to stage encoded image")
+            if (finalBytes > maxOutputBytes) throw OutputLimitExceededException(maxOutputBytes)
+            return stagedFile
+        } catch (error: Throwable) {
+            stagedFile.delete()
+            throw error
+        }
+    }
+
+    private fun copyStagedOutput(
+        stagedFile: File,
+        output: OutputStream,
+        maxOutputBytes: Long,
+    ): Long {
+        val bounded = BoundedOutputStream(output, maxOutputBytes)
+        FileInputStream(stagedFile).use { input -> input.copyTo(bounded) }
+        if (bounded.limitExceeded) throw OutputLimitExceededException(maxOutputBytes)
+        bounded.flush()
+        return bounded.bytesWritten
+    }
+
+    private fun requireTemporaryDirectory(directory: File?): File = requireNotNull(directory) {
+        "EXIF preservation requires an app-private temporary directory"
+    }.also {
+        require(it.isDirectory) { "EXIF temporary directory is unavailable" }
+    }
+
+    private fun encodePreparedOutput(
+        bitmap: Bitmap,
+        options: ImageConversionOptions,
+        output: OutputStream,
+        maxOutputBytes: Long,
+        pngPalettePlan: PngOutputOptimizer.PalettePlan?,
+    ): Long {
+        val useLosslessWebp = ImageOutputEncodingPolicy.usesWebpLossless(
+            format = options.format,
+            requested = options.webpLossless,
+            sdkInt = Build.VERSION.SDK_INT,
+        )
+        val quality = when {
+            useLosslessWebp -> ImageConversionOptions.MAX_QUALITY
+            options.format == ImageOutputFormat.WEBP &&
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.R &&
+                options.quality == ImageConversionOptions.MAX_QUALITY ->
+                ImageConversionOptions.MAX_QUALITY - 1
+            else -> options.quality
+        }
+        val bounded = BoundedOutputStream(output, maxOutputBytes)
+        val compressed = if (options.format == ImageOutputFormat.PNG && pngPalettePlan != null) {
+            PngOutputOptimizer.encode(bitmap, pngPalettePlan, bounded)
+            true
+        } else {
+            bitmap.compress(
+                options.format.compressFormat(useLosslessWebp),
+                quality,
+                bounded,
+            )
+        }
+        if (bounded.limitExceeded) throw OutputLimitExceededException(maxOutputBytes)
+        if (!compressed) {
+            throw IOException("Unable to encode image")
+        }
+        bounded.flush()
+        return bounded.bytesWritten
+    }
+
+    private fun prepareBitmapForEncoding(
+        bitmap: Bitmap,
+        options: ImageConversionOptions,
+    ): Bitmap {
+        if (options.format != ImageOutputFormat.JPEG || !bitmap.hasAlpha()) return bitmap
+        return Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888).also { encoded ->
+            Canvas(encoded).apply {
+                drawColor(options.jpegBackgroundColor)
+                drawBitmap(bitmap, 0f, 0f, null)
+            }
+        }
+    }
+
+    private fun preparePngPalettePlan(
+        bitmap: Bitmap,
+        options: ImageConversionOptions,
+    ): PngOutputOptimizer.PalettePlan? = if (options.format == ImageOutputFormat.PNG) {
+        PngOutputOptimizer.plan(bitmap)
+    } else {
+        null
+    }
+
+    private fun validateOutput(
+        bitmap: Bitmap,
+        options: ImageConversionOptions,
+        maxOutputBytes: Long,
     ) {
         require(bitmap.width == options.targetSize.width && bitmap.height == options.targetSize.height) {
             "Bitmap size does not match conversion options"
         }
         require(maxOutputBytes in 1L..ImageToolsPlugin.MAX_OUTPUT_BYTES) {
             "Invalid output byte limit"
-        }
-        var encodedBitmap = bitmap
-        try {
-            if (options.format == ImageOutputFormat.JPEG && bitmap.hasAlpha()) {
-                encodedBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
-                Canvas(encodedBitmap).apply {
-                    drawColor(options.jpegBackgroundColor)
-                    drawBitmap(bitmap, 0f, 0f, null)
-                }
-            }
-            val quality = when {
-                options.format == ImageOutputFormat.WEBP &&
-                    Build.VERSION.SDK_INT < Build.VERSION_CODES.R &&
-                    options.quality == ImageConversionOptions.MAX_QUALITY ->
-                    ImageConversionOptions.MAX_QUALITY - 1
-                else -> options.quality
-            }
-            val descriptor = resolver.openFileDescriptor(outputUri, ImageToolsPlugin.OUTPUT_OPEN_MODE)
-                ?: throw IOException("Unable to open host output transaction")
-            val base = ParcelFileDescriptor.AutoCloseOutputStream(descriptor)
-            try {
-                val bounded = BoundedOutputStream(base, maxOutputBytes)
-                if (!encodedBitmap.compress(options.format.compressFormat(), quality, bounded)) {
-                    throw IOException("Unable to encode image")
-                }
-                bounded.flush()
-            } finally {
-                base.close()
-            }
-        } finally {
-            if (encodedBitmap !== bitmap) encodedBitmap.recycle()
         }
     }
 
@@ -206,9 +476,11 @@ internal object ImageBitmapIO {
         resolver: ContentResolver,
         uri: Uri,
         options: BitmapFactory.Options,
-    ): Bitmap? = resolver.openInputStream(uri)?.use { input ->
-        BitmapFactory.decodeStream(input, null, options)
-    } ?: throw IOException("Unable to open input image")
+    ): Bitmap? {
+        val input = resolver.openInputStream(uri)
+            ?: throw IOException("Unable to open input image")
+        return input.use { BitmapFactory.decodeStream(it, null, options) }
+    }
 
     private fun selectSampleSize(info: SourceInfo, targetSize: ImagePixelSize): Int? {
         val rawTargetSize = if (info.orientation.swapsDimensions()) {
@@ -242,23 +514,16 @@ internal object ImageBitmapIO {
         return estimatedBytes in 1..heapBudget
     }
 
-    private fun editingPixelBudget(): Long {
+    internal fun editingPixelBudget(): Long {
         val heapBudget = (Runtime.getRuntime().maxMemory() * MAX_EDIT_HEAP_FRACTION).toLong()
         val bitmapBudget = (heapBudget - EDIT_MEMORY_OVERHEAD_BYTES).coerceAtLeast(
-            MIN_EDIT_PIXEL_COUNT * BYTES_PER_PIXEL * EDIT_PEAK_BITMAP_COUNT,
+            MIN_EDIT_PIXEL_COUNT * BYTES_PER_PIXEL * EDIT_PEAK_BITMAP_NUMERATOR /
+                EDIT_PEAK_BITMAP_DENOMINATOR,
         )
-        return (bitmapBudget / BYTES_PER_PIXEL / EDIT_PEAK_BITMAP_COUNT)
+        return (bitmapBudget / BYTES_PER_PIXEL * EDIT_PEAK_BITMAP_DENOMINATOR /
+            EDIT_PEAK_BITMAP_NUMERATOR)
             .coerceIn(MIN_EDIT_PIXEL_COUNT, MAX_EDIT_PIXELS)
     }
-
-    private fun readExifOrientation(resolver: ContentResolver, uri: Uri): Int = runCatching {
-        resolver.openFileDescriptor(uri, ImageToolsPlugin.INPUT_OPEN_MODE)?.use { descriptor ->
-            ExifInterface(descriptor.fileDescriptor).getAttributeInt(
-                ExifInterface.TAG_ORIENTATION,
-                ExifInterface.ORIENTATION_NORMAL,
-            )
-        }
-    }.getOrNull() ?: ExifInterface.ORIENTATION_NORMAL
 
     private fun applyExifOrientation(orientation: Int, source: Bitmap): Bitmap {
         val transformed = when (orientation) {
@@ -290,13 +555,14 @@ internal object ImageBitmapIO {
         if (this > Long.MAX_VALUE / factor) Long.MAX_VALUE else this * factor
 
     @Suppress("DEPRECATION")
-    private fun ImageOutputFormat.compressFormat(): Bitmap.CompressFormat = when (this) {
+    private fun ImageOutputFormat.compressFormat(useLosslessWebp: Boolean): Bitmap.CompressFormat = when (this) {
         ImageOutputFormat.JPEG -> Bitmap.CompressFormat.JPEG
         ImageOutputFormat.PNG -> Bitmap.CompressFormat.PNG
-        ImageOutputFormat.WEBP -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Bitmap.CompressFormat.WEBP_LOSSY
-        } else {
-            Bitmap.CompressFormat.WEBP
+        ImageOutputFormat.WEBP -> when {
+            useLosslessWebp && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ->
+                Bitmap.CompressFormat.WEBP_LOSSLESS
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> Bitmap.CompressFormat.WEBP_LOSSY
+            else -> Bitmap.CompressFormat.WEBP
         }
     }
 
@@ -305,6 +571,10 @@ internal object ImageBitmapIO {
         private val maxBytes: Long,
     ) : FilterOutputStream(output) {
         private var count = 0L
+        val bytesWritten: Long
+            get() = count
+        var limitExceeded = false
+            private set
 
         override fun write(value: Int) {
             requireCapacity(1)
@@ -320,14 +590,25 @@ internal object ImageBitmapIO {
 
         private fun requireCapacity(additional: Int) {
             if (additional < 0 || count > maxBytes - additional.toLong()) {
+                limitExceeded = true
                 throw OutputLimitExceededException(maxBytes)
             }
         }
     }
 
+    private val DISCARDING_OUTPUT_STREAM = object : OutputStream() {
+        override fun write(value: Int) = Unit
+
+        override fun write(buffer: ByteArray, offset: Int, length: Int) {
+            require(offset >= 0 && length >= 0 && offset <= buffer.size - length)
+        }
+    }
+
     private const val MAX_EDIT_PIXELS = 16_000_000L
     private const val MIN_EDIT_PIXEL_COUNT = 256L * 256L
-    private const val EDIT_PEAK_BITMAP_COUNT = 2L
+    // Source + target + one mosaic buffer no larger than 1/16 of the source.
+    private const val EDIT_PEAK_BITMAP_NUMERATOR = 33L
+    private const val EDIT_PEAK_BITMAP_DENOMINATOR = 16L
     private const val BYTES_PER_PIXEL = 4L
     private const val EDIT_MEMORY_OVERHEAD_BYTES = 8L * 1024L * 1024L
     private const val MEMORY_OVERHEAD_BYTES = 16L * 1024L * 1024L
