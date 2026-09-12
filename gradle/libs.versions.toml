@@ -58,6 +58,7 @@ commons-lang3 = "3.18.0"
 constraintlayout = "2.2.1"
 easywindow = "10.3"
 eventbus = "3.3.1"
+exifinterface = "1.4.2"
 flexbox = "3.0.0"
 flexmark-html2md = "0.64.8"
 foojay-resolver-convention = "1.0.0"
@@ -131,6 +132,7 @@ core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 easywindow = { module = "com.github.getActivity:EasyWindow", version.ref = "easywindow" }
 eventbus = { module = "org.greenrobot:eventbus", version.ref = "eventbus" }
+exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
 flexmark-html2md = { module = "com.vladsch.flexmark:flexmark-html2md-converter", version.ref = "flexmark-html2md" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }

@@ -1,44 +1,99 @@
 {
   "$name": "English",
   "text_current_lowercase": "current",
-  "text_plugin_synopsis": "File manager plugin. View images with zoom, metadata, sharing, and safe external fallback",
+  "text_plugin_synopsis": "File manager plugin. Secure read-only image browsing with same-folder paging, zoom, metadata, printing, and sharing",
   "h3_languages_with_ascii": "Languages",
   "p_languages_all_supported_for_readme": "The current README.md supports the following languages",
   "h3_introduction": "Introduction",
-  "p_introduction": "Image Viewer provides the primary image-viewing action for supported files in the file manager. It opens a temporary read-only content URI in a focused viewer without changing the source file.",
-  "h3_functions": "Features",
-  "features": [
-    "Registers a protocol v2 primary Explorer action for the eight image extensions previously viewed by the host.",
-    "Fits the image to the screen and supports focal pinch zoom, panning, double-tap reset, and tap-to-hide controls.",
-    "Displays the file name, MIME type, size, and decoded resolution.",
-    "Shares the image or opens it in another compatible app while excluding this plugin from its own fallback.",
-    "Provides an independent Android `ACTION_VIEW` gateway for read-only `content` URIs with `image/*` MIME types."
+  "p_introduction": "Image Viewer is an image browsing plugin for the AutoJs6 file manager. Once enabled, tapping a common image file such as JPG, PNG, GIF, or WEBP opens it in a dedicated viewer: the image fits the screen automatically, pinch to inspect details, and at 1x you can swipe left or right through supported images in the same folder. The title and bottom metadata bar update for every page, with sharing or handoff to another app available for the originally opened image.",
+  "p_introduction_secure": "The plugin does one thing and does it safely: read-only viewing. The originally tapped file arrives through a temporary read-only content URI, while direct siblings can only be enumerated and opened through a short-lived, host-owned readSiblings session. The plugin requests no storage or network permission, never modifies or moves a source file, and closes the host session with the viewer.",
+  "h3_functions": "Highlights",
+  "highlights": [
+    "Open an exact selection: in AutoJs6 selection mode, choose up to 128 supported images from one folder and tap `View image`; the viewer keeps the host selection order and swipes only within that chosen group.",
+    "Tap and browse: tapping a supported image file opens the viewer directly; at 1x, swipe left or right to move through supported images in the same folder in natural file-name order.",
+    "Natural gestures: focal pinch zoom centered on your fingers (up to {{ max_zoom_factor }}x), one-finger panning, double-tap to toggle a 2.5x zoom around the touch point, 90° clockwise view rotation, and tap to hide or reveal the controls for distraction-free viewing. A compact indicator shows the live multiplier while pinching and briefly after a double-tap.",
+    "Detail-preserving large-image zoom: when oversized JPEG, PNG, or static HEIC/HEIF images exceed the device texture limit or bounded decode budget, the viewer shows a sampled preview and decodes only high-resolution tiles for the visible region while zoomed. Tile memory stays capped and is released on page changes or memory pressure.",
+    "Key facts at a glance: the overlay title bar shows the file name plus a `3 / 12` style page counter when several images are open, while the bottom bar reports the MIME type, file size, and decoded resolution (width x height). On Android 8.0 or later, when the decoder exposes them, it also reports decoded pixel depth (bpp) and output color space.",
+    "Details bottom sheet: tap `Details` to open a draggable sheet with the file name, MIME type, size, resolution, and the capture time, device, exposure, and orientation when EXIF is available. If GPS metadata exists, the viewer reports its presence but keeps the coordinates hidden. Photos are automatically rotated or mirrored to their EXIF orientation before any manual view rotation is applied.",
+    "Print or save as PDF: `Print / Save PDF` in the top-right menu sends the full current image to Android's system print sheet with EXIF correction and manual view rotation preserved. Animated GIFs use the frame visible when tapped; zoom and panning do not crop the output, and the plugin creates no temporary image or PDF file.",
+    "Common formats out of the box: the JPEG family (JPG / JPEG / JPE / JFIF), PNG, WEBP, BMP, GIF, HEIC, HEIF, and AVIF, 11 extensions in total, with animated GIFs looping automatically and a dedicated pause/resume control.",
+    "Share and hand off: bring up the system share sheet with one tap, or use `Open with` for editing or annotating, with the plugin itself excluded from the app list to avoid loops.",
+    "Works as a system image viewer: a separate Android `ACTION_VIEW` entry safely serves read-only image viewing requests from other apps.",
+    "A read-only security sandbox: no storage or network permissions, access to exactly one file through a temporary read-only grant, and the source file is never written."
   ],
-  "h3_supported_formats": "Supported formats",
-  "p_supported_formats": "The Explorer primary action matches these extensions exactly",
-  "h3_plugin_interface": "Plugin interface",
-  "p_plugin_interface": "The host discovers and executes the plugin with the following identities",
-  "p_plugin_scope": "Version 1 supplies the primary image action in the file manager. Image editing, conversion, file information, deletion, moving, and renaming remain host features. Without the plugin, the host falls back to a read-only external `ACTION_VIEW` request.",
-  "p_plugin_packaging": "Host build 5269 or later is required.",
+  "h3_screenshots": "Screenshots",
+  "p_screenshots_intro": "These are real UI captures from AutoJs6 6.8.0 on an Android 13 emulator. Every image, file name, and directory shown was generated specifically for the documentation and contains no personal data.",
+  "screenshot_explorer_caption": "Single-file viewer action in the file manager",
+  "screenshot_selection_caption": "Exact group of two selected images",
+  "screenshot_viewer_caption": "Main viewer and live metadata",
+  "screenshot_zoom_caption": "Immersive 2.5x zoom",
+  "screenshot_share_caption": "System share sheet",
+  "h3_usage": "Installation and Usage",
+  "p_usage_prerequisites": "Before starting, confirm the following requirements",
+  "p_usage_steps_intro": "It takes 4 steps from installation to your first image",
+  "usage_steps": [
+    "Download and install the plugin APK. The plugin has no launcher icon; after installation it is managed entirely by AutoJs6.",
+    "Open AutoJs6, enter the `Plugin center`, locate `Image Viewer`, and enable it.",
+    "In the AutoJs6 file manager, locate any supported image file (such as `screenshot.png`).",
+    "Tap the file. The image opens in the dedicated viewer."
+  ],
+  "p_usage_viewer_tips": "Inside the viewer: at 1x, swipe left or right to move to the previous or next supported image in the same folder. Pinch to zoom around your fingers (1x to {{ max_zoom_factor }}x), drag with one finger to pan, and double-tap to switch between fit-to-screen and a 2.5x zoom centered on the touch point. The current multiplier appears while pinching and briefly after a double-tap. Tap `Rotate` for a view-only quarter turn; an active zoom is preserved, while `Reset zoom` in the top-right menu restores both the original orientation and fitted size. Animated GIFs show a floating `Pause animation` / `Resume animation` button, while static images do not. Tapping the image hides or reveals the overlay bars, and `Details` opens a bottom sheet with the file facts and EXIF fields. `Share` and `Open with` are available on the originally opened image; they are disabled on session-only sibling pages because those pages intentionally have no transferable content URI.",
+  "h3_supported_formats": "Supported Formats",
+  "p_supported_formats": "The viewing action in the file manager matches exactly the following extensions",
+  "p_supported_formats_note": "JFIF and JPE are alias extensions of the JPEG family. HEIC and HEIF require Android 9 or later; AVIF requires Android 12 or later. The viewer also runs a tiny local decoder-capability probe and shows a specific message when the platform decoder is unavailable. The separate `ACTION_VIEW` entry accepts requests by `image/*` MIME type and is not limited to the list above. A single file may be at most {{ max_input_size }}; actual decoding support depends on the Android platform and Glide.",
+  "h3_faq": "FAQ",
+  "faq": [
+    {
+      "question": "Tapping an image file does not open this viewer?",
+      "answer": "Check the following in order: the AutoJs6 version code is at least {{ required_host_build }} (version 6.8.0 or later qualifies); the plugin is enabled in the `Plugin center`; and the file extension is in the supported list. If any of the three fails, the tap will not be served by this plugin."
+    },
+    {
+      "question": "The viewer shows `The image could not be displayed`?",
+      "answer": "Common causes: the image data is corrupted or its encoding is not supported by the current Android platform; the file was moved, renamed, or deleted at the moment of opening; or the declared file size does not match the actual size (the security checks reject such requests)."
+    },
+    {
+      "question": "Can I edit, crop, or permanently rotate images?",
+      "answer": "No. This plugin focuses on read-only viewing. `Rotate` changes only the current display and never the source file. For editing, tap `Open with` to hand the image to an editor app; file operations such as deleting, moving, and renaming remain available in the AutoJs6 file manager."
+    },
+    {
+      "question": "Do animated GIFs play?",
+      "answer": "Yes. Animated GIFs are decoded by Glide and loop automatically. The viewer shows a pause/resume control only for an actual animated drawable, and that control affects display playback without modifying the source file."
+    },
+    {
+      "question": "What happens when the plugin is not installed?",
+      "answer": "The host falls back to a read-only external viewing request served by the image apps already on the device. Once this plugin is installed and enabled, taps open in the built-in viewer instead."
+    },
+    {
+      "question": "Why does the plugin also register a system-level image viewing entry?",
+      "answer": "That is the separate `ACTION_VIEW` entry, which accepts only read-only `content` URI requests of `image/*` types so that other apps can use this viewer. It is isolated from the file manager entry, goes through the same strict validation, and likewise never writes anything."
+    }
+  ],
   "h3_security": "Security",
-  "p_security": "The plugin requests no storage or network permission. The host grants temporary read-only access to the target content URI. The Explorer gateway verifies the exact action, URI, ClipData, file name, MIME type, declared size, and parent relationship, rejects write or persistable grants, and never writes the source. The external `ACTION_VIEW` gateway is separate, accepts only read-only `content` image URIs, and forwards only the validated target URI.",
-  "h3_security_limits": "Safety limits",
-  "security_limits": [
-    "Maximum input size: `{{ max_input_size }}`.",
-    "One target file per action.",
-    "Explorer catalog: `{{ supported_formats }}`.",
-    "External `ACTION_VIEW`: read-only `content` URIs with `image/*` MIME types.",
-    "Actual decoding support still depends on Android and Glide.",
-    "Image editing, conversion, deletion, moving, and renaming are outside this plugin."
+  "p_security_intro": "The plugin is built on a deny-by-default principle. All of the following measures are always on and cannot be disabled",
+  "security_points": [
+    "Bounded explicit groups: multi-selection accepts 1 to 128 supported direct children of one parent. Target IDs, URIs, names, ordered ClipData, MIME types, and sizes must be unique where required and mutually consistent; every selected image is content-checked before the viewer opens.",
+    "Zero sensitive permissions: no storage, network, or other runtime permissions, with cleartext traffic disabled; the file manager entry and the wake entry are protected by the host plugin permission and callable by the host only.",
+    "Temporary scoped read-only access: the selected file uses a temporary content URI; direct siblings are enumerated and opened only through the v12 HOST_SESSION with an opaque target ID and validated direct relative names. The plugin receives no filesystem paths and rejects write or persistable grants.",
+    "Entry-point validation: the action identity, protocol version, request UUID, host build, calling surface, target Bundle, URI structure, ClipData, file name, MIME type, declared size, direct-parent relationship, and host-session Binder descriptor are verified item by item; any mismatch means the request is refused.",
+    "Content double-check: before opening, the image decode bounds are probed and the declared size is compared with the actual size, rejecting on mismatch; a single file is capped at {{ max_input_size }}.",
+    "Isolated dual entries: the file manager entry and the external `ACTION_VIEW` entry are independent of each other; the latter accepts only read-only `content` URI image requests and passes the same content verification.",
+    "The viewer is not exported: the rendering screen can only be started from inside the plugin, sharing and external opening forward only temporary read-only grants, and the source file is never written."
   ],
-  "h3_release_history": "Release history",
-  "h5_for_more_release_history": "For more releases",
+  "h3_plugin_interface": "Plugin Interface (for Developers)",
+  "p_plugin_interface": "The host discovers and invokes the plugin with the following identities",
+  "p_plugin_scope": "The current implementation targets explorer-action protocol version {{ protocol_version }}: the primary action declares a single-file target, read-only access, and `readSiblings`. The host session exposes only direct siblings; the plugin filters supported readable non-link images, applies natural file-name ordering, and keeps a bounded window of at most 128 pages around the selected image. A second read-only selection-toolbar action declares multiple files without `readSiblings`; it accepts 1 to 128 supported images under one parent, preserves host selection order, and transfers only explicitly granted targets. Editing, conversion, file details, deletion, moving, and renaming remain host features; without the plugin, the host falls back to a read-only external `ACTION_VIEW` request.",
+  "h3_roadmap": "Roadmap",
+  "p_roadmap_status": "Completed capabilities and upcoming plans are maintained as a checkable list in ROADMAP.md. Unchecked items express intent and do not describe current abilities.",
+  "text_open_roadmap": "Open the checkable ROADMAP.md",
+  "h3_release_history": "Release History",
+  "h5_for_more_release_history": "Full history",
   "h3_build": "Build",
   "text_release_build": "Release build",
   "p_build_params": "Build parameters come from `version.properties`. The current minimum SDK is 24 and the target SDK is 36",
-  "h3_resource_layout": "Resource layout",
-  "p_resource_layout": "`strings.xml` localizes plugin metadata and UI text. `plugin_instruction.md` provides instructions shown by the host. `.python/generate_markdown.py` generates localized README and changelog files from JSON sources",
+  "h3_resource_layout": "Resource Layout",
+  "p_resource_layout": "`strings.xml` localizes plugin metadata and the viewer UI, while `plugin_instruction.md` provides the usage instructions shown by the host. All README and CHANGELOG files are generated from JSON sources by `.python/generate_markdown.py`: to change the docs, edit the `lang_*.json` files under `.readme` and `.changelog` and rerun the script instead of editing the generated Markdown files",
   "h3_links": "Links",
   "text_link_autojs6_docs": "AutoJs6 documentation",
-  "text_link_android_secure_file_sharing": "Android secure file sharing"
+  "text_link_android_secure_file_sharing": "Android secure file sharing",
+  "text_link_glide": "Glide (image loading and rendering engine)"
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/reset_zoom"
+        android:title="@string/action_reset_zoom"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/print_image"
+        android:enabled="false"
+        android:title="@string/action_print"
+        app:showAsAction="never" />
+
+</menu>

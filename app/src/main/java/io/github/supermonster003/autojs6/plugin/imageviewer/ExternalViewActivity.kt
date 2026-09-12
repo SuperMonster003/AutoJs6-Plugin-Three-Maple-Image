@@ -25,7 +25,14 @@ class ExternalViewActivity : Activity() {
                 ImageContentValidator.resolveExternal(contentResolver, seed)
             }
             if (request != null && !isFinishing && !isDestroyed) {
-                runCatching { startActivity(ImageRequestPolicy.viewerIntent(request)) }
+                runCatching {
+                    startActivity(
+                        ImageViewerContract.viewerIntent(
+                            this@ExternalViewActivity,
+                            ImageViewerLaunchRequest.single(request),
+                        ),
+                    )
+                }
             }
             finish()
         }

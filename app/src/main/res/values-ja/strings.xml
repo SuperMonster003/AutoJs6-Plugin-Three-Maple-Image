@@ -1,18 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">戻る</string>
+    <string name="action_hide_image_details">詳細を非表示</string>
     <string name="action_open_external">別のアプリで開く</string>
+    <string name="action_pause_animation">アニメーションを一時停止</string>
+    <string name="action_print">印刷 / PDF に保存</string>
     <string name="action_reset_zoom">ズームをリセット</string>
+    <string name="action_resume_animation">アニメーションを再開</string>
+    <string name="action_rotate_clockwise">右へ90°回転</string>
     <string name="action_share">共有</string>
+    <string name="action_show_image_details">詳細を表示</string>
     <string name="action_view_image">画像を表示</string>
     <string name="app_name">画像ビューアー</string>
+    <string name="error_cannot_prepare_print">画像を印刷用に準備できませんでした</string>
     <string name="error_cannot_read_image">画像を表示できませんでした</string>
+    <string name="error_image_decoder_unavailable">このデバイスのシステムデコーダーでは %1$s 画像を表示できません</string>
+    <string name="error_image_format_requires_android">%1$s 画像をこのデバイスで表示するには Android %2$d 以降が必要です</string>
     <string name="error_no_external_viewer">ほかの画像ビューアーを利用できません</string>
+    <string name="error_print_failed">印刷ドキュメントを作成できませんでした</string>
+    <string name="exif_capture_time">撮影日時: %1$s</string>
+    <string name="exif_device">撮影機器: %1$s</string>
+    <string name="exif_exposure">露出: %1$s</string>
+    <string name="exif_gps_present">GPS メタデータあり · 座標は非表示</string>
+    <string name="exif_orientation">向き: %1$s</string>
+    <string name="exif_orientation_clockwise">時計回り %1$d°</string>
+    <string name="exif_orientation_mirrored">反転</string>
+    <string name="exif_orientation_mirrored_clockwise">反転 · 時計回り %1$d°</string>
+    <string name="exif_orientation_normal">標準 (0°)</string>
+    <string name="exif_unavailable">EXIF データがありません</string>
     <string name="image_content_description">画像プレビュー</string>
+    <string name="label_details">詳細</string>
+    <string name="label_open_with">他のアプリ</string>
+    <string name="label_rotate">回転</string>
+    <string name="metadata_color_space">色空間: %1$s</string>
+    <string name="metadata_decoded_bit_depth">デコード深度: %1$d bpp</string>
     <string name="metadata_loading" tools:ignore="TypographyEllipsis">画像情報を読み取っています...</string>
     <string name="metadata_resolution">%1$d x %2$d px</string>
     <string name="metadata_resolution_unknown">解像度不明</string>
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
+    <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">画像情報を利用できません</string>
-    <string name="plugin_description">ファイルマネージャープラグイン. ズーム, メタデータ, 共有, 安全な外部フォールバックで画像を表示</string>
+    <string name="page_counter">%1$d / %2$d</string>
+    <string name="plugin_description">ファイルマネージャープラグイン. 同一フォルダーのページ送り, ズーム, メタデータ, 印刷, 共有に対応した安全な読み取り専用画像閲覧</string>
+    <string name="zoom_indicator">%1$s倍</string>
 </resources>

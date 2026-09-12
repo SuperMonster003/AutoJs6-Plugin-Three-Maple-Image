@@ -133,6 +133,7 @@ dependencies {
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.core.ktx)
+    implementation(libs.exifinterface)
     implementation(libs.glide)
     implementation(libs.material)
 

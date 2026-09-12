@@ -4,11 +4,17 @@ import android.content.ClipData
 import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
+import java.util.Locale
+import java.util.UUID
+import org.autojs.plugin.explorer.api.ExplorerActionHostSessionKeys
 import org.autojs.plugin.explorer.api.ExplorerActionIntentExtras
 import org.autojs.plugin.explorer.api.ExplorerActionIntentValues
 import org.autojs.plugin.explorer.api.ExplorerActionPluginActions
 import org.autojs.plugin.explorer.api.ExplorerActionProtocol
-import java.util.Locale
+import org.autojs.plugin.explorer.api.ExplorerActionTargetKeys
+import org.autojs.plugin.explorer.api.ExplorerActionValues
+import org.autojs.plugin.explorer.api.IExplorerActionHostSession
 
 internal data class ImageViewerRequest(
     val targetUri: Uri,
@@ -16,6 +22,26 @@ internal data class ImageViewerRequest(
     val declaredSize: Long,
     val mimeType: String,
 )
+
+internal data class ExplorerImageTarget(
+    val id: String,
+    val image: ImageViewerRequest,
+    val lastModified: Long,
+)
+
+internal data class ExplorerImageRequest(
+    val requestId: String,
+    val parentUri: Uri,
+    val parentDisplayPath: String,
+    val targets: List<ExplorerImageTarget>,
+    val mode: ExplorerImageRequestMode,
+    val hostSession: IExplorerActionHostSession?,
+)
+
+internal enum class ExplorerImageRequestMode {
+    SINGLE_WITH_SIBLINGS,
+    EXPLICIT_SELECTION,
+}
 
 internal data class ExternalImageSeed(
     val targetUri: Uri,
@@ -28,55 +54,28 @@ internal object ImageRequestPolicy {
     const val MAX_DECLARED_SIZE = 8L * 1024L * 1024L * 1024L * 1024L
     const val MAX_DISPLAY_NAME_LENGTH = 255
 
+    private const val INVALID_LAST_MODIFIED = -1L
+    private const val MAX_REQUEST_ID_LENGTH = 36
     private val mimeTokenPattern = Regex("[a-z0-9][a-z0-9!#$&^_.+-]*")
 
-    fun resolveExplorer(intent: Intent?): ImageViewerRequest? = try {
+    fun resolveExplorer(intent: Intent?): ExplorerImageRequest? = try {
         resolveExplorerUnchecked(intent)
     } catch (_: RuntimeException) {
         null
     }
 
-    fun resolveExternal(intent: Intent?): ExternalImageSeed? = try {
-        intent ?: return null
-        if (intent.action != Intent.ACTION_VIEW) return null
-        if (!hasReadOnlyExternalGrant(intent)) return null
-        val targetUri = intent.data?.takeIf(::isPlainContentUri) ?: return null
-        val mimeType = normalizeImageMimeType(intent.type) ?: return null
-        ExternalImageSeed(targetUri, mimeType)
-    } catch (_: RuntimeException) {
-        null
-    }
-
-    fun resolveInternal(intent: Intent?): ImageViewerRequest? = try {
-        intent ?: return null
-        if (intent.action != Intent.ACTION_VIEW) return null
-        if (intent.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION == 0) return null
-        if (intent.flags and FORBIDDEN_INTERNAL_GRANTS != 0) return null
-        val targetUri = intent.data?.takeIf(::isPlainContentUri) ?: return null
-        val clipData = intent.clipData ?: return null
-        if (clipData.itemCount != 1 || !clipData.getItemAt(0).isExactUri(targetUri)) return null
-        val displayName = validateDisplayName(intent.getStringExtra(EXTRA_DISPLAY_NAME)) ?: return null
-        if (!intent.hasExtra(EXTRA_DECLARED_SIZE)) return null
-        val size = intent.getLongExtra(EXTRA_DECLARED_SIZE, -1L)
-            .takeIf(::isDeclaredSizeAccepted) ?: return null
-        val mimeType = normalizeImageMimeType(intent.type) ?: return null
-        ImageViewerRequest(targetUri, displayName, size, mimeType)
-    } catch (_: RuntimeException) {
-        null
-    }
-
-    fun viewerIntent(request: ImageViewerRequest): Intent =
-        Intent(Intent.ACTION_VIEW).apply {
-            setClassName(
-                "io.github.supermonster003.autojs6.plugin.imageviewer",
-                "io.github.supermonster003.autojs6.plugin.imageviewer.ImageViewerActivity",
-            )
-            setDataAndType(request.targetUri, request.mimeType)
-            clipData = ClipData.newRawUri(request.displayName, request.targetUri)
-            putExtra(EXTRA_DISPLAY_NAME, request.displayName)
-            putExtra(EXTRA_DECLARED_SIZE, request.declaredSize)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    fun resolveExternal(intent: Intent?): ExternalImageSeed? {
+        return try {
+            intent ?: return null
+            if (intent.action != Intent.ACTION_VIEW) return null
+            if (!hasReadOnlyExternalGrant(intent)) return null
+            val targetUri = intent.data?.takeIf(::isPlainContentUri) ?: return null
+            val mimeType = normalizeImageMimeType(intent.type) ?: return null
+            ExternalImageSeed(targetUri, mimeType)
+        } catch (_: RuntimeException) {
+            null
         }
+    }
 
     fun normalizeImageMimeType(value: String?): String? {
         val raw = value ?: return null
@@ -104,18 +103,21 @@ internal object ImageRequestPolicy {
     fun mimeTypesAreCompatible(declared: String, resolved: String): Boolean {
         val normalizedDeclared = normalizeImageMimeType(declared) ?: return false
         val normalizedResolved = normalizeImageMimeType(resolved) ?: return false
-        return normalizedDeclared == "image/*" || normalizedDeclared == normalizedResolved
+        return normalizedDeclared == "image/*" ||
+            ImageFormatSupport.mimeTypesAreEquivalent(normalizedDeclared, normalizedResolved)
     }
 
-    private fun resolveExplorerUnchecked(intent: Intent?): ImageViewerRequest? {
+    private fun resolveExplorerUnchecked(intent: Intent?): ExplorerImageRequest? {
         intent ?: return null
         if (intent.action != ExplorerActionPluginActions.EXECUTE) return null
-        if (intent.getStringExtra(ExplorerActionIntentExtras.ACTION_ID) != ImageViewerPlugin.ACTION_ID) {
-            return null
+        val mode = when (intent.getStringExtra(ExplorerActionIntentExtras.ACTION_ID)) {
+            ImageViewerPlugin.ACTION_ID -> ExplorerImageRequestMode.SINGLE_WITH_SIBLINGS
+            ImageViewerPlugin.MULTIPLE_ACTION_ID -> ExplorerImageRequestMode.EXPLICIT_SELECTION
+            else -> return null
         }
         if (
             intent.getIntExtra(ExplorerActionIntentExtras.PROTOCOL_VERSION, Int.MIN_VALUE) !=
-            ExplorerActionProtocol.VERSION
+            ImageViewerPlugin.PROTOCOL_VERSION
         ) {
             return null
         }
@@ -125,39 +127,139 @@ internal object ImageRequestPolicy {
         ) {
             return null
         }
-        if (intent.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION == 0) return null
-        if (intent.flags and FORBIDDEN_EXPLORER_GRANTS != 0) return null
+        if (!hasExactReadOnlyExplorerFlags(intent.flags)) return null
 
-        val targetUri = intent.data?.takeIf(::isPlainContentUri) ?: return null
+        val requestId = canonicalRequestId(
+            intent.getStringExtra(ExplorerActionIntentExtras.REQUEST_ID),
+        ) ?: return null
         val parentUri = intent.parcelableUriExtra(ExplorerActionIntentExtras.PARENT_URI)
             ?.takeIf(::isPlainContentUri)
             ?: return null
-        if (!isStrictDescendant(parentUri, targetUri)) return null
-
-        val clipData = intent.clipData ?: return null
-        if (clipData.itemCount != REQUIRED_EXPLORER_CLIP_ITEM_COUNT) return null
-        if (!clipData.getItemAt(ExplorerActionIntentValues.CLIP_ITEM_TARGET_INDEX).isExactUri(targetUri)) {
-            return null
-        }
-        if (!clipData.getItemAt(ExplorerActionIntentValues.CLIP_ITEM_PARENT_INDEX).isExactUri(parentUri)) {
-            return null
-        }
-
-        val displayName = validateDisplayName(
-            intent.getStringExtra(ExplorerActionIntentExtras.DISPLAY_NAME),
+        val parentDisplayPath = validateParentDisplayPath(
+            intent.getStringExtra(ExplorerActionIntentExtras.PARENT_DISPLAY_PATH),
         ) ?: return null
-        if (targetUri.pathSegments.lastOrNull() != displayName) return null
-        if (!intent.hasExtra(ExplorerActionIntentExtras.SIZE)) return null
-        val declaredSize = intent.getLongExtra(ExplorerActionIntentExtras.SIZE, -1L)
-            .takeIf(::isDeclaredSizeAccepted) ?: return null
-        val mimeType = normalizeImageMimeType(intent.type) ?: return null
+        val targets = intent.parcelableBundleArrayListExtra(ExplorerActionIntentExtras.TARGETS)
+            ?.takeIf { it.size in 1..ExplorerActionProtocol.MAX_TARGETS_PER_REQUEST }
+            ?: return null
+        if (mode == ExplorerImageRequestMode.SINGLE_WITH_SIBLINGS && targets.size != 1) return null
+        val clipData = intent.clipData ?: return null
+        if (clipData.itemCount != targets.size) return null
+        val parsedTargets = targets.mapIndexed { index, targetBundle ->
+            parseExplorerTarget(parentUri, targetBundle)?.also { target ->
+                if (!clipData.getItemAt(index).isExactUri(target.value.image.targetUri)) return null
+            } ?: return null
+        }
+        if (parsedTargets.map { it.value.id }.toSet().size != parsedTargets.size) return null
+        if (parsedTargets.map { it.value.image.targetUri }.toSet().size != parsedTargets.size) return null
+        if (parsedTargets.map { it.value.image.displayName }.toSet().size != parsedTargets.size) return null
 
-        return ImageViewerRequest(targetUri, displayName, declaredSize, mimeType)
+        val firstTarget = parsedTargets.first()
+        if (intent.data != firstTarget.value.image.targetUri) return null
+        val expectedIntentType = if (parsedTargets.size == 1) firstTarget.declaredMimeType else WILDCARD_MIME_TYPE
+        if (intent.type != expectedIntentType) return null
+        if (intent.getStringExtra(ExplorerActionIntentExtras.DISPLAY_NAME) != firstTarget.value.image.displayName) {
+            return null
+        }
+        if (!intent.hasExtra(ExplorerActionIntentExtras.SIZE)) return null
+        if (
+            intent.getLongExtra(ExplorerActionIntentExtras.SIZE, Long.MIN_VALUE) !=
+            firstTarget.value.image.declaredSize
+        ) {
+            return null
+        }
+        if (
+            intent.getLongExtra(ExplorerActionIntentExtras.HOST_VERSION_CODE, Long.MIN_VALUE) <
+            ImageViewerPlugin.REQUIRED_HOST_VERSION
+        ) {
+            return null
+        }
+        val sessionBundle = intent.parcelableBundleExtra(ExplorerActionIntentExtras.HOST_SESSION)
+        val requiresHostSession =
+            mode == ExplorerImageRequestMode.SINGLE_WITH_SIBLINGS || parsedTargets.size > 1
+        val hostSession = if (requiresHostSession) {
+            val binder = sessionBundle?.getBinder(ExplorerActionHostSessionKeys.BINDER) ?: return null
+            if (runCatching { binder.interfaceDescriptor }.getOrNull() != IExplorerActionHostSession.DESCRIPTOR) {
+                return null
+            }
+            IExplorerActionHostSession.Stub.asInterface(binder) ?: return null
+        } else {
+            if (sessionBundle != null) return null
+            null
+        }
+
+        return ExplorerImageRequest(
+            requestId = requestId,
+            parentUri = parentUri,
+            parentDisplayPath = parentDisplayPath,
+            targets = parsedTargets.map(ParsedExplorerTarget::value),
+            mode = mode,
+            hostSession = hostSession,
+        )
+    }
+
+    private fun parseExplorerTarget(parentUri: Uri, bundle: Bundle): ParsedExplorerTarget? {
+        val targetId = validateOpaqueId(bundle.getString(ExplorerActionTargetKeys.ID)) ?: return null
+        val targetUri = bundle.parcelableUri(ExplorerActionTargetKeys.URI)
+            ?.takeIf(::isPlainContentUri)
+            ?: return null
+        if (!isDirectChild(parentUri, targetUri)) return null
+        val displayName = validateDisplayName(bundle.getString(ExplorerActionTargetKeys.DISPLAY_NAME))
+            ?: return null
+        if (targetUri.pathSegments.lastOrNull() != displayName) return null
+        if (
+            bundle.getInt(ExplorerActionTargetKeys.KIND, Int.MIN_VALUE) !=
+            ExplorerActionValues.TARGET_FILE
+        ) {
+            return null
+        }
+        val declaredMimeType = bundle.getString(ExplorerActionTargetKeys.MIME_TYPE) ?: return null
+        val mimeType = ImageFormatSupport.explorerMimeType(displayName, declaredMimeType) ?: return null
+        if (!bundle.containsKey(ExplorerActionTargetKeys.SIZE)) return null
+        val declaredSize = bundle.getLong(ExplorerActionTargetKeys.SIZE, -1L)
+            .takeIf(::isDeclaredSizeAccepted)
+            ?: return null
+        if (!bundle.containsKey(ExplorerActionTargetKeys.LAST_MODIFIED)) return null
+        val lastModified = bundle.getLong(
+            ExplorerActionTargetKeys.LAST_MODIFIED,
+            Long.MIN_VALUE,
+        ).takeIf { it >= INVALID_LAST_MODIFIED } ?: return null
+        return ParsedExplorerTarget(
+            value = ExplorerImageTarget(
+                id = targetId,
+                image = ImageViewerRequest(targetUri, displayName, declaredSize, mimeType),
+                lastModified = lastModified,
+            ),
+            declaredMimeType = declaredMimeType,
+        )
     }
 
     private fun hasReadOnlyExternalGrant(intent: Intent): Boolean {
         if (intent.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION == 0) return false
         return intent.flags and FORBIDDEN_EXTERNAL_GRANTS == 0
+    }
+
+    private fun hasExactReadOnlyExplorerFlags(flags: Int): Boolean =
+        flags and REQUIRED_EXPLORER_FLAGS == REQUIRED_EXPLORER_FLAGS &&
+            flags and ALLOWED_EXPLORER_FLAGS.inv() == 0
+
+    private fun canonicalRequestId(value: String?): String? {
+        val requestId = value?.takeIf { it.length <= MAX_REQUEST_ID_LENGTH } ?: return null
+        val parsed = runCatching { UUID.fromString(requestId) }.getOrNull() ?: return null
+        return requestId.takeIf { parsed.toString().equals(requestId, ignoreCase = true) }
+    }
+
+    private fun validateParentDisplayPath(value: String?): String? {
+        val path = value ?: return null
+        if (path.length !in 1..ExplorerActionProtocol.MAX_PARENT_DISPLAY_PATH_LENGTH) return null
+        return path.takeIf { candidate -> candidate.none(::isUnsafeUnicodeCharacter) }
+    }
+
+    private fun validateOpaqueId(value: String?): String? {
+        val id = value ?: return null
+        if (id.length !in 1..ExplorerActionProtocol.MAX_TARGET_ID_LENGTH) return null
+        return id.takeIf { candidate ->
+            candidate.none { it.isWhitespace() || isUnsafeUnicodeCharacter(it) }
+        }
     }
 
     private fun isPlainContentUri(uri: Uri): Boolean {
@@ -172,11 +274,11 @@ internal object ImageRequestPolicy {
         }
     }
 
-    private fun isStrictDescendant(parentUri: Uri, targetUri: Uri): Boolean {
+    private fun isDirectChild(parentUri: Uri, targetUri: Uri): Boolean {
         if (parentUri.scheme != targetUri.scheme || parentUri.authority != targetUri.authority) return false
         val parentSegments = parentUri.pathSegments
         val targetSegments = targetUri.pathSegments
-        return targetSegments.size > parentSegments.size &&
+        return targetSegments.size == parentSegments.size + 1 &&
             targetSegments.take(parentSegments.size) == parentSegments
     }
 
@@ -195,17 +297,30 @@ internal object ImageRequestPolicy {
     @Suppress("DEPRECATION")
     private fun Intent.parcelableUriExtra(name: String): Uri? = getParcelableExtra(name)
 
-    const val EXTRA_DISPLAY_NAME =
-        "io.github.supermonster003.autojs6.plugin.imageviewer.extra.DISPLAY_NAME"
-    const val EXTRA_DECLARED_SIZE =
-        "io.github.supermonster003.autojs6.plugin.imageviewer.extra.DECLARED_SIZE"
+    @Suppress("DEPRECATION")
+    private fun Intent.parcelableBundleExtra(name: String): Bundle? = getParcelableExtra(name)
 
-    private const val REQUIRED_EXPLORER_CLIP_ITEM_COUNT = 2
-    private const val FORBIDDEN_EXPLORER_GRANTS =
-        Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+    @Suppress("DEPRECATION")
+    private fun Intent.parcelableBundleArrayListExtra(name: String): ArrayList<Bundle>? =
+        getParcelableArrayListExtra(name)
+
+    @Suppress("DEPRECATION")
+    private fun Bundle.parcelableUri(name: String): Uri? = getParcelable(name)
+
+    private const val REQUIRED_EXPLORER_FLAGS =
+        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
+    private const val ALLOWED_EXPLORER_FLAGS =
+        REQUIRED_EXPLORER_FLAGS or
+            Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS or
+            Intent.FLAG_ACTIVITY_NEW_TASK
     private const val FORBIDDEN_EXTERNAL_GRANTS =
         Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
             Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
             Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
-    private const val FORBIDDEN_INTERNAL_GRANTS = FORBIDDEN_EXTERNAL_GRANTS
+    private const val WILDCARD_MIME_TYPE = "*/*"
+
+    private data class ParsedExplorerTarget(
+        val value: ExplorerImageTarget,
+        val declaredMimeType: String,
+    )
 }

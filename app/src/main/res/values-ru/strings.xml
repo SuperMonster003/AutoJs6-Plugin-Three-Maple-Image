@@ -1,18 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">Назад</string>
+    <string name="action_hide_image_details">Скрыть сведения</string>
     <string name="action_open_external">Открыть в другом приложении</string>
+    <string name="action_pause_animation">Приостановить анимацию</string>
+    <string name="action_print">Печать / сохранить PDF</string>
     <string name="action_reset_zoom">Сбросить масштаб</string>
+    <string name="action_resume_animation">Продолжить анимацию</string>
+    <string name="action_rotate_clockwise">Повернуть на 90° по часовой стрелке</string>
     <string name="action_share">Отправить</string>
+    <string name="action_show_image_details">Показать сведения</string>
     <string name="action_view_image">Просмотреть изображение</string>
     <string name="app_name">Просмотр изображений</string>
+    <string name="error_cannot_prepare_print">Не удалось подготовить изображение к печати</string>
     <string name="error_cannot_read_image">Не удалось показать изображение</string>
+    <string name="error_image_decoder_unavailable">Системный декодер этого устройства не может отобразить изображения %1$s</string>
+    <string name="error_image_format_requires_android">Для изображений %1$s на этом устройстве требуется Android %2$d или новее</string>
     <string name="error_no_external_viewer">Другого средства просмотра изображений нет</string>
+    <string name="error_print_failed">Не удалось создать документ для печати</string>
+    <string name="exif_capture_time">Время съёмки: %1$s</string>
+    <string name="exif_device">Устройство: %1$s</string>
+    <string name="exif_exposure">Экспозиция: %1$s</string>
+    <string name="exif_gps_present">Есть метаданные GPS · координаты скрыты</string>
+    <string name="exif_orientation">Ориентация: %1$s</string>
+    <string name="exif_orientation_clockwise">%1$d° по часовой стрелке</string>
+    <string name="exif_orientation_mirrored">Зеркально</string>
+    <string name="exif_orientation_mirrored_clockwise">Зеркально · %1$d° по часовой стрелке</string>
+    <string name="exif_orientation_normal">Обычная (0°)</string>
+    <string name="exif_unavailable">Данные EXIF отсутствуют</string>
     <string name="image_content_description">Предпросмотр изображения</string>
+    <string name="label_details">Сведения</string>
+    <string name="label_open_with">Открыть в</string>
+    <string name="label_rotate">Повернуть</string>
+    <string name="metadata_color_space">Цветовое пространство: %1$s</string>
+    <string name="metadata_decoded_bit_depth">Разрядность после декодирования: %1$d bpp</string>
     <string name="metadata_loading" tools:ignore="TypographyEllipsis">Чтение сведений об изображении...</string>
     <string name="metadata_resolution">%1$d x %2$d px</string>
     <string name="metadata_resolution_unknown">Неизвестное разрешение</string>
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
+    <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">Сведения об изображении недоступны</string>
-    <string name="plugin_description">Плагин файлового менеджера. Просмотр изображений с масштабированием, метаданными, отправкой и безопасным внешним открытием</string>
+    <string name="page_counter">%1$d / %2$d</string>
+    <string name="plugin_description">Плагин файлового менеджера. Безопасный просмотр изображений только для чтения с перелистыванием папки, масштабированием, метаданными, печатью и отправкой</string>
+    <string name="zoom_indicator">%1$s×</string>
 </resources>

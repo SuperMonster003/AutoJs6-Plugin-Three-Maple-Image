@@ -1,18 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">Back</string>
+    <string name="action_hide_image_details">Hide details</string>
     <string name="action_open_external">Open with another app</string>
+    <string name="action_pause_animation">Pause animation</string>
+    <string name="action_print">Print / Save PDF</string>
     <string name="action_reset_zoom">Reset zoom</string>
+    <string name="action_resume_animation">Resume animation</string>
+    <string name="action_rotate_clockwise">Rotate 90° clockwise</string>
     <string name="action_share">Share</string>
+    <string name="action_show_image_details">Show details</string>
     <string name="action_view_image">View image</string>
     <string name="app_name">Image Viewer</string>
+    <string name="error_cannot_prepare_print">The image could not be prepared for printing</string>
     <string name="error_cannot_read_image">The image could not be displayed</string>
+    <string name="error_image_decoder_unavailable">The system decoder on this device cannot display %1$s images</string>
+    <string name="error_image_format_requires_android">%1$s images require Android %2$d or later on this device</string>
     <string name="error_no_external_viewer">No other image viewer is available</string>
+    <string name="error_print_failed">The print document could not be created</string>
+    <string name="exif_capture_time">Captured: %1$s</string>
+    <string name="exif_device">Device: %1$s</string>
+    <string name="exif_exposure">Exposure: %1$s</string>
+    <string name="exif_gps_present">GPS metadata present · coordinates hidden</string>
+    <string name="exif_orientation">Orientation: %1$s</string>
+    <string name="exif_orientation_clockwise">%1$d° clockwise</string>
+    <string name="exif_orientation_mirrored">Mirrored</string>
+    <string name="exif_orientation_mirrored_clockwise">Mirrored · %1$d° clockwise</string>
+    <string name="exif_orientation_normal">Normal (0°)</string>
+    <string name="exif_unavailable">No EXIF data available</string>
     <string name="image_content_description">Image preview</string>
+    <string name="label_details">Details</string>
+    <string name="label_open_with">Open with</string>
+    <string name="label_rotate">Rotate</string>
+    <string name="metadata_color_space">Color: %1$s</string>
+    <string name="metadata_decoded_bit_depth">Decoded depth: %1$d bpp</string>
     <string name="metadata_loading" tools:ignore="TypographyEllipsis">Reading image information...</string>
     <string name="metadata_resolution">%1$d x %2$d px</string>
     <string name="metadata_resolution_unknown">Unknown resolution</string>
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
+    <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">Image information is unavailable</string>
-    <string name="plugin_description">File manager plugin. View images with zoom, metadata, sharing, and safe external fallback</string>
+    <string name="page_counter">%1$d / %2$d</string>
+    <string name="plugin_description">File manager plugin. Secure read-only image browsing with same-folder paging, zoom, metadata, printing, and sharing</string>
+    <string name="zoom_indicator">%1$sx</string>
 </resources>

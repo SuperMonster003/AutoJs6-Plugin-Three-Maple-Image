@@ -1,18 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">뒤로</string>
+    <string name="action_hide_image_details">세부 정보 숨기기</string>
     <string name="action_open_external">다른 앱으로 열기</string>
+    <string name="action_pause_animation">애니메이션 일시중지</string>
+    <string name="action_print">인쇄 / PDF로 저장</string>
     <string name="action_reset_zoom">확대 재설정</string>
+    <string name="action_resume_animation">애니메이션 계속</string>
+    <string name="action_rotate_clockwise">시계 방향으로 90° 회전</string>
     <string name="action_share">공유</string>
+    <string name="action_show_image_details">세부 정보 보기</string>
     <string name="action_view_image">이미지 보기</string>
     <string name="app_name">이미지 뷰어</string>
+    <string name="error_cannot_prepare_print">인쇄할 이미지를 준비할 수 없습니다</string>
     <string name="error_cannot_read_image">이미지를 표시할 수 없습니다</string>
+    <string name="error_image_decoder_unavailable">이 기기의 시스템 디코더는 %1$s 이미지를 표시할 수 없습니다</string>
+    <string name="error_image_format_requires_android">이 기기에서 %1$s 이미지를 표시하려면 Android %2$d 이상이 필요합니다</string>
     <string name="error_no_external_viewer">사용 가능한 다른 이미지 뷰어가 없습니다</string>
+    <string name="error_print_failed">인쇄 문서를 만들 수 없습니다</string>
+    <string name="exif_capture_time">촬영 시각: %1$s</string>
+    <string name="exif_device">기기: %1$s</string>
+    <string name="exif_exposure">노출: %1$s</string>
+    <string name="exif_gps_present">GPS 메타데이터 있음 · 좌표 숨김</string>
+    <string name="exif_orientation">방향: %1$s</string>
+    <string name="exif_orientation_clockwise">시계 방향 %1$d°</string>
+    <string name="exif_orientation_mirrored">좌우 반전</string>
+    <string name="exif_orientation_mirrored_clockwise">좌우 반전 · 시계 방향 %1$d°</string>
+    <string name="exif_orientation_normal">기본 (0°)</string>
+    <string name="exif_unavailable">EXIF 데이터 없음</string>
     <string name="image_content_description">이미지 미리 보기</string>
+    <string name="label_details">상세 정보</string>
+    <string name="label_open_with">다른 앱</string>
+    <string name="label_rotate">회전</string>
+    <string name="metadata_color_space">색 공간: %1$s</string>
+    <string name="metadata_decoded_bit_depth">디코딩 비트 심도: %1$d bpp</string>
     <string name="metadata_loading" tools:ignore="TypographyEllipsis">이미지 정보를 읽는 중...</string>
     <string name="metadata_resolution">%1$d x %2$d px</string>
     <string name="metadata_resolution_unknown">알 수 없는 해상도</string>
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
+    <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">이미지 정보를 사용할 수 없습니다</string>
-    <string name="plugin_description">파일 관리자 플러그인. 확대, 메타데이터, 공유 및 안전한 외부 대체 기능으로 이미지 보기</string>
+    <string name="page_counter">%1$d / %2$d</string>
+    <string name="plugin_description">파일 관리자 플러그인. 같은 폴더 넘기기, 확대, 메타데이터, 인쇄 및 공유를 지원하는 안전한 읽기 전용 이미지 탐색</string>
+    <string name="zoom_indicator">%1$s배</string>
 </resources>

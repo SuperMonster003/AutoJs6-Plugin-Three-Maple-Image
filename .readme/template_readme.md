@@ -2,7 +2,7 @@
 
 <div align="center">
   <p>
-    <img src="{{ repo_url }}/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
+    <img src="{{ repo_url }}/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="{{ icon_alt }}" border="0" width="128" />
   </p>
 
   <p>{{ text_plugin_synopsis }}</p>
@@ -32,13 +32,78 @@
 
 {{ p_introduction }}
 
+{{ p_introduction_secure }}
+
 ******
 
 ### {{ h3_functions }}
 
 ******
 
-{{ placeholder_features }}
+{{ placeholder_highlights }}
+
+******
+
+### {{ h3_screenshots }}
+
+******
+
+{{ p_screenshots_intro }}
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="{{ screenshot_explorer_caption }}" width="360" />
+      <br />
+      <sub>{{ screenshot_explorer_caption }}</sub>
+    </td>
+    <td align="center">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/explorer-selection.png?raw=true" alt="{{ screenshot_selection_caption }}" width="360" />
+      <br />
+      <sub>{{ screenshot_selection_caption }}</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/viewer-main.png?raw=true" alt="{{ screenshot_viewer_caption }}" width="360" />
+      <br />
+      <sub>{{ screenshot_viewer_caption }}</sub>
+    </td>
+    <td align="center">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/viewer-zoom-2.5x.png?raw=true" alt="{{ screenshot_zoom_caption }}" width="360" />
+      <br />
+      <sub>{{ screenshot_zoom_caption }}</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/share-sheet.png?raw=true" alt="{{ screenshot_share_caption }}" width="360" />
+      <br />
+      <sub>{{ screenshot_share_caption }}</sub>
+    </td>
+  </tr>
+</table>
+
+******
+
+### {{ h3_usage }}
+
+******
+
+{{ p_usage_prerequisites }}:
+
+```text
+host app: AutoJs6 ({{ host_package }})
+minimum host build: {{ required_host_build }}
+minimum android: {{ min_android }}
+plugin package: {{ plugin_package }}
+```
+
+{{ p_usage_steps_intro }}:
+
+{{ placeholder_usage_steps }}
+
+{{ p_usage_viewer_tips }}
 
 ******
 
@@ -51,6 +116,26 @@
 ```text
 {{ supported_formats }}
 ```
+
+{{ p_supported_formats_note }}
+
+******
+
+### {{ h3_faq }}
+
+******
+
+{{ placeholder_faq }}
+
+******
+
+### {{ h3_security }}
+
+******
+
+{{ p_security_intro }}:
+
+{{ placeholder_security_points }}
 
 ******
 
@@ -66,30 +151,23 @@ execute action: {{ plugin_execute_action }}
 plugin id: {{ plugin_id }}
 engine: {{ plugin_engine }}
 variant: {{ plugin_variant }}
-Explorer action id: {{ explorer_action_id }}
+explorer action id: {{ explorer_action_id }}
+protocol version: {{ protocol_version }}
 MIME type: {{ mime_type }}
 required host build: {{ required_host_build }}
 ```
 
 {{ p_plugin_scope }}
 
-{{ p_plugin_packaging }}
+******
+
+### {{ h3_roadmap }}
 
 ******
 
-### {{ h3_security }}
+{{ p_roadmap_status }}
 
-******
-
-{{ p_security }}
-
-******
-
-### {{ h3_security_limits }}
-
-******
-
-{{ placeholder_security_limits }}
+- [{{ text_open_roadmap }}]({{ repo_url }}/blob/master/ROADMAP.md)
 
 ******
 
@@ -131,6 +209,7 @@ required host build: {{ required_host_build }}
 .readme/lang_*.json
 .changelog/lang_*.json
 .python/generate_markdown.py
+docs/images/screenshots/*.png
 app/src/main/assets/doc/CHANGELOG-*.md
 app/src/main/res/values-*/strings.xml
 app/src/main/res/raw-*/plugin_instruction.md
@@ -145,6 +224,8 @@ app/src/main/res/raw-*/plugin_instruction.md
 ******
 
 - {{ text_link_autojs6_docs }}: {{ docs_autojs6_url }}
-- {{ text_link_android_secure_file_sharing }}: https://developer.android.com/training/secure-file-sharing
+- {{ text_link_android_secure_file_sharing }}: {{ android_secure_files_url }}
+- {{ text_link_glide }}: {{ glide_repo_url }}
 
-[16 KB page alignment and verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)
+
+[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)

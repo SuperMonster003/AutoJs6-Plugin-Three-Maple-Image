@@ -29,6 +29,12 @@
             android:name="org.autojs.plugin.info.AUTHOR"
             android:value="@string/plugin_author" />
 
+        <provider
+            android:name=".HostSessionImageProvider"
+            android:authorities="io.github.supermonster003.autojs6.plugin.imageviewer.host-images"
+            android:exported="false"
+            android:grantUriPermissions="false" />
+
         <activity
             android:name=".WakeActivity"
             android:excludeFromRecents="true"
@@ -73,7 +79,7 @@
         <activity
             android:name=".ImageViewerActivity"
             android:exported="false"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.Viewer" />
 
         <service
             android:name=".ExplorerActionService"

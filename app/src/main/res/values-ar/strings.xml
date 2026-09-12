@@ -1,18 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">رجوع</string>
+    <string name="action_hide_image_details">إخفاء التفاصيل</string>
     <string name="action_open_external">فتح بتطبيق اخر</string>
+    <string name="action_pause_animation">إيقاف الحركة مؤقتا</string>
+    <string name="action_print">طباعة / حفظ PDF</string>
     <string name="action_reset_zoom">اعادة ضبط التكبير</string>
+    <string name="action_resume_animation">متابعة الحركة</string>
+    <string name="action_rotate_clockwise">تدوير 90° باتجاه عقارب الساعة</string>
     <string name="action_share">مشاركة</string>
+    <string name="action_show_image_details">عرض التفاصيل</string>
     <string name="action_view_image">عرض الصورة</string>
     <string name="app_name">عارض الصور</string>
+    <string name="error_cannot_prepare_print">تعذر إعداد الصورة للطباعة</string>
     <string name="error_cannot_read_image">تعذر عرض الصورة</string>
+    <string name="error_image_decoder_unavailable">يتعذر على برنامج فك ترميز النظام في هذا الجهاز عرض صور %1$s</string>
+    <string name="error_image_format_requires_android">تتطلب صور %1$s نظام Android %2$d أو أحدث على هذا الجهاز</string>
     <string name="error_no_external_viewer">لا يتوفر عارض صور اخر</string>
+    <string name="error_print_failed">تعذر إنشاء مستند الطباعة</string>
+    <string name="exif_capture_time">وقت الالتقاط: %1$s</string>
+    <string name="exif_device">الجهاز: %1$s</string>
+    <string name="exif_exposure">التعريض: %1$s</string>
+    <string name="exif_gps_present">بيانات GPS الوصفية موجودة · الإحداثيات مخفية</string>
+    <string name="exif_orientation">الاتجاه: %1$s</string>
+    <string name="exif_orientation_clockwise">%1$d° مع عقارب الساعة</string>
+    <string name="exif_orientation_mirrored">معكوسة</string>
+    <string name="exif_orientation_mirrored_clockwise">معكوسة · %1$d° مع عقارب الساعة</string>
+    <string name="exif_orientation_normal">عادي (0°)</string>
+    <string name="exif_unavailable">لا تتوفر بيانات EXIF</string>
     <string name="image_content_description">معاينة الصورة</string>
+    <string name="label_details">التفاصيل</string>
+    <string name="label_open_with">فتح باستخدام</string>
+    <string name="label_rotate">تدوير</string>
+    <string name="metadata_color_space">مساحة اللون: %1$s</string>
+    <string name="metadata_decoded_bit_depth">عمق البكسل بعد فك الترميز: %1$d bpp</string>
     <string name="metadata_loading" tools:ignore="TypographyEllipsis">جار قراءة معلومات الصورة...</string>
     <string name="metadata_resolution">%1$d x %2$d px</string>
     <string name="metadata_resolution_unknown">دقة غير معروفة</string>
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
+    <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">معلومات الصورة غير متاحة</string>
-    <string name="plugin_description">ملحق مدير الملفات. عرض الصور مع التكبير والبيانات الوصفية والمشاركة والفتح الخارجي الآمن</string>
+    <string name="page_counter">%1$d / %2$d</string>
+    <string name="plugin_description">ملحق مدير الملفات. تصفح آمن للصور للقراءة فقط مع التنقل داخل المجلد والتكبير والبيانات الوصفية والطباعة والمشاركة</string>
+    <string name="zoom_indicator">%1$s×</string>
 </resources>

@@ -37,7 +37,10 @@ class ImageRequestPolicyTest {
     fun comparesResolvedMimeWithoutWideningConcreteTypes() {
         assertTrue(ImageRequestPolicy.mimeTypesAreCompatible("image/*", "image/webp"))
         assertTrue(ImageRequestPolicy.mimeTypesAreCompatible("image/jpeg", "image/jpeg"))
+        assertTrue(ImageRequestPolicy.mimeTypesAreCompatible("image/heic", "image/heif"))
+        assertTrue(ImageRequestPolicy.mimeTypesAreCompatible("image/heif", "image/heic-sequence"))
         assertFalse(ImageRequestPolicy.mimeTypesAreCompatible("image/jpeg", "image/png"))
+        assertFalse(ImageRequestPolicy.mimeTypesAreCompatible("image/heic", "image/avif"))
         assertFalse(ImageRequestPolicy.mimeTypesAreCompatible("image/jpeg", "video/jpeg"))
     }
 }

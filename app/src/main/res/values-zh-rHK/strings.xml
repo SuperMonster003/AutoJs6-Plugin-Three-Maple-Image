@@ -1,18 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">返回</string>
+    <string name="action_hide_image_details">隱藏詳情</string>
     <string name="action_open_external">使用其他應用程式開啟</string>
+    <string name="action_pause_animation">暫停動圖</string>
+    <string name="action_print">列印 / 儲存 PDF</string>
     <string name="action_reset_zoom">重設縮放</string>
+    <string name="action_resume_animation">繼續播放</string>
+    <string name="action_rotate_clockwise">順時針旋轉 90 度</string>
     <string name="action_share">分享</string>
+    <string name="action_show_image_details">顯示詳情</string>
     <string name="action_view_image">檢視圖像</string>
     <string name="app_name">圖像檢視器</string>
+    <string name="error_cannot_prepare_print">無法準備此圖像以供列印</string>
     <string name="error_cannot_read_image">無法顯示圖像</string>
+    <string name="error_image_decoder_unavailable">此裝置的系統解碼器無法顯示 %1$s 圖像</string>
+    <string name="error_image_format_requires_android">此裝置需要 Android %2$d 或更新版本才能顯示 %1$s 圖像</string>
     <string name="error_no_external_viewer">沒有可用的其他圖像檢視器</string>
+    <string name="error_print_failed">無法建立列印文件</string>
+    <string name="exif_capture_time">拍攝時間: %1$s</string>
+    <string name="exif_device">裝置: %1$s</string>
+    <string name="exif_exposure">曝光: %1$s</string>
+    <string name="exif_gps_present">偵測到 GPS 中繼資料 · 座標已隱藏</string>
+    <string name="exif_orientation">方向: %1$s</string>
+    <string name="exif_orientation_clockwise">順時針 %1$d°</string>
+    <string name="exif_orientation_mirrored">已鏡像</string>
+    <string name="exif_orientation_mirrored_clockwise">已鏡像 · 順時針 %1$d°</string>
+    <string name="exif_orientation_normal">正常 (0°)</string>
+    <string name="exif_unavailable">沒有 EXIF 資料</string>
     <string name="image_content_description">圖像預覽</string>
+    <string name="label_details">詳情</string>
+    <string name="label_open_with">其他應用</string>
+    <string name="label_rotate">旋轉</string>
+    <string name="metadata_color_space">色彩空間: %1$s</string>
+    <string name="metadata_decoded_bit_depth">解碼位深: %1$d bpp</string>
     <string name="metadata_loading" tools:ignore="TypographyEllipsis">正在讀取圖像資料...</string>
     <string name="metadata_resolution">%1$d x %2$d px</string>
     <string name="metadata_resolution_unknown">未知解像度</string>
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
+    <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">圖像資料不可用</string>
-    <string name="plugin_description">檔案管理器外掛程式. 支援縮放, 中繼資料, 分享和安全外部開啟的圖像檢視器</string>
+    <string name="page_counter">%1$d / %2$d</string>
+    <string name="plugin_description">檔案管理器外掛程式. 安全唯讀瀏覽圖像, 支援同一目錄翻頁, 縮放, 中繼資料, 列印與分享</string>
+    <string name="zoom_indicator">%1$s 倍</string>
 </resources>
