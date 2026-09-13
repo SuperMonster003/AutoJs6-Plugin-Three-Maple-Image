@@ -1,5 +1,12 @@
 # Historial de versiones
 
+## v1.2.0
+
+###### 2026/09/13
+
+* `Función` Historial de versiones local desde la interfaz con traducciones y alternativa en inglés
+* `Mejora` Comprobación de la firma completa, los APK esperados y la documentación reproducible de cada versión
+
 ## v1.1.0
 
 ###### 2026/09/12

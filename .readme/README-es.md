@@ -5,7 +5,7 @@
     <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>Complemento del gestor de archivos. Editar y convertir imágenes de forma segura</p>
+  <p>Edita imágenes y convierte sus formatos</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Tools?label=Release"/></a>
@@ -208,6 +208,13 @@ Las capacidades completadas y los planes futuros se mantienen como una lista ver
 
 ******
 
+#### v1.2.0
+
+###### 2026/09/13
+
+* `Función` Historial de versiones local desde la interfaz con traducciones y alternativa en inglés
+* `Mejora` Comprobación de la firma completa, los APK esperados y la documentación reproducible de cada versión
+
 #### v1.1.0
 
 ###### 2026/09/12
@@ -229,22 +236,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista ver
 
 * `Corrección` El plugin no podía activarse desde el centro de plugins de AutoJs6 porque el servicio devolvía un enlace vacío (onNullBinding)
 * `Mejora` Nombre y descripción del plugin abreviados y redacción de la documentación de usuario unificada entre idiomas
-
-#### v1.0.0
-
-###### 2026/08/02
-
-* `Función` Primera versión de Image Tools: dos acciones de menú contextual, `Editar imagen` y `Convertir imagen`, para una sola imagen en el gestor de archivos de AutoJs6, con el resultado guardado como archivo nuevo junto al original, que permanece en solo lectura
-* `Función` Editor con recorte, rotación, volteo, brillo, contraste, saturación, temperatura de color, pincel, texto y hasta 8 pasos de deshacer, con la orientación EXIF aplicada automáticamente
-* `Función` Conversor con salida JPEG / PNG / WebP: calidad ajustable de 1 a 100, tres modos de tamaño (Original / Porcentaje / Personalizado), bloqueo de la relación de aspecto, elección del color de fondo JPEG y estimación en vivo del tamaño de salida
-* `Función` Reconocimiento de las extensiones bmp / gif / heic / heif / jpg / jpeg / png / webp y de todos los tipos MIME `image/*`
-* `Función` Servicio del plugin registrado sobre el protocolo explorer-action v3: entrada de solo lectura de un solo uso combinada con transacciones de salida propiedad del anfitrión, sin solicitar permisos de almacenamiento ni de red
-* `Función` Metadatos del plugin, interfaz, instrucciones, README y registro de cambios en 10 idiomas: chino simplificado, chino tradicional (Hong Kong / Taiwán), inglés, francés, español, japonés, coreano, ruso y árabe
-* `Mejora` Sesiones del editor y del conversor conservadas durante cambios de configuración como la rotación de pantalla, incluidas las herramientas del lienzo, los borradores de diálogos, las opciones de conversión, el historial de deshacer y las tareas en curso
-* `Mejora` Escrituras de salida protegidas con declaraciones de transacción de un solo uso, protección contra acciones simultáneas y corrutinas seguras ante cancelaciones, evitando envíos duplicados y archivos parciales residuales
-* `Mejora` Validación MIME de salida, reciclaje de memoria de bitmaps y coherencia de recursos multilingües reforzados
-* `Dependencia` Anexado AndroidX ExifInterface 1.4.2 para leer con seguridad los metadatos de orientación de las imágenes
-* `Dependencia` Anexado Robolectric 4.16.1 para pruebas unitarias del ciclo de vida y de las transacciones de salida
 
 ##### Historial completo
 

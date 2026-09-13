@@ -97,6 +97,7 @@ class ImageEditorActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_release_history -> { showReleaseHistory(); true }
         android.R.id.home -> true.also { requestExit() }
         R.id.action_save -> true.also { save() }
         R.id.action_undo -> true.also { undo() }

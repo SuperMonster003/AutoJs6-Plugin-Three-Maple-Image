@@ -26,4 +26,5 @@
         android:title="@string/image_editor_restore_original"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_release_history" android:title="@string/release_history" app:showAsAction="never" />
 </menu>

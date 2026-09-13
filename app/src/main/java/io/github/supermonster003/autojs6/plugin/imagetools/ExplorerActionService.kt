@@ -8,7 +8,7 @@ import org.autojs.plugin.explorer.api.IExplorerActionPlugin
 class ExplorerActionService : Service() {
 
     private val binder = object : IExplorerActionPlugin.Stub() {
-        override fun getInfo() = imageToolsPluginInfo()
+        override fun getInfo() = imageToolsPluginInfo().apply { supportedAbis = emptyArray() }
 
         override fun getActionCatalog() = imageToolsActionCatalog()
     }

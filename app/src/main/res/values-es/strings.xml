@@ -3,7 +3,6 @@
     <string name="action_convert_image">Convertir imagen</string>
     <string name="action_edit_image">Editar imagen</string>
     <string name="apk_info_format">Formato</string>
-    <string name="app_name">Herramientas de imagen</string>
     <string name="dialog_button_cancel">Cancelar</string>
     <string name="dialog_button_confirm">OK</string>
     <string name="dialog_button_convert">Convertir</string>
@@ -55,7 +54,9 @@
     <string name="image_editor_text_position_help">Arrastra el texto para elegir su posición</string>
     <string name="image_editor_text_shadow">Sombra</string>
     <string name="image_editor_text_size_percent">Tamaño del texto: %1$d%%</string>
-    <string name="plugin_description">Complemento del gestor de archivos. Editar y convertir imágenes de forma segura</string>
+    <string name="plugin_description">Edita imágenes y convierte sus formatos</string>
+    <string name="release_history">Historial de versiones</string>
+    <string name="release_history_unavailable">El historial de versiones no está disponible</string>
     <string name="text_cannot_read_file">No se puede leer el archivo</string>
     <string name="text_color_palette">Paleta de colores</string>
     <string name="text_done">Hecho</string>
