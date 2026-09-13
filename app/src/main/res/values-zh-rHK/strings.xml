@@ -11,7 +11,6 @@
     <string name="action_share">分享</string>
     <string name="action_show_image_details">顯示詳情</string>
     <string name="action_view_image">檢視圖像</string>
-    <string name="app_name">圖像檢視器</string>
     <string name="error_cannot_prepare_print">無法準備此圖像以供列印</string>
     <string name="error_cannot_read_image">無法顯示圖像</string>
     <string name="error_image_decoder_unavailable">此裝置的系統解碼器無法顯示 %1$s 圖像</string>
@@ -41,6 +40,8 @@
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">圖像資料不可用</string>
     <string name="page_counter">%1$d / %2$d</string>
-    <string name="plugin_description">檔案管理器外掛程式. 安全唯讀瀏覽圖像, 支援同一目錄翻頁, 縮放, 中繼資料, 列印與分享</string>
+    <string name="plugin_description">檢視圖像及其詳細資訊</string>
+    <string name="release_history">發行歷史</string>
+    <string name="release_history_unavailable">發行歷史暫不可用</string>
     <string name="zoom_indicator">%1$s 倍</string>
 </resources>

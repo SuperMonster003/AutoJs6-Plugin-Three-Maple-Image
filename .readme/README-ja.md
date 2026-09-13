@@ -5,7 +5,7 @@
     <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>ファイルマネージャープラグイン. 同一フォルダーのページ送り, ズーム, メタデータ, 印刷, 共有に対応した安全な読み取り専用画像閲覧</p>
+  <p>画像の表示と詳細情報の確認</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -225,6 +225,13 @@ required host build: 5276
 
 ******
 
+#### v1.3.0
+
+###### 2026/09/13
+
+* `機能` 画面からローカルのリリース履歴を表示し, 各言語と英語へのフォールバックに対応
+* `改善` リリース署名の設定, APK の構成, ドキュメントの再生成結果を検証
+
 #### v1.2.0
 
 ###### 2026/09/12
@@ -250,13 +257,6 @@ required host build: 5276
 * `改善` すべての入口で explorer-action v12 の要求, 対象, 内容, サイズ, 直下項目を厳密に検証し, 一時的な読み取り専用アクセスとストレージ/ネットワーク権限なしの設計を維持
 * `改善` 10 言語のインターフェースとユーザードキュメントを拡充し, 実際の Android UI から取得した 5 枚のギャラリーを追加
 * `依存関係` EXIF メタデータを読み取り専用で解析する AndroidX ExifInterface 1.4.2 を追加
-
-#### v1.0.1
-
-###### 2026/08/08
-
-* `修正` AutoJs6 プラグインセンターでプラグインを有効化する際, サービスが空のバインディング (onNullBinding) を返して有効化に失敗する問題
-* `改善` プラグイン名と説明を簡潔にし, 各言語のユーザードキュメントの表現を統一
 
 ##### 完全な履歴
 

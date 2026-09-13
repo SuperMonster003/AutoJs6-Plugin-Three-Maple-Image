@@ -11,7 +11,6 @@
     <string name="action_share">مشاركة</string>
     <string name="action_show_image_details">عرض التفاصيل</string>
     <string name="action_view_image">عرض الصورة</string>
-    <string name="app_name">عارض الصور</string>
     <string name="error_cannot_prepare_print">تعذر إعداد الصورة للطباعة</string>
     <string name="error_cannot_read_image">تعذر عرض الصورة</string>
     <string name="error_image_decoder_unavailable">يتعذر على برنامج فك ترميز النظام في هذا الجهاز عرض صور %1$s</string>
@@ -41,6 +40,8 @@
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">معلومات الصورة غير متاحة</string>
     <string name="page_counter">%1$d / %2$d</string>
-    <string name="plugin_description">ملحق مدير الملفات. تصفح آمن للصور للقراءة فقط مع التنقل داخل المجلد والتكبير والبيانات الوصفية والطباعة والمشاركة</string>
+    <string name="plugin_description">عرض الصور وفحص تفاصيلها</string>
+    <string name="release_history">سجل الإصدارات</string>
+    <string name="release_history_unavailable">سجل الإصدارات غير متاح</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

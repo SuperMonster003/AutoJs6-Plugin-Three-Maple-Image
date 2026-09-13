@@ -5,7 +5,7 @@
     <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>파일 관리자 플러그인. 같은 폴더 넘기기, 확대, 메타데이터, 인쇄 및 공유를 지원하는 안전한 읽기 전용 이미지 탐색</p>
+  <p>이미지 보기 및 상세 정보 확인</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -225,6 +225,13 @@ required host build: 5276
 
 ******
 
+#### v1.3.0
+
+###### 2026/09/13
+
+* `기능` 화면에서 현지화된 로컬 릴리스 기록을 표시하고 영어 대체 제공
+* `개선` 릴리스 서명 설정, 예상 APK 구성 및 문서 재생성 결과 검증
+
 #### v1.2.0
 
 ###### 2026/09/12
@@ -250,13 +257,6 @@ required host build: 5276
 * `개선` 모든 진입점에서 explorer-action v12 요청, 대상, 콘텐츠, 크기, 직계 하위 항목을 엄격히 검증하면서 임시 읽기 전용 접근과 저장소/네트워크 권한 없는 설계를 유지
 * `개선` 10개 언어의 인터페이스와 사용자 문서를 확장하고 실제 Android UI에서 캡처한 5장의 갤러리 추가
 * `의존성` EXIF 메타데이터를 읽기 전용으로 분석하기 위해 AndroidX ExifInterface 1.4.2 추가
-
-#### v1.0.1
-
-###### 2026/08/08
-
-* `수정` AutoJs6 플러그인 센터에서 플러그인을 활성화할 때 서비스가 빈 바인딩 (onNullBinding)을 반환해 활성화에 실패하던 문제
-* `개선` 플러그인 이름과 설명을 간결하게 다듬고 각 언어 사용자 문서의 표현을 통일
 
 ##### 전체 이력
 

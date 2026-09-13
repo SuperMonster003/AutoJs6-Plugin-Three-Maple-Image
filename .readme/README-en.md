@@ -5,7 +5,7 @@
     <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>File manager plugin. Secure read-only image browsing with same-folder paging, zoom, metadata, printing, and sharing</p>
+  <p>View images and inspect image details</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -225,6 +225,13 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v1.3.0
+
+###### 2026/09/13
+
+* `Added` Local release history is available from the interface, with localized text and an English fallback
+* `Improved` Release packages are checked for a complete signing configuration, exact APK contents and reproducible documentation
+
 #### v1.2.0
 
 ###### 2026/09/12
@@ -250,13 +257,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Improved` Hardened every entry path with strict explorer-action v12 request, target, content, size and direct-child validation while retaining temporary read-only access and no storage or network permissions
 * `Improved` Expanded the localized interface and user documentation in 10 languages, including a five-image gallery captured from the real Android UI
 * `Dependency` Added AndroidX ExifInterface 1.4.2 for read-only EXIF metadata parsing
-
-#### v1.0.1
-
-###### 2026/08/08
-
-* `Fixed` Enabling the plugin in the AutoJs6 plugin center failed because the service returned an empty binding (onNullBinding)
-* `Improved` Leaner plugin name and description with consistent wording across all language documents
 
 ##### Full history
 

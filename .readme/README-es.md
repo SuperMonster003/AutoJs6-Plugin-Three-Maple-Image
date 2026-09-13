@@ -5,7 +5,7 @@
     <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>Complemento del gestor de archivos. Navegación segura de imágenes de solo lectura con paginación en la misma carpeta, zoom, metadatos, impresión y uso compartido</p>
+  <p>Muestra imágenes y sus detalles</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -225,6 +225,13 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v1.3.0
+
+###### 2026/09/13
+
+* `Función` Historial de versiones local desde la interfaz con traducciones y alternativa en inglés
+* `Mejora` Comprobación de la firma completa, los APK esperados y la documentación reproducible de cada versión
+
 #### v1.2.0
 
 ###### 2026/09/12
@@ -250,13 +257,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 * `Mejora` Validación reforzada de solicitudes explorer-action v12, objetivos, contenido, tamaño e hijos directos en todas las entradas, manteniendo el acceso temporal de solo lectura y sin permisos de almacenamiento ni de red
 * `Mejora` Interfaz y documentación de usuario ampliadas en 10 idiomas, incluida una galería de cinco capturas de la interfaz Android real
 * `Dependencia` Se añade AndroidX ExifInterface 1.4.2 para analizar metadatos EXIF en modo de solo lectura
-
-#### v1.0.1
-
-###### 2026/08/08
-
-* `Corrección` La activación del complemento en el centro de plugins de AutoJs6 fallaba porque el servicio devolvía un enlace vacío (onNullBinding)
-* `Mejora` Nombre y descripción del complemento más concisos, con una redacción coherente en los documentos de todos los idiomas
 
 ##### Historial completo
 

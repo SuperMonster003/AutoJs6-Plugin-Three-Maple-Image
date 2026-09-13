@@ -1,7 +1,7 @@
 {
   "$name": "한국어",
   "text_current_lowercase": "현재",
-  "text_plugin_synopsis": "파일 관리자 플러그인. 같은 폴더 넘기기, 확대, 메타데이터, 인쇄 및 공유를 지원하는 안전한 읽기 전용 이미지 탐색",
+  "text_plugin_synopsis": "이미지 보기 및 상세 정보 확인",
   "h3_languages_with_ascii": "언어 (Languages)",
   "p_languages_all_supported_for_readme": "현재 README.md는 다음 언어를 지원합니다",
   "h3_introduction": "소개",

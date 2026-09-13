@@ -11,7 +11,6 @@
     <string name="action_share">共有</string>
     <string name="action_show_image_details">詳細を表示</string>
     <string name="action_view_image">画像を表示</string>
-    <string name="app_name">画像ビューアー</string>
     <string name="error_cannot_prepare_print">画像を印刷用に準備できませんでした</string>
     <string name="error_cannot_read_image">画像を表示できませんでした</string>
     <string name="error_image_decoder_unavailable">このデバイスのシステムデコーダーでは %1$s 画像を表示できません</string>
@@ -41,6 +40,8 @@
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">画像情報を利用できません</string>
     <string name="page_counter">%1$d / %2$d</string>
-    <string name="plugin_description">ファイルマネージャープラグイン. 同一フォルダーのページ送り, ズーム, メタデータ, 印刷, 共有に対応した安全な読み取り専用画像閲覧</string>
+    <string name="plugin_description">画像の表示と詳細情報の確認</string>
+    <string name="release_history">リリース履歴</string>
+    <string name="release_history_unavailable">リリース履歴を表示できません</string>
     <string name="zoom_indicator">%1$s倍</string>
 </resources>
