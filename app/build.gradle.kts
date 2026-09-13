@@ -21,6 +21,7 @@ android {
     compileSdk = versions.sdkVersionCompile
 
     defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         applicationId = globalApplicationId
         minSdk = versions.sdkVersionMin
         targetSdk = versions.sdkVersionTarget
@@ -132,6 +133,8 @@ dependencies {
     implementation(libs.exifinterface)
     implementation(libs.material)
 
+    androidTestImplementation(libs.test.ext.junit)
+    androidTestImplementation(libs.test.runner)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
 }
