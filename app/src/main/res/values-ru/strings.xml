@@ -11,7 +11,6 @@
     <string name="action_share">Отправить</string>
     <string name="action_show_image_details">Показать сведения</string>
     <string name="action_view_image">Просмотреть изображение</string>
-    <string name="app_name">Просмотр изображений</string>
     <string name="error_cannot_prepare_print">Не удалось подготовить изображение к печати</string>
     <string name="error_cannot_read_image">Не удалось показать изображение</string>
     <string name="error_image_decoder_unavailable">Системный декодер этого устройства не может отобразить изображения %1$s</string>
@@ -41,6 +40,8 @@
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">Сведения об изображении недоступны</string>
     <string name="page_counter">%1$d / %2$d</string>
-    <string name="plugin_description">Плагин файлового менеджера. Безопасный просмотр изображений только для чтения с перелистыванием папки, масштабированием, метаданными, печатью и отправкой</string>
+    <string name="plugin_description">Просмотр изображений и сведений о них</string>
+    <string name="release_history">История выпусков</string>
+    <string name="release_history_unavailable">История выпусков недоступна</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

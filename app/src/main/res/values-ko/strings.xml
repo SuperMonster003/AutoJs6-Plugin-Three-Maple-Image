@@ -11,7 +11,6 @@
     <string name="action_share">공유</string>
     <string name="action_show_image_details">세부 정보 보기</string>
     <string name="action_view_image">이미지 보기</string>
-    <string name="app_name">이미지 뷰어</string>
     <string name="error_cannot_prepare_print">인쇄할 이미지를 준비할 수 없습니다</string>
     <string name="error_cannot_read_image">이미지를 표시할 수 없습니다</string>
     <string name="error_image_decoder_unavailable">이 기기의 시스템 디코더는 %1$s 이미지를 표시할 수 없습니다</string>
@@ -41,6 +40,8 @@
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">이미지 정보를 사용할 수 없습니다</string>
     <string name="page_counter">%1$d / %2$d</string>
-    <string name="plugin_description">파일 관리자 플러그인. 같은 폴더 넘기기, 확대, 메타데이터, 인쇄 및 공유를 지원하는 안전한 읽기 전용 이미지 탐색</string>
+    <string name="plugin_description">이미지 보기 및 상세 정보 확인</string>
+    <string name="release_history">릴리스 기록</string>
+    <string name="release_history_unavailable">릴리스 기록을 사용할 수 없습니다</string>
     <string name="zoom_indicator">%1$s배</string>
 </resources>

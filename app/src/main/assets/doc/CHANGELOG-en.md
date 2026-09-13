@@ -4,6 +4,13 @@
 
 ******
 
+## v1.3.0
+
+###### 2026/09/13
+
+* `Added` Local release history is available from the interface, with localized text and an English fallback
+* `Improved` Release packages are checked for a complete signing configuration, exact APK contents and reproducible documentation
+
 ## v1.2.0
 
 ###### 2026/09/12

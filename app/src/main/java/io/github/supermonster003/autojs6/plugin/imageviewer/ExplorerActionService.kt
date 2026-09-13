@@ -11,7 +11,7 @@ import org.autojs.plugin.explorer.api.IExplorerActionPlugin
 class ExplorerActionService : Service() {
 
     private val binder = object : IExplorerActionPlugin.Stub() {
-        override fun getInfo() = imageViewerPluginInfo()
+        override fun getInfo() = imageViewerPluginInfo().apply { supportedAbis = emptyArray() }
 
         override fun getActionCatalog() = imageViewerActionCatalog()
 

@@ -1,7 +1,7 @@
 {
   "$name": "Español",
   "text_current_lowercase": "actual",
-  "text_plugin_synopsis": "Complemento del gestor de archivos. Navegación segura de imágenes de solo lectura con paginación en la misma carpeta, zoom, metadatos, impresión y uso compartido",
+  "text_plugin_synopsis": "Muestra imágenes y sus detalles",
   "h3_languages_with_ascii": "Idiomas (Languages)",
   "p_languages_all_supported_for_readme": "El README.md actual admite los siguientes idiomas",
   "h3_introduction": "Introducción",

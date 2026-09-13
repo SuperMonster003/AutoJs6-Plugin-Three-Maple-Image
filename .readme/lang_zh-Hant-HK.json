@@ -1,7 +1,7 @@
 {
   "$name": "繁體中文 (香港)",
   "text_current_lowercase": "目前",
-  "text_plugin_synopsis": "檔案管理器外掛程式. 安全唯讀瀏覽圖像, 支援同一目錄翻頁, 縮放, 中繼資料, 列印與分享",
+  "text_plugin_synopsis": "檢視圖像及其詳細資訊",
   "h3_languages_with_ascii": "語言 (Languages)",
   "p_languages_all_supported_for_readme": "目前 README.md 支援以下語言",
   "h3_introduction": "簡介",

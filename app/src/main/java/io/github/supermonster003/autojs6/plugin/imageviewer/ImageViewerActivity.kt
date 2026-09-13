@@ -270,6 +270,7 @@ class ImageViewerActivity : AppCompatActivity() {
     private fun View.basePadding() = Rect(paddingLeft, paddingTop, paddingRight, paddingBottom)
 
     private fun onToolbarMenuItemClick(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_release_history -> { showReleaseHistory(); true }
         R.id.reset_zoom -> {
             hideZoomIndicator()
             binding.image.resetZoom()

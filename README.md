@@ -5,7 +5,7 @@
     <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>文件管理器插件. 安全只读浏览图像, 支持同目录翻页, 缩放, 元数据, 打印与分享</p>
+  <p>查看图像及其详细信息</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -225,6 +225,13 @@ required host build: 5276
 
 ******
 
+#### v1.3.0
+
+###### 2026/09/13
+
+* `新增` 界面提供本地发行历史, 支持多语言及英语回退
+* `优化` 校验发行签名配置, 预期 APK 集合与可复现文档
+
 #### v1.2.0
 
 ###### 2026/09/12
@@ -250,13 +257,6 @@ required host build: 5276
 * `优化` 强化所有入口的 explorer-action v12 请求, 目标, 内容, 大小与直属文件校验, 继续仅使用临时只读访问且不申请存储或网络权限
 * `优化` 完善 10 种语言的界面与用户文档, 并加入五张来自真实 Android 界面的功能截图
 * `依赖` 附加 AndroidX ExifInterface 1.4.2, 用于只读解析 EXIF 元数据
-
-#### v1.0.1
-
-###### 2026/08/08
-
-* `修复` 在 AutoJs6 插件中心启用插件时因服务返回空绑定 (onNullBinding) 而无法启用的问题
-* `优化` 精简插件名称与描述, 统一各语言用户文档的表述
 
 ##### 完整记录
 

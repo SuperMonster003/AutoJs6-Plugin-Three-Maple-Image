@@ -11,7 +11,6 @@
     <string name="action_share">Partager</string>
     <string name="action_show_image_details">Afficher les détails</string>
     <string name="action_view_image">Afficher l\'image</string>
-    <string name="app_name">Visionneuse d\'images</string>
     <string name="error_cannot_prepare_print">Impossible de préparer l\'image pour l\'impression</string>
     <string name="error_cannot_read_image">L\'image n\'a pas pu être affichée</string>
     <string name="error_image_decoder_unavailable">Le décodeur système de cet appareil ne peut pas afficher les images %1$s</string>
@@ -41,6 +40,8 @@
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">Les informations de l\'image ne sont pas disponibles</string>
     <string name="page_counter">%1$d / %2$d</string>
-    <string name="plugin_description">Plugin de gestionnaire de fichiers. Navigation d\'images sécurisée en lecture seule avec pagination dans le même dossier, zoom, métadonnées, impression et partage</string>
+    <string name="plugin_description">Affiche les images et leurs détails</string>
+    <string name="release_history">Historique des versions</string>
+    <string name="release_history_unavailable">L\'historique des versions est indisponible</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

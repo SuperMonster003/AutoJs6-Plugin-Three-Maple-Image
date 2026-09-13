@@ -1,7 +1,7 @@
 {
   "$name": "English",
   "text_current_lowercase": "current",
-  "text_plugin_synopsis": "File manager plugin. Secure read-only image browsing with same-folder paging, zoom, metadata, printing, and sharing",
+  "text_plugin_synopsis": "View images and inspect image details",
   "h3_languages_with_ascii": "Languages",
   "p_languages_all_supported_for_readme": "The current README.md supports the following languages",
   "h3_introduction": "Introduction",

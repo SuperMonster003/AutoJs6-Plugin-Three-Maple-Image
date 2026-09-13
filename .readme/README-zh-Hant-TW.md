@@ -5,7 +5,7 @@
     <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>檔案管理器外掛程式. 安全唯讀瀏覽圖片, 支援同一目錄翻頁, 縮放, 中繼資料, 列印與分享</p>
+  <p>檢視影像及其詳細資訊</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -225,6 +225,13 @@ required host build: 5276
 
 ******
 
+#### v1.3.0
+
+###### 2026/09/13
+
+* `新增` 介面提供本地發行歷史, 支援多語言及英語回退
+* `優化` 校驗發行簽章設定, 預期 APK 集合與可重現文件
+
 #### v1.2.0
 
 ###### 2026/09/12
@@ -250,13 +257,6 @@ required host build: 5276
 * `優化` 強化所有入口的 explorer-action v12 請求, 目標, 內容, 大小與直屬檔案驗證, 繼續僅使用暫時唯讀存取且不申請儲存或網路權限
 * `優化` 完善 10 種語言的介面與使用者文件, 並加入五張來自真實 Android 介面的功能截圖
 * `相依性` 附加 AndroidX ExifInterface 1.4.2, 用於唯讀解析 EXIF 中繼資料
-
-#### v1.0.1
-
-###### 2026/08/08
-
-* `修復` 在 AutoJs6 外掛中心啟用外掛時因服務回傳空繫結 (onNullBinding) 而無法啟用的問題
-* `優化` 精簡外掛名稱與描述, 統一各語言使用者文件的表述
 
 ##### 完整記錄
 

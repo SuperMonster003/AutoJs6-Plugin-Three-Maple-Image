@@ -5,7 +5,7 @@
     <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>ملحق مدير الملفات. تصفح آمن للصور للقراءة فقط مع التنقل داخل المجلد والتكبير والبيانات الوصفية والطباعة والمشاركة</p>
+  <p>عرض الصور وفحص تفاصيلها</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
@@ -225,6 +225,13 @@ required host build: 5276
 
 ******
 
+#### v1.3.0
+
+###### 2026/09/13
+
+* `ميزة` يتوفر سجل الإصدارات محليا من الواجهة بالنص المترجم والإنجليزية كبديل
+* `تحسين` التحقق من اكتمال إعداد توقيع حزم الإصدار وملفات APK المتوقعة وإمكانية إعادة إنشاء الوثائق
+
 #### v1.2.0
 
 ###### 2026/09/12
@@ -250,13 +257,6 @@ required host build: 5276
 * `تحسين` تعزيز التحقق من طلبات explorer-action v12 والأهداف والمحتوى والحجم والعناصر الفرعية المباشرة في كل نقاط الدخول, مع إبقاء الوصول مؤقتا وللقراءة فقط ومن دون أذونات التخزين أو الشبكة
 * `تحسين` توسيع الواجهة ووثائق المستخدم في 10 لغات, مع معرض من خمس لقطات مأخوذة من واجهة Android الحقيقية
 * `تبعية` إضافة AndroidX ExifInterface 1.4.2 لتحليل بيانات EXIF الوصفية في وضع القراءة فقط
-
-#### v1.0.1
-
-###### 2026/08/08
-
-* `إصلاح` فشل تمكين الملحق في مركز اضافات AutoJs6 لأن الخدمة كانت تعيد ارتباطا فارغا (onNullBinding)
-* `تحسين` اسم ووصف أكثر إيجازا للملحق مع توحيد الصياغة في وثائق جميع اللغات
 
 ##### السجل الكامل
 
