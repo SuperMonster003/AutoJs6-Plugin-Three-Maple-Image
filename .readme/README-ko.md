@@ -5,7 +5,7 @@
     <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>파일 관리자 플러그인. 안전하게 이미지 편집 및 변환</p>
+  <p>이미지 편집 및 형식 변환</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Tools?label=Release"/></a>
@@ -208,6 +208,13 @@ required host build: 5269
 
 ******
 
+#### v1.2.0
+
+###### 2026/09/13
+
+* `기능` 화면에서 현지화된 로컬 릴리스 기록을 표시하고 영어 대체 제공
+* `개선` 릴리스 서명 설정, 예상 APK 구성 및 문서 재생성 결과 검증
+
 #### v1.1.0
 
 ###### 2026/09/12
@@ -229,22 +236,6 @@ required host build: 5269
 
 * `수정` AutoJs6 플러그인 센터에서 활성화할 때 서비스가 빈 바인딩 (onNullBinding)을 반환하여 활성화할 수 없던 문제
 * `개선` 플러그인 이름과 설명을 간결하게 다듬고 각 언어 사용자 문서의 표현을 통일
-
-#### v1.0.0
-
-###### 2026/08/02
-
-* `기능` Image Tools 첫 릴리스: AutoJs6 파일 관리자의 단일 이미지에 `이미지 편집`과 `이미지 변환` 두 가지 더보기 메뉴 동작을 제공하고, 처리 결과를 원본 파일 옆에 새 파일로 저장하며 원본 파일은 읽기 전용으로 유지
-* `기능` 편집기는 자르기, 회전, 뒤집기, 밝기, 대비, 채도, 색온도, 브러시, 텍스트와 최대 8단계 실행 취소를 지원하고 EXIF 방향을 자동 적용
-* `기능` 변환기는 JPEG / PNG / WebP 출력을 지원: 품질 1-100 조절, 크기는 원본 / 백분율 / 사용자 지정의 3가지 모드, 가로세로 비율 고정, JPEG 배경색 선택, 출력 크기 실시간 추정 제공
-* `기능` bmp / gif / heic / heif / jpg / jpeg / png / webp 확장자와 모든 `image/*` MIME 유형 인식
-* `기능` explorer-action 프로토콜 v3 기반으로 플러그인 서비스를 등록: 일회용 읽기 전용 입력과 호스트 소유 출력 트랜잭션을 결합하고 저장소 권한과 네트워크 권한을 요청하지 않음
-* `기능` 플러그인 정보, 인터페이스, 사용 설명, README, 변경 로그가 중국어 간체, 중국어 번체 (홍콩 / 대만), 영어, 프랑스어, 스페인어, 일본어, 한국어, 러시아어, 아랍어의 10개 언어 지원
-* `개선` 화면 회전 등 구성 변경 중에도 편집기와 변환기 세션을 유지: 캔버스 도구, 대화 상자 초안, 변환 옵션, 실행 취소 기록, 진행 중인 작업 포함
-* `개선` 일회용 트랜잭션 선언, 동작 사용 중 보호, 취소 안전 코루틴으로 출력 쓰기를 보호하여 중복 제출과 미완성 파일 잔류를 방지
-* `개선` 출력 MIME 유형 검증, 비트맵 메모리 회수, 다국어 리소스 일관성 강화
-* `의존성` 이미지 방향 메타데이터를 안전하게 읽기 위해 AndroidX ExifInterface 1.4.2 추가
-* `의존성` 수명 주기와 출력 트랜잭션 단위 테스트를 위해 Robolectric 4.16.1 추가
 
 ##### 전체 기록
 

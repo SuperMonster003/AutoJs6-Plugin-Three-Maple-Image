@@ -5,7 +5,7 @@
     <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-tools-ic-launcher" border="0" width="128" />
   </p>
 
-  <p>檔案管理器外掛程式. 安全編輯及轉換影像</p>
+  <p>編輯影像並轉換影像格式</p>
 
   <p>
     <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Tools/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Tools?label=Release"/></a>
@@ -208,6 +208,13 @@ required host build: 5269
 
 ******
 
+#### v1.2.0
+
+###### 2026/09/13
+
+* `新增` 介面提供本地發行歷史, 支援多語言及英語回退
+* `優化` 校驗發行簽章設定, 預期 APK 集合與可重現文件
+
 #### v1.1.0
 
 ###### 2026/09/12
@@ -229,22 +236,6 @@ required host build: 5269
 
 * `修復` 在 AutoJs6 外掛中心啟用外掛時因服務回傳空繫結 (onNullBinding) 導致無法啟用的問題
 * `優化` 精簡外掛名稱與描述, 統一各語言使用者文件的表述
-
-#### v1.0.0
-
-###### 2026/08/02
-
-* `新增` Image Tools 首個版本: 為 AutoJs6 檔案管理器中的單一影像提供 `編輯影像` 與 `轉換影像` 兩個更多選單動作, 處理結果儲存為來源檔案旁的新檔案, 來源檔案保持唯讀
-* `新增` 編輯器支援裁切, 旋轉, 翻轉, 亮度, 對比度, 飽和度, 色溫, 畫筆, 文字與最多 8 步撤銷, 並自動套用 EXIF 方向
-* `新增` 轉換器支援 JPEG / PNG / WebP 輸出: 品質 1-100 可調, 尺寸提供原始 / 百分比 / 自訂三種模式, 支援長寬比鎖定, JPEG 背景色選擇與輸出大小即時預估
-* `新增` 識別 bmp / gif / heic / heif / jpg / jpeg / png / webp 副檔名及全部 `image/*` MIME 類型
-* `新增` 基於 explorer-action 協定 v3 註冊外掛服務: 一次性唯讀輸入配合宿主擁有的輸出交易, 不申請儲存空間或網路權限
-* `新增` 外掛資訊, 介面, 使用說明, README 與更新日誌支援簡體中文, 繁體中文 (香港 / 台灣), 英語, 法語, 西班牙語, 日語, 韓語, 俄語與阿拉伯語共 10 種語言
-* `優化` 螢幕旋轉等組態變更期間保留編輯器與轉換器工作階段, 包括畫布工具, 對話框草稿, 轉換選項, 撤銷歷史與執行中的任務
-* `優化` 以一次性交易宣告, 動作忙碌保護與可取消協程守護輸出寫入, 避免重複提交與殘留半成品檔案
-* `優化` 強化輸出 MIME 類型驗證, 點陣圖記憶體回收與多語言資源一致性
-* `相依性` 附加 AndroidX ExifInterface 1.4.2, 用於安全讀取影像方向中繼資料
-* `相依性` 附加 Robolectric 4.16.1, 用於生命週期與輸出交易的單元測試
 
 ##### 完整記錄
 

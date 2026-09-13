@@ -1,4 +1,4 @@
-# Outils d'image
+# Image Tools
 
 Image Tools est un plugin de traitement d'images pour le gestionnaire de fichiers d'AutoJs6. Une fois activé, chaque fichier image du gestionnaire de fichiers propose deux actions dans son menu secondaire: `Modifier l'image` ouvre un éditeur avec un canevas et une barre d'outils pour les retouches courantes (recadrage, rotation, réglages de couleur, dessin), tandis que `Convertir l'image` ouvre une boîte de dialogue qui enregistre l'image en JPEG, PNG ou WebP, avec un redimensionnement optionnel.
 

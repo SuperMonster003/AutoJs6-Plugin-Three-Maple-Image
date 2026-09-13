@@ -1,4 +1,4 @@
-# Herramientas de imagen
+# Image Tools
 
 Image Tools es un complemento de procesamiento de imágenes para el gestor de archivos de AutoJs6. Una vez activado, cada archivo de imagen del gestor de archivos muestra dos acciones en su menú secundario: `Editar imagen` abre un editor con lienzo y barra de herramientas para retoques cotidianos (recorte, rotación, ajustes de color, dibujo), mientras que `Convertir imagen` abre un diálogo que guarda la imagen como JPEG, PNG o WebP, con la opción de cambiar el tamaño por el camino.
 

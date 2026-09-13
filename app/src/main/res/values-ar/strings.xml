@@ -3,7 +3,6 @@
     <string name="action_convert_image">تحويل الصورة</string>
     <string name="action_edit_image">تحرير الصورة</string>
     <string name="apk_info_format">التنسيق</string>
-    <string name="app_name">أدوات الصور</string>
     <string name="dialog_button_cancel">يلغي</string>
     <string name="dialog_button_confirm">نعم</string>
     <string name="dialog_button_convert">تحويل</string>
@@ -55,7 +54,9 @@
     <string name="image_editor_text_position_help">اسحب النص لاختيار موضعه</string>
     <string name="image_editor_text_shadow">ظل</string>
     <string name="image_editor_text_size_percent">حجم النص: %1$d%%</string>
-    <string name="plugin_description">ملحق مدير الملفات. تحرير الصور وتحويلها بأمان</string>
+    <string name="plugin_description">تحرير الصور وتحويل تنسيقاتها</string>
+    <string name="release_history">سجل الإصدارات</string>
+    <string name="release_history_unavailable">سجل الإصدارات غير متاح</string>
     <string name="text_cannot_read_file">لا يمكن قراءة الملف</string>
     <string name="text_color_palette">لوحة الألوان</string>
     <string name="text_done">فعله</string>

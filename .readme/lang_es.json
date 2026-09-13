@@ -1,7 +1,7 @@
 {
   "$name": "Español",
   "text_current_lowercase": "actual",
-  "text_plugin_synopsis": "Complemento del gestor de archivos. Editar y convertir imágenes de forma segura",
+  "text_plugin_synopsis": "Edita imágenes y convierte sus formatos",
   "h3_languages_with_ascii": "Idiomas (Languages)",
   "p_languages_all_supported_for_readme": "El README.md actual admite los siguientes idiomas",
   "h3_introduction": "Introducción",
