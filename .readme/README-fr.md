@@ -208,6 +208,12 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
+#### v1.2.1
+
+###### 2026/09/15
+
+* `Amélioration` compileSdk et targetSdk passent à 37 (Android 17) ; le comportement du plugin ne dépend pas de la nouvelle cible
+
 #### v1.2.0
 
 ###### 2026/09/13
@@ -229,13 +235,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 * `Amélioration` Extension de la restauration d'état, des limites mémoire / sortie et de la couverture de régression à 23 suites / 99 tests
 * `Amélioration` Mise à jour des README et instructions hôte en 10 langues depuis des sources partagées, avec trois captures réelles sans données personnelles
 * `Amélioration` La vérification de compilation rejette les dépendances natives involontaires et produit un rapport JSON
-
-#### v1.0.1
-
-###### 2026/08/08
-
-* `Correctif` Le plugin ne pouvait pas être activé depuis le centre des plugins AutoJs6 car le service renvoyait une liaison vide (onNullBinding)
-* `Amélioration` Nom et description du plugin raccourcis et formulation de la documentation utilisateur unifiée entre les langues
 
 ##### Historique complet
 
