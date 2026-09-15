@@ -225,6 +225,12 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v1.3.1
+
+###### 2026/09/15
+
+* `Improved` Raise compileSdk and targetSdk to 37 (Android 17); the plugin's behavior does not depend on the new target
+
 #### v1.3.0
 
 ###### 2026/09/13
@@ -243,20 +249,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Improved` Edge-to-edge system bar and display cutout handling, so the layout stays fully visible on Android 15 and later instead of being covered by system bars
 * `Improved` Every icon control carries an accessibility description matching its former text label
 * `Improved` Build verification rejects accidental native dependencies and produces a JSON report
-
-#### v1.1.0
-
-###### 2026/08/31
-
-* `Hint` AutoJs6 host build 5276 or later is required for explorer-action v12 same-folder browsing and explicit multi-selection
-* `Added` Browse supported images in the same folder by swiping in natural filename order, or open an explicit selection of up to 128 images while preserving the host selection order
-* `Added` Enhanced viewer gestures with focal pinch zoom, 2.5x double-tap zoom, 90-degree view rotation, a transient zoom indicator and pause/resume controls for animated GIFs
-* `Added` On-demand EXIF details with automatic correction of all 8 orientation variants and hidden GPS coordinates, plus decoded pixel depth and color space when available and printing or saving the full image as PDF
-* `Added` HEIC / HEIF support on Android 9 or later and AVIF support on Android 12 or later, backed by real decoder capability probes and clear unsupported-format messages
-* `Added` Tiled viewing for huge JPEG / PNG and static HEIC / HEIF images, using a bounded preview and high-resolution tiles for the visible region within a capped memory budget
-* `Improved` Hardened every entry path with strict explorer-action v12 request, target, content, size and direct-child validation while retaining temporary read-only access and no storage or network permissions
-* `Improved` Expanded the localized interface and user documentation in 10 languages, including a five-image gallery captured from the real Android UI
-* `Dependency` Added AndroidX ExifInterface 1.4.2 for read-only EXIF metadata parsing
 
 ##### Full history
 

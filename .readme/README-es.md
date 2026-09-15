@@ -225,6 +225,12 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v1.3.1
+
+###### 2026/09/15
+
+* `Mejora` compileSdk y targetSdk suben a 37 (Android 17); el comportamiento del plugin no depende del nuevo objetivo
+
 #### v1.3.0
 
 ###### 2026/09/13
@@ -243,20 +249,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 * `Mejora` Gestión de barras del sistema de borde a borde y de recortes de pantalla, para que la interfaz siga siendo completamente visible en Android 15 y posteriores en lugar de quedar cubierta por las barras del sistema
 * `Mejora` Cada control de icono incluye una descripción de accesibilidad equivalente a su antigua etiqueta de texto
 * `Mejora` La verificación de compilación rechaza dependencias nativas accidentales y genera un informe JSON
-
-#### v1.1.0
-
-###### 2026/08/31
-
-* `Aviso` La navegación por la misma carpeta y la selección múltiple explícita mediante explorer-action v12 requieren la build 5276 o posterior del anfitrión AutoJs6
-* `Función` Recorre las imágenes compatibles de la misma carpeta deslizando en el orden natural de sus nombres, o abre una selección explícita de hasta 128 imágenes conservando el orden elegido en el anfitrión
-* `Función` Gestos y controles mejorados con zoom de pellizco centrado en el toque, zoom 2.5x con doble toque, rotación de vista de 90 grados, indicador temporal de aumento y pausa/reanudación de GIF animados
-* `Función` Detalles EXIF bajo demanda con corrección automática de las 8 orientaciones y coordenadas GPS siempre ocultas, profundidad de píxel y espacio de color cuando estén disponibles, e impresión o guardado de la imagen completa como PDF
-* `Función` Compatibilidad con HEIC / HEIF en Android 9 o posterior y AVIF en Android 12 o posterior, con pruebas reales de capacidad del decodificador y mensajes claros cuando no estén disponibles
-* `Función` Visualización por mosaicos de imágenes JPEG / PNG y HEIC / HEIF estáticas de gran tamaño, con vista previa acotada y mosaicos de alta resolución para la zona visible dentro de un presupuesto de memoria limitado
-* `Mejora` Validación reforzada de solicitudes explorer-action v12, objetivos, contenido, tamaño e hijos directos en todas las entradas, manteniendo el acceso temporal de solo lectura y sin permisos de almacenamiento ni de red
-* `Mejora` Interfaz y documentación de usuario ampliadas en 10 idiomas, incluida una galería de cinco capturas de la interfaz Android real
-* `Dependencia` Se añade AndroidX ExifInterface 1.4.2 para analizar metadatos EXIF en modo de solo lectura
 
 ##### Historial completo
 
