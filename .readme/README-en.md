@@ -208,6 +208,12 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v1.2.1
+
+###### 2026/09/15
+
+* `Improvement` Raise compileSdk and targetSdk to 37 (Android 17); the plugin's behavior does not depend on the new target
+
 #### v1.2.0
 
 ###### 2026/09/13
@@ -229,13 +235,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Improvement` Expanded state restoration, memory / output-limit enforcement, and regression coverage to 23 suites / 99 tests
 * `Improvement` Updated all 10-language README files and host instructions from shared sources and added three privacy-safe real-device screenshots
 * `Improvement` Build verification rejects accidental native dependencies and produces a JSON report
-
-#### v1.0.1
-
-###### 2026/08/08
-
-* `Fix` Plugin could not be enabled from the AutoJs6 plugin center because the service returned an empty binding (onNullBinding)
-* `Improvement` Shortened the plugin name and description and unified the wording of user documentation across languages
 
 ##### Full history
 
