@@ -227,8 +227,9 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 #### v1.3.1
 
-###### 2026/09/15
+###### 2026/09/19
 
+* `Fixed` SDK XML v4 parsing warnings with AGP 9.1 and APK native alignment checks incorrectly triggered by JVM unit-test assembly tasks, using shared build plugins 1.8.3
 * `Improved` Raise compileSdk and targetSdk to 37 (Android 17); the plugin's behavior does not depend on the new target
 
 #### v1.3.0
