@@ -5,6 +5,17 @@
   "changelog_label_improvement": "تحسين",
   "changelog_label_dependency": "تبعية",
   "$data": {
+    "v2.0.0": {
+      "released_date": "2026/10/04",
+      "hint": [
+        "يتغير معرف التطبيق من io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools إلى io.github.supermonster003.autojs6.plugin.three.maple.image. يثبته Android كتطبيق مستقل; يمكن الاحتفاظ بالتطبيقات والبيانات السابقة ولا تنتقل الإعدادات تلقائيا"
+      ],
+      "feature": [
+        "تم دمج Image Viewer و Image Tools في 3-Maple Image لعرض الصور وتحريرها وتحويل صيغها",
+        "تتيح الصفحة الرئيسية المستقلة اختيار صورة محلية وعرضها أو تحريرها أو تحويلها وحفظ النتيجة في الموقع المختار",
+        "توفر الإعدادات الموحدة اللغة والوضع الليلي ولون السمة وأربعة خيارات لأيقونة المشغل"
+      ]
+    },
     "v1.3.1": {
       "released_date": "2026/09/19",
       "improvement": [

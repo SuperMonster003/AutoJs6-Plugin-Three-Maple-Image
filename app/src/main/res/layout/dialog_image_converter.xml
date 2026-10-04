@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/apk_info_format"
+            android:textColor="@color/text_color_primary"
+            android:textSize="15sp" />
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/format"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:spinnerMode="dropdown" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/quality_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/text_image_conversion_quality"
+                android:textColor="@color/text_color_primary"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/quality_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_color_secondary"
+                android:textSize="14sp"
+                tools:text="92" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/quality"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="99"
+            tools:progress="91" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/webp_lossless"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="@string/text_image_conversion_webp_lossless"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/target_file_size_enabled"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="@string/text_image_conversion_target_file_size"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/target_file_size_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/text_image_conversion_target_file_size_hint"
+            android:visibility="gone"
+            app:expandedHintEnabled="false"
+            app:helperText="@string/text_image_conversion_target_file_size_helper"
+            app:suffixText="KiB"
+            tools:visibility="visible">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/target_file_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="9"
+                android:textColor="@color/text_color_primary"
+                tools:text="500" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/text_image_conversion_resize"
+            android:textColor="@color/text_color_primary"
+            android:textSize="15sp" />
+
+        <RadioGroup
+            android:id="@+id/resize_mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/resize_original"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:checked="true"
+                android:text="@string/text_image_conversion_original_size" />
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/resize_percentage"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="@string/text_image_conversion_percentage" />
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/resize_long_edge"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="@string/text_image_conversion_long_edge" />
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/resize_custom"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="@string/text_image_conversion_custom_size" />
+
+        </RadioGroup>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/percentage_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/text_image_conversion_percentage_hint"
+            android:visibility="gone"
+            app:expandedHintEnabled="false"
+            app:suffixText="%">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/percentage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="4"
+                android:text="@string/value_100"
+                android:textColor="@color/text_color_primary" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/long_edge_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/text_image_conversion_long_edge_hint"
+            android:visibility="gone"
+            app:expandedHintEnabled="false"
+            app:suffixText="px"
+            tools:visibility="visible">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/long_edge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="5"
+                android:textColor="@color/text_color_primary"
+                tools:text="1920" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/custom_size_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/width_parent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/text_image_conversion_width"
+                    app:expandedHintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/width"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:maxLength="5"
+                        android:textColor="@color/text_color_primary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Space
+                    android:layout_width="12dp"
+                    android:layout_height="1dp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/height_parent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/text_image_conversion_height"
+                    app:expandedHintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/height"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:maxLength="5"
+                        android:textColor="@color/text_color_primary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/lock_aspect_ratio"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:checked="true"
+                android:text="@string/text_image_conversion_lock_aspect_ratio" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/jpeg_background_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_image_conversion_jpeg_background"
+                android:textColor="@color/text_color_primary"
+                android:textSize="15sp" />
+
+            <RadioGroup
+                android:id="@+id/jpeg_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/jpeg_background_white"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="@string/text_image_conversion_background_white" />
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/jpeg_background_black"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="@string/text_image_conversion_background_black" />
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/preserve_exif"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:checked="false"
+            android:minHeight="48dp"
+            android:text="@string/text_image_conversion_preserve_exif" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/text_image_conversion_preserve_exif_helper"
+            android:textColor="@color/text_color_secondary"
+            android:textSize="13sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
+            android:background="@color/divider" />
+
+        <TextView
+            android:id="@+id/output_resolution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_color_primary"
+            android:textSize="14sp"
+            tools:text="Output: 1920 x 1080" />
+
+        <TextView
+            android:id="@+id/output_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/text_color_primary"
+            android:textSize="14sp"
+            tools:text="Estimated file size: ~1.2 MiB" />
+
+        <TextView
+            android:id="@+id/output_filename"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="middle"
+            android:maxLines="2"
+            android:textColor="@color/text_color_primary"
+            android:textSize="14sp"
+            tools:text="Output: photo_converted.jpg" />
+
+        <TextView
+            android:id="@+id/validation_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/validation_error"
+            android:textSize="13sp"
+            android:visibility="gone"
+            tools:text="The output image is too large"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+</ScrollView>

@@ -1,6 +1,11 @@
-# 圖像檢視器
+# AutoJs6 3-Maple Image
 
-Image Viewer 為檔案管理器中的 AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG 和 WEBP 檔案提供圖像主要動作.
+Image Viewer 與 Image Tools 合併為 3-Maple Image, 在同一應用程式提供圖片檢視, 編輯與格式轉換.
+統一設定頁提供語言, 夜間模式, 主題色及四種啟動器圖示選項.
+應用程式 ID 從 io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools 改為 io.github.supermonster003.autojs6.plugin.three.maple.image. Android 將其視為獨立應用程式, 原應用程式與資料可以保留, 設定不會自動遷移.
+
+
+3-Maple Image 為檔案管理器中的 AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG 和 WEBP 檔案提供圖像主要動作.
 
 HEIC 與 HEIF 需要 Android 9 或更新版本, AVIF 需要 Android 12 或更新版本. 平台解碼器不可用時, 檢視器會顯示明確的版本或能力提示, 而非靜默失敗.
 

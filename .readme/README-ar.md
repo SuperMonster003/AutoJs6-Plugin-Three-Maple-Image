@@ -2,15 +2,18 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
+    <picture>
+      <source srcset="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/res/mipmap-night/ic_launcher.png?raw=true" media="(prefers-color-scheme: dark)" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
+    </picture>
   </p>
 
-  <p>عرض الصور وفحص تفاصيلها</p>
+  <p>عرض الصور وتحريرها وتحويل صيغها</p>
 
   <p>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/issues"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues/SuperMonster003/AutoJs6-Plugin-Image-Viewer?color=A24232&label=Issues"/></a>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/SuperMonster003/AutoJs6-Plugin-Image-Viewer?color=534BAE&label=License"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?label=Release"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/issues"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?color=A24232&label=Issues"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?color=534BAE&label=License"/></a>
   </p>
 </div>
 
@@ -22,16 +25,24 @@
 
 يدعم README.md الحالي اللغات التالية:
 
-- [简体中文 [zh-Hans]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-zh-Hans.md)
-- [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-zh-Hant-HK.md)
-- [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-zh-Hant-TW.md)
-- [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-en.md)
-- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-fr.md)
-- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-es.md)
-- [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ja.md)
-- [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ko.md)
-- [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ru.md)
+- [简体中文 [zh-Hans]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-zh-Hans.md)
+- [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-zh-Hant-HK.md)
+- [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-zh-Hant-TW.md)
+- [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-en.md)
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-fr.md)
+- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-es.md)
+- [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ja.md)
+- [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ko.md)
+- [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ru.md)
 - العربية [ar] # الحالي
+
+******
+
+### بدء الاستخدام
+
+تتيح الصفحة الرئيسية المستقلة اختيار صورة محلية وعرضها أو تحريرها أو تحويلها وحفظ النتيجة في الموقع المختار. توفر الإعدادات الموحدة اللغة والوضع الليلي ولون السمة وأربعة خيارات لأيقونة المشغل.
+
+يتغير معرف التطبيق من `io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools` إلى `io.github.supermonster003.autojs6.plugin.three.maple.image`. يثبته Android كتطبيق مستقل; يمكن الاحتفاظ بالتطبيقات والبيانات السابقة ولا تنتقل الإعدادات تلقائيا.
 
 ******
 
@@ -39,9 +50,9 @@
 
 ******
 
-Image Viewer هو ملحق لتصفح الصور في مدير ملفات AutoJs6. يؤدي الضغط على ملف JPG أو PNG أو GIF أو WEBP إلى فتح عارض مخصص: تتلاءم الصورة تلقائيا مع الشاشة, ويمكن القرص لتفحص التفاصيل, وعند المقياس 1x يمكن السحب يمينا أو يسارا عبر الصور المدعومة في المجلد نفسه. يتحدث العنوان والبيانات الوصفية مع كل صفحة, ويمكن مشاركة الصورة المفتوحة أولا أو تسليمها إلى تطبيق آخر.
+تم دمج Image Viewer و Image Tools في 3-Maple Image لعرض الصور وتحريرها وتحويل صيغها.
 
-يقوم الملحق بمهمة واحدة وينجزها بأمان: العرض للقراءة فقط. يصل الملف المضغوط عليه أولا عبر content URI مؤقت للقراءة فقط, بينما لا تعدد الملفات المجاورة المباشرة ولا تفتح إلا عبر جلسة readSiblings قصيرة العمر يملكها المضيف. لا يطلب الملحق أذونات تخزين أو شبكة, ولا يعدل ملفات المصدر أو ينقلها, ويغلق جلسة المضيف مع العارض.
+يستخدم العرض مدخلات للقراءة فقط. ينتج التحرير والتحويل ملفا منفصلا مع الحفاظ على الصورة الأصلية. يستخدم التطبيق المستقل منتقي مستندات Android.
 
 ******
 
@@ -59,7 +70,14 @@ Image Viewer هو ملحق لتصفح الصور في مدير ملفات AutoJs
 - التنسيقات الشائعة جاهزة فورا: عائلة JPEG (JPG / JPEG / JPE / JFIF) و PNG و WEBP و BMP و GIF و HEIC و HEIF و AVIF, أي 11 امتدادا, مع تكرار تلقائي لصور GIF المتحركة وتحكم مخصص للإيقاف المؤقت والمتابعة.
 - المشاركة والتسليم: افتح لوحة المشاركة في النظام بلمسة, أو استخدم `فتح باستخدام` للتحرير أو التعليق, مع استبعاد الملحق نفسه تلقائيا من قائمة التطبيقات لتجنب الحلقات.
 - يعمل كعارض صور للنظام: نقطة دخول Android مستقلة من نوع `ACTION_VIEW` تخدم بأمان طلبات عرض الصور للقراءة فقط من التطبيقات الأخرى.
-- بيئة معزولة للقراءة فقط: لا أذونات تخزين أو شبكة, ووصول إلى ملف واحد بالضبط عبر تصريح مؤقت للقراءة فقط, ولا كتابة في الملف الأصلي أبدا.
+- يوفر المحرر إعدادات مسبقة لنسب الاقتصاص, وتدويرا بزاوية 90 درجة وتدويرا دقيقا من -45° إلى +45°, وقلبا أفقيا ورأسيا, وضبط السطوع والتباين والتشبع وحرارة اللون, وفرشا ونصا منسقا مع معاينة حية.
+- تشمل أنواع الفرشاة القلم وقلم التمييز وفسيفساء الخصوصية والممحاة مع تذكر اللون والسماكة; ويدعم النص عدة أسطر والحجم واللون والحد والظل وتحديد الموضع بالسحب.
+- يحتفظ التراجع والإعادة بما يصل إلى 8 لقطات سجل ضمن ميزانية 192 MiB; ويمكن التراجع عن `استعادة الصورة الأصلية` نفسها, ويتطلب الخروج مع تغييرات غير محفوظة تأكيدا.
+- يمكن لمربع حوار حفظ المحرر اتباع تنسيق المصدر أو اختيار JPEG أو PNG أو WebP وضبط جودة الضغط مع فقدان وتفعيل WebP بلا فقدان على Android 11+; وينشر المضيف ملفا جديدا مجاورا بدلا من استبدال المصدر.
+- يدعم المحول JPEG / PNG / WebP والجودة 1-100 (الافتراضي 92) وحجم الملف المستهدف لـ JPEG و WebP مع فقدان و WebP بلا فقدان على Android 11+ والتحسين التلقائي لـ PNG المفهرس عندما لا تتجاوز الصورة 256 لونا.
+- تتضمن أوضاع الحجم الأربعة `الأصلي` و `النسبة المئوية` (1-1000) و `مخصص` مع قفل النسبة و `الضلع الطويل` (1920 بكسل افتراضيا ومن دون تكبير); ويمكن لـ JPEG ملء الشفافية بالأبيض أو الأسود.
+- يعرض مربع الحوار الدقة والحجم المتوقع في الوقت الفعلي. يكون الاحتفاظ الآمن ببيانات EXIF معطلا افتراضيا; وعند تشغيله يحتفظ بحقول كاميرا محدودة ويطبع الاتجاه ويزيل دائما GPS والمعاينات المضمنة.
+- تحافظ تغييرات الإعداد على اللوحة ومسودات مربعات الحوار وسجل التراجع/الإعادة والمهام الجارية; ويظل كل إجراء يستخدم إدخالا واحدا للقراءة فقط ومعاملة إخراج مجاورة واحدة يملكها المضيف وتستخدم مرة واحدة.
 
 ******
 
@@ -72,31 +90,31 @@ Image Viewer هو ملحق لتصفح الصور في مدير ملفات AutoJs
 <table>
   <tr>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="إجراء عرض ملف واحد في مدير الملفات" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="إجراء عرض ملف واحد في مدير الملفات" width="360" />
       <br />
       <sub>إجراء عرض ملف واحد في مدير الملفات</sub>
     </td>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/explorer-selection.png?raw=true" alt="مجموعة دقيقة من صورتين محددتين" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-selection.png?raw=true" alt="مجموعة دقيقة من صورتين محددتين" width="360" />
       <br />
       <sub>مجموعة دقيقة من صورتين محددتين</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/viewer-main.png?raw=true" alt="واجهة العارض الرئيسية والبيانات الوصفية المباشرة" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-main.png?raw=true" alt="واجهة العارض الرئيسية والبيانات الوصفية المباشرة" width="360" />
       <br />
       <sub>واجهة العارض الرئيسية والبيانات الوصفية المباشرة</sub>
     </td>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/viewer-zoom-2.5x.png?raw=true" alt="تكبير غامر بمقدار 2.5x" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-zoom-2.5x.png?raw=true" alt="تكبير غامر بمقدار 2.5x" width="360" />
       <br />
       <sub>تكبير غامر بمقدار 2.5x</sub>
     </td>
   </tr>
   <tr>
     <td align="center" colspan="2">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/share-sheet.png?raw=true" alt="لوحة مشاركة النظام" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/share-sheet.png?raw=true" alt="لوحة مشاركة النظام" width="360" />
       <br />
       <sub>لوحة مشاركة النظام</sub>
     </td>
@@ -115,12 +133,12 @@ Image Viewer هو ملحق لتصفح الصور في مدير ملفات AutoJs
 host app: AutoJs6 (org.autojs.autojs6)
 minimum host build: 5276
 minimum android: 7.0 (API 24)
-plugin package: io.github.supermonster003.autojs6.plugin.imageviewer
+plugin package: io.github.supermonster003.autojs6.plugin.three.maple.image
 ```
 
 من التثبيت إلى مشاهدة أول صورة 4 خطوات:
 
-1. نزل ملف APK الخاص بالملحق وثبته. لا يملك الملحق أيقونة تشغيل; بعد التثبيت يديره AutoJs6 بالكامل.
+1. تتيح الصفحة الرئيسية المستقلة اختيار صورة محلية وعرضها أو تحريرها أو تحويلها وحفظ النتيجة في الموقع المختار.
 2. افتح AutoJs6, وادخل إلى `مركز الاضافات`, وحدد `عارض الصور` وقم بتمكينه.
 3. في مدير ملفات AutoJs6, حدد أي ملف صورة مدعوم (مثل `screenshot.png`).
 4. اضغط على الملف. تفتح الصورة في العارض المخصص.
@@ -147,29 +165,29 @@ JFIF و JPE امتدادان بديلان لعائلة JPEG. يتطلب HEIC و 
 
 ******
 
-**الضغط على ملف صورة لا يفتح هذا العارض?**
+**لا يظهر `تحرير الصورة` و `تحويل الصورة` في قائمة الملف?**
 
-تحقق بالترتيب: أن يكون رمز إصدار AutoJs6 لا يقل عن 5276 (الإصدار 6.8.0 وما بعده يفي بالشرط); وأن يكون الملحق مفعلا في `مركز الاضافات`; وأن يكون امتداد الملف ضمن القائمة المدعومة. إذا اختل أي شرط من الثلاثة, فلن يعالج هذا الملحق الضغطة.
+تحقق بالترتيب: رمز إصدار AutoJs6 لا يقل عن 5276; الملحق مفعل في `مركز الاضافات`; امتداد الملف أو نوع MIME الخاص به ضمن قائمة الدعم. إن لم يتحقق أي شرط منها فلن تظهر إجراءات القائمة.
 
-**يظهر العارض رسالة `تعذر عرض الصورة`?**
+**يظهر `تعذر قراءة معلومات الصورة` عند الفتح أو تغلق الشاشة فورا?**
 
-الأسباب الشائعة: بيانات الصورة تالفة أو ترميزها غير مدعوم في منصة Android الحالية; أو نقل الملف أو اعادة تسميته أو حذفه لحظة الفتح; أو عدم تطابق الحجم المعلن مع الحجم الفعلي (ترفض فحوصات الأمان هذه الطلبات).
+يستخدم العرض مدخلات للقراءة فقط. ينتج التحرير والتحويل ملفا منفصلا مع الحفاظ على الصورة الأصلية. يستخدم التطبيق المستقل منتقي مستندات Android.
 
-**هل يمكن تحرير الصور أو قصها أو تدويرها بشكل دائم?**
+**أين تحفظ النتيجة? وهل يستبدل الملف الأصلي?**
 
-لا. يركز هذا الملحق على العرض للقراءة فقط. يغير `تدوير` العرض الحالي فقط ولا يغير الملف المصدر أبدا. للتحرير, المس `فتح باستخدام` لتسليم الصورة إلى تطبيق تحرير; ويبقى الحذف والنقل واعادة التسمية متاحة في مدير ملفات AutoJs6.
+يدعم العرض مجموعة صور محددة بينما يعالج التحرير والتحويل صورة واحدة كل مرة. يمكنك اختيار وجهة الحفظ من الصفحة المستقلة; تنشئ استدعاءات AutoJs6 ملفا جديدا بجانب الأصل.
 
-**هل تعمل صور GIF المتحركة?**
+**يبلغ تحويل صورة كبيرة عن نفاد الذاكرة أو تجاوز عدد البكسلات?**
 
-نعم. يفكك Glide صور GIF المتحركة وتتكرر تلقائيا. يعرض العارض تحكم الإيقاف المؤقت والمتابعة للصور المتحركة القابلة للتشغيل فقط, ويؤثر هذا التحكم في العرض دون تعديل الملف الأصلي.
+حجم الإخراج مقيد بثلاثة حدود: لا يتجاوز أي ضلع 16384 px, ولا يتجاوز إجمالي البكسلات 40 مليونا (40 MP), ويجب أن يبقى ضمن ميزانية ذاكرة الجهاز. إذا تجاوز المصدر الحدود فبدل `تغيير الحجم` إلى `النسبة المئوية` أو `الضلع الطويل` أو `مخصص` لتصغير الإخراج; ونفاد الذاكرة يحل عادة بإغلاق التطبيقات الأخرى أو خفض الدقة أكثر.
 
-**ماذا يحدث عندما لا يكون الملحق مثبتا?**
+**لماذا تحفظ الصورة المحررة بدقة أقل?**
 
-يتراجع المضيف إلى طلب عرض خارجي للقراءة فقط تخدمه تطبيقات الصور الموجودة على الجهاز. وبعد تثبيت هذا الملحق وتمكينه, تفتح الضغطات في العارض المدمج.
+للحفاظ على سلاسة التحرير واستقراره, الصور التي تتجاوز ميزانية بكسلات التحرير (حتى نحو 16 MP حسب ذاكرة الجهاز) يخفض حجمها قبل تحميلها في المحرر, وتطابق النتيجة المحفوظة لوحة التحرير. إن أردت تغيير التنسيق أو الحجم فقط دون لمس البكسلات فاستخدم `تحويل الصورة`: فهو يفك الترميز بدقة وفق حجم الإخراج ولا يخضع لهذه الميزانية.
 
-**لماذا يسجل الملحق أيضا نقطة دخول لعرض الصور على مستوى النظام?**
+**هل يمكن معالجة عدة صور دفعة واحدة أو حفظ النتيجة في مجلد آخر?**
 
-هذه هي نقطة الدخول المستقلة `ACTION_VIEW`, وهي لا تقبل إلا طلبات `image/*` بعناوين `content` URI للقراءة فقط, ليتمكن غيرها من التطبيقات من استخدام هذا العارض. وهي معزولة عن نقطة دخول مدير الملفات, وتمر بالتحقق الصارم نفسه, ولا تكتب شيئا أبدا.
+يدعم العرض مجموعة صور محددة بينما يعالج التحرير والتحويل صورة واحدة كل مرة. يمكنك اختيار وجهة الحفظ من الصفحة المستقلة; تنشئ استدعاءات AutoJs6 ملفا جديدا بجانب الأصل.
 
 ******
 
@@ -179,13 +197,7 @@ JFIF و JPE امتدادان بديلان لعائلة JPEG. يتطلب HEIC و 
 
 بني الملحق على مبدأ الرفض الافتراضي. جميع التدابير التالية مفعلة دائما ولا يمكن تعطيلها:
 
-- مجموعات صريحة محدودة: يقبل التحديد المتعدد من 1 إلى 128 ملفا مباشرا مدعوما تحت أب واحد. يجب أن تكون معرفات الأهداف وعناوين URI والأسماء و ClipData المرتب وأنواع MIME والأحجام فريدة عند اللزوم ومتسقة فيما بينها; ويعاد فحص المحتوى الفعلي لكل صورة قبل فتح العارض.
-- صفر أذونات حساسة: لا أذونات تخزين أو شبكة أو أذونات تشغيل أخرى, مع تعطيل حركة المرور غير المشفرة; ونقطة دخول مدير الملفات ونقطة الإيقاظ محميتان بإذن ملحقات المضيف ولا يستدعيهما إلا المضيف.
-- وصول مؤقت ومحدود للقراءة فقط: يستخدم الملف المحدد content URI مؤقتا; ولا تعدد الملفات المجاورة المباشرة ولا تفتح إلا عبر v12 HOST_SESSION مع معرف هدف مبهم وأسماء نسبية مباشرة متحقق منها. لا يستقبل الملحق مسارات نظام الملفات, ويرفض تصاريح الكتابة أو التصاريح الدائمة.
-- التحقق من نقاط الدخول بندا بندا: تفحص هوية الإجراء وإصدار البروتوكول و UUID الطلب وبنية المضيف ومصدر الاستدعاء و Bundle الهدف وبنية URI و ClipData واسم الملف ونوع MIME والحجم المعلن وعلاقة الأب المباشر وواصف Binder للجلسة; وأي اختلال يعني رفض الطلب.
-- فحص مزدوج للمحتوى: قبل الفتح تسبر حدود تفكيك الصورة ويقارن الحجم المعلن بالحجم الفعلي مع الرفض عند التعارض; والحد الأقصى للملف الواحد 8 TiB.
-- نقطتا دخول معزولتان: نقطة دخول مدير الملفات ونقطة `ACTION_VIEW` الخارجية مستقلتان; ولا تقبل الأخيرة إلا طلبات صور بعناوين `content` URI للقراءة فقط وتمر بفحص المحتوى نفسه.
-- العارض غير مصدر للخارج: لا يمكن تشغيل شاشة العرض إلا من داخل الملحق, ولا تمرر المشاركة والفتح الخارجي سوى تصاريح مؤقتة للقراءة فقط, ولا يكتب في الملف الأصلي أبدا.
+- يستخدم العرض مدخلات للقراءة فقط. ينتج التحرير والتحويل ملفا منفصلا مع الحفاظ على الصورة الأصلية. يستخدم التطبيق المستقل منتقي مستندات Android.
 
 ******
 
@@ -198,7 +210,7 @@ JFIF و JPE امتدادان بديلان لعائلة JPEG. يتطلب HEIC و 
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
 execute action: org.autojs.plugin.EXPLORER_ACTION_EXECUTE
-plugin id: image-viewer
+plugin id: three-maple-image
 engine: explorer-action
 variant: default
 explorer action id: view-image
@@ -217,13 +229,22 @@ required host build: 5276
 
 تدار القدرات المكتملة والخطط القادمة كقائمة قابلة للتأشير في ROADMAP.md. تعبر البنود غير المؤشرة عن نية ولا تصف القدرات الحالية.
 
-- [فتح ROADMAP.md القابل للتأشير](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/ROADMAP.md)
+- [فتح ROADMAP.md القابل للتأشير](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/ROADMAP.md)
 
 ******
 
 ### سجل الإصدارات
 
 ******
+
+#### v2.0.0
+
+###### 2026/10/04
+
+* `تلميح` يتغير معرف التطبيق من io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools إلى io.github.supermonster003.autojs6.plugin.three.maple.image. يثبته Android كتطبيق مستقل; يمكن الاحتفاظ بالتطبيقات والبيانات السابقة ولا تنتقل الإعدادات تلقائيا
+* `ميزة` تم دمج Image Viewer و Image Tools في 3-Maple Image لعرض الصور وتحريرها وتحويل صيغها
+* `ميزة` تتيح الصفحة الرئيسية المستقلة اختيار صورة محلية وعرضها أو تحريرها أو تحويلها وحفظ النتيجة في الموقع المختار
+* `ميزة` توفر الإعدادات الموحدة اللغة والوضع الليلي ولون السمة وأربعة خيارات لأيقونة المشغل
 
 #### v1.3.1
 
@@ -239,21 +260,9 @@ required host build: 5276
 * `ميزة` يتوفر سجل الإصدارات محليا من الواجهة بالنص المترجم والإنجليزية كبديل
 * `تحسين` التحقق من اكتمال إعداد توقيع حزم الإصدار وملفات APK المتوقعة وإمكانية إعادة إنشاء الوثائق
 
-#### v1.2.0
-
-###### 2026/09/12
-
-* `ميزة` اعادة تصميم العارض كشاشة غامرة كاملة: تملأ الصورة الان النافذة بالكامل اسفل شريط الحالة وشريط التنقل, وصار الشريطان العلوي والسفلي طبقتين شبه شفافتين تختفيان او تعودان بلمسة واحدة
-* `ميزة` شريط عنوان متراكب يعرض اسم الملف, وعداد صفحات بصيغة `3 / 12` عند تصفح مجلد او تحديد, وقائمة في الزاوية العلوية تضم `اعادة ضبط التكبير` و `طباعة / حفظ PDF`
-* `ميزة` شريط اجراءات سفلي بازرار ايقونات `التفاصيل` و `تدوير` و `مشاركة` و `فتح باستخدام`, مع زر عائم للايقاف المؤقت / المتابعة يظهر فقط مع صور GIF المتحركة
-* `ميزة` تفاصيل الصورة تفتح الان في لوحة سفلية قابلة للسحب تعرض اسم الملف ونوع MIME والحجم والدقة ومعلومات الالوان بعد فك الترميز وحقول EXIF; اسحب للاسفل او المس الصورة او اضغط رجوع لاغلاقها
-* `تحسين` معالجة اشرطة النظام من الحافة الى الحافة وفتحات الشاشة, بحيث تبقى الواجهة ظاهرة بالكامل على Android 15 والاحدث بدلا من ان تغطيها اشرطة النظام
-* `تحسين` كل عنصر تحكم بايقونة يحمل وصفا لامكانية الوصول يطابق تسميته النصية السابقة
-* `تحسين` التحقق أثناء البناء لمنع إدخال تبعيات أصلية غير مقصودة, مع تقرير JSON
-
 ##### السجل الكامل
 
-* [CHANGELOG-ar.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/assets/doc/CHANGELOG-ar.md)
+* [CHANGELOG-ar.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/assets/doc/CHANGELOG-ar.md)
 
 ******
 
@@ -302,4 +311,9 @@ app/src/main/res/raw-*/plugin_instruction.md
 - Glide (محرك تحميل الصور وعرضها): https://github.com/bumptech/glide
 
 
-[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)
+[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/16kb.md)
+
+
+### المصادر والشكر
+
+[THIRD_PARTY_NOTICES.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/THIRD_PARTY_NOTICES.md) · [RIGHTS_AND_TAKEDOWN.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/RIGHTS_AND_TAKEDOWN.md)

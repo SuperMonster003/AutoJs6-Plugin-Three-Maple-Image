@@ -4,6 +4,15 @@
 
 ******
 
+## v2.0.0
+
+###### 2026/10/04
+
+* `提示` 應用程式 ID 從 io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools 改為 io.github.supermonster003.autojs6.plugin.three.maple.image. Android 將其視為獨立應用程式, 原應用程式與資料可以保留, 設定不會自動遷移
+* `新增` Image Viewer 與 Image Tools 合併為 3-Maple Image, 在同一應用程式提供圖片檢視, 編輯與格式轉換
+* `新增` 獨立首頁可選擇本機圖片進行檢視, 編輯或轉換, 並將處理結果另存至指定位置
+* `新增` 統一設定頁提供語言, 夜間模式, 主題色及四種啟動器圖示選項
+
 ## v1.3.1
 
 ###### 2026/09/19

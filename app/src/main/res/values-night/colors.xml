@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="appearance_accent">#9CCAFF</color>
+    <color name="appearance_brand_primary">#9CCAFF</color>
+    <color name="appearance_divider">#34363A</color>
+    <color name="appearance_error">#EF9A9A</color>
+    <color name="appearance_outline">#777A82</color>
+    <color name="appearance_surface">#1E1E1E</color>
+    <color name="appearance_surface_variant">#1E1E1E</color>
+    <color name="appearance_system_bar">#121212</color>
+    <color name="appearance_text_primary">#E6E1E5</color>
+    <color name="appearance_text_secondary">#B9BAC0</color>
+    <color name="appearance_window_background">#121212</color>
     <color name="color_primary">#B96500</color>
     <color name="color_primary_dark">#6E3700</color>
     <color name="color_secondary">#4DD0E1</color>
+    <color name="divider">#33FFFFFF</color>
     <color name="overlay_surface">#E60D1117</color>
+    <color name="text_color_primary">#FFFFFFFF</color>
+    <color name="text_color_secondary">#B3FFFFFF</color>
     <color name="toolbar_overlay_background">#E6B96500</color>
     <color name="toolbar_text">#FFFFFFFF</color>
+    <color name="validation_error">#FFEF9A9A</color>
     <color name="verification_match">#FF81C784</color>
     <color name="verification_mismatch">#FFEF9A9A</color>
     <color name="window_background">#FF0D1117</color>

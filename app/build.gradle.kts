@@ -12,7 +12,7 @@ plugins {
     id("com.android.application")
 }
 
-val globalApplicationId = "io.github.supermonster003.autojs6.plugin.imageviewer"
+val globalApplicationId = "io.github.supermonster003.autojs6.plugin.three.maple.image"
 
 val buildTypeDebug = "debug"
 val buildTypeRelease = "release"
@@ -31,8 +31,14 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         resValue("string", "plugin_author", "SuperMonster003")
+        resValue("string", "plugin_id", "three-maple-image")
+        resValue("string", "plugin_engine", "explorer-action")
+        resValue("string", "plugin_variant", "default")
+        resValue("string", "plugin_requires_host_version", "5276")
         resValue("string", "plugin_version_date", utils.getDateString("MMM d, yyyy", "GMT+08:00"))
     }
+
+    testOptions { unitTests.isIncludeAndroidResources = true }
 
     lint {
         abortOnError = true
@@ -123,6 +129,7 @@ androidComponents {
 }
 
 dependencies {
+    testImplementation(libs.robolectric)
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.21")
     implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.2.21")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")

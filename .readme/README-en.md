@@ -2,15 +2,18 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
+    <picture>
+      <source srcset="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/res/mipmap-night/ic_launcher.png?raw=true" media="(prefers-color-scheme: dark)" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
+    </picture>
   </p>
 
-  <p>View images and inspect image details</p>
+  <p>Image viewing, editing and format conversion</p>
 
   <p>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/issues"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues/SuperMonster003/AutoJs6-Plugin-Image-Viewer?color=A24232&label=Issues"/></a>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/SuperMonster003/AutoJs6-Plugin-Image-Viewer?color=534BAE&label=License"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?label=Release"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/issues"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?color=A24232&label=Issues"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?color=534BAE&label=License"/></a>
   </p>
 </div>
 
@@ -22,16 +25,24 @@
 
 The current README.md supports the following languages:
 
-- [简体中文 [zh-Hans]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-zh-Hans.md)
-- [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-zh-Hant-HK.md)
-- [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-zh-Hant-TW.md)
+- [简体中文 [zh-Hans]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-zh-Hans.md)
+- [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-zh-Hant-HK.md)
+- [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-zh-Hant-TW.md)
 - English [en] # current
-- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-fr.md)
-- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-es.md)
-- [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ja.md)
-- [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ko.md)
-- [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ru.md)
-- [العربية [ar]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ar.md)
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-fr.md)
+- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-es.md)
+- [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ja.md)
+- [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ko.md)
+- [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ru.md)
+- [العربية [ar]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ar.md)
+
+******
+
+### Get started
+
+A standalone home screen opens local images, starts editing or conversion, and saves the result to a chosen destination. Language, dark mode, theme color and four launcher icon choices are available in the shared settings layout.
+
+The application ID changes from `io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools` to `io.github.supermonster003.autojs6.plugin.three.maple.image`. Android installs this as a separate app; existing apps and data can remain, and settings are not migrated automatically.
 
 ******
 
@@ -39,9 +50,9 @@ The current README.md supports the following languages:
 
 ******
 
-Image Viewer is an image browsing plugin for the AutoJs6 file manager. Once enabled, tapping a common image file such as JPG, PNG, GIF, or WEBP opens it in a dedicated viewer: the image fits the screen automatically, pinch to inspect details, and at 1x you can swipe left or right through supported images in the same folder. The title and bottom metadata bar update for every page, with sharing or handoff to another app available for the originally opened image.
+Image Viewer and Image Tools are combined in 3-Maple Image, with viewing, editing and format conversion in one app.
 
-The plugin does one thing and does it safely: read-only viewing. The originally tapped file arrives through a temporary read-only content URI, while direct siblings can only be enumerated and opened through a short-lived, host-owned readSiblings session. The plugin requests no storage or network permission, never modifies or moves a source file, and closes the host session with the viewer.
+Viewing uses read-only inputs. Editing and conversion produce a separate output; the source image is preserved. Standalone file access uses the Android document picker.
 
 ******
 
@@ -59,7 +70,14 @@ The plugin does one thing and does it safely: read-only viewing. The originally 
 - Common formats out of the box: the JPEG family (JPG / JPEG / JPE / JFIF), PNG, WEBP, BMP, GIF, HEIC, HEIF, and AVIF, 11 extensions in total, with animated GIFs looping automatically and a dedicated pause/resume control.
 - Share and hand off: bring up the system share sheet with one tap, or use `Open with` for editing or annotating, with the plugin itself excluded from the app list to avoid loops.
 - Works as a system image viewer: a separate Android `ACTION_VIEW` entry safely serves read-only image viewing requests from other apps.
-- A read-only security sandbox: no storage or network permissions, access to exactly one file through a temporary read-only grant, and the source file is never written.
+- The editor offers crop presets; 90-degree and fine -45° to +45° rotation; horizontal and vertical flip; brightness, contrast, saturation, and color temperature; brushes and styled text, with live preview while adjusting.
+- Brush types include pen, highlighter, privacy-preserving mosaic, and eraser with remembered color and width; text supports multiline content, size, color, outline, shadow, and drag placement.
+- Undo and redo keep up to 8 history snapshots within a 192 MiB budget; `Restore original` is reversible, and leaving with unsaved changes requires confirmation.
+- The editor save dialog can follow the source format or choose JPEG, PNG, or WebP, adjust lossy quality, and enable lossless WebP on Android 11+; the host publishes a new sibling instead of overwriting the source.
+- The converter supports JPEG / PNG / WebP, quality 1-100 (default 92), target file size for JPEG and lossy WebP, lossless WebP on Android 11+, and automatic indexed PNG optimization when the image has at most 256 colors.
+- Four sizing modes cover `Original`, `Percentage` (1-1000), `Custom` with aspect-ratio locking, and `Long edge` (1920 px by default and never upscales); JPEG can fill transparency with white or black.
+- The dialog previews resolution and estimated size in real time. Safe EXIF preservation is off by default; when enabled it keeps bounded camera fields, normalizes orientation, and always removes GPS and embedded previews.
+- Configuration changes preserve the canvas, dialog drafts, undo/redo history, and running tasks; each action still uses one read-only input and one host-owned single-use sibling-output transaction.
 
 ******
 
@@ -72,31 +90,31 @@ These are real UI captures from AutoJs6 6.8.0 on an Android 13 emulator. Every i
 <table>
   <tr>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="Single-file viewer action in the file manager" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="Single-file viewer action in the file manager" width="360" />
       <br />
       <sub>Single-file viewer action in the file manager</sub>
     </td>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/explorer-selection.png?raw=true" alt="Exact group of two selected images" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-selection.png?raw=true" alt="Exact group of two selected images" width="360" />
       <br />
       <sub>Exact group of two selected images</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/viewer-main.png?raw=true" alt="Main viewer and live metadata" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-main.png?raw=true" alt="Main viewer and live metadata" width="360" />
       <br />
       <sub>Main viewer and live metadata</sub>
     </td>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/viewer-zoom-2.5x.png?raw=true" alt="Immersive 2.5x zoom" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-zoom-2.5x.png?raw=true" alt="Immersive 2.5x zoom" width="360" />
       <br />
       <sub>Immersive 2.5x zoom</sub>
     </td>
   </tr>
   <tr>
     <td align="center" colspan="2">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/share-sheet.png?raw=true" alt="System share sheet" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/share-sheet.png?raw=true" alt="System share sheet" width="360" />
       <br />
       <sub>System share sheet</sub>
     </td>
@@ -115,13 +133,13 @@ Before starting, confirm the following requirements:
 host app: AutoJs6 (org.autojs.autojs6)
 minimum host build: 5276
 minimum android: 7.0 (API 24)
-plugin package: io.github.supermonster003.autojs6.plugin.imageviewer
+plugin package: io.github.supermonster003.autojs6.plugin.three.maple.image
 ```
 
 It takes 4 steps from installation to your first image:
 
-1. Download and install the plugin APK. The plugin has no launcher icon; after installation it is managed entirely by AutoJs6.
-2. Open AutoJs6, enter the `Plugin center`, locate `Image Viewer`, and enable it.
+1. A standalone home screen opens local images, starts editing or conversion, and saves the result to a chosen destination.
+2. Open AutoJs6, enter the `Plugin center`, locate `3-Maple Image`, and enable it.
 3. In the AutoJs6 file manager, locate any supported image file (such as `screenshot.png`).
 4. Tap the file. The image opens in the dedicated viewer.
 
@@ -147,29 +165,29 @@ JFIF and JPE are alias extensions of the JPEG family. HEIC and HEIF require Andr
 
 ******
 
-**Tapping an image file does not open this viewer?**
+**The file menu does not show `Edit image` and `Convert image`?**
 
-Check the following in order: the AutoJs6 version code is at least 5276 (version 6.8.0 or later qualifies); the plugin is enabled in the `Plugin center`; and the file extension is in the supported list. If any of the three fails, the tap will not be served by this plugin.
+Check the following in order: the AutoJs6 version code is at least 5276; the plugin is enabled in the `Plugin center`; and the file extension or MIME type is in the supported list. If any of the three fails, the menu actions will not appear.
 
-**The viewer shows `The image could not be displayed`?**
+**Opening fails with `Unable to read image information` or the screen flashes and closes?**
 
-Common causes: the image data is corrupted or its encoding is not supported by the current Android platform; the file was moved, renamed, or deleted at the moment of opening; or the declared file size does not match the actual size (the security checks reject such requests).
+Viewing uses read-only inputs. Editing and conversion produce a separate output; the source image is preserved. Standalone file access uses the Android document picker.
 
-**Can I edit, crop, or permanently rotate images?**
+**Where is the result saved? Does it overwrite the original?**
 
-No. This plugin focuses on read-only viewing. `Rotate` changes only the current display and never the source file. For editing, tap `Open with` to hand the image to an editor app; file operations such as deleting, moving, and renaming remain available in the AutoJs6 file manager.
+Viewing supports a selected group of images. Editing and conversion handle one image at a time. From the standalone home screen, you choose where to save the result; calls from AutoJs6 create a new sibling file.
 
-**Do animated GIFs play?**
+**Converting a large image reports insufficient memory or too many pixels?**
 
-Yes. Animated GIFs are decoded by Glide and loop automatically. The viewer shows a pause/resume control only for an actual animated drawable, and that control affects display playback without modifying the source file.
+Output size is bounded three ways: no side may exceed 16384 px, the total may not exceed 40 million pixels (40 MP), and it must fit the device memory budget. If the source exceeds the limits, switch `Resize` to `Percentage`, `Long edge`, or `Custom` to shrink the output; for memory issues, closing other apps or lowering the resolution further usually resolves it.
 
-**What happens when the plugin is not installed?**
+**Why does an edited image come out at a lower resolution?**
 
-The host falls back to a read-only external viewing request served by the image apps already on the device. Once this plugin is installed and enabled, taps open in the built-in viewer instead.
+To keep editing smooth and stable, images above the editing pixel budget (up to about 16 MP, depending on device memory) are downsampled before entering the editor, and the saved result matches the editing canvas. If you only need to change the format or size without touching pixels, use `Convert image` instead: it decodes precisely at the output size and is not subject to this budget.
 
-**Why does the plugin also register a system-level image viewing entry?**
+**Can it process multiple images at once, or save the result to another directory?**
 
-That is the separate `ACTION_VIEW` entry, which accepts only read-only `content` URI requests of `image/*` types so that other apps can use this viewer. It is isolated from the file manager entry, goes through the same strict validation, and likewise never writes anything.
+Viewing supports a selected group of images. Editing and conversion handle one image at a time. From the standalone home screen, you choose where to save the result; calls from AutoJs6 create a new sibling file.
 
 ******
 
@@ -179,13 +197,7 @@ That is the separate `ACTION_VIEW` entry, which accepts only read-only `content`
 
 The plugin is built on a deny-by-default principle. All of the following measures are always on and cannot be disabled:
 
-- Bounded explicit groups: multi-selection accepts 1 to 128 supported direct children of one parent. Target IDs, URIs, names, ordered ClipData, MIME types, and sizes must be unique where required and mutually consistent; every selected image is content-checked before the viewer opens.
-- Zero sensitive permissions: no storage, network, or other runtime permissions, with cleartext traffic disabled; the file manager entry and the wake entry are protected by the host plugin permission and callable by the host only.
-- Temporary scoped read-only access: the selected file uses a temporary content URI; direct siblings are enumerated and opened only through the v12 HOST_SESSION with an opaque target ID and validated direct relative names. The plugin receives no filesystem paths and rejects write or persistable grants.
-- Entry-point validation: the action identity, protocol version, request UUID, host build, calling surface, target Bundle, URI structure, ClipData, file name, MIME type, declared size, direct-parent relationship, and host-session Binder descriptor are verified item by item; any mismatch means the request is refused.
-- Content double-check: before opening, the image decode bounds are probed and the declared size is compared with the actual size, rejecting on mismatch; a single file is capped at 8 TiB.
-- Isolated dual entries: the file manager entry and the external `ACTION_VIEW` entry are independent of each other; the latter accepts only read-only `content` URI image requests and passes the same content verification.
-- The viewer is not exported: the rendering screen can only be started from inside the plugin, sharing and external opening forward only temporary read-only grants, and the source file is never written.
+- Viewing uses read-only inputs. Editing and conversion produce a separate output; the source image is preserved. Standalone file access uses the Android document picker.
 
 ******
 
@@ -198,7 +210,7 @@ The host discovers and invokes the plugin with the following identities:
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
 execute action: org.autojs.plugin.EXPLORER_ACTION_EXECUTE
-plugin id: image-viewer
+plugin id: three-maple-image
 engine: explorer-action
 variant: default
 explorer action id: view-image
@@ -217,13 +229,22 @@ The current implementation targets explorer-action protocol version 12: the prim
 
 Completed capabilities and upcoming plans are maintained as a checkable list in ROADMAP.md. Unchecked items express intent and do not describe current abilities.
 
-- [Open the checkable ROADMAP.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/ROADMAP.md)
+- [Open the checkable ROADMAP.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/ROADMAP.md)
 
 ******
 
 ### Release History
 
 ******
+
+#### v2.0.0
+
+###### 2026/10/04
+
+* `Hint` The application ID changes from io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools to io.github.supermonster003.autojs6.plugin.three.maple.image. Android installs this as a separate app; existing apps and data can remain, and settings are not migrated automatically
+* `Added` Image Viewer and Image Tools are combined in 3-Maple Image, with viewing, editing and format conversion in one app
+* `Added` A standalone home screen opens local images, starts editing or conversion, and saves the result to a chosen destination
+* `Added` Language, dark mode, theme color and four launcher icon choices are available in the shared settings layout
 
 #### v1.3.1
 
@@ -239,21 +260,9 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Added` Local release history is available from the interface, with localized text and an English fallback
 * `Improved` Release packages are checked for a complete signing configuration, exact APK contents and reproducible documentation
 
-#### v1.2.0
-
-###### 2026/09/12
-
-* `Added` Redesigned the viewer as an immersive full-bleed screen: the image now fills the whole window under the status and navigation bars, and the top and bottom bars are translucent overlays that hide or return with a single tap
-* `Added` Overlay title bar with the file name, a `3 / 12` style page counter while browsing a folder or a selection, and a top-right menu hosting `Reset zoom` and `Print / Save PDF`
-* `Added` Bottom action bar with icon buttons for `Details`, `Rotate`, `Share`, and `Open with`, plus a floating pause / resume button that appears only for animated GIFs
-* `Added` Image details now open in a draggable bottom sheet with the file name, MIME type, size, resolution, decoded color information, and EXIF fields; swipe down, tap the image, or press back to close it
-* `Improved` Edge-to-edge system bar and display cutout handling, so the layout stays fully visible on Android 15 and later instead of being covered by system bars
-* `Improved` Every icon control carries an accessibility description matching its former text label
-* `Improved` Build verification rejects accidental native dependencies and produces a JSON report
-
 ##### Full history
 
-* [CHANGELOG-en.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/assets/doc/CHANGELOG-en.md)
+* [CHANGELOG-en.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/assets/doc/CHANGELOG-en.md)
 
 ******
 
@@ -302,4 +311,9 @@ app/src/main/res/raw-*/plugin_instruction.md
 - Glide (image loading and rendering engine): https://github.com/bumptech/glide
 
 
-[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)
+[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/16kb.md)
+
+
+### Sources and acknowledgments
+
+[THIRD_PARTY_NOTICES.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/THIRD_PARTY_NOTICES.md) · [RIGHTS_AND_TAKEDOWN.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/RIGHTS_AND_TAKEDOWN.md)

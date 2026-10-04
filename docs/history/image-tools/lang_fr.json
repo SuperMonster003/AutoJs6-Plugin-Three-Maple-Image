@@ -1,0 +1,75 @@
+{
+  "changelog_label_hint": "Note",
+  "changelog_label_feature": "Fonctionnalité",
+  "changelog_label_fix": "Correctif",
+  "changelog_label_improvement": "Amélioration",
+  "changelog_label_dependency": "Dépendance",
+  "$data": {
+    "v1.2.1": {
+      "released_date": "2026/09/19",
+      "improvement": [
+        "compileSdk et targetSdk passent à 37 (Android 17) ; le comportement du plugin ne dépend pas de la nouvelle cible"
+      ],
+      "fix": [
+        "Avertissements de lecture SDK XML v4 avec AGP 9.1 et contrôles d'alignement natif des APK déclenchés par erreur lors de l'assemblage des tests unitaires JVM, avec les plugins de compilation partagés 1.8.3"
+      ]
+    },
+    "v1.2.0": {
+      "released_date": "2026/09/13",
+      "feature": [
+        "Historique local accessible depuis l'interface, avec traductions et repli en anglais"
+      ],
+      "improvement": [
+        "Vérification de la signature complète, des APK attendus et de la reproductibilité de la documentation"
+      ]
+    },
+    "v1.1.0": {
+      "released_date": "2026/09/12",
+      "feature": [
+        "Ajout d'un historique symétrique Annuler / Rétablir, de la restauration réversible de l'original, de formats de recadrage prédéfinis et d'une rotation fine de -45° à +45° sans modifier les dimensions de sortie",
+        "Extension du dessin avec Stylo, Surligneur, Mosaïque et Gomme, ainsi que du texte multiligne déplaçable avec contour, ombre et rotation",
+        "Ajout dans l'éditeur des formats Source / JPEG / PNG / WebP, de la qualité avec perte réglable et du WebP sans perte sous Android 11+",
+        "Ajout au convertisseur du WebP sans perte, du PNG indexé jusqu'à 256 couleurs, d'une taille de fichier cible pour JPEG / WebP avec perte et d'un redimensionnement par côté long sans agrandissement",
+        "Ajout de la conservation facultative des EXIF sûres, avec suppression systématique du GPS, des aperçus intégrés et des métadonnées opaques, puis normalisation de l'orientation"
+      ],
+      "fix": [
+        "Correction du rejet d'images valides lorsque l'inspection des seules limites par BitmapFactory ne renvoyait correctement aucun bitmap",
+        "Correction des libellés d'outils illisibles dans l'éditeur en mode sombre"
+      ],
+      "improvement": [
+        "Extension de la restauration d'état, des limites mémoire / sortie et de la couverture de régression à 23 suites / 99 tests",
+        "Mise à jour des README et instructions hôte en 10 langues depuis des sources partagées, avec trois captures réelles sans données personnelles",
+        "La vérification de compilation rejette les dépendances natives involontaires et produit un rapport JSON"
+      ]
+    },
+    "v1.0.1": {
+      "released_date": "2026/08/08",
+      "fix": [
+        "Le plugin ne pouvait pas être activé depuis le centre des plugins AutoJs6 car le service renvoyait une liaison vide (onNullBinding)"
+      ],
+      "improvement": [
+        "Nom et description du plugin raccourcis et formulation de la documentation utilisateur unifiée entre les langues"
+      ]
+    },
+    "v1.0.0": {
+      "released_date": "2026/08/02",
+      "feature": [
+        "Première version d'Image Tools : deux actions de menu contextuel, `Modifier l'image` et `Convertir l'image`, pour une image unique dans le gestionnaire de fichiers AutoJs6, le résultat étant enregistré comme nouveau fichier à côté de la source qui reste en lecture seule",
+        "Éditeur avec recadrage, rotation, retournement, luminosité, contraste, saturation, température de couleur, pinceau, texte et jusqu'à 8 étapes d'annulation, avec application automatique de l'orientation EXIF",
+        "Convertisseur avec sortie JPEG / PNG / WebP : qualité réglable de 1 à 100, trois modes de redimensionnement (Original / Pourcentage / Personnalisé), verrouillage des proportions, choix de la couleur de fond JPEG et estimation en direct de la taille de sortie",
+        "Reconnaissance des extensions bmp / gif / heic / heif / jpg / jpeg / png / webp et de tous les types MIME `image/*`",
+        "Service du plugin enregistré sur le protocole explorer-action v3 : entrée en lecture seule à usage unique associée à des transactions de sortie détenues par l'hôte, sans demande de permission de stockage ni de réseau",
+        "Métadonnées du plugin, interface, instructions, README et journal des modifications en 10 langues : chinois simplifié, chinois traditionnel (Hong Kong / Taïwan), anglais, français, espagnol, japonais, coréen, russe et arabe"
+      ],
+      "improvement": [
+        "Sessions de l'éditeur et du convertisseur préservées lors des changements de configuration comme la rotation de l'écran, y compris les outils du canevas, les brouillons de dialogues, les options de conversion, l'historique d'annulation et les tâches en cours",
+        "Écritures de sortie protégées par des déclarations de transaction à usage unique, une protection contre les actions simultanées et des coroutines sûres à l'annulation, évitant les soumissions en double et les fichiers partiels résiduels",
+        "Validation MIME de sortie, recyclage mémoire des bitmaps et cohérence des ressources multilingues renforcés"
+      ],
+      "dependency": [
+        "Ajout d'AndroidX ExifInterface 1.4.2 pour lire en toute sécurité les métadonnées d'orientation des images",
+        "Ajout de Robolectric 4.16.1 pour les tests unitaires du cycle de vie et des transactions de sortie"
+      ]
+    }
+  }
+}

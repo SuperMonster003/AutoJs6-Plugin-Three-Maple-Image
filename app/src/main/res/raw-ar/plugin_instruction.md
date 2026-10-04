@@ -1,6 +1,11 @@
-# عارض الصور
+# AutoJs6 3-Maple Image
 
-يوفر Image Viewer إجراء الصور الرئيسي في مدير الملفات لملفات AVIF وBMP وGIF وHEIC وHEIF وJFIF وJPE وJPEG وJPG وPNG وWEBP.
+تم دمج Image Viewer و Image Tools في 3-Maple Image لعرض الصور وتحريرها وتحويل صيغها.
+توفر الإعدادات الموحدة اللغة والوضع الليلي ولون السمة وأربعة خيارات لأيقونة المشغل.
+يتغير معرف التطبيق من io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools إلى io.github.supermonster003.autojs6.plugin.three.maple.image. يثبته Android كتطبيق مستقل; يمكن الاحتفاظ بالتطبيقات والبيانات السابقة ولا تنتقل الإعدادات تلقائيا.
+
+
+يوفر 3-Maple Image إجراء الصور الرئيسي في مدير الملفات لملفات AVIF وBMP وGIF وHEIC وHEIF وJFIF وJPE وJPEG وJPG وPNG وWEBP.
 
 يتطلب HEIC وHEIF نظام Android 9 أو أحدث, بينما يتطلب AVIF نظام Android 12 أو أحدث. إذا لم يتوفر برنامج فك ترميز المنصة, يعرض العارض المتطلب المحدد بدلا من الفشل بصمت.
 
