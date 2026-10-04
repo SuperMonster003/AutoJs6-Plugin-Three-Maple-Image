@@ -1,7 +1,7 @@
--keep class io.github.supermonster003.autojs6.plugin.imageviewer.ExplorerActionService { *; }
--keep class io.github.supermonster003.autojs6.plugin.imageviewer.ExplorerActionActivity { *; }
--keep class io.github.supermonster003.autojs6.plugin.imageviewer.ExternalViewActivity { *; }
--keep class io.github.supermonster003.autojs6.plugin.imageviewer.ImageViewerActivity { *; }
--keep class io.github.supermonster003.autojs6.plugin.imageviewer.WakeActivity { *; }
+-keep class io.github.supermonster003.autojs6.plugin.three.maple.image.ExplorerActionService { *; }
+-keep class io.github.supermonster003.autojs6.plugin.three.maple.image.ExplorerActionActivity { *; }
+-keep class io.github.supermonster003.autojs6.plugin.three.maple.image.ExternalViewActivity { *; }
+-keep class io.github.supermonster003.autojs6.plugin.three.maple.image.ImageViewerActivity { *; }
+-keep class io.github.supermonster003.autojs6.plugin.three.maple.image.WakeActivity { *; }
 -keep class org.autojs.plugin.common.api.PluginInfo { *; }
 -keep class org.autojs.plugin.explorer.api.** { *; }

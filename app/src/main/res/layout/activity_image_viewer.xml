@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <io.github.supermonster003.autojs6.plugin.imageviewer.ZoomableImageView
+    <io.github.supermonster003.autojs6.plugin.three.maple.image.ZoomableImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -4,6 +4,15 @@
 
 ******
 
+## v2.0.0
+
+###### 2026/10/04
+
+* `Hint` The application ID changes from io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools to io.github.supermonster003.autojs6.plugin.three.maple.image. Android installs this as a separate app; existing apps and data can remain, and settings are not migrated automatically
+* `Added` Image Viewer and Image Tools are combined in 3-Maple Image, with viewing, editing and format conversion in one app
+* `Added` A standalone home screen opens local images, starts editing or conversion, and saves the result to a chosen destination
+* `Added` Language, dark mode, theme color and four launcher icon choices are available in the shared settings layout
+
 ## v1.3.1
 
 ###### 2026/09/19

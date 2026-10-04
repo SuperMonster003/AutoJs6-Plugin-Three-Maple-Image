@@ -2,15 +2,18 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
+    <picture>
+      <source srcset="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/res/mipmap-night/ic_launcher.png?raw=true" media="(prefers-color-scheme: dark)" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
+    </picture>
   </p>
 
-  <p>Просмотр изображений и сведений о них</p>
+  <p>Просмотр, редактирование и преобразование изображений</p>
 
   <p>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/issues"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues/SuperMonster003/AutoJs6-Plugin-Image-Viewer?color=A24232&label=Issues"/></a>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/SuperMonster003/AutoJs6-Plugin-Image-Viewer?color=534BAE&label=License"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?label=Release"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/issues"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?color=A24232&label=Issues"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?color=534BAE&label=License"/></a>
   </p>
 </div>
 
@@ -22,16 +25,24 @@
 
 Текущий README.md поддерживает следующие языки:
 
-- [简体中文 [zh-Hans]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-zh-Hans.md)
-- [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-zh-Hant-HK.md)
-- [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-zh-Hant-TW.md)
-- [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-en.md)
-- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-fr.md)
-- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-es.md)
-- [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ja.md)
-- [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ko.md)
+- [简体中文 [zh-Hans]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-zh-Hans.md)
+- [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-zh-Hant-HK.md)
+- [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-zh-Hant-TW.md)
+- [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-en.md)
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-fr.md)
+- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-es.md)
+- [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ja.md)
+- [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ko.md)
 - Русский [ru] # текущий
-- [العربية [ar]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ar.md)
+- [العربية [ar]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ar.md)
+
+******
+
+### Начать
+
+Отдельный главный экран позволяет открывать, редактировать и преобразовывать локальные изображения, сохраняя результат в выбранное место. Общие настройки включают язык, ночной режим, цвет темы и четыре варианта значка запуска.
+
+Идентификатор приложения изменен с `io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools` на `io.github.supermonster003.autojs6.plugin.three.maple.image`. Android устанавливает отдельное приложение; прежние приложения и данные можно сохранить, настройки автоматически не переносятся.
 
 ******
 
@@ -39,9 +50,9 @@
 
 ******
 
-Image Viewer - плагин просмотра изображений для файлового менеджера AutoJs6. Нажатие на JPG, PNG, GIF или WEBP открывает специальное средство просмотра: изображение автоматически подгоняется под экран, жест щипка позволяет рассмотреть детали, а при масштабе 1x можно листать влево и вправо поддерживаемые изображения из той же папки. Заголовок и метаданные обновляются для каждой страницы, а первоначально открытое изображение можно отправить или передать другому приложению.
+Image Viewer и Image Tools объединены в 3-Maple Image для просмотра, редактирования и преобразования изображений.
 
-Плагин делает одну вещь и делает ее безопасно: просмотр только для чтения. Первоначально нажатый файл передается через временный content URI только для чтения, а непосредственные соседние файлы перечисляются и открываются только через короткоживущую сессию readSiblings, принадлежащую хосту. Плагин не запрашивает разрешений на хранилище и сеть, не изменяет и не перемещает исходные файлы и закрывает сессию хоста вместе со средством просмотра.
+Просмотр использует входные данные только для чтения. Редактирование и преобразование создают отдельный файл, сохраняя исходное изображение. Отдельное приложение использует системный выбор документов Android.
 
 ******
 
@@ -59,7 +70,14 @@ Image Viewer - плагин просмотра изображений для ф�
 - Распространенные форматы из коробки: семейство JPEG (JPG / JPEG / JPE / JFIF), PNG, WEBP, BMP, GIF, HEIC, HEIF и AVIF, всего 11 расширений; анимированные GIF автоматически зацикливаются и имеют отдельную кнопку паузы/продолжения.
 - Отправка и передача: откройте системную панель отправки одним нажатием или используйте `Открыть в` для редактирования и аннотирования; сам плагин автоматически исключается из списка приложений во избежание циклов.
 - Работает как системное средство просмотра изображений: отдельная точка входа Android `ACTION_VIEW` безопасно обслуживает запросы на просмотр только для чтения от других приложений.
-- Песочница только для чтения: без разрешений на хранилище и сеть, доступ ровно к одному файлу через временное разрешение только на чтение, исходный файл никогда не записывается.
+- Редактор предлагает предустановки обрезки, поворот на 90 градусов и точный поворот от -45° до +45°, отражение по горизонтали и вертикали, яркость, контрастность, насыщенность, цветовую температуру, кисти и стилизованный текст с живым предпросмотром.
+- Типы кисти включают карандаш, маркер, мозаику для приватности и ластик с запоминанием цвета и толщины; текст поддерживает несколько строк, размер, цвет, контур, тень и размещение перетаскиванием.
+- Отмена и повтор сохраняют до 8 снимков истории в пределах 192 MiB; `Восстановить оригинал` тоже можно отменить, а выход с несохраненными изменениями требует подтверждения.
+- Диалог сохранения редактора может следовать исходному формату или выбрать JPEG, PNG либо WebP, настроить качество с потерями и включить WebP без потерь на Android 11+; хост публикует новый соседний файл, не перезаписывая источник.
+- Конвертер поддерживает JPEG / PNG / WebP, качество 1-100 (по умолчанию 92), целевой размер для JPEG и WebP с потерями, WebP без потерь на Android 11+ и автоматическую индексированную оптимизацию PNG для изображений не более чем с 256 цветами.
+- Четыре режима размера: `Исходный`, `Процент` (1-1000), `Пользовательский` с фиксацией пропорций и `Длинная сторона` (по умолчанию 1920 px, без увеличения); JPEG может заполнять прозрачность белым или черным.
+- Диалог в реальном времени показывает разрешение и ожидаемый размер. Безопасное сохранение EXIF по умолчанию выключено; при включении оно оставляет ограниченные поля камеры, нормализует ориентацию и всегда удаляет GPS и встроенные эскизы.
+- Изменения конфигурации сохраняют холст, черновики, историю отмены/повтора и выполняющиеся задачи; каждое действие по-прежнему использует один ввод только для чтения и одну одноразовую соседнюю транзакцию вывода, принадлежащую хосту.
 
 ******
 
@@ -72,31 +90,31 @@ Image Viewer - плагин просмотра изображений для ф�
 <table>
   <tr>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="Действие просмотра одного файла" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="Действие просмотра одного файла" width="360" />
       <br />
       <sub>Действие просмотра одного файла</sub>
     </td>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/explorer-selection.png?raw=true" alt="Точная группа из двух выбранных изображений" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-selection.png?raw=true" alt="Точная группа из двух выбранных изображений" width="360" />
       <br />
       <sub>Точная группа из двух выбранных изображений</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/viewer-main.png?raw=true" alt="Главный экран и метаданные в реальном времени" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-main.png?raw=true" alt="Главный экран и метаданные в реальном времени" width="360" />
       <br />
       <sub>Главный экран и метаданные в реальном времени</sub>
     </td>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/viewer-zoom-2.5x.png?raw=true" alt="Иммерсивное увеличение 2,5x" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-zoom-2.5x.png?raw=true" alt="Иммерсивное увеличение 2,5x" width="360" />
       <br />
       <sub>Иммерсивное увеличение 2,5x</sub>
     </td>
   </tr>
   <tr>
     <td align="center" colspan="2">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/share-sheet.png?raw=true" alt="Системная панель отправки" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/share-sheet.png?raw=true" alt="Системная панель отправки" width="360" />
       <br />
       <sub>Системная панель отправки</sub>
     </td>
@@ -115,12 +133,12 @@ Image Viewer - плагин просмотра изображений для ф�
 host app: AutoJs6 (org.autojs.autojs6)
 minimum host build: 5276
 minimum android: 7.0 (API 24)
-plugin package: io.github.supermonster003.autojs6.plugin.imageviewer
+plugin package: io.github.supermonster003.autojs6.plugin.three.maple.image
 ```
 
 От установки до первого открытого изображения всего 4 шага:
 
-1. Скачайте и установите APK плагина. У плагина нет значка запуска; после установки им полностью управляет AutoJs6.
+1. Отдельный главный экран позволяет открывать, редактировать и преобразовывать локальные изображения, сохраняя результат в выбранное место.
 2. Откройте AutoJs6, зайдите в `Центр плагинов`, найдите `Просмотр изображений` и включите его.
 3. В файловом менеджере AutoJs6 найдите любой поддерживаемый файл изображения (например `screenshot.png`).
 4. Нажмите на файл. Изображение откроется в специальном средстве просмотра.
@@ -147,29 +165,29 @@ JFIF и JPE - расширения-псевдонимы семейства JPEG.
 
 ******
 
-**Нажатие на файл изображения не открывает это средство просмотра?**
+**В меню файла нет пунктов `Редактировать изображение` и `Преобразовать изображение`?**
 
-Проверьте по порядку: код версии AutoJs6 не ниже 5276 (подходит версия 6.8.0 и новее); плагин включен в `Центре плагинов`; расширение файла входит в список поддерживаемых. Если хотя бы одно условие не выполнено, нажатие не будет обработано этим плагином.
+Проверьте по порядку: код версии AutoJs6 не ниже 5276; плагин включен в `Центре плагинов`; расширение файла или его MIME-тип есть в списке поддерживаемых. Если хотя бы одно условие не выполнено, действия в меню не появятся.
 
-**Появляется сообщение `Не удалось показать изображение`?**
+**При открытии появляется `Не удалось прочитать информацию об изображении` или экран сразу закрывается?**
 
-Частые причины: данные изображения повреждены или их кодирование не поддерживается текущей платформой Android; файл был перемещен, переименован или удален в момент открытия; либо заявленный размер файла не совпадает с фактическим (проверки безопасности отклоняют такие запросы).
+Просмотр использует входные данные только для чтения. Редактирование и преобразование создают отдельный файл, сохраняя исходное изображение. Отдельное приложение использует системный выбор документов Android.
 
-**Можно ли редактировать, обрезать или навсегда поворачивать изображения?**
+**Где сохраняется результат? Перезаписывается ли оригинал?**
 
-Нет. Плагин сосредоточен на просмотре только для чтения. `Повернуть` меняет только текущий вид и никогда не изменяет исходный файл. Для редактирования нажмите `Открыть в` и передайте изображение редактору; удаление, перемещение и переименование по-прежнему доступны в файловом менеджере AutoJs6.
+Просмотр поддерживает выбранную группу изображений, редактирование и преобразование выполняются по одному изображению. На отдельном главном экране можно выбрать место сохранения; вызовы AutoJs6 создают новый файл рядом с исходным.
 
-**Воспроизводятся ли анимированные GIF?**
+**Преобразование большого изображения сообщает о нехватке памяти или превышении числа пикселей?**
 
-Да. Анимированные GIF декодируются Glide и автоматически зацикливаются. Кнопка паузы/продолжения отображается только для фактически анимированного изображения и управляет лишь воспроизведением на экране, не изменяя исходный файл.
+Размер вывода ограничен трижды: ни одна сторона не может превышать 16384 px, общее число пикселей не может превышать 40 миллионов (40 MP), и все должно уложиться в бюджет памяти устройства. Если источник превышает лимиты, переключите `Изменить размер` на `Процент`, `Длинная сторона` или `Пользовательский`, чтобы уменьшить вывод; при нехватке памяти обычно помогает закрыть другие приложения или еще снизить разрешение.
 
-**Что происходит, если плагин не установлен?**
+**Почему отредактированное изображение сохраняется с меньшим разрешением?**
 
-Хост переключается на внешний запрос просмотра только для чтения, который обслуживают уже установленные на устройстве приложения для изображений. После установки и включения этого плагина нажатия открываются во встроенном средстве просмотра.
+Чтобы редактирование оставалось плавным и стабильным, изображения выше бюджета пикселей редактирования (до примерно 16 MP в зависимости от памяти устройства) уменьшаются перед загрузкой в редактор, и сохраненный результат соответствует холсту редактирования. Если нужно лишь сменить формат или размер, не трогая пиксели, используйте `Преобразовать изображение`: он декодирует точно под выходной размер и этому бюджету не подчиняется.
 
-**Зачем плагин также регистрирует системную точку входа для просмотра изображений?**
+**Можно ли обработать несколько изображений сразу или сохранить результат в другой каталог?**
 
-Это отдельная точка входа `ACTION_VIEW`, принимающая только запросы `image/*` с URI `content` только для чтения, чтобы другие приложения могли использовать это средство просмотра. Она изолирована от точки входа файлового менеджера, проходит ту же строгую проверку и так же ничего не записывает.
+Просмотр поддерживает выбранную группу изображений, редактирование и преобразование выполняются по одному изображению. На отдельном главном экране можно выбрать место сохранения; вызовы AutoJs6 создают новый файл рядом с исходным.
 
 ******
 
@@ -179,13 +197,7 @@ JFIF и JPE - расширения-псевдонимы семейства JPEG.
 
 Плагин построен по принципу запрета по умолчанию. Все перечисленные меры всегда включены и не могут быть отключены:
 
-- Ограниченные явные группы: множественный выбор принимает от 1 до 128 поддерживаемых непосредственных файлов одного родителя. ID целей, URI, имена, упорядоченный ClipData, типы MIME и размеры должны быть уникальными там, где это требуется, и согласованными между собой; содержимое каждого изображения повторно проверяется до открытия средства просмотра.
-- Ноль чувствительных разрешений: нет разрешений на хранилище, сеть и других разрешений времени выполнения, открытый трафик отключен; точка входа файлового менеджера и точка пробуждения защищены хостовым разрешением плагинов и вызываются только хостом.
-- Временный ограниченный доступ только для чтения: выбранный файл использует временный content URI; непосредственные соседи перечисляются и открываются только через v12 HOST_SESSION с непрозрачным ID цели и проверенными прямыми относительными именами. Плагин не получает путей файловой системы и отклоняет разрешения на запись и постоянные разрешения.
-- Проверка точек входа: идентичность действия, версия протокола, UUID запроса, сборка хоста, источник вызова, Bundle цели, структура URI, ClipData, имя файла, тип MIME, заявленный размер, отношение к непосредственному родителю и дескриптор Binder сессии проверяются по пунктам; любое несоответствие означает отказ.
-- Двойная проверка содержимого: перед открытием зондируются границы декодирования изображения, а заявленный размер сверяется с фактическим с отказом при расхождении; один файл ограничен 8 TiB.
-- Изолированные двойные точки входа: точка входа файлового менеджера и внешняя точка `ACTION_VIEW` независимы друг от друга; последняя принимает только запросы изображений с URI `content` только для чтения и проходит ту же проверку содержимого.
-- Средство просмотра не экспортируется: экран отображения запускается только изнутри плагина, отправка и внешнее открытие передают лишь временные разрешения только на чтение, исходный файл никогда не записывается.
+- Просмотр использует входные данные только для чтения. Редактирование и преобразование создают отдельный файл, сохраняя исходное изображение. Отдельное приложение использует системный выбор документов Android.
 
 ******
 
@@ -198,7 +210,7 @@ JFIF и JPE - расширения-псевдонимы семейства JPEG.
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
 execute action: org.autojs.plugin.EXPLORER_ACTION_EXECUTE
-plugin id: image-viewer
+plugin id: three-maple-image
 engine: explorer-action
 variant: default
 explorer action id: view-image
@@ -217,13 +229,22 @@ required host build: 5276
 
 Завершенные возможности и предстоящие планы ведутся в виде списка с отметками в ROADMAP.md. Неотмеченные пункты выражают намерение и не описывают текущие возможности.
 
-- [Открыть ROADMAP.md со списком отметок](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/ROADMAP.md)
+- [Открыть ROADMAP.md со списком отметок](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/ROADMAP.md)
 
 ******
 
 ### История выпусков
 
 ******
+
+#### v2.0.0
+
+###### 2026/10/04
+
+* `Подсказка` Идентификатор приложения изменен с io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools на io.github.supermonster003.autojs6.plugin.three.maple.image. Android устанавливает отдельное приложение; прежние приложения и данные можно сохранить, настройки автоматически не переносятся
+* `Функция` Image Viewer и Image Tools объединены в 3-Maple Image для просмотра, редактирования и преобразования изображений
+* `Функция` Отдельный главный экран позволяет открывать, редактировать и преобразовывать локальные изображения, сохраняя результат в выбранное место
+* `Функция` Общие настройки включают язык, ночной режим, цвет темы и четыре варианта значка запуска
 
 #### v1.3.1
 
@@ -239,21 +260,9 @@ required host build: 5276
 * `Функция` Локальная история выпусков в интерфейсе с переводами и английским запасным вариантом
 * `Улучшение` Проверка полной настройки подписи, ожидаемого набора APK и воспроизводимости документации
 
-#### v1.2.0
-
-###### 2026/09/12
-
-* `Функция` Просмотрщик переработан в иммерсивный полноэкранный режим: изображение теперь заполняет всё окно под строкой состояния и панелью навигации, а верхняя и нижняя панели стали полупрозрачными наложениями, которые скрываются и возвращаются одним касанием
-* `Функция` Наложенная панель заголовка с именем файла, счётчиком страниц вида `3 / 12` при просмотре папки или выделения и меню в правом верхнем углу с пунктами `Сбросить масштаб` и `Печать / сохранить PDF`
-* `Функция` Нижняя панель действий с кнопками-значками `Сведения`, `Повернуть`, `Отправить` и `Открыть в`, а также плавающая кнопка паузы / продолжения, которая появляется только для анимированных GIF
-* `Функция` Сведения об изображении открываются в перетаскиваемой нижней панели с именем файла, MIME-типом, размером, разрешением, сведениями о декодированном цвете и полями EXIF; закрыть её можно смахиванием вниз, касанием изображения или кнопкой назад
-* `Улучшение` Обработка системных панелей от края до края и вырезов экрана, чтобы интерфейс оставался полностью видимым на Android 15 и новее, а не перекрывался системными панелями
-* `Улучшение` Каждый элемент управления со значком имеет описание для специальных возможностей, совпадающее с прежней текстовой подписью
-* `Улучшение` Проверка сборки отклоняет непреднамеренные нативные зависимости и создает отчет JSON
-
 ##### Полная история
 
-* [CHANGELOG-ru.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/assets/doc/CHANGELOG-ru.md)
+* [CHANGELOG-ru.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/assets/doc/CHANGELOG-ru.md)
 
 ******
 
@@ -302,4 +311,9 @@ app/src/main/res/raw-*/plugin_instruction.md
 - Glide (движок загрузки и отображения изображений): https://github.com/bumptech/glide
 
 
-[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)
+[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/16kb.md)
+
+
+### Источники и благодарности
+
+[THIRD_PARTY_NOTICES.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/THIRD_PARTY_NOTICES.md) · [RIGHTS_AND_TAKEDOWN.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/RIGHTS_AND_TAKEDOWN.md)

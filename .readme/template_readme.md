@@ -2,7 +2,10 @@
 
 <div align="center">
   <p>
-    <img src="{{ repo_url }}/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="{{ icon_alt }}" border="0" width="128" />
+    <picture>
+      <source srcset="{{ repo_url }}/blob/master/app/src/main/res/mipmap-night/ic_launcher.png?raw=true" media="(prefers-color-scheme: dark)" />
+      <img src="{{ repo_url }}/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="{{ icon_alt }}" border="0" width="128" />
+    </picture>
   </p>
 
   <p>{{ text_plugin_synopsis }}</p>
@@ -23,6 +26,14 @@
 {{ p_languages_all_supported_for_readme }}:
 
 {{ placeholder_ul_languages_all_supported }}
+
+******
+
+### {{ h3_standalone }}
+
+{{ p_standalone }}
+
+{{ p_migration }}
 
 ******
 
@@ -228,4 +239,9 @@ app/src/main/res/raw-*/plugin_instruction.md
 - {{ text_link_glide }}: {{ glide_repo_url }}
 
 
-[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)
+[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/16kb.md)
+
+
+### {{ h3_sources }}
+
+{{ p_sources }}

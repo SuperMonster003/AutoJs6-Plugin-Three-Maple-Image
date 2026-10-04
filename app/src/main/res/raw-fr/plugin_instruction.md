@@ -1,6 +1,11 @@
-# Visionneuse d'images
+# AutoJs6 3-Maple Image
 
-Image Viewer fournit l'action principale pour les images AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG et WEBP dans le gestionnaire de fichiers.
+Image Viewer et Image Tools sont réunis dans 3-Maple Image pour afficher, retoucher et convertir les images.
+Les paramètres communs proposent la langue, le mode sombre, la couleur et quatre icônes de lanceur.
+L'identifiant passe de io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools à io.github.supermonster003.autojs6.plugin.three.maple.image. Android installe une application distincte; les anciennes applications et leurs données peuvent être conservées, sans migration automatique des paramètres.
+
+
+3-Maple Image fournit l'action principale pour les images AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG et WEBP dans le gestionnaire de fichiers.
 
 HEIC et HEIF nécessitent Android 9 ou version ultérieure, tandis qu'AVIF nécessite Android 12 ou version ultérieure. Si le décodeur de la plateforme est indisponible, la visionneuse affiche l'exigence précise au lieu d'échouer silencieusement.
 

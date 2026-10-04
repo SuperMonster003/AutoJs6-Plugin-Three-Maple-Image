@@ -1,4 +1,5 @@
 [versions]
+robolectric = "4.16.1"
 
 #deprecated   : Only retained for dependencies of certain libraries (such as MQTT)
 #substitution : LiveData or SharedFlow
@@ -108,6 +109,7 @@ xz = "1.10"
 zip4j = "2.11.5"
 
 [libraries]
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity-ktx" }
 android-annotations = { module = "org.androidannotations:androidannotations", version.ref = "android-annotations" }

@@ -2,15 +2,18 @@
 
 <div align="center">
   <p>
-    <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
+    <picture>
+      <source srcset="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/res/mipmap-night/ic_launcher.png?raw=true" media="(prefers-color-scheme: dark)" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/res/mipmap/ic_launcher.png?raw=true" alt="image-viewer-ic-launcher" border="0" width="128" />
+    </picture>
   </p>
 
-  <p>查看图像及其详细信息</p>
+  <p>图片查看, 编辑与格式转换</p>
 
   <p>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Image-Viewer?label=Release"/></a>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/issues"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues/SuperMonster003/AutoJs6-Plugin-Image-Viewer?color=A24232&label=Issues"/></a>
-    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/SuperMonster003/AutoJs6-Plugin-Image-Viewer?color=534BAE&label=License"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/releases"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?label=Release"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/issues"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?color=A24232&label=Issues"/></a>
+    <a href="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image?color=534BAE&label=License"/></a>
   </p>
 </div>
 
@@ -23,15 +26,23 @@
 当前 README.md 支持以下语言:
 
 - 简体中文 [zh-Hans] # 当前
-- [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-zh-Hant-HK.md)
-- [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-zh-Hant-TW.md)
-- [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-en.md)
-- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-fr.md)
-- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-es.md)
-- [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ja.md)
-- [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ko.md)
-- [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ru.md)
-- [العربية [ar]](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/.readme/README-ar.md)
+- [繁體中文 (香港) [zh-Hant-HK]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-zh-Hant-HK.md)
+- [繁體中文 (台灣) [zh-Hant-TW]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-zh-Hant-TW.md)
+- [English [en]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-en.md)
+- [Français [fr]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-fr.md)
+- [Español [es]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-es.md)
+- [日本語 [ja]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ja.md)
+- [한국어 [ko]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ko.md)
+- [Русский [ru]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ru.md)
+- [العربية [ar]](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/.readme/README-ar.md)
+
+******
+
+### 开始使用
+
+独立首页可选择本地图片进行查看, 编辑或转换, 并将处理结果另存到指定位置. 统一设置页提供语言, 夜间模式, 主题色及四种启动器图标选项.
+
+应用 ID 从 `io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools` 改为 `io.github.supermonster003.autojs6.plugin.three.maple.image`. Android 将其视为独立应用, 原应用与数据可以保留, 设置不会自动迁移.
 
 ******
 
@@ -39,9 +50,9 @@
 
 ******
 
-Image Viewer 是 AutoJs6 文件管理器的图像浏览插件. 启用后, 点击 JPG, PNG, GIF, WEBP 等常见图像文件即可在专用查看器中打开: 图像自动适应屏幕, 双指缩放查看细节, 在 1 倍状态下左右滑动还可连续浏览同目录受支持的图像. 标题与底部元数据会随页面刷新, 最初打开的图像仍可一键分享或交给其他应用处理.
+Image Viewer 与 Image Tools 合并为 3-Maple Image, 在同一应用中提供图片查看, 编辑与格式转换.
 
-插件只做一件事并把它做稳: 只读查看. 最初点击的文件通过临时只读 content URI 进入查看器, 同目录直属文件则只能经由宿主持有的短期 readSiblings 会话枚举与打开. 插件不申请存储与网络权限, 不修改也不移动任何源文件, 关闭查看器时会同步关闭宿主会话.
+查看流程只读访问输入. 编辑和转换生成单独的输出文件, 保留源图片. 独立应用通过 Android 系统文件选择器访问文件.
 
 ******
 
@@ -59,7 +70,14 @@ Image Viewer 是 AutoJs6 文件管理器的图像浏览插件. 启用后, 点击
 - 常见格式开箱即用: 覆盖 JPEG 家族 (JPG / JPEG / JPE / JFIF), PNG, WEBP, BMP, GIF, HEIC, HEIF 与 AVIF 共 11 种扩展名, GIF 动图自动循环播放并提供专用暂停/继续控件.
 - 分享与接力: 一键调起系统分享面板; 需要编辑或标注时可点按 `其他应用`, 应用列表自动排除本插件避免绕圈.
 - 可作系统图像查看器: 独立的 Android `ACTION_VIEW` 入口安全承接其他应用发起的只读图像查看请求.
-- 只读安全沙盒: 不申请存储与网络权限, 仅凭临时只读授权访问单个文件, 全程绝不写入源文件.
+- 编辑器提供裁剪比例预设; 90 度旋转与 -45° 至 +45° 微调旋转; 水平和垂直翻转; 亮度, 对比度, 饱和度和色温; 画笔与样式文字, 调节过程实时预览.
+- 画笔类型包括画笔, 荧光笔, 隐私马赛克和橡皮擦, 并记忆颜色与线宽; 文字支持多行内容, 大小, 颜色, 描边, 阴影与拖动定位.
+- 撤销和重做在 192 MiB 预算内保留最多 8 个历史快照; `恢复原图` 本身也可撤销, 有未保存修改时退出会要求确认.
+- 编辑器保存对话框可跟随源格式或选择 JPEG, PNG, WebP, 调整有损质量, 并在 Android 11+ 启用无损 WebP; 宿主发布同级新文件, 不会覆盖源文件.
+- 转换器支持 JPEG / PNG / WebP, 质量 1-100 (默认 92), JPEG 与有损 WebP 的目标文件大小, Android 11+ 无损 WebP, 以及不超过 256 色时的自动索引 PNG 优化.
+- 四种尺寸模式包括 `原始`, `百分比` (1-1000), 可锁定宽高比的 `自定义`, 以及默认 1920 px 且不会放大的 `长边限制`; JPEG 可用白色或黑色填充透明区域.
+- 对话框实时预览分辨率与预计大小. 安全 EXIF 保留默认关闭; 开启后仅保留有界相机字段, 归一化方向, 并始终移除 GPS 与内嵌预览.
+- 配置变更会保留画布, 对话框草稿, 撤销/重做历史与执行中的任务; 每个动作仍只使用一个只读输入和一个宿主拥有的一次性同级输出事务.
 
 ******
 
@@ -72,31 +90,31 @@ Image Viewer 是 AutoJs6 文件管理器的图像浏览插件. 启用后, 点击
 <table>
   <tr>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="文件管理器中的单文件查看入口" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="文件管理器中的单文件查看入口" width="360" />
       <br />
       <sub>文件管理器中的单文件查看入口</sub>
     </td>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/explorer-selection.png?raw=true" alt="两张已选图像的精确多选组" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-selection.png?raw=true" alt="两张已选图像的精确多选组" width="360" />
       <br />
       <sub>两张已选图像的精确多选组</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/viewer-main.png?raw=true" alt="查看器主界面与实时元数据" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-main.png?raw=true" alt="查看器主界面与实时元数据" width="360" />
       <br />
       <sub>查看器主界面与实时元数据</sub>
     </td>
     <td align="center">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/viewer-zoom-2.5x.png?raw=true" alt="沉浸式 2.5 倍缩放" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-zoom-2.5x.png?raw=true" alt="沉浸式 2.5 倍缩放" width="360" />
       <br />
       <sub>沉浸式 2.5 倍缩放</sub>
     </td>
   </tr>
   <tr>
     <td align="center" colspan="2">
-      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/images/screenshots/share-sheet.png?raw=true" alt="系统分享面板" width="360" />
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/share-sheet.png?raw=true" alt="系统分享面板" width="360" />
       <br />
       <sub>系统分享面板</sub>
     </td>
@@ -115,12 +133,12 @@ Image Viewer 是 AutoJs6 文件管理器的图像浏览插件. 启用后, 点击
 host app: AutoJs6 (org.autojs.autojs6)
 minimum host build: 5276
 minimum android: 7.0 (API 24)
-plugin package: io.github.supermonster003.autojs6.plugin.imageviewer
+plugin package: io.github.supermonster003.autojs6.plugin.three.maple.image
 ```
 
 从安装到看到第一张图像共 4 步:
 
-1. 下载并安装本插件 APK. 插件没有独立桌面图标, 安装后统一由 AutoJs6 管理.
+1. 独立首页可选择本地图片进行查看, 编辑或转换, 并将处理结果另存到指定位置.
 2. 打开 AutoJs6, 进入 `插件中心`, 找到 `图像查看器` 并启用.
 3. 在 AutoJs6 文件管理器中定位任意受支持的图像文件 (如 `screenshot.png`).
 4. 点击该文件, 图像随即在专用查看器中打开.
@@ -147,29 +165,29 @@ AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 ******
 
-**点击图像文件后没有进入本查看器?**
+**文件的菜单里没有出现 `编辑图像` 和 `转换图像`?**
 
-请依次检查: AutoJs6 版本代码是否不低于 5276 (6.8.0 及以上版本满足); 插件是否已在 `插件中心` 启用; 文件扩展名是否在支持列表中. 三者任一不满足, 点击都不会由本插件承接.
+请依次检查: AutoJs6 版本代码是否不低于 5276; 插件是否已在 `插件中心` 启用; 文件扩展名或 MIME 类型是否在支持列表中. 三者任一不满足, 菜单动作都不会出现.
 
-**打开后提示 `无法显示图像`?**
+**打开时提示 `无法读取图片信息` 或页面一闪而过?**
 
-常见原因: 图像数据损坏或编码不受当前 Android 平台支持; 文件在打开瞬间被移动, 重命名或删除; 或文件的声明大小与实际大小不一致 (安全校验会拒绝这类请求).
+查看流程只读访问输入. 编辑和转换生成单独的输出文件, 保留源图片. 独立应用通过 Android 系统文件选择器访问文件.
 
-**可以编辑, 裁剪或永久旋转图像吗?**
+**处理结果保存在哪里? 会覆盖原图吗?**
 
-不能. 本插件专注只读查看; `旋转` 仅改变当前显示, 绝不修改源文件. 需要编辑时请点按 `其他应用` 交给编辑类应用; 删除, 移动与重命名等文件管理操作仍由 AutoJs6 文件管理器提供.
+图片查看支持选定的多张图片, 编辑和转换每次处理一张. 从独立首页开始时可以选择结果保存位置; 从 AutoJs6 调用时会在原文件旁生成新文件.
 
-**GIF 动图会播放吗?**
+**转换大图时提示内存不足或像素数超限?**
 
-会. 动图由 Glide 解码并自动循环播放. 查看器只会为实际可播放的动图显示暂停/继续控件, 该控件仅影响画面播放, 不会修改源文件.
+输出尺寸有三重限制: 单边不超过 16384 px, 总像素不超过 4000 万 (40 MP), 且需在设备内存预算之内. 源图像超限时, 请在 `调整尺寸` 中改用 `百分比`, `长边限制` 或 `自定义` 缩小输出; 内存不足时关闭其他应用或进一步降低分辨率通常即可解决.
 
-**未安装本插件时点击图像会怎样?**
+**编辑后保存的图像分辨率为什么变低了?**
 
-宿主会降级为向系统发起只读的外部查看请求, 由设备上已有的图像应用承接. 安装并启用本插件后, 点击则优先在内置查看器中打开.
+为保证编辑流畅与稳定, 超过编辑像素预算 (最高约 16 MP, 视设备内存而定) 的图像会先降采样再进入编辑器, 保存结果即编辑画布的分辨率. 若只需改格式或缩放而无需逐笔修改, 请改用 `转换图像`, 它按输出尺寸精确解码, 不受此预算限制.
 
-**插件为什么还注册了系统级的图像查看入口?**
+**能一次处理多张图像, 或把结果保存到其他目录吗?**
 
-这是独立的 `ACTION_VIEW` 入口, 仅接受只读 `content` URI 的 `image/*` 请求, 便于其他应用调用本查看器. 它与文件管理器入口相互隔离, 经过同样严格的校验, 同样不落盘不修改.
+图片查看支持选定的多张图片, 编辑和转换每次处理一张. 从独立首页开始时可以选择结果保存位置; 从 AutoJs6 调用时会在原文件旁生成新文件.
 
 ******
 
@@ -179,13 +197,7 @@ AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 插件按默认拒绝原则构建, 以下措施全部默认开启且无法关闭:
 
-- 有界的显式选择组: 多选仅接受同一父目录下 1 至 128 个受支持的直属文件. 目标 ID, URI, 文件名, 有序 ClipData, MIME 类型与大小必须按契约唯一且彼此一致; 打开查看器前会逐一复核每张选中图像的实际内容.
-- 零敏感权限: 不申请存储, 网络或其他运行时权限, 并禁用明文网络流量; 文件管理器入口与唤醒入口受宿主插件权限保护, 仅宿主可调用.
-- 临时且限域的只读访问: 选中文件使用临时 content URI; 同目录直属文件只能通过 v12 HOST_SESSION, 不透明目标 ID 与经校验的直属相对名称枚举和打开. 插件不接收文件系统路径, 拒绝写入与持久化授权.
-- 入口逐项校验: 动作标识, 协议版本, 请求 UUID, 宿主构建版本, 调用来源, 目标 Bundle, URI 结构, ClipData, 文件名, MIME 类型, 声明大小, 直属父目录关系与宿主会话 Binder 描述符逐项核验, 任一不符即拒绝打开.
-- 内容二次核验: 打开前探测图像解码边界并核对声明大小与实际大小, 不一致即拒绝; 单文件上限 8 TiB.
-- 双入口相互隔离: 文件管理器入口与外部 `ACTION_VIEW` 入口彼此独立, 后者仅接受只读 `content` URI 图像请求并经过同样的内容核验.
-- 查看器不对外导出: 渲染界面仅能由插件内部启动, 分享与外部打开也只转发临时只读授权, 源文件全程不被写入.
+- 查看流程只读访问输入. 编辑和转换生成单独的输出文件, 保留源图片. 独立应用通过 Android 系统文件选择器访问文件.
 
 ******
 
@@ -198,7 +210,7 @@ AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 ```text
 service action: org.autojs.plugin.EXPLORER_ACTION
 execute action: org.autojs.plugin.EXPLORER_ACTION_EXECUTE
-plugin id: image-viewer
+plugin id: three-maple-image
 engine: explorer-action
 variant: default
 explorer action id: view-image
@@ -217,13 +229,22 @@ required host build: 5276
 
 已完成能力与后续计划以可勾选清单维护在 ROADMAP.md 中. 未勾选条目表示规划意向, 不代表当前版本能力.
 
-- [查看可勾选的 ROADMAP.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/ROADMAP.md)
+- [查看可勾选的 ROADMAP.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/ROADMAP.md)
 
 ******
 
 ### 版本记录
 
 ******
+
+#### v2.0.0
+
+###### 2026/10/04
+
+* `提示` 应用 ID 从 io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools 改为 io.github.supermonster003.autojs6.plugin.three.maple.image. Android 将其视为独立应用, 原应用与数据可以保留, 设置不会自动迁移
+* `新增` Image Viewer 与 Image Tools 合并为 3-Maple Image, 在同一应用中提供图片查看, 编辑与格式转换
+* `新增` 独立首页可选择本地图片进行查看, 编辑或转换, 并将处理结果另存到指定位置
+* `新增` 统一设置页提供语言, 夜间模式, 主题色及四种启动器图标选项
 
 #### v1.3.1
 
@@ -239,21 +260,9 @@ required host build: 5276
 * `新增` 发行历史页面, 支持多语言显示及英文回退
 * `优化` 完善发行签名, APK 变体及生成文档一致性校验
 
-#### v1.2.0
-
-###### 2026/09/12
-
-* `新增` 查看器采用沉浸式全屏布局, 图像延伸至系统栏下方, 顶栏及底栏以半透明浮层显示, 点按图像可切换显示状态
-* `新增` 标题栏显示文件名及分组浏览页码, 菜单提供 "重置缩放" 及 "打印/保存 PDF"
-* `新增` 底部操作栏改为 "详情", "旋转", "分享", "其他应用" 四个图标按钮, GIF 动图另有仅在动图时出现的悬浮暂停 / 继续按钮
-* `新增` 图像详情改为可拖拽的底部面板, 展示文件名, MIME 类型, 大小, 分辨率, 解码色彩信息与 EXIF 字段; 下滑, 点按图像或按返回键即可关闭
-* `优化` 适配 edge-to-edge 系统栏与刘海屏, 在 Android 15 及以上界面不再被系统栏遮挡
-* `优化` 所有图标控件均带有与原文字标签一致的无障碍描述
-* `优化` 构建阶段阻止意外引入原生依赖, 并输出 JSON 校验报告
-
 ##### 完整记录
 
-* [CHANGELOG-zh-Hans.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/app/src/main/assets/doc/CHANGELOG-zh-Hans.md)
+* [CHANGELOG-zh-Hans.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/app/src/main/assets/doc/CHANGELOG-zh-Hans.md)
 
 ******
 
@@ -302,4 +311,9 @@ app/src/main/res/raw-*/plugin_instruction.md
 - Glide (图像加载与渲染引擎): https://github.com/bumptech/glide
 
 
-[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Image-Viewer/blob/master/docs/16kb.md)
+[16 KB page alignment and build verification](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/16kb.md)
+
+
+### 来源与致谢
+
+[THIRD_PARTY_NOTICES.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/THIRD_PARTY_NOTICES.md) · [RIGHTS_AND_TAKEDOWN.md](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/RIGHTS_AND_TAKEDOWN.md)
