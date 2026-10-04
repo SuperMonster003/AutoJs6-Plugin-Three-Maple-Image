@@ -237,6 +237,12 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v2.0.1
+
+###### 2026/10/04
+
+* `Mejora` Los iconos del centro de plugins usan los tamaños, posiciones, imágenes claras y oscuras y fondos circulares ajustados en Icon Studio, conservando fuentes y parámetros reproducibles
+
 #### v2.0.0
 
 ###### 2026/10/04
@@ -252,13 +258,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 * `Corrección` Advertencias de lectura de SDK XML v4 con AGP 9.1 y comprobaciones de alineación nativa de APK activadas por error al ensamblar pruebas unitarias JVM, mediante los plugins de compilación compartidos 1.8.3
 * `Mejora` compileSdk y targetSdk suben a 37 (Android 17); el comportamiento del plugin no depende del nuevo objetivo
-
-#### v1.3.0
-
-###### 2026/09/13
-
-* `Función` Historial de versiones local desde la interfaz con traducciones y alternativa en inglés
-* `Mejora` Comprobación de la firma completa, los APK esperados y la documentación reproducible de cada versión
 
 ##### Historial completo
 

@@ -237,6 +237,12 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
+#### v2.0.1
+
+###### 2026/10/04
+
+* `Amélioration` Les icônes du centre de plugins utilisent les tailles, positions, images claires et sombres et fonds circulaires réglés dans Icon Studio, avec les sources et paramètres permettant de les reproduire
+
 #### v2.0.0
 
 ###### 2026/10/04
@@ -252,13 +258,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 * `Correctif` Avertissements de lecture SDK XML v4 avec AGP 9.1 et contrôles d'alignement natif des APK déclenchés par erreur lors de l'assemblage des tests unitaires JVM, avec les plugins de compilation partagés 1.8.3
 * `Amélioration` compileSdk et targetSdk passent à 37 (Android 17) ; le comportement du plugin ne dépend pas de la nouvelle cible
-
-#### v1.3.0
-
-###### 2026/09/13
-
-* `Fonctionnalité` Historique local accessible depuis l'interface, avec traductions et repli en anglais
-* `Amélioration` Vérification de la signature complète, des APK attendus et de la reproductibilité de la documentation
 
 ##### Historique complet
 

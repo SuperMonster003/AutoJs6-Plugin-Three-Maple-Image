@@ -18,3 +18,9 @@ Run `.python/check_markdown.bat`, `py -3 -m unittest discover -s .python/tests`,
 - Public capability actions, AIDL packages, transaction order and engine names describe behavior and remain compatible. Four stable launcher aliases default to Auto; settings expose language, night mode, theme color, launcher icon and bundled release history.
 - Preserve both source histories: Viewer `3ec7fe5` and Tools `8a1af1e`. The merge commit count includes both parents. One Explorer Action v12 service publishes `view-image`, `view-images`, `edit-image`, `convert-image`; output operations retain the bounded v3-style output envelope within v12. Standalone editor/converter subclasses are private and use local sessions; never weaken the exported host grant validation to support local files.
 - Commit `.icons/`, portable generators, icon CI, `.gitattributes` and generated resources together. Ignore only caches, local signing files and build outputs. Icon Studio drafts/backups remain outside this repository in its ignored `.studio/`.
+
+
+## Icon Studio publication snapshot (2026-10-04)
+
+- `.icons/recipe.json` and its content-addressed original assets own the current icon geometry, tone and backgrounds. Keep the portable renderer, generated resources, keep rules and icon CI in the same change.
+- Use `.python/generate_icon_studio.py --check` for read-only reproduction checks. Optical size bands are advisory; retain canvas, transparency and safe-circle checks. Three uses neutral foregrounds and fixed #FAFAFA / #212121 surfaces; other plugins may use colored artwork and custom or transparent surfaces.

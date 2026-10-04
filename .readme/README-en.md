@@ -237,6 +237,12 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v2.0.1
+
+###### 2026/10/04
+
+* `Improved` Plugin Center icons use the sizes, positions, light and dark artwork, and circular backgrounds adjusted in Icon Studio, retaining reproducible sources and parameters
+
 #### v2.0.0
 
 ###### 2026/10/04
@@ -252,13 +258,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 * `Fixed` SDK XML v4 parsing warnings with AGP 9.1 and APK native alignment checks incorrectly triggered by JVM unit-test assembly tasks, using shared build plugins 1.8.3
 * `Improved` Raise compileSdk and targetSdk to 37 (Android 17); the plugin's behavior does not depend on the new target
-
-#### v1.3.0
-
-###### 2026/09/13
-
-* `Added` Local release history is available from the interface, with localized text and an English fallback
-* `Improved` Release packages are checked for a complete signing configuration, exact APK contents and reproducible documentation
 
 ##### Full history
 
