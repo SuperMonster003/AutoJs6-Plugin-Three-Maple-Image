@@ -239,9 +239,10 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 #### v2.0.1
 
-###### 2026/10/04
+###### 2026/10/05
 
 * `Improved` Plugin Center icons use the sizes, positions, light and dark artwork, and circular backgrounds adjusted in Icon Studio, retaining reproducible sources and parameters
+* `Improved` Android App info icons share Icon Studio artwork and light/dark backgrounds while preserving transparent Plugin Center artwork and existing launcher choices
 
 #### v2.0.0
 
