@@ -76,7 +76,7 @@ La visualización usa entradas de solo lectura. La edición y conversión crean 
 - El diálogo de guardado del editor puede seguir el formato de origen o elegir JPEG, PNG o WebP, ajustar la calidad con pérdida y activar WebP sin pérdida en Android 11+; el anfitrión publica un archivo nuevo junto al original sin sobrescribirlo.
 - El conversor admite JPEG / PNG / WebP, calidad 1-100 (92 por defecto), tamaño objetivo para JPEG y WebP con pérdida, WebP sin pérdida en Android 11+ y optimización automática de PNG indexado cuando la imagen tiene como máximo 256 colores.
 - Cuatro modos de tamaño cubren `Original`, `Porcentaje` (1-1000), `Personalizado` con bloqueo de proporción y `Lado largo` (1920 px por defecto, sin ampliar); JPEG puede rellenar la transparencia con blanco o negro.
-- El diálogo previsualiza la resolución y el tamaño estimado en tiempo real. La conservación segura de EXIF está desactivada por defecto; al activarla conserva campos de cámara limitados, normaliza la orientación y siempre elimina GPS y vistas previas incrustadas.
+- La página del conversor previsualiza en tiempo real, en la parte inferior, la resolución de salida, el tamaño estimado y el sufijo. La conservación segura de EXIF está desactivada por defecto; al activarla conserva campos de cámara limitados, normaliza la orientación y siempre elimina GPS y vistas previas incrustadas.
 - Los cambios de configuración conservan el lienzo, los borradores, el historial de deshacer/rehacer y las tareas en curso; cada acción sigue usando una entrada de solo lectura y una transacción de salida vecina, de un solo uso y propiedad del anfitrión.
 
 ******
@@ -143,7 +143,7 @@ Desde la instalación hasta la primera imagen hay 4 pasos:
 3. En el gestor de archivos de AutoJs6, localice cualquier archivo de imagen compatible (por ejemplo `screenshot.png`).
 4. Toque el archivo. La imagen se abre en el visor dedicado.
 
-Dentro del visor: a escala 1x, deslice a izquierda o derecha para pasar a la imagen compatible anterior o siguiente de la misma carpeta. Pellizque para hacer zoom alrededor de los dedos (de 1x a 5x), arrastre con un dedo para desplazarse y haga doble toque para alternar entre el ajuste a pantalla y un zoom de 2,5x centrado en el punto tocado. El aumento actual aparece durante el pellizco y brevemente después de un doble toque. Toque `Girar` para girar solo la vista; se conserva el zoom activo, mientras que `Restablecer zoom`, en el menú superior derecho, recupera tanto la orientación original como el ajuste. Los GIF animados muestran un botón flotante `Pausar animación` / `Reanudar animación`; las imágenes estáticas no. Tocar la imagen oculta o muestra las barras superpuestas, y `Detalles` abre un panel inferior con los datos del archivo y los campos EXIF. `Compartir` y `Abrir con` están disponibles en la imagen abierta inicialmente; se desactivan en las páginas hermanas de sesión porque estas no tienen intencionadamente un content URI transferible.
+Dentro del visor: a escala 1x, deslice a izquierda o derecha para pasar a la imagen compatible anterior o siguiente de la misma carpeta. Pellizque para hacer zoom alrededor de los dedos (de 1x a 5x), arrastre con un dedo para desplazarse y haga doble toque para alternar entre el ajuste a pantalla y un zoom de 2,5x centrado en el punto tocado. El aumento actual aparece durante el pellizco y brevemente después de un doble toque. Toque `Girar` para girar solo la vista; se conserva el zoom activo, mientras que `Restablecer zoom`, en el menú superior derecho, recupera tanto la orientación original como el ajuste. Los GIF animados muestran un botón flotante `Pausar animación` / `Reanudar animación`; las imágenes estáticas no. Tocar la imagen oculta o muestra las barras superpuestas, y `Detalles` abre un panel inferior con los datos del archivo y los campos EXIF. `Compartir` y `Abrir con` están disponibles en la imagen abierta inicialmente; se desactivan en las páginas hermanas de sesión porque estas no tienen intencionadamente un content URI transferible. Las imágenes abiertas desde el inicio independiente o desde otra aplicación ofrecen además `Editar`, que abre el editor y permite guardar el resultado; las entradas del host y las páginas hermanas no lo ofrecen.
 
 ******
 
@@ -242,8 +242,18 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 ###### 2026/10/13
 
 * `Aviso` El APK ahora incluye libandroidx.graphics.path.so, una biblioteca nativa incluida con Jetpack Compose (unos 10 KB para cada una de arm64-v8a, armeabi-v7a, x86_64 y x86); el plugin en sí sigue sin contener código nativo y sigue siendo un único APK universal
+* `Aviso` Los primeros arranques tras la instalación son algo más lentos en dispositivos antiguos hasta que el sistema termina su optimización en segundo plano
+* `Función` Toda la interfaz pasa a Material 3 (Jetpack Compose): inicio, ajustes, acerca de, historial de versiones, visor, editor y conversor se rehacen, siguen el color del tema y el modo oscuro, y admiten fuentes grandes y diseño de derecha a izquierda
+* `Función` La barra de herramientas del editor pasa a ser tiras de herramientas agrupadas con iconos y etiquetas (transformar, ajustar, dibujar, texto); el panel de parámetros sigue a la herramienta activa y se rehacen los diálogos de texto, guardado y paleta
+* `Función` El conversor deja de ser un diálogo y pasa a ser una página completa que solo muestra las entradas del modo de tamaño actual, con la resolución de salida, el tamaño estimado y el sufijo fijados en la parte inferior
+* `Función` La barra inferior del visor ofrece ahora Detalles, Rotar, Editar, Compartir y Abrir con; las imágenes abiertas desde el inicio independiente o desde otra aplicación pueden pasar directamente al editor y guardar el resultado
+* `Corrección` La página de historial de versiones dentro de la aplicación estaba en blanco (no se reconocían los encabezados ## de versión del archivo generado)
+* `Corrección` Tras cambiar el idioma de la aplicación a árabe, las páginas ya abiertas mantenían el diseño de izquierda a derecha
+* `Corrección` En modo claro los iconos de la barra de estado del visor y del editor seguían el tema de la página y se volvían oscuros, por lo que no se veían sobre el lienzo oscuro
 * `Mejora` Los iconos del centro de plugins usan los tamaños, posiciones, imágenes claras y oscuras y fondos circulares ajustados en Icon Studio, conservando fuentes y parámetros reproducibles
 * `Mejora` Los iconos de información de la aplicación de Android comparten las imágenes y los fondos claros y oscuros de Icon Studio, conservando las imágenes transparentes del centro de plugins y las opciones del lanzador
+* `Mejora` Los iconos se unifican como vectores Material de 24 dp; se eliminan los iconos de mapa de bits y los recursos de color, estilo y texto sin uso
+* `Mejora` Un perfil base de arranque integrado reduce el coste de arranque en frío del inicio tras la migración de interfaz una vez que el sistema ejecuta su optimización en segundo plano
 * `Dependencia` Se añade Jetpack Compose BOM 2026.09.00 para la migración de la interfaz
 * `Dependencia` Se añade la integración Glide Compose 1.0.0-beta10 para cargar imágenes en las pantallas Compose
 * `Dependencia` Se actualiza Glide 5.0.5 -> 5.0.9

@@ -9,8 +9,18 @@
 ###### 2026/10/13
 
 * `Note` L'APK contient désormais libandroidx.graphics.path.so, une bibliothèque native fournie avec Jetpack Compose (environ 10 KB pour chacune des ABI arm64-v8a, armeabi-v7a, x86_64 et x86) ; le plugin lui-même ne contient toujours aucun code natif et reste un APK universel unique
+* `Note` Les premiers lancements après l'installation sont un peu plus lents sur les appareils anciens jusqu'à ce que le système termine son optimisation en arrière-plan
+* `Fonctionnalité` Toute l'interface passe à Material 3 (Jetpack Compose): accueil, paramètres, à propos, historique des versions, visionneuse, éditeur et convertisseur sont refaits, suivent la couleur du thème et le mode sombre, et prennent en charge les grandes polices et la disposition de droite à gauche
+* `Fonctionnalité` La barre d'outils de l'éditeur devient des bandes d'outils groupées avec icônes et libellés (transformer, ajuster, dessiner, texte); le panneau de paramètres suit l'outil actif et les dialogues de texte, d'enregistrement et de palette sont refaits
+* `Fonctionnalité` Le convertisseur passe d'un dialogue à une page complète qui n'affiche que les champs du mode de redimensionnement actuel, avec la résolution de sortie, la taille estimée et le suffixe fixés en bas
+* `Fonctionnalité` La barre inférieure de la visionneuse propose désormais Détails, Pivoter, Modifier, Partager et Ouvrir avec; les images ouvertes depuis l'accueil autonome ou depuis une autre application passent directement à l'éditeur et enregistrent le résultat
+* `Correctif` La page d'historique des versions dans l'application était vide (les titres de version ## du fichier généré n'étaient pas reconnus)
+* `Correctif` Après le passage de la langue de l'application à l'arabe, les pages déjà ouvertes gardaient une disposition de gauche à droite
+* `Correctif` En mode clair, les icônes de la barre d'état de la visionneuse et de l'éditeur suivaient le thème de la page et devenaient sombres, donc invisibles sur le fond sombre
 * `Amélioration` Les icônes du centre de plugins utilisent les tailles, positions, images claires et sombres et fonds circulaires réglés dans Icon Studio, avec les sources et paramètres permettant de les reproduire
 * `Amélioration` Les icônes des informations d'application Android utilisent les illustrations et les fonds clairs et sombres d'Icon Studio, en conservant les images transparentes du centre de plugins et les choix du lanceur
+* `Amélioration` Les icônes sont unifiées en vecteurs Material 24 dp; les icônes bitmap et les ressources de couleur, de style et de texte inutilisées sont supprimées
+* `Amélioration` Un profil de référence de démarrage intégré réduit le coût du démarrage à froid de l'accueil après la migration de l'interface une fois que le système a effectué son optimisation en arrière-plan
 * `Dépendance` Ajout de Jetpack Compose BOM 2026.09.00 pour la migration de l'interface
 * `Dépendance` Ajout de l'intégration Glide Compose 1.0.0-beta10 pour le chargement des images dans les écrans Compose
 * `Dépendance` Mise à jour de Glide 5.0.5 -> 5.0.9

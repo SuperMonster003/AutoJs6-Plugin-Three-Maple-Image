@@ -9,8 +9,18 @@
 ###### 2026/10/13
 
 * `Aviso` El APK ahora incluye libandroidx.graphics.path.so, una biblioteca nativa incluida con Jetpack Compose (unos 10 KB para cada una de arm64-v8a, armeabi-v7a, x86_64 y x86); el plugin en sí sigue sin contener código nativo y sigue siendo un único APK universal
+* `Aviso` Los primeros arranques tras la instalación son algo más lentos en dispositivos antiguos hasta que el sistema termina su optimización en segundo plano
+* `Función` Toda la interfaz pasa a Material 3 (Jetpack Compose): inicio, ajustes, acerca de, historial de versiones, visor, editor y conversor se rehacen, siguen el color del tema y el modo oscuro, y admiten fuentes grandes y diseño de derecha a izquierda
+* `Función` La barra de herramientas del editor pasa a ser tiras de herramientas agrupadas con iconos y etiquetas (transformar, ajustar, dibujar, texto); el panel de parámetros sigue a la herramienta activa y se rehacen los diálogos de texto, guardado y paleta
+* `Función` El conversor deja de ser un diálogo y pasa a ser una página completa que solo muestra las entradas del modo de tamaño actual, con la resolución de salida, el tamaño estimado y el sufijo fijados en la parte inferior
+* `Función` La barra inferior del visor ofrece ahora Detalles, Rotar, Editar, Compartir y Abrir con; las imágenes abiertas desde el inicio independiente o desde otra aplicación pueden pasar directamente al editor y guardar el resultado
+* `Corrección` La página de historial de versiones dentro de la aplicación estaba en blanco (no se reconocían los encabezados ## de versión del archivo generado)
+* `Corrección` Tras cambiar el idioma de la aplicación a árabe, las páginas ya abiertas mantenían el diseño de izquierda a derecha
+* `Corrección` En modo claro los iconos de la barra de estado del visor y del editor seguían el tema de la página y se volvían oscuros, por lo que no se veían sobre el lienzo oscuro
 * `Mejora` Los iconos del centro de plugins usan los tamaños, posiciones, imágenes claras y oscuras y fondos circulares ajustados en Icon Studio, conservando fuentes y parámetros reproducibles
 * `Mejora` Los iconos de información de la aplicación de Android comparten las imágenes y los fondos claros y oscuros de Icon Studio, conservando las imágenes transparentes del centro de plugins y las opciones del lanzador
+* `Mejora` Los iconos se unifican como vectores Material de 24 dp; se eliminan los iconos de mapa de bits y los recursos de color, estilo y texto sin uso
+* `Mejora` Un perfil base de arranque integrado reduce el coste de arranque en frío del inicio tras la migración de interfaz una vez que el sistema ejecuta su optimización en segundo plano
 * `Dependencia` Se añade Jetpack Compose BOM 2026.09.00 para la migración de la interfaz
 * `Dependencia` Se añade la integración Glide Compose 1.0.0-beta10 para cargar imágenes en las pantallas Compose
 * `Dependencia` Se actualiza Glide 5.0.5 -> 5.0.9

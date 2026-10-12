@@ -144,7 +144,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 5.4 发布
 
-- [ ] (发布) 按第 4 节 P1-P5 发布 v2.1.0; changelog `feature` 描述 "界面全面改为 Material 3 风格" 与编辑器工具栏变化, `dependency` 记录 Compose BOM, Coil 或 glide-compose, Room 不在本版; `hint` 说明 APK 新增 Compose 自带的 `libandroidx.graphics.path.so`.
+- [ ] (发布) 按第 4 节 P1-P5 发布 v2.1.0; changelog `feature` 描述 "界面全面改为 Material 3 风格" 与编辑器工具栏变化, `dependency` 记录 Compose BOM, Coil 或 glide-compose, Room 不在本版; `hint` 说明 APK 新增 Compose 自带的 `libandroidx.graphics.path.so`. 进度 (2026-10-13): P1 10 种语言 changelog 已补 feature (界面, 编辑器工具条, 转换器整页, 查看器五按钮) / fix (发行历史空白, 阿拉伯语重建布局) / improvement (图标统一, 基线 profile) / hint (首次启动稍慢; Compose 原生库已在), Coil 未引入故 dependency 只记 Compose BOM 与 glide-compose, Room 不在本版; P2 `.readme` 10 种语言改转换器整页与查看器 `编辑` 说明, README / CHANGELOG 已重新生成, `docs/images/screenshots` 的 viewer-main / viewer-zoom-2.5x / share-sheet 在 API 33 模拟器 (1080 x 2340, 合成图 01-orbit.png) 重采, explorer-* 为宿主界面未变; P3 `--no-daemon` Temurin 平台验收构建与 `verifySignedReleaseArtifacts` 通过, 四台真机完整 instrumentation 通过 (5.3); 待办: 附录 E 冒烟记录 (型号 / API / APK 摘要), P4 tag 与 GitHub Release, P5 官方索引登记 由维护者执行 (本会话不推送), Q10 拍板后再勾选.
 
 验收条件: 五类页面全部为 Compose 实现且无功能回退; 入口契约, 协议版本与最低宿主不变; 原生库门禁按 T2 收紧后通过; 四台真机 instrumentation 与 CI 通过; 10 种语言文案与文档同步.
 

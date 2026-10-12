@@ -9,8 +9,18 @@
 ###### 2026/10/13
 
 * `Hint` The APK now carries libandroidx.graphics.path.so, a native library bundled with Jetpack Compose (about 10 KB each for arm64-v8a, armeabi-v7a, x86_64 and x86); the plugin itself still contains no native code and remains one universal APK
+* `Hint` The first few launches after installation are a little slower on older devices until the system finishes its background optimization
+* `Added` The whole interface moves to Material 3 (Jetpack Compose): home, settings, about, release history, viewer, editor and converter are rebuilt, follow the theme color and dark mode, and support large fonts and right-to-left layouts
+* `Added` The editor toolbar becomes grouped tool strips with icons and labels (transform, adjust, draw, text); the parameter panel follows the active tool, and the text, save and palette dialogs are rebuilt
+* `Added` The converter turns from a dialog into a full page form that shows only the inputs of the current resize mode, with the output resolution, estimated size and suffix pinned at the bottom
+* `Added` The viewer bottom bar now offers Details, Rotate, Edit, Share and Open with; images opened from the standalone home or from another app can go straight to the editor and save the result
+* `Fixed` The in-app release history page was blank (the ## version headings of the generated file were not recognized)
+* `Fixed` After switching the app language to Arabic, pages that were already open kept a left-to-right layout
+* `Fixed` In light mode the status bar icons of the viewer and editor followed the page theme and turned dark, so they were invisible over the dark canvas
 * `Improved` Plugin Center icons use the sizes, positions, light and dark artwork, and circular backgrounds adjusted in Icon Studio, retaining reproducible sources and parameters
 * `Improved` Android App info icons share Icon Studio artwork and light/dark backgrounds while preserving transparent Plugin Center artwork and existing launcher choices
+* `Improved` Icons are unified as Material 24 dp vectors; bitmap icons and unused color, style and string resources are removed
+* `Improved` A built-in startup baseline profile lowers the home cold start cost of the interface migration once the system has run its background optimization
 * `Dependency` Added Jetpack Compose BOM 2026.09.00 for the user interface migration
 * `Dependency` Added the Glide Compose integration 1.0.0-beta10 for image loading in Compose screens
 * `Dependency` Upgraded Glide 5.0.5 -> 5.0.9
