@@ -4,6 +4,7 @@
     <string name="action_convert_image">تحويل الصورة</string>
     <string name="action_edit_image">تحرير الصورة</string>
     <string name="action_hide_image_details">إخفاء التفاصيل</string>
+    <string name="action_more">المزيد</string>
     <string name="action_open_external">فتح بتطبيق اخر</string>
     <string name="action_pause_animation">إيقاف الحركة مؤقتا</string>
     <string name="action_print">طباعة / حفظ PDF</string>

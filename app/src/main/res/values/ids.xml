@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Stable id of the zoomable image surface hosted inside the Compose viewer; tests look it up by id. -->
+    <item name="image" type="id" />
+</resources>

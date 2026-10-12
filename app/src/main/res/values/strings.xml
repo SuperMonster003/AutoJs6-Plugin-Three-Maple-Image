@@ -4,6 +4,7 @@
     <string name="action_convert_image">Convert image</string>
     <string name="action_edit_image">Edit image</string>
     <string name="action_hide_image_details">Hide details</string>
+    <string name="action_more">More</string>
     <string name="action_open_external">Open with another app</string>
     <string name="action_pause_animation">Pause animation</string>
     <string name="action_print">Print / Save PDF</string>

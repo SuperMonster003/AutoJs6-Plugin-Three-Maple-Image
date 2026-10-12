@@ -4,6 +4,7 @@
     <string name="action_convert_image">Преобразовать изображение</string>
     <string name="action_edit_image">Редактировать изображение</string>
     <string name="action_hide_image_details">Скрыть сведения</string>
+    <string name="action_more">Ещё</string>
     <string name="action_open_external">Открыть в другом приложении</string>
     <string name="action_pause_animation">Приостановить анимацию</string>
     <string name="action_print">Печать / сохранить PDF</string>

@@ -5,13 +5,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
-import android.view.View
-import android.widget.TextView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import com.bumptech.glide.Glide
-import com.google.android.material.button.MaterialButton
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
@@ -67,28 +64,21 @@ class ModernImageFormatInstrumentationTest {
             ImageViewerContract.viewerIntent(context, request),
         ).use { scenario ->
             scenario.onActivity { activity ->
-                val error = activity.findViewById<TextView>(R.id.error_text)
-                assertEquals(View.VISIBLE, error.visibility)
+                val state = activity.viewerStateForTesting
+                val error = requireNotNull(state.errorText)
                 assertEquals(
                     activity.getString(
                         R.string.error_image_format_requires_android,
                         ModernImageFormat.AVIF.displayLabel,
                         ModernImageFormat.AVIF.minimumAndroidVersion,
                     ),
-                    error.text.toString(),
+                    error,
                 )
-                assertFalse(error.text.toString() == activity.getString(R.string.error_cannot_read_image))
-                assertEquals(View.GONE, activity.findViewById<View>(R.id.loading_indicator).visibility)
-                assertEquals(
-                    activity.getString(R.string.metadata_unavailable),
-                    activity.findViewById<TextView>(R.id.metadata).text.toString(),
-                )
-                assertFalse(
-                    activity.findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
-                        .menu.findItem(R.id.print_image).isEnabled,
-                )
-                assertTrue(activity.findViewById<MaterialButton>(R.id.share).isEnabled)
-                assertTrue(activity.findViewById<MaterialButton>(R.id.open_external).isEnabled)
+                assertFalse(error == activity.getString(R.string.error_cannot_read_image))
+                assertFalse(state.loading)
+                assertEquals(activity.getString(R.string.metadata_unavailable), state.metadataText)
+                assertFalse(state.printEnabled)
+                assertTrue(state.canForward)
             }
         }
     }
@@ -131,7 +121,7 @@ class ModernImageFormatInstrumentationTest {
                         ModernImageFormat.AVIF.displayLabel,
                         ModernImageFormat.AVIF.minimumAndroidVersion,
                     ),
-                    activity.findViewById<TextView>(R.id.error_text).text.toString(),
+                    activity.viewerStateForTesting.errorText,
                 )
             }
         }
@@ -194,8 +184,7 @@ class ModernImageFormatInstrumentationTest {
         }
     }
 
-    private fun ImageViewerActivity.titleText(): String =
-        findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar).title.toString()
+    private fun ImageViewerActivity.titleText(): String = viewerStateForTesting.title
 
     private class RecordingHostSession(
         private val openCalls: AtomicInteger,

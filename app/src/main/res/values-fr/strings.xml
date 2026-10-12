@@ -4,6 +4,7 @@
     <string name="action_convert_image">Convertir l\'image</string>
     <string name="action_edit_image">Modifier l\'image</string>
     <string name="action_hide_image_details">Masquer les détails</string>
+    <string name="action_more">Plus</string>
     <string name="action_open_external">Ouvrir avec une autre application</string>
     <string name="action_pause_animation">Mettre l\'animation en pause</string>
     <string name="action_print">Imprimer / enregistrer en PDF</string>

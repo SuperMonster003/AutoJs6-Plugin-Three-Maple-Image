@@ -3,17 +3,14 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
-import android.view.View
-import android.widget.TextView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.button.MaterialButton
 import java.io.File
 import org.autojs.plugin.explorer.api.IExplorerActionHostSession
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -67,12 +64,8 @@ class ImageViewerExifInstrumentationTest {
                 awaitImageReady(scenario)
                 assertTransientZoomIndicator(scenario)
                 scenario.onActivity { activity ->
-                    val button = activity.findViewById<MaterialButton>(R.id.image_details_toggle)
-                    assertEquals(
-                        activity.getString(R.string.action_show_image_details),
-                        button.contentDescription.toString(),
-                    )
-                    button.performClick()
+                    assertFalse(activity.viewerStateForTesting.detailsExpanded)
+                    activity.toggleDetailsForTesting()
                     assertDetailsAreSafe(activity)
                 }
 
@@ -81,13 +74,8 @@ class ImageViewerExifInstrumentationTest {
                 awaitDetailsPanel(scenario, expanded = true)
                 scenario.onActivity { activity ->
                     assertDetailsAreSafe(activity)
-                    val button = activity.findViewById<MaterialButton>(R.id.image_details_toggle)
-                    button.performClick()
-                    assertEquals(View.GONE, activity.findViewById<View>(R.id.details_sheet).visibility)
-                    assertEquals(
-                        activity.getString(R.string.action_show_image_details),
-                        button.contentDescription.toString(),
-                    )
+                    activity.toggleDetailsForTesting()
+                    assertFalse(activity.viewerStateForTesting.detailsExpanded)
                 }
             }
         } finally {
@@ -97,9 +85,10 @@ class ImageViewerExifInstrumentationTest {
     }
 
     private fun assertDetailsAreSafe(activity: ImageViewerActivity) {
-        val details = activity.findViewById<TextView>(R.id.exif_details)
-        val text = details.text.toString()
-        assertEquals(View.VISIBLE, activity.findViewById<View>(R.id.details_sheet).visibility)
+        val state = activity.viewerStateForTesting
+        val text = state.exifText
+        assertTrue(state.detailsAvailable)
+        assertTrue(state.detailsExpanded)
         assertTrue(text.contains("2026-08-31 14:05:09"))
         assertTrue(text.contains("${ExifJpegTestFixture.MAKE} ${ExifJpegTestFixture.MODEL}"))
         assertTrue(text.contains("1/125 s"))
@@ -110,13 +99,10 @@ class ImageViewerExifInstrumentationTest {
         assertTrue(text.contains(activity.getString(R.string.exif_gps_present)))
         assertFalse(text.contains(ExifJpegTestFixture.LATITUDE.toString()))
         assertFalse(text.contains(ExifJpegTestFixture.LONGITUDE.toString()))
-        val metadata = activity.findViewById<TextView>(R.id.metadata).text.toString()
+        val metadata = state.metadataText
         assertTrue(metadata.contains("32 bpp"))
         assertTrue(metadata.contains("sRGB", ignoreCase = true))
-        assertEquals(
-            activity.getString(R.string.action_hide_image_details),
-            activity.findViewById<MaterialButton>(R.id.image_details_toggle).contentDescription.toString(),
-        )
+        assertEquals(metadata, state.detailsSummary)
     }
 
     private fun assertTransientZoomIndicator(
@@ -125,20 +111,19 @@ class ImageViewerExifInstrumentationTest {
         scenario.onActivity { activity ->
             val image = activity.findViewById<ZoomableImageView>(R.id.image)
             assertTrue(image.toggleDoubleTapZoom(image.width / 2f, image.height / 2f))
-            val indicator = activity.findViewById<TextView>(R.id.zoom_indicator)
-            assertEquals(View.VISIBLE, indicator.visibility)
+            val indicator = requireNotNull(activity.viewerStateForTesting.zoomIndicatorText)
             val zoom = requireNotNull(
                 ImageZoomIndicatorFormatter.format(
                     image.currentZoomForTesting,
                     activity.resources.configuration.locales[0],
                 ),
             )
-            assertEquals(activity.getString(R.string.zoom_indicator, zoom), indicator.text.toString())
+            assertEquals(activity.getString(R.string.zoom_indicator, zoom), indicator)
         }
         SystemClock.sleep(ZOOM_INDICATOR_SETTLE_MILLIS)
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
         scenario.onActivity { activity ->
-            assertEquals(View.GONE, activity.findViewById<View>(R.id.zoom_indicator).visibility)
+            assertNull(activity.viewerStateForTesting.zoomIndicatorText)
         }
     }
 
@@ -147,8 +132,7 @@ class ImageViewerExifInstrumentationTest {
         var ready = false
         while (!ready && SystemClock.uptimeMillis() < deadline) {
             scenario.onActivity { activity ->
-                ready = activity.findViewById<MaterialToolbar>(R.id.toolbar)
-                    .menu.findItem(R.id.print_image).isEnabled
+                ready = activity.viewerStateForTesting.printEnabled
             }
             if (!ready) SystemClock.sleep(POLL_INTERVAL_MILLIS)
         }
@@ -163,10 +147,8 @@ class ImageViewerExifInstrumentationTest {
         var ready = false
         while (!ready && SystemClock.uptimeMillis() < deadline) {
             scenario.onActivity { activity ->
-                val button = activity.findViewById<MaterialButton>(R.id.image_details_toggle)
-                val details = activity.findViewById<View>(R.id.details_sheet)
-                ready = button.visibility == View.VISIBLE &&
-                    (details.visibility == View.VISIBLE) == expanded
+                val state = activity.viewerStateForTesting
+                ready = state.detailsAvailable && state.detailsExpanded == expanded
             }
             if (!ready) SystemClock.sleep(POLL_INTERVAL_MILLIS)
         }

@@ -29,7 +29,7 @@ class ExternalViewActivity : Activity() {
                     startActivity(
                         ImageViewerContract.viewerIntent(
                             this@ExternalViewActivity,
-                            ImageViewerLaunchRequest.single(request),
+                            ImageViewerLaunchRequest.single(request, editable = true),
                         ),
                     )
                 }

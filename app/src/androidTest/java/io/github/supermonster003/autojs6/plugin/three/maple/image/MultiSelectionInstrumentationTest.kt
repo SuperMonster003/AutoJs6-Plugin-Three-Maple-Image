@@ -6,8 +6,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
-import android.view.View
-import androidx.appcompat.widget.Toolbar
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -79,8 +77,7 @@ class MultiSelectionInstrumentationTest {
                 scenario.onActivity { activity ->
                     val image = activity.findViewById<ZoomableImageView>(R.id.image)
                     assertEquals(ImageZoomState.MIN_ZOOM, image.currentZoomForTesting)
-                    assertTrue(activity.findViewById<View>(R.id.share).isEnabled)
-                    assertTrue(activity.findViewById<View>(R.id.open_external).isEnabled)
+                    assertTrue(activity.viewerStateForTesting.canForward)
                     image.onPageSwipe?.invoke(ZoomableImageView.DIRECTION_PREVIOUS)
                 }
 
@@ -106,7 +103,7 @@ class MultiSelectionInstrumentationTest {
         while (SystemClock.uptimeMillis() < deadline) {
             var ready = false
             scenario.onActivity { activity ->
-                val title = activity.findViewById<Toolbar>(R.id.toolbar).title?.toString()
+                val title = activity.viewerStateForTesting.title
                 val drawable = activity.findViewById<ZoomableImageView>(R.id.image).drawable
                     as? BitmapDrawable
                 val bitmap = drawable?.bitmap

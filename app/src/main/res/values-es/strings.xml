@@ -4,6 +4,7 @@
     <string name="action_convert_image">Convertir imagen</string>
     <string name="action_edit_image">Editar imagen</string>
     <string name="action_hide_image_details">Ocultar detalles</string>
+    <string name="action_more">Más</string>
     <string name="action_open_external">Abrir con otra aplicación</string>
     <string name="action_pause_animation">Pausar animación</string>
     <string name="action_print">Imprimir / guardar PDF</string>

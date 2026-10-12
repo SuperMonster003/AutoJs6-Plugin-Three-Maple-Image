@@ -4,6 +4,7 @@
     <string name="action_convert_image">이미지 변환</string>
     <string name="action_edit_image">이미지 편집</string>
     <string name="action_hide_image_details">세부 정보 숨기기</string>
+    <string name="action_more">더보기</string>
     <string name="action_open_external">다른 앱으로 열기</string>
     <string name="action_pause_animation">애니메이션 일시중지</string>
     <string name="action_print">인쇄 / PDF로 저장</string>

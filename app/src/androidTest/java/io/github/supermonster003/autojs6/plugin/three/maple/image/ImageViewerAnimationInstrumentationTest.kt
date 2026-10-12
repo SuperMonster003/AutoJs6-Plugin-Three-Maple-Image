@@ -4,14 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
-import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import com.bumptech.glide.load.resource.gif.GifDrawable
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.button.MaterialButton
 import java.io.File
 import org.autojs.plugin.explorer.api.IExplorerActionHostSession
 import org.junit.Assert.assertEquals
@@ -77,17 +74,13 @@ class ImageViewerAnimationInstrumentationTest {
             ).use { scenario ->
                 awaitAnimationControl(scenario, R.string.action_pause_animation)
                 scenario.onActivity { activity ->
-                    val button = activity.findViewById<MaterialButton>(R.id.animation_toggle)
                     val drawable = activity.findViewById<ZoomableImageView>(R.id.image).drawable
                     assertTrue(drawable is GifDrawable && drawable.frameCount == 2)
                     assertTrue((drawable as GifDrawable).isRunning)
-                    button.performClick()
-                    assertEquals(
-                        activity.getString(R.string.action_resume_animation),
-                        button.contentDescription.toString(),
-                    )
+                    activity.toggleAnimationForTesting()
+                    assertEquals(ImageAnimationPlayback.PAUSED, activity.viewerStateForTesting.animation)
                     assertFalse(drawable.isRunning)
-                    activity.findViewById<MaterialButton>(R.id.rotate_clockwise).performClick()
+                    activity.rotateForTesting()
                     assertEquals(90, activity.findViewById<ZoomableImageView>(R.id.image)
                         .currentRotationDegreesForTesting)
                     assertFalse(drawable.isRunning)
@@ -102,8 +95,7 @@ class ImageViewerAnimationInstrumentationTest {
                     assertFalse((drawable as GifDrawable).isRunning)
                     val image = activity.findViewById<ZoomableImageView>(R.id.image)
                     assertEquals(90, image.currentRotationDegreesForTesting)
-                    activity.findViewById<MaterialToolbar>(R.id.toolbar)
-                        .menu.performIdentifierAction(R.id.reset_zoom, 0)
+                    activity.resetZoomForTesting()
                     assertEquals(0, image.currentRotationDegreesForTesting)
                     assertFalse(drawable.isRunning)
                 }
@@ -122,9 +114,13 @@ class ImageViewerAnimationInstrumentationTest {
         var ready = false
         while (!ready && SystemClock.uptimeMillis() < deadline) {
             scenario.onActivity { activity ->
-                val button = activity.findViewById<MaterialButton>(R.id.animation_toggle)
-                ready = button.visibility == View.VISIBLE &&
-                    button.contentDescription?.toString() == activity.getString(expectedText)
+                val state = activity.viewerStateForTesting
+                val expected = if (expectedText == R.string.action_resume_animation) {
+                    ImageAnimationPlayback.PAUSED
+                } else {
+                    ImageAnimationPlayback.PLAYING
+                }
+                ready = state.controlsVisible && state.animation == expected
             }
             if (!ready) SystemClock.sleep(POLL_INTERVAL_MILLIS)
         }

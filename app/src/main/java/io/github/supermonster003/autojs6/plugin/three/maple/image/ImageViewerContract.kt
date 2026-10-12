@@ -21,6 +21,8 @@ internal data class ImageViewerLaunchRequest(
     val startIndex: Int = 0,
     val hostSession: IExplorerActionHostSession? = null,
     val hostTargetId: String? = null,
+    /** True only for the standalone and external entries, where the viewer may hand the image to the editor (R5). */
+    val editable: Boolean = false,
 ) {
     init {
         require(pages.size in 1..ImageSiblingDiscoveryPolicy.MAX_PAGES)
@@ -40,8 +42,8 @@ internal data class ImageViewerLaunchRequest(
         get() = pages[startIndex]
 
     companion object {
-        fun single(image: ImageViewerRequest): ImageViewerLaunchRequest =
-            ImageViewerLaunchRequest(pages = listOf(ImageViewerPage(image)))
+        fun single(image: ImageViewerRequest, editable: Boolean = false): ImageViewerLaunchRequest =
+            ImageViewerLaunchRequest(pages = listOf(ImageViewerPage(image)), editable = editable)
 
         fun explicitSelection(images: List<ImageViewerRequest>): ImageViewerLaunchRequest {
             require(images.isNotEmpty())
@@ -65,6 +67,8 @@ internal object ImageViewerContract {
         "io.github.supermonster003.autojs6.plugin.three.maple.image.extra.START_INDEX"
     private const val EXTRA_HOST_REQUEST =
         "io.github.supermonster003.autojs6.plugin.three.maple.image.extra.HOST_REQUEST"
+    private const val EXTRA_EDITABLE =
+        "io.github.supermonster003.autojs6.plugin.three.maple.image.extra.EDITABLE"
     private const val HOST_TARGET_ID = "targetId"
     private const val HOST_RELATIVE_PATHS = "relativePaths"
 
@@ -150,6 +154,7 @@ internal object ImageViewerContract {
             startIndex = startIndex,
             hostSession = hostSession,
             hostTargetId = hostTargetId,
+            editable = hostSession == null && intent.getBooleanExtra(EXTRA_EDITABLE, false),
         )
     }.getOrNull()
 
@@ -188,6 +193,7 @@ internal object ImageViewerContract {
         )
         putExtra(EXTRA_PAGE_DECLARED_SIZES, request.pages.map { it.image.declaredSize }.toLongArray())
         putExtra(EXTRA_START_INDEX, request.startIndex)
+        putExtra(EXTRA_EDITABLE, request.editable)
         request.hostSession?.let { session ->
             putExtra(
                 EXTRA_HOST_REQUEST,

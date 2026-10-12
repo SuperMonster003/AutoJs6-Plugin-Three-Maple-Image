@@ -4,6 +4,7 @@
     <string name="action_convert_image">画像を変換</string>
     <string name="action_edit_image">画像を編集</string>
     <string name="action_hide_image_details">詳細を非表示</string>
+    <string name="action_more">その他</string>
     <string name="action_open_external">別のアプリで開く</string>
     <string name="action_pause_animation">アニメーションを一時停止</string>
     <string name="action_print">印刷 / PDF に保存</string>

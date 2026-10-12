@@ -10,12 +10,10 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
-import android.widget.TextView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.exifinterface.media.ExifInterface
-import com.google.android.material.button.MaterialButton
 import java.io.File
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.abs
@@ -269,7 +267,7 @@ class TiledImageDrawableInstrumentationTest {
                 }
                 scenario.onActivity { activity ->
                     val image = activity.findViewById<ZoomableImageView>(R.id.image)
-                    activity.findViewById<MaterialButton>(R.id.rotate_clockwise).performClick()
+                    activity.rotateForTesting()
                     assertEquals(90, image.currentRotationDegreesForTesting)
                     assertEquals(ImageZoomState.DOUBLE_TAP_ZOOM, image.currentZoomForTesting)
                     image.onPageSwipe?.invoke(ZoomableImageView.DIRECTION_NEXT)
@@ -300,9 +298,8 @@ class TiledImageDrawableInstrumentationTest {
             var ready = false
             scenario.onActivity { activity ->
                 val image = activity.findViewById<ZoomableImageView>(R.id.image)
-                val metadata = activity.findViewById<TextView>(R.id.metadata).text.toString()
-                val toolbar = activity.findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
-                ready = toolbar.menu.findItem(R.id.print_image).isEnabled &&
+                val metadata = activity.viewerStateForTesting.metadataText
+                ready = activity.viewerStateForTesting.printEnabled &&
                     image.drawable is TiledImageDrawable &&
                     activity.titleText() == expectedName &&
                     metadata.contains("${LargePngTestFixture.WIDTH}") &&
@@ -345,8 +342,7 @@ class TiledImageDrawableInstrumentationTest {
     private fun describeColor(color: Int): String =
         "rgb(${Color.red(color)},${Color.green(color)},${Color.blue(color)})"
 
-    private fun ImageViewerActivity.titleText(): String =
-        findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar).title.toString()
+    private fun ImageViewerActivity.titleText(): String = viewerStateForTesting.title
 
     private class RecordingHostSession(
         private val file: File,

@@ -7,7 +7,6 @@ import android.content.ComponentCallbacks2
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
@@ -15,28 +14,23 @@ import android.os.ParcelFileDescriptor
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.text.format.Formatter
-import android.util.TypedValue
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
-import androidx.activity.addCallback
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
+import androidx.annotation.VisibleForTesting
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import io.github.supermonster003.autojs6.plugin.three.maple.image.databinding.ActivityImageViewerBinding
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerCallbacks
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerScreen
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -45,29 +39,36 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
-import kotlin.math.roundToInt
 
+/**
+ * Read-only image viewer. The decoding pipeline (direct content URIs, host session siblings, tiled large images,
+ * EXIF normalization through Glide) is unchanged; the overlay chrome is a Compose [ViewerScreen] driven by one
+ * [ViewerUiState], while the zoomable surface stays the [ZoomableImageView] hosted through AndroidView.
+ */
 class ImageViewerActivity : ConfiguredActivity() {
 
-    private lateinit var binding: ActivityImageViewerBinding
+    private lateinit var imageView: ZoomableImageView
     private lateinit var launchRequest: ImageViewerLaunchRequest
     private lateinit var animationController: ImageAnimationController
-    private lateinit var detailsBehavior: BottomSheetBehavior<*>
-    private lateinit var closeDetailsOnBack: OnBackPressedCallback
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var pageJob: Job? = null
     private var tiledImageDrawable: TiledImageDrawable? = null
     private var hostImageSessionToken: String? = null
     private var currentIndex = -1
     private var loadGeneration = 0
-    private var controlsVisible = true
     private var hostSessionClosed = false
     private var restoredAnimationIndex = -1
     private var restoredAnimationPaused = false
     private var restoredRotationIndex = -1
     private var restoredRotationQuarterTurns = ImageRotationState.ORIGINAL_QUARTER_TURNS
-    private var exifDetailsExpanded = false
     private var restoredExpandedDetailsIndex = -1
+    private var uiState by mutableStateOf(ViewerUiState())
+    private var editBusy = false
+    private val editHandoff = StandaloneEditHandoff(
+        activity = this,
+        onBusy = { busy -> editBusy = busy },
+        onMessage = { resource -> Toast.makeText(this, resource, Toast.LENGTH_SHORT).show() },
+    )
     private val memoryClassMebibytes: Int by lazy {
         getSystemService(ActivityManager::class.java)?.memoryClass ?: 128
     }
@@ -95,46 +96,35 @@ class ImageViewerActivity : ConfiguredActivity() {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) LEGACY_NAVIGATION_SCRIM else Color.TRANSPARENT,
             ),
         )
-        binding = ActivityImageViewerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        imageView = ZoomableImageView(this).apply {
+            id = R.id.image
+            contentDescription = getString(R.string.image_content_description)
+            setOnClickListener {
+                if (uiState.detailsExpanded) setExifDetailsExpanded(false) else setControlsVisible(!uiState.controlsVisible)
+            }
+            onPageSwipe = { direction -> showPage(currentIndex + direction) }
+            onZoomInteraction = ::showZoomIndicator
+        }
         animationController = ImageAnimationController { playback ->
-            binding.animationToggle.renderImageAnimationPlayback(playback)
-            binding.animationToggle.isVisible = binding.animationToggle.isVisible && controlsVisible
+            uiState = uiState.copy(animation = playback)
         }
-        applyWindowInsets()
-
-        binding.toolbar.setNavigationOnClickListener { finish() }
-        binding.toolbar.inflateMenu(R.menu.menu_image_viewer)
-        binding.toolbar.setOnMenuItemClickListener(::onToolbarMenuItemClick)
-        binding.image.setOnClickListener {
-            if (exifDetailsExpanded) {
-                setExifDetailsExpanded(false)
-            } else {
-                setControlsVisible(!controlsVisible)
+        val callbacks = ViewerCallbacks(
+            onBack = ::finish,
+            onToggleDetails = { setExifDetailsExpanded(!uiState.detailsExpanded) },
+            onDismissDetails = { setExifDetailsExpanded(false) },
+            onRotate = { imageView.rotateClockwise90() },
+            onEdit = ::editImage,
+            onShare = ::shareImage,
+            onOpenWith = ::openWithAnotherApp,
+            onResetZoom = { hideZoomIndicator(); imageView.resetZoom() },
+            onPrint = ::printImage,
+            onReleaseHistory = ::showReleaseHistory,
+            onToggleAnimation = { animationController.toggle() },
+        )
+        setContent {
+            MapleTheme(palette = appPalette) {
+                ViewerScreen(state = uiState, imageView = imageView, callbacks = callbacks)
             }
-        }
-        binding.image.onPageSwipe = { direction -> showPage(currentIndex + direction) }
-        binding.image.onZoomInteraction = ::showZoomIndicator
-        binding.imageDetailsToggle.setOnClickListener {
-            setExifDetailsExpanded(!exifDetailsExpanded)
-        }
-        binding.animationToggle.setOnClickListener { animationController.toggle() }
-        binding.rotateClockwise.setOnClickListener { binding.image.rotateClockwise90() }
-        binding.share.setOnClickListener { shareImage() }
-        binding.openExternal.setOnClickListener { openWithAnotherApp() }
-
-        detailsBehavior = BottomSheetBehavior.from(binding.detailsSheet)
-        detailsBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_HIDDEN && exifDetailsExpanded) {
-                    setExifDetailsExpanded(false)
-                }
-            }
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
-        })
-        closeDetailsOnBack = onBackPressedDispatcher.addCallback(this, enabled = false) {
-            setExifDetailsExpanded(false)
         }
 
         val restoredIndex = savedInstanceState?.getInt(STATE_CURRENT_INDEX, -1)
@@ -163,7 +153,7 @@ class ImageViewerActivity : ConfiguredActivity() {
     override fun onStart() {
         super.onStart()
         if (::animationController.isInitialized) {
-            binding.image.post {
+            imageView.post {
                 if (!isFinishing && !isDestroyed) animationController.reapplyRequestedPlayback()
             }
         }
@@ -184,17 +174,13 @@ class ImageViewerActivity : ConfiguredActivity() {
             )
         }
         if (
-            ::binding.isInitialized &&
-            binding.image.currentRotationQuarterTurns !=
-            ImageRotationState.ORIGINAL_QUARTER_TURNS
+            ::imageView.isInitialized &&
+            imageView.currentRotationQuarterTurns != ImageRotationState.ORIGINAL_QUARTER_TURNS
         ) {
             outState.putInt(STATE_ROTATION_INDEX, currentIndex)
-            outState.putInt(
-                STATE_ROTATION_QUARTER_TURNS,
-                binding.image.currentRotationQuarterTurns,
-            )
+            outState.putInt(STATE_ROTATION_QUARTER_TURNS, imageView.currentRotationQuarterTurns)
         }
-        if (exifDetailsExpanded && currentIndex in launchRequest.pages.indices) {
+        if (uiState.detailsExpanded && ::launchRequest.isInitialized && currentIndex in launchRequest.pages.indices) {
             outState.putInt(STATE_EXPANDED_DETAILS_INDEX, currentIndex)
         }
         super.onSaveInstanceState(outState)
@@ -203,17 +189,20 @@ class ImageViewerActivity : ConfiguredActivity() {
     override fun onDestroy() {
         pageJob?.cancel()
         scope.cancel()
-        if (::binding.isInitialized) {
+        if (::imageView.isInitialized) {
             animationController.clear()
             releaseTiledImage()
-            Glide.with(applicationContext).clear(binding.image)
-            binding.image.onPageSwipe = null
-            binding.image.onZoomInteraction = null
-            binding.zoomIndicator.removeCallbacks(hideZoomIndicatorRunnable)
+            Glide.with(applicationContext).clear(imageView)
+            imageView.onPageSwipe = null
+            imageView.onZoomInteraction = null
+            imageView.removeCallbacks(hideZoomIndicatorRunnable)
         }
         HostSessionImageRegistry.unregister(hostImageSessionToken)
         hostImageSessionToken = null
-        if (!isChangingConfigurations) closeHostSession()
+        if (!isChangingConfigurations) {
+            closeHostSession()
+            if (isFinishing) editHandoff.discard()
+        }
         super.onDestroy()
     }
 
@@ -230,61 +219,31 @@ class ImageViewerActivity : ConfiguredActivity() {
         super.onLowMemory()
     }
 
-    private fun applyWindowInsets() {
-        val actionBarSize = TypedValue().let { value ->
-            theme.resolveAttribute(android.R.attr.actionBarSize, value, true)
-            TypedValue.complexToDimensionPixelSize(value.data, resources.displayMetrics)
-        }
-        val gap = (OVERLAY_GAP_DP * resources.displayMetrics.density).roundToInt()
-        val bottomBarPadding = binding.bottomBar.basePadding()
-        val sheetPadding = binding.detailsSheet.basePadding()
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val bars = insets.getInsets(
-                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
-            )
-            binding.toolbar.updatePadding(left = bars.left, top = bars.top, right = bars.right)
-            binding.toolbar.updateLayoutParams { height = actionBarSize + bars.top }
-            binding.bottomBar.updatePadding(
-                left = bottomBarPadding.left + bars.left,
-                right = bottomBarPadding.right + bars.right,
-                bottom = bottomBarPadding.bottom + bars.bottom,
-            )
-            binding.animationToggle.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                leftMargin = gap + bars.left
-                rightMargin = gap + bars.right
-            }
-            binding.detailsSheet.updatePadding(
-                left = sheetPadding.left + bars.left,
-                right = sheetPadding.right + bars.right,
-                bottom = sheetPadding.bottom + bars.bottom,
-            )
-            binding.zoomIndicator.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = bars.top + actionBarSize + gap
-                leftMargin = gap + bars.left
-                rightMargin = gap + bars.right
-            }
-            insets
-        }
+    // region Test hooks
+
+    @get:VisibleForTesting
+    internal val viewerStateForTesting: ViewerUiState
+        get() = uiState
+
+    @VisibleForTesting
+    internal fun toggleDetailsForTesting() = setExifDetailsExpanded(!uiState.detailsExpanded)
+
+    @VisibleForTesting
+    internal fun rotateForTesting(): Boolean = imageView.rotateClockwise90()
+
+    @VisibleForTesting
+    internal fun resetZoomForTesting() {
+        hideZoomIndicator()
+        imageView.resetZoom()
     }
 
-    private fun View.basePadding() = Rect(paddingLeft, paddingTop, paddingRight, paddingBottom)
+    @VisibleForTesting
+    internal fun toggleAnimationForTesting() = animationController.toggle()
 
-    private fun onToolbarMenuItemClick(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_release_history -> { showReleaseHistory(); true }
-        R.id.reset_zoom -> {
-            hideZoomIndicator()
-            binding.image.resetZoom()
-            true
-        }
-        R.id.print_image -> {
-            printImage()
-            true
-        }
-        else -> false
-    }
+    // endregion
 
     private fun setPrintEnabled(enabled: Boolean) {
-        binding.toolbar.menu.findItem(R.id.print_image)?.isEnabled = enabled
+        uiState = uiState.copy(printEnabled = enabled)
     }
 
     private fun showPage(index: Int) {
@@ -292,33 +251,34 @@ class ImageViewerActivity : ConfiguredActivity() {
         pageJob?.cancel()
         animationController.clear()
         releaseTiledImage()
-        Glide.with(this).clear(binding.image)
+        Glide.with(this).clear(imageView)
         loadGeneration += 1
         val generation = loadGeneration
         currentIndex = index
         val page = launchRequest.pages[index]
 
-        binding.image.resetZoom()
+        imageView.resetZoom()
         hideZoomIndicator()
-        binding.toolbar.title = page.image.displayName
-        binding.toolbar.subtitle = launchRequest.pages.size.takeIf { it > 1 }?.let { pageCount ->
-            getString(R.string.page_counter, index + 1, pageCount)
-        }
-        binding.detailsTitle.text = page.image.displayName
-        binding.metadata.setText(R.string.metadata_loading)
-        binding.detailsSummary.setText(R.string.metadata_loading)
-        binding.imageDetailsToggle.isVisible = false
-        setExifDetailsExpanded(false)
-        binding.loadingIndicator.isVisible = true
-        binding.errorText.setText(R.string.error_cannot_read_image)
-        binding.errorText.isVisible = false
-        setPrintEnabled(false)
         val canForward = page.hostRelativePath.isNullOrEmpty()
-        binding.share.isEnabled = canForward
-        binding.openExternal.isEnabled = canForward
+        uiState = uiState.copy(
+            title = page.image.displayName,
+            subtitle = launchRequest.pages.size.takeIf { it > 1 }?.let { pageCount ->
+                getString(R.string.page_counter, index + 1, pageCount)
+            },
+            metadataText = getString(R.string.metadata_loading),
+            detailsSummary = getString(R.string.metadata_loading),
+            exifText = getString(R.string.exif_unavailable),
+            detailsAvailable = false,
+            detailsExpanded = false,
+            loading = true,
+            errorText = null,
+            printEnabled = false,
+            canForward = canForward,
+            canEdit = canForward && launchRequest.editable,
+        )
 
         ImagePlatformDecodeSupport.unsupported(page.image)?.let { unavailable ->
-            binding.metadata.setText(R.string.metadata_unavailable)
+            uiState = uiState.copy(metadataText = getString(R.string.metadata_unavailable))
             val message = when (unavailable.reason) {
                 ModernImageUnavailableReason.ANDROID_VERSION -> getString(
                     R.string.error_image_format_requires_android,
@@ -334,7 +294,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             return
         }
 
-        val limits = binding.image.largeImageLimits(memoryClassMebibytes)
+        val limits = imageView.largeImageLimits(memoryClassMebibytes)
         if (page.hostRelativePath.isNullOrEmpty()) {
             loadDirectPage(index, page, generation, limits)
         } else {
@@ -450,15 +410,12 @@ class ImageViewerActivity : ConfiguredActivity() {
         generation: Int,
     ) {
         tiledImageDrawable = drawable
-        binding.image.setImageDrawable(drawable)
-        binding.loadingIndicator.isVisible = false
-        binding.errorText.isVisible = false
+        imageView.setImageDrawable(drawable)
+        uiState = uiState.copy(loading = false, errorText = null)
         setPrintEnabled(true)
-        binding.image.post {
+        imageView.post {
             if (generation == loadGeneration && !isFinishing && !isDestroyed) {
-                binding.image.restoreRotationQuarterTurns(
-                    consumeRestoredRotation(pageIndex),
-                )
+                imageView.restoreRotationQuarterTurns(consumeRestoredRotation(pageIndex))
             }
         }
     }
@@ -466,8 +423,8 @@ class ImageViewerActivity : ConfiguredActivity() {
     private fun releaseTiledImage() {
         val drawable = tiledImageDrawable ?: return
         tiledImageDrawable = null
-        if (::binding.isInitialized && binding.image.drawable === drawable) {
-            binding.image.setImageDrawable(null)
+        if (::imageView.isInitialized && imageView.drawable === drawable) {
+            imageView.setImageDrawable(null)
         }
         drawable.close()
     }
@@ -489,8 +446,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         pageIndex: Int,
         generation: Int,
     ) {
-        binding.loadingIndicator.isVisible = true
-        binding.errorText.isVisible = false
+        uiState = uiState.copy(loading = true, errorText = null)
         // Glide 5's static-image Downsampler applies all eight EXIF rotation/mirror variants.
         // ZoomableImageView therefore tracks only the user's additional quarter turns.
         Glide.with(this)
@@ -516,13 +472,10 @@ class ImageViewerActivity : ConfiguredActivity() {
                     isFirstResource: Boolean,
                 ): Boolean {
                     if (generation == loadGeneration && !isFinishing && !isDestroyed) {
-                        binding.loadingIndicator.isVisible = false
-                        binding.errorText.isVisible = false
-                        binding.image.post {
+                        uiState = uiState.copy(loading = false, errorText = null)
+                        imageView.post {
                             if (generation == loadGeneration && !isFinishing && !isDestroyed) {
-                                binding.image.restoreRotationQuarterTurns(
-                                    consumeRestoredRotation(pageIndex),
-                                )
+                                imageView.restoreRotationQuarterTurns(consumeRestoredRotation(pageIndex))
                                 animationController.attach(
                                     resource,
                                     startPaused = consumeRestoredAnimationPause(pageIndex),
@@ -534,11 +487,11 @@ class ImageViewerActivity : ConfiguredActivity() {
                     return false
                 }
             })
-            .into(binding.image)
+            .into(imageView)
     }
 
     private fun showMetadata(request: ImageViewerRequest, metadata: ImageMetadata?) {
-        binding.metadata.text = if (metadata == null) {
+        val text = if (metadata == null) {
             getString(R.string.metadata_unavailable)
         } else {
             val size = Formatter.formatFileSize(this, metadata.byteSize)
@@ -551,16 +504,10 @@ class ImageViewerActivity : ConfiguredActivity() {
             if (decodedColor == null) {
                 getString(R.string.metadata_summary, request.mimeType, size, resolution)
             } else {
-                getString(
-                    R.string.metadata_summary_with_color,
-                    request.mimeType,
-                    size,
-                    resolution,
-                    decodedColor,
-                )
+                getString(R.string.metadata_summary_with_color, request.mimeType, size, resolution, decodedColor)
             }
         }
-        binding.detailsSummary.text = binding.metadata.text
+        uiState = uiState.copy(metadataText = text, detailsSummary = text)
         showExifDetails(metadata)
     }
 
@@ -576,29 +523,23 @@ class ImageViewerActivity : ConfiguredActivity() {
     }
 
     private fun showZoomIndicator(zoom: Float, gestureInProgress: Boolean) {
-        val formattedZoom = ImageZoomIndicatorFormatter.format(
-            zoom,
-            resources.configuration.locales[0],
-        )
+        val formattedZoom = ImageZoomIndicatorFormatter.format(zoom, resources.configuration.locales[0])
             ?: return hideZoomIndicator()
-        binding.zoomIndicator.apply {
-            removeCallbacks(hideZoomIndicatorRunnable)
-            text = getString(R.string.zoom_indicator, formattedZoom)
-            isVisible = true
-            if (!gestureInProgress) {
-                postDelayed(hideZoomIndicatorRunnable, ZOOM_INDICATOR_DURATION_MILLIS)
-            }
+        imageView.removeCallbacks(hideZoomIndicatorRunnable)
+        uiState = uiState.copy(zoomIndicatorText = getString(R.string.zoom_indicator, formattedZoom))
+        if (!gestureInProgress) {
+            imageView.postDelayed(hideZoomIndicatorRunnable, ZOOM_INDICATOR_DURATION_MILLIS)
         }
     }
 
     private fun hideZoomIndicator() {
-        if (!::binding.isInitialized) return
-        binding.zoomIndicator.removeCallbacks(hideZoomIndicatorRunnable)
-        binding.zoomIndicator.isVisible = false
+        if (!::imageView.isInitialized) return
+        imageView.removeCallbacks(hideZoomIndicatorRunnable)
+        uiState = uiState.copy(zoomIndicatorText = null)
     }
 
     private val hideZoomIndicatorRunnable = Runnable {
-        if (::binding.isInitialized) binding.zoomIndicator.isVisible = false
+        uiState = uiState.copy(zoomIndicatorText = null)
     }
 
     private fun showLoadFailure(
@@ -606,12 +547,13 @@ class ImageViewerActivity : ConfiguredActivity() {
     ) {
         animationController.clear()
         hideZoomIndicator()
-        binding.imageDetailsToggle.isVisible = false
-        setExifDetailsExpanded(false)
-        binding.loadingIndicator.isVisible = false
-        binding.errorText.text = message
-        binding.errorText.isVisible = true
-        setPrintEnabled(false)
+        uiState = uiState.copy(
+            detailsAvailable = false,
+            detailsExpanded = false,
+            loading = false,
+            errorText = message.toString(),
+            printEnabled = false,
+        )
     }
 
     private fun consumeRestoredAnimationPause(pageIndex: Int): Boolean {
@@ -632,8 +574,10 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     private fun showExifDetails(metadata: ImageMetadata?) {
         val details = metadata?.exif?.let(::formatExifDetails)
-        binding.exifDetails.text = details ?: getString(R.string.exif_unavailable)
-        binding.imageDetailsToggle.isVisible = metadata != null
+        uiState = uiState.copy(
+            exifText = details ?: getString(R.string.exif_unavailable),
+            detailsAvailable = metadata != null,
+        )
         val restoreExpanded = restoredExpandedDetailsIndex == currentIndex
         if (restoreExpanded) restoredExpandedDetailsIndex = -1
         setExifDetailsExpanded(restoreExpanded && metadata != null)
@@ -651,12 +595,7 @@ class ImageViewerActivity : ConfiguredActivity() {
                 add(getString(R.string.exif_exposure, exposure))
             }
             exif.orientation?.let { orientation ->
-                add(
-                    getString(
-                        R.string.exif_orientation,
-                        formatExifOrientation(orientation),
-                    ),
-                )
+                add(getString(R.string.exif_orientation, formatExifOrientation(orientation)))
             }
             if (exif.hasGpsMetadata) add(getString(R.string.exif_gps_present))
         }
@@ -675,32 +614,17 @@ class ImageViewerActivity : ConfiguredActivity() {
     }
 
     private fun setExifDetailsExpanded(expanded: Boolean) {
-        exifDetailsExpanded = expanded && binding.imageDetailsToggle.isVisible
-        if (exifDetailsExpanded) {
-            binding.detailsSheet.isVisible = true
-            detailsBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        } else {
-            if (detailsBehavior.state != BottomSheetBehavior.STATE_HIDDEN) {
-                detailsBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
-            binding.detailsSheet.isVisible = false
-        }
-        closeDetailsOnBack.isEnabled = exifDetailsExpanded
-        binding.imageDetailsToggle.contentDescription = getString(
-            if (exifDetailsExpanded) {
-                R.string.action_hide_image_details
-            } else {
-                R.string.action_show_image_details
-            },
-        )
+        uiState = uiState.copy(detailsExpanded = expanded && uiState.detailsAvailable)
     }
 
     private fun setControlsVisible(visible: Boolean) {
-        controlsVisible = visible
-        binding.toolbar.isVisible = visible
-        binding.bottomBar.isVisible = visible
-        binding.animationToggle.isVisible =
-            visible && animationController.playback != ImageAnimationPlayback.UNAVAILABLE
+        uiState = uiState.copy(controlsVisible = visible)
+    }
+
+    private fun editImage() {
+        if (editBusy || !launchRequest.editable) return
+        val page = currentShareablePage() ?: return
+        scope.launch { editHandoff.edit(page.targetUri) }
     }
 
     private fun shareImage() {
@@ -716,10 +640,10 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     private fun printImage() {
         val page = launchRequest.pages.getOrNull(currentIndex) ?: return
-        val drawable = binding.image.drawable ?: return showPrintPreparationFailure()
+        val drawable = imageView.drawable ?: return showPrintPreparationFailure()
         val snapshot = ImagePrintSnapshot.capture(
             drawable = drawable,
-            rotationQuarterTurns = binding.image.currentRotationQuarterTurns,
+            rotationQuarterTurns = imageView.currentRotationQuarterTurns,
         ) ?: return showPrintPreparationFailure()
         val printManager = getSystemService(PRINT_SERVICE) as? PrintManager
         if (printManager == null) {
@@ -815,7 +739,6 @@ class ImageViewerActivity : ConfiguredActivity() {
         const val STATE_ROTATION_QUARTER_TURNS = "rotationQuarterTurns"
         const val STATE_EXPANDED_DETAILS_INDEX = "expandedDetailsIndex"
         const val ZOOM_INDICATOR_DURATION_MILLIS = 900L
-        const val OVERLAY_GAP_DP = 16f
         const val LEGACY_NAVIGATION_SCRIM = 0x66000000
     }
 }

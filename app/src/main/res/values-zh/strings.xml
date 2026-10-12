@@ -4,6 +4,7 @@
     <string name="action_convert_image">转换图像</string>
     <string name="action_edit_image">编辑图像</string>
     <string name="action_hide_image_details">隐藏详情</string>
+    <string name="action_more">更多</string>
     <string name="action_open_external">使用其他应用打开</string>
     <string name="action_pause_animation">暂停动图</string>
     <string name="action_print">打印 / 保存 PDF</string>

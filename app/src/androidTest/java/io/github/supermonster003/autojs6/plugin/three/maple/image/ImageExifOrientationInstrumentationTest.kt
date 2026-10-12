@@ -10,15 +10,12 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
-import android.widget.TextView
 import androidx.exifinterface.media.ExifInterface
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.button.MaterialButton
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -128,7 +125,7 @@ class ImageExifOrientationInstrumentationTest {
                         displayedCornerColors(image, decoded),
                     )
 
-                    activity.findViewById<MaterialButton>(R.id.rotate_clockwise).performClick()
+                    activity.rotateForTesting()
 
                     assertEquals(90, image.currentRotationDegreesForTesting)
                     assertCornerColors(
@@ -149,8 +146,7 @@ class ImageExifOrientationInstrumentationTest {
                         displayedCornerColors(image, decoded),
                     )
 
-                    activity.findViewById<MaterialToolbar>(R.id.toolbar)
-                        .menu.performIdentifierAction(R.id.reset_zoom, 0)
+                    activity.resetZoomForTesting()
 
                     assertEquals(0, image.currentRotationDegreesForTesting)
                     assertCornerColors(
@@ -188,9 +184,8 @@ class ImageExifOrientationInstrumentationTest {
             scenario.onActivity { activity ->
                 val image = activity.findViewById<ZoomableImageView>(R.id.image)
                 val bitmap = (image.drawable as? BitmapDrawable)?.bitmap
-                val metadataText = activity.findViewById<TextView>(R.id.metadata).text
-                val printEnabled = activity.findViewById<MaterialToolbar>(R.id.toolbar)
-                    .menu.findItem(R.id.print_image).isEnabled
+                val metadataText = activity.viewerStateForTesting.metadataText
+                val printEnabled = activity.viewerStateForTesting.printEnabled
                 val expectedResolution = activity.getString(
                     R.string.metadata_resolution,
                     ExifJpegTestFixture.PATTERN_HEIGHT,
