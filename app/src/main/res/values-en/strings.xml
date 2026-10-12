@@ -116,12 +116,15 @@
     <string name="standalone_follow_autojs6_summary">Follow AutoJs6 - %1$s</string>
     <string name="standalone_follow_system">Follow system</string>
     <string name="standalone_home_actions">Get started</string>
+    <string name="standalone_home_convert_summary">Change the format, quality and size</string>
     <string name="standalone_home_discard">Discard</string>
+    <string name="standalone_home_edit_summary">Crop, rotate, adjust colors, draw and add text</string>
     <string name="standalone_home_host_missing">AutoJs6 is not installed</string>
     <string name="standalone_home_host_summary">Open the file manager and choose a file action</string>
     <string name="standalone_home_open_archive">Open an archive</string>
     <string name="standalone_home_open_failed">The selected file could not be opened or saved</string>
     <string name="standalone_home_open_host">Use with AutoJs6</string>
+    <string name="standalone_home_pending_summary">%1$s is not saved yet</string>
     <string name="standalone_home_save_output">Save the processed image</string>
     <string name="standalone_home_saved">File saved</string>
     <string name="standalone_home_scope">View, edit and convert images here or from the AutoJs6 file manager</string>
@@ -129,6 +132,7 @@
     <string name="standalone_home_sources">Sources and acknowledgments</string>
     <string name="standalone_home_sources_summary">Project, dependency sources and license notices</string>
     <string name="standalone_home_unsaved">Save or discard the current processed image before starting another</string>
+    <string name="standalone_home_view_summary">Pick one image to open it in the viewer</string>
     <string name="standalone_home_working" tools:ignore="TypographyEllipsis">Preparing the file...</string>
     <string name="standalone_language_ar">العربية</string>
     <string name="standalone_language_en">English</string>

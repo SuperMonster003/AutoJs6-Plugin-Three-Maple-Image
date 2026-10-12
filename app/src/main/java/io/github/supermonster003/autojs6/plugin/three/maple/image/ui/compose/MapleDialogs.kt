@@ -57,6 +57,8 @@ internal fun MapleDialog(
     modifier: Modifier = Modifier,
     confirmEnabled: Boolean = true,
     scrollable: Boolean = true,
+    neutralText: String? = null,
+    onNeutral: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(usePlatformDefaultWidth = false)) {
@@ -89,6 +91,13 @@ internal fun MapleDialog(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.End,
                     ) {
+                        if (neutralText != null && onNeutral != null) {
+                            TextButton(
+                                onClick = onNeutral,
+                                modifier = Modifier.defaultMinSize(minHeight = MapleDialogDefaults.buttonMinHeight).testTag("maple.dialog.neutral"),
+                            ) { Text(neutralText) }
+                            Spacer(Modifier.weight(1f))
+                        }
                         TextButton(
                             onClick = onDismissRequest,
                             modifier = Modifier.defaultMinSize(minHeight = MapleDialogDefaults.buttonMinHeight).testTag("maple.dialog.cancel"),

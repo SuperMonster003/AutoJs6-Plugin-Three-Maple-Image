@@ -116,12 +116,15 @@
     <string name="standalone_follow_autojs6_summary">跟随 AutoJs6 - %1$s</string>
     <string name="standalone_follow_system">跟随系统</string>
     <string name="standalone_home_actions">开始使用</string>
+    <string name="standalone_home_convert_summary">改格式, 质量与尺寸</string>
     <string name="standalone_home_discard">丢弃</string>
+    <string name="standalone_home_edit_summary">裁剪, 旋转, 调色, 画笔与文字</string>
     <string name="standalone_home_host_missing">尚未安装 AutoJs6</string>
     <string name="standalone_home_host_summary">打开文件管理器并选择文件操作</string>
     <string name="standalone_home_open_archive">打开压缩档案</string>
     <string name="standalone_home_open_failed">无法打开或保存所选文件</string>
     <string name="standalone_home_open_host">在 AutoJs6 中使用</string>
+    <string name="standalone_home_pending_summary">%1$s 尚未保存</string>
     <string name="standalone_home_save_output">保存处理结果</string>
     <string name="standalone_home_saved">文件已保存</string>
     <string name="standalone_home_scope">可直接查看, 编辑和转换图片, 也可从 AutoJs6 文件管理器调用</string>
@@ -129,6 +132,7 @@
     <string name="standalone_home_sources">来源与致谢</string>
     <string name="standalone_home_sources_summary">项目, 依赖来源和许可证说明</string>
     <string name="standalone_home_unsaved">开始处理另一张图片前, 请先保存或丢弃当前结果</string>
+    <string name="standalone_home_view_summary">选择一张图片打开查看器</string>
     <string name="standalone_home_working" tools:ignore="TypographyEllipsis">正在准备文件...</string>
     <string name="standalone_language_ar">العربية</string>
     <string name="standalone_language_en">English</string>

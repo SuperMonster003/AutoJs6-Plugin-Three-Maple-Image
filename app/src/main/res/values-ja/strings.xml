@@ -116,12 +116,15 @@
     <string name="standalone_follow_autojs6_summary">AutoJs6 に従う - %1$s</string>
     <string name="standalone_follow_system">システムに従う</string>
     <string name="standalone_home_actions">使い始める</string>
+    <string name="standalone_home_convert_summary">形式, 品質, サイズを変更</string>
     <string name="standalone_home_discard">破棄</string>
+    <string name="standalone_home_edit_summary">トリミング, 回転, 色調整, ブラシと文字</string>
     <string name="standalone_home_host_missing">AutoJs6 がインストールされていません</string>
     <string name="standalone_home_host_summary">ファイル管理から操作を選択</string>
     <string name="standalone_home_open_archive">圧縮ファイルを開く</string>
     <string name="standalone_home_open_failed">選択したファイルを開くか保存できません</string>
     <string name="standalone_home_open_host">AutoJs6 で使用</string>
+    <string name="standalone_home_pending_summary">%1$s はまだ保存されていません</string>
     <string name="standalone_home_save_output">処理結果を保存</string>
     <string name="standalone_home_saved">ファイルを保存しました</string>
     <string name="standalone_home_scope">ここから, または AutoJs6 のファイル管理から画像を表示, 編集, 変換できます</string>
@@ -129,6 +132,7 @@
     <string name="standalone_home_sources">出典と謝辞</string>
     <string name="standalone_home_sources_summary">プロジェクト, 依存関係の出典とライセンス</string>
     <string name="standalone_home_unsaved">別の画像を処理する前に現在の結果を保存または破棄してください</string>
+    <string name="standalone_home_view_summary">画像を 1 枚選んでビューアーで開きます</string>
     <string name="standalone_home_working" tools:ignore="TypographyEllipsis">ファイルを準備中...</string>
     <string name="standalone_language_ar">العربية</string>
     <string name="standalone_language_en">English</string>

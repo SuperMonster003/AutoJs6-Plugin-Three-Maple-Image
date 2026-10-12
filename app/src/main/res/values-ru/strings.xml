@@ -116,12 +116,15 @@
     <string name="standalone_follow_autojs6_summary">Следовать AutoJs6 - %1$s</string>
     <string name="standalone_follow_system">Следовать системе</string>
     <string name="standalone_home_actions">Начать</string>
+    <string name="standalone_home_convert_summary">Изменение формата, качества и размера</string>
     <string name="standalone_home_discard">Отменить результат</string>
+    <string name="standalone_home_edit_summary">Обрезка, поворот, цветокоррекция, кисть и текст</string>
     <string name="standalone_home_host_missing">AutoJs6 не установлен</string>
     <string name="standalone_home_host_summary">Открыть файловый менеджер и выбрать действие</string>
     <string name="standalone_home_open_archive">Открыть архив</string>
     <string name="standalone_home_open_failed">Не удалось открыть или сохранить выбранный файл</string>
     <string name="standalone_home_open_host">Использовать с AutoJs6</string>
+    <string name="standalone_home_pending_summary">%1$s еще не сохранен</string>
     <string name="standalone_home_save_output">Сохранить обработанное изображение</string>
     <string name="standalone_home_saved">Файл сохранен</string>
     <string name="standalone_home_scope">Просматривайте, редактируйте и преобразуйте изображения здесь или из файлового менеджера AutoJs6</string>
@@ -129,6 +132,7 @@
     <string name="standalone_home_sources">Источники и благодарности</string>
     <string name="standalone_home_sources_summary">Проект, зависимости и лицензии</string>
     <string name="standalone_home_unsaved">Сохраните или отмените текущий результат перед обработкой другого изображения</string>
+    <string name="standalone_home_view_summary">Выберите одно изображение, чтобы открыть его в просмотрщике</string>
     <string name="standalone_home_working" tools:ignore="TypographyEllipsis">Подготовка файла...</string>
     <string name="standalone_language_ar">العربية</string>
     <string name="standalone_language_en">English</string>

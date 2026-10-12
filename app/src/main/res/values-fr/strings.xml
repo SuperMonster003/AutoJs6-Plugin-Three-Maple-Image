@@ -116,12 +116,15 @@
     <string name="standalone_follow_autojs6_summary">Suivre AutoJs6 - %1$s</string>
     <string name="standalone_follow_system">Suivre le système</string>
     <string name="standalone_home_actions">Commencer</string>
+    <string name="standalone_home_convert_summary">Changer le format, la qualité et la taille</string>
     <string name="standalone_home_discard">Abandonner</string>
+    <string name="standalone_home_edit_summary">Recadrer, pivoter, ajuster les couleurs, dessiner et ajouter du texte</string>
     <string name="standalone_home_host_missing">AutoJs6 n\'est pas installé</string>
     <string name="standalone_home_host_summary">Ouvrir le gestionnaire de fichiers et choisir une action</string>
     <string name="standalone_home_open_archive">Ouvrir une archive</string>
     <string name="standalone_home_open_failed">Impossible d\'ouvrir ou d\'enregistrer le fichier choisi</string>
     <string name="standalone_home_open_host">Utiliser avec AutoJs6</string>
+    <string name="standalone_home_pending_summary">%1$s n\'est pas encore enregistré</string>
     <string name="standalone_home_save_output">Enregistrer le résultat</string>
     <string name="standalone_home_saved">Fichier enregistré</string>
     <string name="standalone_home_scope">Affichez, retouchez et convertissez les images ici ou depuis le gestionnaire de fichiers AutoJs6</string>
@@ -129,6 +132,7 @@
     <string name="standalone_home_sources">Sources et remerciements</string>
     <string name="standalone_home_sources_summary">Projet, dépendances et licences</string>
     <string name="standalone_home_unsaved">Enregistrez ou abandonnez le résultat actuel avant de traiter une autre image</string>
+    <string name="standalone_home_view_summary">Choisissez une image pour l\'ouvrir dans la visionneuse</string>
     <string name="standalone_home_working" tools:ignore="TypographyEllipsis">Préparation du fichier...</string>
     <string name="standalone_language_ar">العربية</string>
     <string name="standalone_language_en">English</string>

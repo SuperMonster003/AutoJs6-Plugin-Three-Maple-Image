@@ -2,19 +2,25 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.content.ComponentName
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import androidx.test.core.app.ActivityScenario
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class StandaloneHomeInstrumentationTest {
+
+    @get:Rule
+    val compose = createAndroidComposeRule<HomeActivity>()
+
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Test fun launcherAndPrivateSettingsHaveExpectedComponents() {
@@ -28,18 +34,12 @@ class StandaloneHomeInstrumentationTest {
         }
     }
 
-    @Test fun homeShowsItsOwnIdentity() {
-        ActivityScenario.launch<HomeActivity>(Intent(context, HomeActivity::class.java)).use { scenario ->
-            scenario.onActivity { activity ->
-                val texts = labels(activity.window.decorView)
-                assertTrue(texts.contains(activity.getString(R.string.app_name)))
-                assertTrue(texts.contains(activity.getString(R.string.standalone_settings_title)))
-            }
+    @Test fun homeShowsItsIdentityAndEveryEntryRow() {
+        compose.onNodeWithText(context.getString(R.string.app_name)).assertIsDisplayed()
+        compose.onNodeWithText(context.getString(R.string.plugin_description)).assertIsDisplayed()
+        for (tag in listOf("maple.home.view", "maple.home.edit", "maple.home.convert", "maple.home.settings", "maple.home.openHost")) {
+            compose.onNodeWithTag(tag).assertIsDisplayed().assertIsEnabled()
         }
-    }
-
-    private fun labels(view: View): List<String> = buildList {
-        if (view is TextView) add(view.text.toString())
-        if (view is ViewGroup) for (i in 0 until view.childCount) addAll(labels(view.getChildAt(i)))
+        compose.onNodeWithText(context.getString(R.string.standalone_settings_title)).assertIsDisplayed()
     }
 }
