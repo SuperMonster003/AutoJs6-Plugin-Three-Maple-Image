@@ -73,6 +73,8 @@ class ImageViewerActivity : ConfiguredActivity() {
         getSystemService(ActivityManager::class.java)?.memoryClass ?: 128
     }
 
+    override val usesDarkSystemBars: Boolean get() = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launchRequest = ImageViewerContract.resolve(intent) ?: run {

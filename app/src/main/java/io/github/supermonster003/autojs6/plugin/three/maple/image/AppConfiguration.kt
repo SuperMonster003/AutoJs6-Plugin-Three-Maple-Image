@@ -285,6 +285,13 @@ abstract class ConfiguredActivity : AppCompatActivity() {
     /** True while a Compose dialog of this screen is open; host-driven recreation waits like it does for [presentedDialog]. */
     internal var composeDialogOpen: Boolean = false
 
+    /**
+     * Screens drawn on the dark image canvas (viewer, editor) configure transparent system bars with light icons
+     * themselves through `enableEdgeToEdge`; the palette based appearance below must not override that, or light
+     * mode would paint dark status bar icons over the dark scrim.
+     */
+    protected open val usesDarkSystemBars: Boolean = false
+
     override fun onDestroy() {
         presentedDialog = null
         super.onDestroy()
@@ -586,6 +593,7 @@ abstract class ConfiguredActivity : AppCompatActivity() {
 
     @Suppress("DEPRECATION")
     private fun applyWindowAppearance() {
+        if (usesDarkSystemBars) return
         window.statusBarColor = appPalette.windowBackground
         window.navigationBarColor = appPalette.windowBackground
         val lightStatusBackground = AppColorPolicy.luminance(appPalette.windowBackground) >= 0.179

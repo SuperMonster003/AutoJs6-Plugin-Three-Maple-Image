@@ -83,6 +83,8 @@ open class ImageEditorActivity : ConfiguredActivity() {
 
     internal open fun resolveRequest(): ImageToolsRequest? = ImageToolsRequestPolicy.resolve(this, intent, ImageToolsPlugin.EDIT_ACTION_ID)
 
+    override val usesDarkSystemBars: Boolean get() = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setResult(RESULT_CANCELED)
