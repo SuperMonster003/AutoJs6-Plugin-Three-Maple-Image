@@ -1,19 +1,9 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.os.Bundle
-import android.util.TypedValue
-import android.view.Gravity
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.ContentPadding
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.Ui
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.accentTone
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.buildScaffold
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.cardContainer
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.cardListParams
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.emptyStateView
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.roundedFill
+import androidx.activity.compose.setContent
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ReleaseHistoryScreen
 import java.util.Locale
 
 /** Maps the UI locale to the bundled changelog asset shipped for it. */
@@ -88,33 +78,17 @@ internal object ReleaseHistoryParser {
     }
 }
 
-/** Renders the bundled changelog for the current locale as one card per released version. */
+/** Renders the bundled changelog for the current locale as one group per released version. */
 internal class ReleaseHistoryActivity : ConfiguredActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val scaffold = buildScaffold(
-            R.string.standalone_release_history_title,
-            contentPadding = ContentPadding.SCREEN,
-        )
         val entries = loadReleaseHistory()?.let(ReleaseHistoryParser::parse).orEmpty()
-        if (entries.isEmpty()) {
-            scaffold.content.addView(
-                emptyStateView(
-                    getString(R.string.standalone_release_history_load_failed),
-                    iconResource = R.drawable.ic_warning_24,
-                ),
-                LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                ).apply { topMargin = uiDp(Ui.SECTION_GAP) },
-            )
-        } else {
-            entries.forEach { entry ->
-                scaffold.content.addView(versionCard(entry), cardListParams())
+        setContent {
+            MapleTheme(palette = appPalette) {
+                ReleaseHistoryScreen(entries = entries, onBack = ::finish)
             }
         }
-        setContentView(scaffold.root)
     }
 
     private fun loadReleaseHistory(): String? = runCatching {
@@ -123,74 +97,4 @@ internal class ReleaseHistoryActivity : ConfiguredActivity() {
             stream.readBytes().toString(Charsets.UTF_8)
         }
     }.getOrNull()
-
-    private fun versionCard(entry: ReleaseHistoryEntry): LinearLayout {
-        val card = cardContainer()
-        card.addView(
-            LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
-                addView(
-                    TextView(context).apply {
-                        text = entry.version
-                        setTextSize(TypedValue.COMPLEX_UNIT_SP, Ui.TEXT_TITLE)
-                        typeface = Ui.mediumTypeface
-                        setTextColor(appPalette.primaryText)
-                    },
-                    LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f),
-                )
-                if (entry.date != null) {
-                    addView(
-                        TextView(context).apply {
-                            text = entry.date
-                            setTextSize(TypedValue.COMPLEX_UNIT_SP, Ui.TEXT_CAPTION)
-                            setTextColor(appPalette.secondaryText)
-                        },
-                    )
-                }
-            },
-        )
-        entry.items.forEach { item ->
-            card.addView(
-                bulletRow(item),
-                LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                ).apply { topMargin = uiDp(Ui.SPACE_SM + 2) },
-            )
-        }
-        return card
-    }
-
-    private fun bulletRow(item: ReleaseHistoryItem): LinearLayout = LinearLayout(this).apply {
-        orientation = LinearLayout.HORIZONTAL
-        if (item.tag != null) {
-            addView(
-                TextView(context).apply {
-                    text = item.tag
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, Ui.TEXT_CAPTION)
-                    typeface = Ui.mediumTypeface
-                    setTextColor(appPalette.accent)
-                    background = roundedFill(accentTone(appPalette.accent), Ui.RADIUS_CONTROL)
-                    setPaddingRelative(uiDp(Ui.SPACE_SM), uiDp(2), uiDp(Ui.SPACE_SM), uiDp(2))
-                },
-                LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    marginEnd = uiDp(Ui.SPACE_SM)
-                    topMargin = uiDp(1)
-                },
-            )
-        }
-        addView(
-            TextView(context).apply {
-                text = item.text
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, Ui.TEXT_BODY)
-                setTextColor(appPalette.primaryText)
-                setLineSpacing(0f, Ui.LINE_SPACING_BODY)
-            },
-            LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f),
-        )
-    }
 }

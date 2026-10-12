@@ -282,6 +282,9 @@ abstract class ConfiguredActivity : AppCompatActivity() {
             field = value
         }
 
+    /** True while a Compose dialog of this screen is open; host-driven recreation waits like it does for [presentedDialog]. */
+    internal var composeDialogOpen: Boolean = false
+
     override fun onDestroy() {
         presentedDialog = null
         super.onDestroy()
@@ -374,7 +377,7 @@ abstract class ConfiguredActivity : AppCompatActivity() {
         if (recreationRequested || isFinishing || isDestroyed) return
         val localChanged = ApplicationSettingsStore(this).revision() != appliedSettingsRevision
         val hostChanged = currentHostAppearanceSignature() != appliedHostAppearanceSignature
-        if (localChanged || (hostChanged && !interactionStarted && presentedDialog?.isShowing != true)) {
+        if (localChanged || (hostChanged && !interactionStarted && presentedDialog?.isShowing != true && !composeDialogOpen)) {
             recreationRequested = true
             recreate()
         }

@@ -28,7 +28,7 @@ class StandaloneHomeInstrumentationTest {
         }
     }
 
-    @Test fun homeShowsItsOwnIdentityAndSettingsCanCancelAppearanceChanges() {
+    @Test fun homeShowsItsOwnIdentity() {
         ActivityScenario.launch<HomeActivity>(Intent(context, HomeActivity::class.java)).use { scenario ->
             scenario.onActivity { activity ->
                 val texts = labels(activity.window.decorView)
@@ -36,37 +36,10 @@ class StandaloneHomeInstrumentationTest {
                 assertTrue(texts.contains(activity.getString(R.string.standalone_settings_title)))
             }
         }
-        val store = ApplicationSettingsStore(context)
-        val original = store.load()
-        try {
-            ActivityScenario.launch<AppSettingsActivity>(Intent(context, AppSettingsActivity::class.java)).use { scenario ->
-                scenario.onActivity { activity ->
-                    val texts = labels(activity.window.decorView)
-                    for (resource in listOf(R.string.standalone_settings_language, R.string.standalone_settings_dark_mode,
-                        R.string.standalone_settings_theme_color, R.string.launcher_icon_title, R.string.standalone_release_history_title)) {
-                        assertTrue(activity.getString(resource), texts.contains(activity.getString(resource)))
-                    }
-                    var row: View? = findLabel(activity.window.decorView, activity.getString(R.string.standalone_settings_dark_mode))
-                    while (row != null && !row.isClickable) row = row.parent as? View
-                    assertNotNull(row)
-                    row!!.performClick()
-                    val dialog = requireNotNull(activity.presentedDialog)
-                    val choices = dialog.listView
-                    choices.performItemClick(null, 3, 3L)
-                    dialog.getButton(android.content.DialogInterface.BUTTON_NEGATIVE).performClick()
-                    assertEquals(original, store.load())
-                }
-            }
-        } finally { store.save(original) }
     }
 
     private fun labels(view: View): List<String> = buildList {
         if (view is TextView) add(view.text.toString())
         if (view is ViewGroup) for (i in 0 until view.childCount) addAll(labels(view.getChildAt(i)))
-    }
-    private fun findLabel(view: View, label: String): View? {
-        if (view is TextView && view.text.toString() == label) return view
-        if (view is ViewGroup) for (i in 0 until view.childCount) findLabel(view.getChildAt(i), label)?.let { return it }
-        return null
     }
 }

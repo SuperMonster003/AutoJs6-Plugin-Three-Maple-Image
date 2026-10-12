@@ -2,187 +2,171 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputType
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
-import android.text.style.RelativeSizeSpan
-import android.text.style.TypefaceSpan
-import android.widget.LinearLayout
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.SettingRow
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.hairline
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.inputDialog
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.materialDialog
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.sectionHeader
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.settingRow
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.singleChoiceDialog
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.switchRow
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.buildScaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleChoice
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleChoiceDialog
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleThemeColorDialog
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleThemeColorLabels
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SettingsScreen
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SettingsSummaries
 import java.util.Locale
 
 /**
- * Application settings: appearance (language, dark mode, theme color, each able to follow the
- * AutoJs6 host), conversion behavior, update checking, and entry points to the release history
- * and about screens.
+ * Application settings: appearance (language, dark mode, theme color, each able to follow the AutoJs6 host,
+ * plus the launcher icon) and entry points to the release history and about screens. Every dialog follows
+ * the "select, then confirm" rule; saving persists once and recreates the screen through [ConfiguredActivity].
  */
 internal class AppSettingsActivity : ConfiguredActivity() {
 
-    internal lateinit var launcherIconRow: SettingRow
-    internal var launcherIconDialog: androidx.appcompat.app.AlertDialog? = null
-        private set
+    private sealed interface SettingsDialog {
+        data object Language : SettingsDialog
+        data object DarkMode : SettingsDialog
+        data object ThemeColor : SettingsDialog
+        data object LauncherIcon : SettingsDialog
+    }
 
     private lateinit var settingsStore: ApplicationSettingsStore
     private lateinit var settings: ApplicationSettings
     private lateinit var hostResult: AutoJs6HostSettingsResult
+    private var dialog by mutableStateOf<SettingsDialog?>(null)
+    private var launcherIconSummary by mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settingsStore = ApplicationSettingsStore(applicationContext)
         settings = settingsStore.load()
         hostResult = AutoJs6HostSettingsClient.query(this)
-        val scaffold = buildScaffold(R.string.standalone_settings_title)
-        buildSettingsContent(scaffold.content)
-        applyThemeToControls(scaffold.content)
-        setContentView(scaffold.root)
-    }
-
-    private fun buildSettingsContent(content: LinearLayout) {
-        content.addView(sectionHeader(R.string.standalone_settings_section_appearance))
-        content.addView(
-            settingRow(
-                title = getString(R.string.standalone_settings_language),
-                summary = languageSummary(),
-                iconResource = R.drawable.ic_settings_language,
-                onClick = ::showLanguageDialog,
-            ).view,
-        )
-        content.addView(
-            settingRow(
-                title = getString(R.string.standalone_settings_dark_mode),
-                summary = darkModeSummary(),
-                iconResource = R.drawable.ic_settings_night,
-                onClick = ::showDarkModeDialog,
-            ).view,
-        )
-        content.addView(
-            settingRow(
-                title = getString(R.string.standalone_settings_theme_color),
-                summary = themeSummary(),
-                iconResource = R.drawable.ic_settings_theme,
-                onClick = ::showThemeColorDialog,
-            ).view,
-        )
-        launcherIconRow = settingRow(
-            title = getString(R.string.launcher_icon_title),
-            summary = getString(launcherIconLabels[LauncherIcons.current(this).ordinal]),
-            iconResource = R.drawable.ic_settings_launcher,
-            onClick = ::showLauncherIconDialog,
-        )
-        content.addView(launcherIconRow.view)
-        content.addView(hairline())
-
-        content.addView(sectionHeader(R.string.standalone_settings_section_information))
-        content.addView(settingRow(
-            title = getString(R.string.standalone_release_history_title),
-            summary = getString(R.string.standalone_update_release_history_summary),
-            iconResource = R.drawable.ic_article_24,
-            onClick = { startActivity(Intent(this, ReleaseHistoryActivity::class.java)) },
-        ).view)
-        content.addView(
-            settingRow(
-                title = getString(R.string.standalone_about_title),
-                summary = getString(R.string.standalone_about_app_summary),
-                iconResource = R.drawable.ic_info_24,
-                onClick = { startActivity(Intent(this, AboutActivity::class.java)) },
-            ).view,
-        )
-    }
-
-    // region Appearance dialogs
-
-    private fun showLauncherIconDialog() {
-        val modes = LauncherIconMode.entries
-        val labels: List<CharSequence> = modes.map { mode ->
-            val label = getString(launcherIconLabels[mode.ordinal])
-            val note = when (mode) {
-                LauncherIconMode.AUTO -> R.string.launcher_icon_auto_note
-                LauncherIconMode.TRANSPARENT -> R.string.launcher_icon_transparent_note
-                else -> null
-            }
-            if (note == null) label else SpannableString("$label\n${getString(note)}").apply {
-                setSpan(RelativeSizeSpan(14f / 16f), label.length + 1, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                setSpan(ForegroundColorSpan(appPalette.secondaryText), label.length + 1, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        launcherIconSummary = getString(launcherIconLabels[LauncherIcons.current(this).ordinal])
+        setContent {
+            MapleTheme(palette = appPalette) {
+                SettingsScreen(
+                    summaries = SettingsSummaries(
+                        language = languageSummary(),
+                        darkMode = darkModeSummary(),
+                        themeColor = themeSummary(),
+                        launcherIcon = launcherIconSummary,
+                    ),
+                    onBack = ::finish,
+                    onLanguage = { open(SettingsDialog.Language) },
+                    onDarkMode = { open(SettingsDialog.DarkMode) },
+                    onThemeColor = { open(SettingsDialog.ThemeColor) },
+                    onLauncherIcon = { open(SettingsDialog.LauncherIcon) },
+                    onReleaseHistory = { startActivity(Intent(this, ReleaseHistoryActivity::class.java)) },
+                    onAbout = { startActivity(Intent(this, AboutActivity::class.java)) },
+                )
+                Dialogs()
             }
         }
-        launcherIconDialog = singleChoiceDialog(
-            title = getString(R.string.launcher_icon_title),
-            labels = labels,
-            checkedIndex = modes.indexOf(LauncherIcons.current(this)),
-            confirmSelection = true,
-        ) { index ->
-            val succeeded = runCatching { LauncherIcons.select(this, modes[index]) }.isSuccess
-            launcherIconRow.summaryView.text = getString(launcherIconLabels[LauncherIcons.current(this).ordinal])
-            Toast.makeText(this, if (succeeded) R.string.launcher_icon_applied_note else R.string.launcher_icon_failed, Toast.LENGTH_LONG).show()
+    }
+
+    private fun open(target: SettingsDialog) {
+        // Re-read the host appearance so "follow AutoJs6" descriptions reflect the current host state.
+        if (target != SettingsDialog.LauncherIcon) hostResult = AutoJs6HostSettingsClient.query(this)
+        dialog = target
+        composeDialogOpen = true
+    }
+
+    private fun close() {
+        dialog = null
+        composeDialogOpen = false
+    }
+
+    @Composable
+    private fun Dialogs() {
+        when (dialog) {
+            null -> Unit
+            SettingsDialog.Language -> {
+                val values = AppLanguage.entries
+                MapleChoiceDialog(
+                    title = getString(R.string.standalone_settings_language),
+                    options = values.mapIndexed { index, language ->
+                        followAutoJs6Choice(getString(language.labelResource()), index == 0, quotedFollowSystemLabel())
+                    },
+                    selectedIndex = values.indexOf(settings.language),
+                    onDismissRequest = ::close,
+                    onConfirm = { index -> close(); saveSettings(settings.copy(language = values[index])) },
+                    confirmText = getString(R.string.dialog_button_confirm),
+                    dismissText = getString(R.string.dialog_button_cancel),
+                )
+            }
+            SettingsDialog.DarkMode -> {
+                val values = AppDarkMode.entries
+                MapleChoiceDialog(
+                    title = getString(R.string.standalone_settings_dark_mode),
+                    options = values.mapIndexed { index, mode ->
+                        followAutoJs6Choice(getString(mode.labelResource()), index == 0, quotedFollowSystemLabel())
+                    },
+                    selectedIndex = values.indexOf(settings.darkMode),
+                    onDismissRequest = ::close,
+                    onConfirm = { index -> close(); saveSettings(settings.copy(darkMode = values[index])) },
+                    confirmText = getString(R.string.dialog_button_confirm),
+                    dismissText = getString(R.string.dialog_button_cancel),
+                )
+            }
+            SettingsDialog.ThemeColor -> MapleThemeColorDialog(
+                currentColor = if (settings.themeSelection == AppThemeSelection.FOLLOW_AUTOJS6) null else settings.customThemeColor,
+                hostColor = followedThemeColor(),
+                labels = MapleThemeColorLabels(
+                    title = getString(R.string.standalone_settings_theme_color),
+                    followHost = getString(R.string.standalone_follow_autojs6),
+                    presets = getString(R.string.theme_picker_presets),
+                    custom = getString(R.string.theme_picker_custom),
+                    input = getString(R.string.theme_picker_input),
+                    invalid = getString(R.string.theme_picker_invalid),
+                    preview = getString(R.string.theme_picker_preview),
+                    confirm = getString(R.string.dialog_button_confirm),
+                    dismiss = getString(R.string.dialog_button_cancel),
+                ),
+                onDismissRequest = ::close,
+                onConfirm = { color ->
+                    close()
+                    saveSettings(
+                        if (color == null) settings.copy(themeSelection = AppThemeSelection.FOLLOW_AUTOJS6)
+                        else settings.copy(themeSelection = AppThemeSelection.CUSTOM, customThemeColor = color),
+                    )
+                },
+            )
+            SettingsDialog.LauncherIcon -> {
+                val modes = LauncherIconMode.entries
+                MapleChoiceDialog(
+                    title = getString(R.string.launcher_icon_title),
+                    options = modes.map { mode ->
+                        MapleChoice(
+                            label = getString(launcherIconLabels[mode.ordinal]),
+                            description = when (mode) {
+                                LauncherIconMode.AUTO -> getString(R.string.launcher_icon_auto_note)
+                                LauncherIconMode.TRANSPARENT -> getString(R.string.launcher_icon_transparent_note)
+                                else -> null
+                            },
+                        )
+                    },
+                    selectedIndex = modes.indexOf(LauncherIcons.current(this)),
+                    onDismissRequest = ::close,
+                    onConfirm = { index ->
+                        close()
+                        val succeeded = runCatching { LauncherIcons.select(this, modes[index]) }.isSuccess
+                        launcherIconSummary = getString(launcherIconLabels[LauncherIcons.current(this).ordinal])
+                        Toast.makeText(this, if (succeeded) R.string.launcher_icon_applied_note else R.string.launcher_icon_failed, Toast.LENGTH_LONG).show()
+                    },
+                    confirmText = getString(R.string.dialog_button_confirm),
+                    dismissText = getString(R.string.dialog_button_cancel),
+                )
+            }
         }
-        // The checked dark row must not scroll the first choice out of view.
-        launcherIconDialog?.listView?.post { launcherIconDialog?.listView?.setSelection(0) }
     }
 
     internal companion object {
         val launcherIconLabels = listOf(R.string.launcher_icon_light, R.string.launcher_icon_dark, R.string.launcher_icon_auto, R.string.launcher_icon_transparent)
     }
 
-    private fun showLanguageDialog() {
-        hostResult = AutoJs6HostSettingsClient.query(this)
-        val values = AppLanguage.entries
-        val labels: List<CharSequence> = values.mapIndexed { index, language ->
-            val label = getString(language.labelResource())
-            if (index == 0) followAutoJs6ChoiceLabel(label, quotedFollowSystemLabel()) else label
-        }
-        singleChoiceDialog(
-            title = getString(R.string.standalone_settings_language),
-            labels = labels,
-            checkedIndex = values.indexOf(settings.language),
-            confirmSelection = true,
-        ) { index -> saveSettings(settings.copy(language = values[index])) }
-    }
-
-    private fun showDarkModeDialog() {
-        hostResult = AutoJs6HostSettingsClient.query(this)
-        val values = AppDarkMode.entries
-        val labels: List<CharSequence> = values.mapIndexed { index, mode ->
-            val label = getString(mode.labelResource())
-            if (index == 0) followAutoJs6ChoiceLabel(label, quotedFollowSystemLabel()) else label
-        }
-        singleChoiceDialog(
-            title = getString(R.string.standalone_settings_dark_mode),
-            labels = labels,
-            checkedIndex = values.indexOf(settings.darkMode),
-            confirmSelection = true,
-        ) { index -> saveSettings(settings.copy(darkMode = values[index])) }
-    }
-
-    private fun showThemeColorDialog() {
-        hostResult = AutoJs6HostSettingsClient.query(this)
-        presentedDialog = ThemeColorChooser.show(
-            this,
-            if (settings.themeSelection == AppThemeSelection.FOLLOW_AUTOJS6) null else settings.customThemeColor,
-            followedThemeColor(),
-            ThemeColorChooser.Palette(appPalette.accent, appPalette.surface, appPalette.primaryText, appPalette.secondaryText, appPalette.outline),
-            ThemeColorChooser.Labels(getString(R.string.standalone_settings_theme_color), getString(R.string.standalone_follow_autojs6),
-                getString(R.string.theme_picker_presets), getString(R.string.theme_picker_custom), getString(R.string.theme_picker_input),
-                getString(R.string.theme_picker_invalid), getString(R.string.theme_picker_preview)),
-        ) { color ->
-            saveSettings(if (color == null) settings.copy(themeSelection = AppThemeSelection.FOLLOW_AUTOJS6)
-                else settings.copy(themeSelection = AppThemeSelection.CUSTOM, customThemeColor = color))
-        }
-    }
-
-    // endregion
-
-    // region Summaries and labels
+    // region Saving
 
     private fun saveSettings(updated: ApplicationSettings) {
         if (updated == settings) return
@@ -192,6 +176,10 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         recreate()
     }
 
+    // endregion
+
+    // region Summaries and labels
+
     private fun languageSummary(): String = when (settings.language) {
         AppLanguage.FOLLOW_AUTOJS6 -> followAutoJs6Summary(resolvedHostLanguageLabel())
         else -> getString(settings.language.labelResource())
@@ -199,18 +187,13 @@ internal class AppSettingsActivity : ConfiguredActivity() {
 
     private fun darkModeSummary(): String = when (settings.darkMode) {
         AppDarkMode.FOLLOW_AUTOJS6 -> followAutoJs6Summary(
-            getString(
-                hostResult.snapshot?.darkModePolicy?.labelResource()
-                    ?: R.string.standalone_follow_system,
-            ),
+            getString(hostResult.snapshot?.darkModePolicy?.labelResource() ?: R.string.standalone_follow_system),
         )
         else -> getString(settings.darkMode.labelResource())
     }
 
     private fun themeSummary(): String = when (settings.themeSelection) {
-        AppThemeSelection.FOLLOW_AUTOJS6 -> followAutoJs6Summary(
-            AppSettingsPolicy.colorHex(followedThemeColor()),
-        )
+        AppThemeSelection.FOLLOW_AUTOJS6 -> followAutoJs6Summary(AppSettingsPolicy.colorHex(followedThemeColor()))
         AppThemeSelection.CUSTOM -> AppSettingsPolicy.colorHex(settings.customThemeColor)
     }
 
@@ -232,33 +215,13 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         "\"${getString(R.string.standalone_follow_system)}\""
 
     /**
-     * Label for the "follow AutoJs6" choice. When the host is not usable, a smaller secondary
-     * line explains which fallback value would apply, instead of hiding or disabling the choice.
+     * The "follow AutoJs6" choice stays selectable even when the host is not usable; a smaller secondary line
+     * then explains which fallback value applies instead of hiding or disabling the choice.
      */
-    private fun followAutoJs6ChoiceLabel(title: String, fallbackValue: String): CharSequence {
-        if (hostResult.selectable) return title
-        val subtitle = getString(R.string.standalone_follow_autojs6_fallback_subtitle, fallbackValue)
-        return SpannableString("$title\n$subtitle").apply {
-            val start = title.length + 1
-            setSpan(
-                ForegroundColorSpan(appPalette.secondaryText),
-                start,
-                length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-            setSpan(RelativeSizeSpan(14f / 16f), start, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            setSpan(
-                TypefaceSpan("sans-serif-light"),
-                start,
-                length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-        }
+    private fun followAutoJs6Choice(title: String, isFollowChoice: Boolean, fallbackValue: String): MapleChoice {
+        if (!isFollowChoice || hostResult.selectable) return MapleChoice(title)
+        return MapleChoice(title, getString(R.string.standalone_follow_autojs6_fallback_subtitle, fallbackValue))
     }
-
-    private fun installedVersionName(): String = runCatching {
-        packageManager.getPackageInfo(packageName, 0).versionName
-    }.getOrNull().orEmpty()
 
     @StringRes
     private fun AppDarkMode.labelResource(): Int = when (this) {
