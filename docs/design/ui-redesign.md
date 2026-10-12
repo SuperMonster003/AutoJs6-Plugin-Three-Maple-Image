@@ -716,7 +716,7 @@ Simple Gallery 的 "高级编辑器" (第三方 SDK 界面, 仅作形态参考):
 | `AppConfiguration.applyThemeToControls` 等 tint 工厂 | 仅保留给 `AndroidView` 嵌入组件 | 页面级控件由 `MapleTheme` 覆盖 |
 | `activity_image_viewer.xml` + `menu_image_viewer.xml` | `ViewerScreen` (Box: AndroidView + overlays) + `DropdownMenu` | `BottomSheetBehavior` -> `MapleSheet` |
 | `activity_image_editor.xml` + 4 个面板 + `image_editor_confirm_buttons.xml` + `menu_image_editor.xml` | `EditorScreen` (Column: TopBar + AndroidView + `MapleToolStrip` x 2 / `MapleParameterPanel`) | `EditorToolState` 驱动面板 |
-| `dialog_image_editor_save.xml`, `dialog_image_editor_text.xml` | `SaveDialog`, `TextDialog` (Compose) | `EditorSaveOptions`, `EditorTextStyleSettings` 不变 |
+| `dialog_image_editor_save.xml`, `dialog_image_editor_text.xml` | `EditorSaveDialog`, `EditorTextDialog`, `EditorColorDialog` (Compose, 草稿对象由 Activity 持有) | `EditorSaveOptions`, `EditorTextStyleSettings` 不变; 调色板替换而非叠加在文字对话框之上 |
 | `dialog_image_converter.xml` | `ConverterScreen` (Column: TopBar + 预览 + 表单 + 预估栏) | 由对话框改为整页, 字段逻辑不变 |
 | `activity_image_viewer.xml` 的 `zoom_indicator` / `animation_toggle` | `MapleZoomIndicator` / `MapleFab` | |
 | `styles.xml` `AppTheme.*`, `Theme.Standalone`, `Widget.App.BottomActionButton` | `MapleTheme`; Activity 主题只保留窗口级属性 (背景, 刘海模式, 透明入口) | 删除不再引用的 style |

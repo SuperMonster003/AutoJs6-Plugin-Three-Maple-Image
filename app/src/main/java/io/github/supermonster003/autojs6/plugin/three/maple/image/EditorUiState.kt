@@ -1,5 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorGroup
+
 internal enum class EditorToolState {
     NORMAL,
     ADJUSTMENT,
@@ -78,6 +80,7 @@ internal data class EditorUiState(
     val mosaicStrengthProgress: Int = 8,
     val cropAspectRatioPreset: CropAspectRatioPreset = CropAspectRatioPreset.FREE,
     val canvasState: ImageEditingView.CanvasState = ImageEditingView.CanvasState.Normal,
+    val group: EditorGroup = EditorGroup.TRANSFORM,
     val textStyleSettings: EditorTextStyleSettings = EditorTextStyleSettings(),
     val textDialogDraft: EditorTextDialogDraft? = null,
     val saveOptions: EditorSaveOptions = EditorSaveOptions(),

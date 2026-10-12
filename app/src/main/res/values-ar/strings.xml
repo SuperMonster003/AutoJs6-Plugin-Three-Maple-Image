@@ -65,6 +65,9 @@
     <string name="image_editor_crop_ratio_original">الأصلية</string>
     <string name="image_editor_flip_horizontal">قلب أفقي</string>
     <string name="image_editor_flip_vertical">قلب رأسي</string>
+    <string name="image_editor_group_adjust">ضبط</string>
+    <string name="image_editor_group_draw">رسم</string>
+    <string name="image_editor_group_transform">تحويل</string>
     <string name="image_editor_history_unavailable">سجل التعديل غير متاح مؤقتًا</string>
     <string name="image_editor_mosaic_strength">قوة الفسيفساء</string>
     <string name="image_editor_mosaic_strength_value">%1$d</string>
@@ -82,7 +85,7 @@
     <string name="image_editor_text_outline">حدّ خارجي</string>
     <string name="image_editor_text_position_help">اسحب النص لاختيار موضعه</string>
     <string name="image_editor_text_shadow">ظل</string>
-    <string name="image_editor_text_size_percent">حجم النص: %1$d%%</string>
+    <string name="image_editor_text_size_percent">%1$d%%</string>
     <string name="image_tools_plugin_description">تحرير الصور وتحويل تنسيقاتها</string>
     <string name="label_details">التفاصيل</string>
     <string name="label_open_with">فتح باستخدام</string>

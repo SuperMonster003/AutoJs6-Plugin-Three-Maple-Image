@@ -65,6 +65,9 @@
     <string name="image_editor_crop_ratio_original">原圖</string>
     <string name="image_editor_flip_horizontal">水平翻轉</string>
     <string name="image_editor_flip_vertical">垂直翻轉</string>
+    <string name="image_editor_group_adjust">調整</string>
+    <string name="image_editor_group_draw">繪製</string>
+    <string name="image_editor_group_transform">變換</string>
     <string name="image_editor_history_unavailable">編輯歷史暫時無法使用</string>
     <string name="image_editor_mosaic_strength">馬賽克強度</string>
     <string name="image_editor_mosaic_strength_value">%1$d</string>
@@ -82,7 +85,7 @@
     <string name="image_editor_text_outline">描邊</string>
     <string name="image_editor_text_position_help">拖動文字以選擇位置</string>
     <string name="image_editor_text_shadow">陰影</string>
-    <string name="image_editor_text_size_percent">文字大小: %1$d%%</string>
+    <string name="image_editor_text_size_percent">%1$d%%</string>
     <string name="image_tools_plugin_description">編輯圖像並轉換圖像格式</string>
     <string name="label_details">詳情</string>
     <string name="label_open_with">其他應用</string>

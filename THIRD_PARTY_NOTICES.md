@@ -5,6 +5,7 @@
 - Image loading: [Glide](https://github.com/bumptech/glide), at the version pinned in `gradle/libs.versions.toml`. Retain its upstream license notices and bundled component licenses.
 - Android UI, lifecycle and EXIF handling: [AndroidX](https://android.googlesource.com/platform/frameworks/support/) and [Material Components](https://github.com/material-components/material-components-android), under their respective Apache-2.0 notices.
 - Compose user interface: [Jetpack Compose](https://developer.android.com/jetpack/compose) (AndroidX, Apache-2.0) at the BOM version pinned in `gradle/libs.versions.toml`. Its `ui-graphics` artifact depends on `androidx.graphics:graphics-path`, whose `libandroidx.graphics.path.so` is the only native library in the APK (Apache-2.0).
+- Icons: the vector drawables under `app/src/main/res/drawable` are [Material Design Icons](https://github.com/google/material-design-icons) (Google, Apache-2.0), recolored through theme tints and otherwise unchanged.
 - Compose image loading: the [Glide Compose integration](https://github.com/bumptech/glide/tree/master/integration/compose), under Glide's BSD-2-Clause / Apache-2.0 notices, at the version pinned in `gradle/libs.versions.toml`.
 - App appearance and optical icon geometry reuse the maintainer's existing AutoJs6 plugin implementations. The maple artwork was supplied by the maintainer; the original light/dark files are preserved in `.python/icons/`.
 

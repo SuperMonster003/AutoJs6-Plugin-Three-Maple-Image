@@ -65,6 +65,9 @@
     <string name="image_editor_crop_ratio_original">Исходное</string>
     <string name="image_editor_flip_horizontal">Отразить по горизонтали</string>
     <string name="image_editor_flip_vertical">Отразить по вертикали</string>
+    <string name="image_editor_group_adjust">Коррекция</string>
+    <string name="image_editor_group_draw">Рисование</string>
+    <string name="image_editor_group_transform">Преобразование</string>
     <string name="image_editor_history_unavailable">История редактирования временно недоступна</string>
     <string name="image_editor_mosaic_strength">Интенсивность мозаики</string>
     <string name="image_editor_mosaic_strength_value">%1$d</string>
@@ -82,7 +85,7 @@
     <string name="image_editor_text_outline">Обводка</string>
     <string name="image_editor_text_position_help">Перетащите текст, чтобы выбрать его положение</string>
     <string name="image_editor_text_shadow">Тень</string>
-    <string name="image_editor_text_size_percent">Размер текста: %1$d%%</string>
+    <string name="image_editor_text_size_percent">%1$d%%</string>
     <string name="image_tools_plugin_description">Редактирование изображений и преобразование форматов</string>
     <string name="label_details">Сведения</string>
     <string name="label_open_with">Открыть в</string>

@@ -65,6 +65,9 @@
     <string name="image_editor_crop_ratio_original">Original</string>
     <string name="image_editor_flip_horizontal">Voltear horizontalmente</string>
     <string name="image_editor_flip_vertical">Voltear verticalmente</string>
+    <string name="image_editor_group_adjust">Ajustar</string>
+    <string name="image_editor_group_draw">Dibujar</string>
+    <string name="image_editor_group_transform">Transformar</string>
     <string name="image_editor_history_unavailable">El historial de edición no está disponible temporalmente</string>
     <string name="image_editor_mosaic_strength">Intensidad del mosaico</string>
     <string name="image_editor_mosaic_strength_value">%1$d</string>
@@ -82,7 +85,7 @@
     <string name="image_editor_text_outline">Contorno</string>
     <string name="image_editor_text_position_help">Arrastra el texto para elegir su posición</string>
     <string name="image_editor_text_shadow">Sombra</string>
-    <string name="image_editor_text_size_percent">Tamaño del texto: %1$d%%</string>
+    <string name="image_editor_text_size_percent">%1$d%%</string>
     <string name="image_tools_plugin_description">Edita imágenes y convierte sus formatos</string>
     <string name="label_details">Detalles</string>
     <string name="label_open_with">Abrir con</string>

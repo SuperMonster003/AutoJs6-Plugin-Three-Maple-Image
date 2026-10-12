@@ -65,6 +65,9 @@
     <string name="image_editor_crop_ratio_original">Original</string>
     <string name="image_editor_flip_horizontal">Retourner horizontalement</string>
     <string name="image_editor_flip_vertical">Retourner verticalement</string>
+    <string name="image_editor_group_adjust">Ajuster</string>
+    <string name="image_editor_group_draw">Dessiner</string>
+    <string name="image_editor_group_transform">Transformer</string>
     <string name="image_editor_history_unavailable">L\'historique des modifications est temporairement indisponible</string>
     <string name="image_editor_mosaic_strength">Intensité de la mosaïque</string>
     <string name="image_editor_mosaic_strength_value">%1$d</string>
@@ -82,7 +85,7 @@
     <string name="image_editor_text_outline">Contour</string>
     <string name="image_editor_text_position_help">Faites glisser le texte pour choisir sa position</string>
     <string name="image_editor_text_shadow">Ombre</string>
-    <string name="image_editor_text_size_percent">Taille du texte: %1$d%%</string>
+    <string name="image_editor_text_size_percent">%1$d%%</string>
     <string name="image_tools_plugin_description">Modifie les images et convertit leurs formats</string>
     <string name="label_details">Détails</string>
     <string name="label_open_with">Ouvrir avec</string>
