@@ -21,7 +21,7 @@
     <string name="dialog_button_discard_changes">Descartar</string>
     <string name="dialog_button_save_closest">Guardar el más cercano</string>
     <string name="dialog_title_color_palette">Paleta de colores</string>
-    <string name="edit_exit_without_save_warn">El contenido no se ha guardado, ¿está seguro de salir?</string>
+    <string name="edit_exit_without_save_warn">El contenido no se ha guardado, está seguro de salir?</string>
     <string name="error_cannot_prepare_print">No se pudo preparar la imagen para imprimirla</string>
     <string name="error_cannot_read_image">No se pudo mostrar la imagen</string>
     <string name="error_failed_to_save">Error al guardar</string>
@@ -186,8 +186,8 @@
     <string name="text_image_conversion_quality">Calidad</string>
     <string name="text_image_conversion_resize">Cambiar tamaño</string>
     <string name="text_image_conversion_target_file_size">Tamaño de archivo objetivo</string>
-    <string name="text_image_conversion_target_file_size_above_maximum">La calidad máxima %1$s produce %2$s, por debajo del objetivo de %3$s. ¿Guardar este resultado más cercano?</string>
-    <string name="text_image_conversion_target_file_size_below_minimum">Incluso la calidad mínima %1$s produce %2$s, por encima del objetivo de %3$s. ¿Guardar este resultado más cercano?</string>
+    <string name="text_image_conversion_target_file_size_above_maximum">La calidad máxima %1$s produce %2$s, por debajo del objetivo de %3$s. Guardar este resultado más cercano?</string>
+    <string name="text_image_conversion_target_file_size_below_minimum">Incluso la calidad mínima %1$s produce %2$s, por encima del objetivo de %3$s. Guardar este resultado más cercano?</string>
     <string name="text_image_conversion_target_file_size_helper">La calidad se elegirá automáticamente</string>
     <string name="text_image_conversion_target_file_size_hint">Tamaño objetivo</string>
     <string name="text_image_conversion_target_file_size_saved">Se guardó %1$s con calidad %2$s para el objetivo de %3$s</string>
