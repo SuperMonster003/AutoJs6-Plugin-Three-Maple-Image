@@ -1,5 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 
+import android.text.TextUtils
+import android.view.View
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
@@ -11,8 +13,11 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
 import io.github.supermonster003.autojs6.plugin.three.maple.image.AppThemePalette
 
@@ -54,9 +59,17 @@ internal fun MapleTheme(palette: AppThemePalette, content: @Composable () -> Uni
     val roles = remember(palette) { MapleColorRoles.from(palette) }
     val colorScheme = remember(roles) { roles.toColorScheme() }
     val canvas = remember(roles) { roles.toCanvasTokens() }
+    // Derive the direction from the resolved locale rather than the host View: an Activity recreated after an
+    // in-app language change keeps the old View direction while its resources already speak the new language.
+    val configuration = LocalConfiguration.current
+    val layoutDirection = remember(configuration) {
+        val locale = configuration.locales[0]
+        if (TextUtils.getLayoutDirectionFromLocale(locale) == View.LAYOUT_DIRECTION_RTL) LayoutDirection.Rtl else LayoutDirection.Ltr
+    }
     CompositionLocalProvider(
         LocalAppThemePalette provides palette,
         LocalMapleCanvasTokens provides canvas,
+        LocalLayoutDirection provides layoutDirection,
     ) {
         MaterialTheme(colorScheme = colorScheme, typography = MapleTypography, content = content)
     }
