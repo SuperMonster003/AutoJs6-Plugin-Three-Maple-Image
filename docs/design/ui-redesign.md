@@ -97,6 +97,7 @@ Simple Gallery 的 "高级编辑器" (第三方 SDK 界面, 仅作形态参考):
 | Compose 接入后 debug APK 体积 (未收缩) | 17,436,682 B (含 Coil 与 glide-compose 两个候选) / 16,915,485 B (定稿 Glide 后) | `assembleDebug`, 2026-10-13 |
 | Compose 接入后 release APK 体积 (尚无 Compose 页面) | 2,397,161 B (+212,906 B, 来自 Glide 5.0.9, activity-compose 与四个 ABI 的 graphics-path 库; 未引用的 Compose 代码已被 R8 移除) | `assembleRelease`, 2026-10-13; 第一个 Compose 页面迁移后再记录一次 |
 | Compose 接入后冷启动 (尚无 Compose 页面) | 首页 362 / 142 / 157 / 145 / 173 ms, 中位数 157 ms (基线 144 ms 的 109%); 查看器 116 ms (基线 124 ms) | release 构建, 同设备同方法, 2026-10-13; 第一个 Compose 页面迁移后再记录一次, 2.1.0 验收线为 2.0.1 的 110% (ROADMAP 5.3) |
+| 2.1.0 release APK 体积 (五类页面全部 Compose) | 3,344,935 B (+947,774 B 对 2.0.1 的 2,397,161 B; 其中 `assets/dexopt/baseline.prof` 9,850 B) | `assembleRelease`, 2026-10-13, 含 `app/src/main/baseline-prof.txt` |
 
 `am start -W` 的 TotalTime 只计到首帧, 不含图像解码; 数值仅用于同设备前后对比.
 
@@ -116,6 +117,20 @@ Simple Gallery 的 "高级编辑器" (第三方 SDK 界面, 仅作形态参考):
 | Java Heap | 16 MB | 15 MB | 143 MB | 120 MB |
 
 结论: 首帧与掉帧两者在同一水平 (差异小于轮间波动); 内存行为差异明显: Coil 默认使用硬件位图, 图形内存在 189-498 MB 之间波动且不受 Java 堆上限约束, 在 G8441 这类低内存设备上风险更高; Glide 的位图位于按内存等级限定的 Java 堆 LruCache, PSS 稳定在 340-360 MB. 加上 Glide 已承担查看器的 EXIF 规范化, HEIC/AVIF 探针与分块渲染, 以及 MediaStore 缩略图加载器, 最终选择 Glide 单库 (`glide-compose` 1.0.0-beta10, Glide 5.0.5 -> 5.0.9). 代价: 集成库仍为 beta, Glide 升级后需复跑 EXIF 方向与现代格式 instrumentation (ROADMAP 5.3). Coil 不再引入.
+
+### 3.5 性能复测 (2.1.0 对 2.0.1, 2026-10-13)
+
+方法: 2.0.1 基线由提交 `0b696fe` (Compose 之前的最后一个提交) 在本机构建 release 包, 与 2.1.0 release 包在同一设备上交替测量. 冷启动 = `am force-stop` 后 `am start -W` 的 TotalTime (首帧); 编辑器 = 首页 -> "编辑图像" -> 系统选择器选中 20 MP (5000 x 4000) JPEG 后 logcat `Displayed ...ImageEditorActivity` 的首帧耗时 (不含解码). "首次安装" 为刚安装未经 dexopt 的状态; "编译后" 为启动一次让 `profileinstaller` 写入 profile, 再 `cmd package compile -m speed-profile -f` (等价于后台 dexopt 之后的日常状态). 取中位数, 括号内为样本数.
+
+| 设备 | 状态 | 首页冷启动 2.0.1 -> 2.1.0 | 查看器直开 2.0.1 -> 2.1.0 | 编辑器首帧 2.0.1 -> 2.1.0 |
+| --- | --- | --- | --- | --- |
+| G8441 (Sony XZ1 Compact, API 28) | 首次安装 | 270 -> 398 ms (147%, 10 次) | 158 -> 178 ms (113%, 5 次) | 150 -> 259 ms (173%, 5 次) |
+| G8441 | 编译后 | 212 -> 245 ms (115%, 10 次); 另一组 5 次为 226 -> 242 ms (107%) | 164 -> 163 ms (99%, 5 次) | 139 -> 101 ms (73%, 5 次) |
+| G8441 | 编译后, 仅库自带 profile (无 `baseline-prof.txt`) | 226 -> 291 ms (129%, 5 次) | 156 -> 160 ms (103%) | 139 -> 126 ms (91%) |
+| 23046RP50C (Xiaomi Pad, API 35) | 首次安装 | 217 -> 228 ms (105%, 5 次) | 136 -> 137 ms (101%, 5 次) | 未测 (选择器标签差异) |
+| 23046RP50C | 编译后 | 182 -> 201 ms (110%, 10 次) | 128 -> 131 ms (102%, 5 次) | 101 -> 80 ms (79%, 5 次) |
+
+结论: 查看器与编辑器满足 ROADMAP 5.3 的 110% 验收线; 首页冷启动在 dexopt 之后处于 107-115% (API 28) 与 110% (API 35), 首次安装状态在 2017 年的 API 28 机型上明显更慢 (147%), 来源是 Compose 运行时首次加载; `baseline-prof.txt` (见 `docs/development/baseline-profile.md`) 把编译后的首页从 129% 压到 107-115%. 是否接受当前首页数据或另排一轮启动优化 (例如首页延后 `AutoJs6HostSettingsClient.refresh`, 减少首帧组件) 列为 ROADMAP 附录 C Q10.
 
 ### 3.3 观察到的可用性缺陷 (2.1.0 允许顺带修正)
 

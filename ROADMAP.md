@@ -140,7 +140,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 - [x] (测试) instrumentation 迁移: 所有基于 View id / `contentDescription` 的断言改为 Compose 语义 (`testTag` / `contentDescription`), 新增 `compose-ui-test` 依赖; 保留夹具 (`AnimatedGifTestFixture`, `ExifJpegTestFixture`, `LargePngTestFixture`, `ModernImageTestFixture`). 验收: API 28 / 31 / 33 / 35 四台真机完整 instrumentation 通过, CI API 35 通过. 证据 (2026-10-13): View id 断言已全部改为 Compose 语义 (`testTag` / 状态钩子), `compose-ui-test` 已接入, 夹具未动; 完整套件 75 个用例在四台真机通过: G8441 (Sony XZ1 Compact, API 28, 720x1280), XQ-AT72 (API 31), 22120RN86C (Redmi, API 33, 720x1650), 23046RP50C (Xiaomi Pad, API 35, 1800x2880); 小屏暴露的两处 "节点在折叠线以下" 断言改为先 `performScrollTo()`; OPD2413 (API 35) 因 adb 安装需在设备上手动确认而未跑; CI (API 35) 留待推送后核对.
 - [x] (测试) 视觉回归: 对首页, 设置页, 查看器, 编辑器, 转换器各采一组亮/暗/大字号/RTL 截图存 `.bak/visual/2.1.0/` (不入库), 人工核对设计文档线框. 验收: 文档记录核对日期与设备. 证据 (2026-10-13): QV710AF65F (Sony XQ-AT72, API 31) 共 25 张截图存 `.bak/visual/2.1.0/` (不入库): 暗色 + 130% 字号 10 张 (首页, 设置, 关于, 发行历史, 查看器, 编辑器与亮度面板, 文字对话框, 转换器与目标大小), 亮色 100% 9 张 (含主题色对话框, 画笔面板), 阿拉伯语 RTL 6 张 (设置, 首页, 转换器, 查看器, 编辑器与亮度面板); 对照设计稿 7.x 线框逐页核对, 结论: 130% 下两行摘要与底栏标签正常换行, 查看器元数据第二行按设计省略, 编辑器工具条可横向滚动; RTL 下顶栏 / 底栏 / 分段 / 滑条全部镜像. 发现并修复一处缺陷: 应用内切换语言后由 `recreate()` 重建的页面保持 LTR (全新启动的页面正常), `MapleTheme` 现按解析后的 locale 提供 `LocalLayoutDirection`; 核对记录见设计稿第 15 节. TalkBack 与键盘可达留人工核对.
-- [ ] (测试) 性能基线: 冷启动 (首页 / 查看器直开) 与编辑器打开 20 MP 图的耗时在 API 28 与 35 设备各测 5 次取中位数, 不劣于 2.0.1 的 110%. 验收: 数据写入 `docs/design/ui-redesign.md`.
+- [ ] (测试) 性能基线: 冷启动 (首页 / 查看器直开) 与编辑器打开 20 MP 图的耗时在 API 28 与 35 设备各测 5 次取中位数, 不劣于 2.0.1 的 110%. 验收: 数据写入 `docs/design/ui-redesign.md`. 进度 (2026-10-13): 2.0.1 基线由 `0b696fe` 本机构建 release 包同机对比, 数据与方法在设计稿 3.5 节: 查看器 99-106%, 编辑器首帧 73-79%, 首页冷启动 dexopt 后 107-115% (G8441, API 28) 与 110% (23046RP50C, API 35), 首次安装状态 API 28 为 147%; 新增生成的 `app/src/main/baseline-prof.txt` (`.python/baseline_profile.py`, `docs/development/baseline-profile.md`) 把 API 28 编译后首页从 129% 压到 107-115%. 首页是否按当前数据验收或另排启动优化, 见附录 C Q10; 拍板前不勾选.
 
 ### 5.4 发布
 
@@ -418,6 +418,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 | Q7 | 覆盖选项是否记忆 (T11) | 进入 M4.2 前 | 不记忆 |
 | Q8 | 自建回收站 (API 24-29) 的容量上限与清理策略细节 | 进入 M3.2 前 | 可用空间的 10% 且不超过 2 GiB, 启动时与删除前清理 |
 | Q9 | `gallery.pick` 在部分访问 (Android 14+) 状态下是否自动弹出系统 "管理所选照片" | 进入 M6 前 | 不自动弹, 返回 `PERMISSION_REQUIRED` 并附设置入口 |
+| Q10 | 2.1.0 首页冷启动在 dexopt 后为 2.0.1 的 107-115% (API 28) / 110% (API 35), 首次安装状态 API 28 为 147% (设计稿 3.5 节): 按现状发布, 还是在 5.4 前再排一轮启动优化 (延后宿主设置查询, 精简首帧组件, 启动 profile 的 dex 布局优化) | 进入 5.4 前 | 按现状发布 2.1.0, 启动优化列入 M2 (相册首页本就要重做) |
 
 ---
 
