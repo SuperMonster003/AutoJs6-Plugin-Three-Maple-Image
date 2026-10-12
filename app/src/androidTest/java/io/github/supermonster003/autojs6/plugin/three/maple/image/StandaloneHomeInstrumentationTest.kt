@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
@@ -38,8 +39,8 @@ class StandaloneHomeInstrumentationTest {
         compose.onNodeWithText(context.getString(R.string.app_name)).assertIsDisplayed()
         compose.onNodeWithText(context.getString(R.string.plugin_description)).assertIsDisplayed()
         for (tag in listOf("maple.home.view", "maple.home.edit", "maple.home.convert", "maple.home.settings", "maple.home.openHost")) {
-            compose.onNodeWithTag(tag).assertIsDisplayed().assertIsEnabled()
+            compose.onNodeWithTag(tag).performScrollTo().assertIsDisplayed().assertIsEnabled()
         }
-        compose.onNodeWithText(context.getString(R.string.standalone_settings_title)).assertIsDisplayed()
+        compose.onNodeWithText(context.getString(R.string.standalone_settings_title)).performScrollTo().assertIsDisplayed()
     }
 }

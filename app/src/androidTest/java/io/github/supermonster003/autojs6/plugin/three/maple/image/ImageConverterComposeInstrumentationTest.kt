@@ -13,6 +13,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.core.content.FileProvider
@@ -67,25 +68,25 @@ class ImageConverterComposeInstrumentationTest {
             compose.onNodeWithTag("maple.converter.resolution")
                 .assertTextEquals(context.getString(R.string.text_image_conversion_output_resolution, 400, 300))
             compose.onNodeWithTag("maple.converter.percentage").assertDoesNotExist()
-            compose.onNodeWithTag("maple.converter.resize.1").performClick()
-            compose.onNodeWithTag("maple.converter.percentage").assertIsDisplayed()
+            compose.onNodeWithTag("maple.converter.resize.1").performScrollTo().performClick()
+            compose.onNodeWithTag("maple.converter.percentage").performScrollTo().assertIsDisplayed()
             compose.onNodeWithTag("maple.converter.longEdge").assertDoesNotExist()
-            compose.onNodeWithTag("maple.converter.percentage").performTextClearance()
-            compose.onNodeWithTag("maple.converter.percentage").performTextInput("50")
+            compose.onNodeWithTag("maple.converter.percentage").performScrollTo().performTextClearance()
+            compose.onNodeWithTag("maple.converter.percentage").performScrollTo().performTextInput("50")
             compose.onNodeWithTag("maple.converter.resolution")
                 .assertTextEquals(context.getString(R.string.text_image_conversion_output_resolution, 200, 150))
             compose.onNodeWithTag("maple.converter.convert").assertIsEnabled()
-            compose.onNodeWithTag("maple.converter.percentage").performTextClearance()
-            compose.onNodeWithTag("maple.converter.percentage").performTextInput("0")
+            compose.onNodeWithTag("maple.converter.percentage").performScrollTo().performTextClearance()
+            compose.onNodeWithTag("maple.converter.percentage").performScrollTo().performTextInput("0")
             compose.onNodeWithTag("maple.converter.convert").assertIsNotEnabled()
             compose.onNodeWithTag("maple.converter.resolution")
                 .assertTextEquals(context.getString(R.string.text_image_conversion_output_resolution_unavailable))
-            compose.onNodeWithTag("maple.converter.resize.3").performClick()
-            compose.onNodeWithTag("maple.converter.width").assertIsDisplayed()
-            compose.onNodeWithTag("maple.converter.height").assertIsDisplayed()
-            compose.onNodeWithTag("maple.converter.lockAspect").performClick()
-            compose.onNodeWithTag("maple.converter.width").performTextClearance()
-            compose.onNodeWithTag("maple.converter.width").performTextInput("200")
+            compose.onNodeWithTag("maple.converter.resize.3").performScrollTo().performClick()
+            compose.onNodeWithTag("maple.converter.width").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithTag("maple.converter.height").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithTag("maple.converter.lockAspect").performScrollTo().performClick()
+            compose.onNodeWithTag("maple.converter.width").performScrollTo().performTextClearance()
+            compose.onNodeWithTag("maple.converter.width").performScrollTo().performTextInput("200")
             compose.onNodeWithTag("maple.converter.resolution")
                 .assertTextEquals(context.getString(R.string.text_image_conversion_output_resolution, 200, 150))
             compose.onNodeWithTag("maple.converter.convert").assertIsEnabled()
@@ -94,23 +95,23 @@ class ImageConverterComposeInstrumentationTest {
 
     @Test fun formatDrivesQualityTargetSizeAndBackgroundControlsAndSurvivesRecreation() {
         launch().use { scenario ->
-            compose.onNodeWithTag("maple.converter.format.1").assertIsSelected()
+            compose.onNodeWithTag("maple.converter.format.1").performScrollTo().assertIsSelected()
             compose.onNodeWithTag("maple.converter.targetEnabled").assertDoesNotExist()
             compose.onNodeWithTag("maple.converter.background.0").assertDoesNotExist()
-            compose.onNodeWithTag("maple.converter.format.0").performClick()
-            compose.onNodeWithTag("maple.converter.background.0").assertIsSelected()
-            compose.onNodeWithTag("maple.converter.targetEnabled").performClick()
-            compose.onNodeWithTag("maple.converter.targetFileSize").assertIsDisplayed()
-            compose.onNodeWithTag("maple.converter.targetFileSize").performTextClearance()
-            compose.onNodeWithTag("maple.converter.targetFileSize").performTextInput("0")
+            compose.onNodeWithTag("maple.converter.format.0").performScrollTo().performClick()
+            compose.onNodeWithTag("maple.converter.background.0").performScrollTo().assertIsSelected()
+            compose.onNodeWithTag("maple.converter.targetEnabled").performScrollTo().performClick()
+            compose.onNodeWithTag("maple.converter.targetFileSize").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithTag("maple.converter.targetFileSize").performScrollTo().performTextClearance()
+            compose.onNodeWithTag("maple.converter.targetFileSize").performScrollTo().performTextInput("0")
             compose.onNodeWithTag("maple.converter.convert").assertIsNotEnabled()
-            compose.onNodeWithTag("maple.converter.targetFileSize").performTextClearance()
-            compose.onNodeWithTag("maple.converter.targetFileSize").performTextInput("64")
+            compose.onNodeWithTag("maple.converter.targetFileSize").performScrollTo().performTextClearance()
+            compose.onNodeWithTag("maple.converter.targetFileSize").performScrollTo().performTextInput("64")
             compose.onNodeWithTag("maple.converter.convert").assertIsEnabled()
             scenario.recreate()
             compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag("maple.converter.targetFileSize")).fetchSemanticsNodes().isNotEmpty() }
-            compose.onNodeWithTag("maple.converter.format.0").assertIsSelected()
-            compose.onNodeWithTag("maple.converter.targetFileSize").assert(hasText("64"))
+            compose.onNodeWithTag("maple.converter.format.0").performScrollTo().assertIsSelected()
+            compose.onNodeWithTag("maple.converter.targetFileSize").performScrollTo().assert(hasText("64"))
             scenario.onActivity { assertEquals(false, it.isFinishing) }
         }
     }
