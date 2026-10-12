@@ -15,6 +15,5 @@
     <color name="color_primary_dark">#A85A00</color>
     <color name="color_secondary">#0097A7</color>
     <color name="image_surface">#FF111111</color>
-    <color name="toolbar_text">#FFFFFFFF</color>
     <color name="window_background">#FFFFFFFF</color>
 </resources>

@@ -149,7 +149,7 @@ internal fun ViewerScreen(state: ViewerUiState, imageView: ZoomableImageView, ca
                         .testTag("maple.viewer.animation"),
                 ) {
                     Icon(
-                        painter = painterResource(if (paused) R.drawable.ic_play_arrow else R.drawable.ic_pause),
+                        painter = painterResource(if (paused) R.drawable.ic_play_arrow_24 else R.drawable.ic_pause_24),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onPrimary,
                     )
@@ -174,7 +174,7 @@ internal fun ViewerScreen(state: ViewerUiState, imageView: ZoomableImageView, ca
                         overlay = true,
                         actions = listOf(
                             MapleAction(
-                                icon = painterResource(R.drawable.ic_info_outline),
+                                icon = painterResource(R.drawable.ic_info_outline_24),
                                 label = stringResource(R.string.label_details),
                                 contentDescription = stringResource(
                                     if (state.detailsExpanded) R.string.action_hide_image_details else R.string.action_show_image_details,
@@ -184,7 +184,7 @@ internal fun ViewerScreen(state: ViewerUiState, imageView: ZoomableImageView, ca
                                 testTag = "maple.viewer.details",
                             ),
                             MapleAction(
-                                icon = painterResource(R.drawable.ic_rotate_right),
+                                icon = painterResource(R.drawable.ic_rotate_right_24),
                                 label = stringResource(R.string.label_rotate),
                                 contentDescription = stringResource(R.string.action_rotate_clockwise),
                                 onClick = callbacks.onRotate,
@@ -199,14 +199,14 @@ internal fun ViewerScreen(state: ViewerUiState, imageView: ZoomableImageView, ca
                                 testTag = "maple.viewer.edit",
                             ),
                             MapleAction(
-                                icon = painterResource(R.drawable.ic_share),
+                                icon = painterResource(R.drawable.ic_share_24),
                                 label = stringResource(R.string.action_share),
                                 enabled = state.canForward,
                                 onClick = callbacks.onShare,
                                 testTag = "maple.viewer.share",
                             ),
                             MapleAction(
-                                icon = painterResource(R.drawable.ic_open_in_new),
+                                icon = painterResource(R.drawable.ic_open_in_new_24),
                                 label = stringResource(R.string.label_open_with),
                                 contentDescription = stringResource(R.string.action_open_external),
                                 enabled = state.canForward,
@@ -255,7 +255,7 @@ private fun ViewerTopBar(state: ViewerUiState, callbacks: ViewerCallbacks) {
     MapleTopBar(
         title = state.title,
         subtitle = state.subtitle,
-        navigationIcon = painterResource(R.drawable.ic_arrow_back),
+        navigationIcon = painterResource(R.drawable.ic_arrow_back_24),
         navigationContentDescription = stringResource(R.string.action_back),
         onNavigationClick = callbacks.onBack,
         overlay = true,

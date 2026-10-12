@@ -269,7 +269,7 @@ Simple Gallery 的 "高级编辑器" (第三方 SDK 界面, 仅作形态参考):
 
 ### 5.6 图标
 
-- 全部 24 dp 线性风格 vector (Material Symbols Outlined, Apache-2.0), 线宽约 2 dp, 端点圆润; 浮层上白色, 页面上 `onSurfaceVariant`, 选中态主题色.
+- 全部 24 dp vector, 统一 `ic_<name>_24` 命名, 取自 Material Design Icons 填充风格 (Apache-2.0, 见 `THIRD_PARTY_NOTICES.md`); 2.1.0 实施时放弃了早先设想的描边风格, 因为编辑器与查看器的 30 余个图标都来自填充集, 混用两种线型不一致; 浮层上白色, 页面上 `onSurfaceVariant`, 选中态主题色.
 - 2.1.0 需要的新增 / 替换图标 (资源名按 `ic_<语义>_24` 命名): 保存 `ic_save_24`, 撤销 `ic_undo_24`, 重做 `ic_redo_24`, 裁剪 `ic_crop_24`, 左转 `ic_rotate_left_24`, 右转 `ic_rotate_right_24`, 微调 `ic_rotate_fine_24`, 水平翻转 `ic_flip_horizontal_24`, 垂直翻转 `ic_flip_vertical_24`, 亮度 `ic_brightness_24`, 对比度 `ic_contrast_24`, 饱和度 `ic_saturation_24`, 色温 `ic_temperature_24`, 画笔 `ic_brush_24`, 文字 `ic_text_24`, 调色盘 `ic_palette_24` (已有), 对比 `ic_compare_24`, 详情 `ic_info_24` (已有), 分享 `ic_share_24`, 其他应用 `ic_open_in_new_24` (已有), 打印 `ic_print_24`, 重置缩放 `ic_fit_screen_24`, 暂停 / 播放 `ic_pause_24` / `ic_play_24`, 转换 `ic_swap_horiz_24` (已有), 文件夹 `ic_folder_24`, 图片 `ic_image_24`.
 - 删除 `ic_save_white_48dp.png`, `ic_undo_white_48dp.png`, `ic_redo_white_24dp.xml`, `ic_arrow_back.xml` 与 `ic_arrow_back_24.xml` 二选一.
 

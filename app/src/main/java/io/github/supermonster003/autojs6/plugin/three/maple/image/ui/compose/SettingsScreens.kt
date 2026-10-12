@@ -56,28 +56,28 @@ internal fun SettingsScreen(
             MapleSettingsRow(
                 title = stringResource(R.string.standalone_settings_language),
                 summary = summaries.language,
-                iconResource = R.drawable.ic_settings_language,
+                iconResource = R.drawable.ic_language_24,
                 onClick = onLanguage,
                 modifier = Modifier.testTag("maple.settings.language"),
             )
             MapleSettingsRow(
                 title = stringResource(R.string.standalone_settings_dark_mode),
                 summary = summaries.darkMode,
-                iconResource = R.drawable.ic_settings_night,
+                iconResource = R.drawable.ic_dark_mode_24,
                 onClick = onDarkMode,
                 modifier = Modifier.testTag("maple.settings.darkMode"),
             )
             MapleSettingsRow(
                 title = stringResource(R.string.standalone_settings_theme_color),
                 summary = summaries.themeColor,
-                iconResource = R.drawable.ic_settings_theme,
+                iconResource = R.drawable.ic_palette_24,
                 onClick = onThemeColor,
                 modifier = Modifier.testTag("maple.settings.themeColor"),
             )
             MapleSettingsRow(
                 title = stringResource(R.string.launcher_icon_title),
                 summary = summaries.launcherIcon,
-                iconResource = R.drawable.ic_settings_launcher,
+                iconResource = R.drawable.ic_apps_24,
                 onClick = onLauncherIcon,
                 modifier = Modifier.testTag("maple.settings.launcherIcon"),
             )

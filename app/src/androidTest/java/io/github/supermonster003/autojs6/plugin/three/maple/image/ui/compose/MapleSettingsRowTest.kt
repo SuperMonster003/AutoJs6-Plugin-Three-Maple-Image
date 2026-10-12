@@ -34,7 +34,7 @@ class MapleSettingsRowTest {
                 MapleSwitchRow(
                     title = "Resume",
                     summary = "Summary",
-                    iconResource = R.drawable.ic_settings_tune,
+                    iconResource = R.drawable.ic_tune_24,
                     checked = checked,
                     onToggle = { checked = it; toggles++ },
                     modifier = androidx.compose.ui.Modifier.testTag("row"),
@@ -59,7 +59,7 @@ class MapleSettingsRowTest {
                     MapleSettingsRow(
                         title = "Language",
                         summary = "Follow AutoJs6",
-                        iconResource = R.drawable.ic_settings_language,
+                        iconResource = R.drawable.ic_language_24,
                         onClick = { clicks++ },
                         modifier = androidx.compose.ui.Modifier.testTag("double"),
                     )

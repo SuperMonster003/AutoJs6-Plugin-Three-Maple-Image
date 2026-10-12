@@ -112,7 +112,7 @@ internal fun HomeScreen(
             MapleSettingsRow(
                 title = stringResource(R.string.standalone_settings_title),
                 summary = stringResource(R.string.standalone_home_settings_summary),
-                iconResource = R.drawable.ic_settings_theme,
+                iconResource = R.drawable.ic_palette_24,
                 enabled = enabled,
                 onClick = onSettings,
                 modifier = Modifier.testTag("maple.home.settings"),

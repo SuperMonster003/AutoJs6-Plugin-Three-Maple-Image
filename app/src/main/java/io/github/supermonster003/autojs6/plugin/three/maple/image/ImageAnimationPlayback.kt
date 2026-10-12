@@ -105,10 +105,10 @@ internal class ImageAnimationController(
 internal fun MaterialButton.renderImageAnimationPlayback(playback: ImageAnimationPlayback) {
     isVisible = playback != ImageAnimationPlayback.UNAVAILABLE
     if (playback == ImageAnimationPlayback.PAUSED) {
-        setIconResource(R.drawable.ic_play_arrow)
+        setIconResource(R.drawable.ic_play_arrow_24)
         contentDescription = context.getString(R.string.action_resume_animation)
     } else {
-        setIconResource(R.drawable.ic_pause)
+        setIconResource(R.drawable.ic_pause_24)
         contentDescription = context.getString(R.string.action_pause_animation)
     }
 }

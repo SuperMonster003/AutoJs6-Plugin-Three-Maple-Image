@@ -88,21 +88,21 @@ class ComposeShowcaseActivity : ConfiguredActivity() {
                 MapleSettingsRow(
                     title = getString(R.string.standalone_settings_dark_mode),
                     summary = choices[choice].label,
-                    iconResource = R.drawable.ic_settings_night,
+                    iconResource = R.drawable.ic_dark_mode_24,
                     onClick = { choiceOpen = true },
                 )
                 MapleHairline()
                 MapleSettingsRow(
                     title = getString(R.string.standalone_settings_theme_color),
                     summary = themeColor?.let(ThemeColorValue::hex) ?: getString(R.string.standalone_follow_autojs6),
-                    iconResource = R.drawable.ic_settings_theme,
+                    iconResource = R.drawable.ic_palette_24,
                     onClick = { themeOpen = true },
                 )
                 MapleHairline()
                 MapleSwitchRow(
                     title = getString(R.string.action_resume_animation),
                     summary = getString(R.string.launcher_icon_auto_note),
-                    iconResource = R.drawable.ic_settings_tune,
+                    iconResource = R.drawable.ic_tune_24,
                     checked = switch,
                     onToggle = { switch = it },
                 )
@@ -131,11 +131,11 @@ class ComposeShowcaseActivity : ConfiguredActivity() {
                     )
                     MapleBottomActionBar(
                         actions = listOf(
-                            MapleAction(painterResource(R.drawable.ic_info_outline), getString(R.string.label_details), { toast("details") }),
-                            MapleAction(painterResource(R.drawable.ic_rotate_right), getString(R.string.label_rotate), { toast("rotate") }),
+                            MapleAction(painterResource(R.drawable.ic_info_outline_24), getString(R.string.label_details), { toast("details") }),
+                            MapleAction(painterResource(R.drawable.ic_rotate_right_24), getString(R.string.label_rotate), { toast("rotate") }),
                             MapleAction(painterResource(R.drawable.ic_edit_24), getString(R.string.text_edit), { toast("edit") }, enabled = false),
-                            MapleAction(painterResource(R.drawable.ic_share), getString(R.string.action_share), { toast("share") }),
-                            MapleAction(painterResource(R.drawable.ic_open_in_new), getString(R.string.label_open_with), { toast("open") }),
+                            MapleAction(painterResource(R.drawable.ic_share_24), getString(R.string.action_share), { toast("share") }),
+                            MapleAction(painterResource(R.drawable.ic_open_in_new_24), getString(R.string.label_open_with), { toast("open") }),
                         ),
                         overlay = true,
                         modifier = Modifier.align(Alignment.BottomCenter),

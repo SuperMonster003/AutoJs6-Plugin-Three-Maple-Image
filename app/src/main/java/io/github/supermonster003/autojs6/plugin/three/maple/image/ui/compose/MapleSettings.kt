@@ -113,7 +113,7 @@ internal fun MapleSettingsRow(
         if (showChevron && onClick != null) {
             Spacer(Modifier.width(16.dp))
             Icon(
-                painter = painterResource(R.drawable.ic_settings_chevron),
+                painter = painterResource(R.drawable.ic_chevron_right_24),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = MapleSettingsDefaults.CHEVRON_ALPHA).disabledIf(!enabled),
                 modifier = Modifier.size(MapleSettingsDefaults.iconSize),
