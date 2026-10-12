@@ -144,7 +144,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 5.4 发布
 
-- [ ] (发布) 按第 4 节 P1-P5 发布 v2.1.0; changelog `feature` 描述 "界面全面改为 Material 3 风格" 与编辑器工具栏变化, `dependency` 记录 Compose BOM, Coil 或 glide-compose, Room 不在本版; `hint` 说明 APK 新增 Compose 自带的 `libandroidx.graphics.path.so`. 进度 (2026-10-13): P1 10 种语言 changelog 已补 feature (界面, 编辑器工具条, 转换器整页, 查看器五按钮) / fix (发行历史空白, 阿拉伯语重建布局) / improvement (图标统一, 基线 profile) / hint (首次启动稍慢; Compose 原生库已在), Coil 未引入故 dependency 只记 Compose BOM 与 glide-compose, Room 不在本版; P2 `.readme` 10 种语言改转换器整页与查看器 `编辑` 说明, README / CHANGELOG 已重新生成, `docs/images/screenshots` 的 viewer-main / viewer-zoom-2.5x / share-sheet 在 API 33 模拟器 (1080 x 2340, 合成图 01-orbit.png) 重采, explorer-* 为宿主界面未变; P3 `--no-daemon` Temurin 平台验收构建与 `verifySignedReleaseArtifacts` 通过, 四台真机完整 instrumentation 通过 (5.3); 待办: 附录 E 冒烟记录 (型号 / API / APK 摘要), P4 tag 与 GitHub Release, P5 官方索引登记 由维护者执行 (本会话不推送), Q10 拍板后再勾选.
+- [ ] (发布) 按第 4 节 P1-P5 发布 v2.1.0; changelog `feature` 描述 "界面全面改为 Material 3 风格" 与编辑器工具栏变化, `dependency` 记录 Compose BOM, Coil 或 glide-compose, Room 不在本版; `hint` 说明 APK 新增 Compose 自带的 `libandroidx.graphics.path.so`. 进度 (2026-10-13): P1 10 种语言 changelog 已补 feature (界面, 编辑器工具条, 转换器整页, 查看器五按钮) / fix (发行历史空白, 阿拉伯语重建布局) / improvement (图标统一, 基线 profile) / hint (首次启动稍慢; Compose 原生库已在), Coil 未引入故 dependency 只记 Compose BOM 与 glide-compose, Room 不在本版; P2 `.readme` 10 种语言改转换器整页与查看器 `编辑` 说明, README / CHANGELOG 已重新生成, `docs/images/screenshots` 的 viewer-main / viewer-zoom-2.5x / share-sheet 在 API 33 模拟器 (1080 x 2340, 合成图 01-orbit.png) 重采, explorer-* 为宿主界面未变; P3 `--no-daemon` Temurin 平台验收构建与 `verifySignedReleaseArtifacts` 通过, 四台真机完整 instrumentation 通过 (5.3); 附录 E 已记冒烟 (五台真机 + API 33 模拟器, OPD2413 未完成); 待办: P4 `appendDigestToReleasedFiles` 收集, tag 与 GitHub Release, P5 官方索引登记 由维护者执行 (本会话不推送, 最终 APK 摘要以收集时为准), Q10 拍板后再勾选.
 
 验收条件: 五类页面全部为 Compose 实现且无功能回退; 入口契约, 协议版本与最低宿主不变; 原生库门禁按 T2 收紧后通过; 四台真机 instrumentation 与 CI 通过; 10 种语言文案与文档同步.
 
@@ -456,6 +456,17 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 | AVD | 24, 29, 37 | 最低 API, Android 10 写路径, 最新 API |
 | 在线 Samsung SM-A566B | 36 | 16 KB 页, Android 16 权限 |
 | 在线 Samsung SM-F971B | 37 | 折叠屏尺寸变化 |
+
+冒烟记录 (2.1.0 候选, 2026-10-13, 提交 `9658b70` 之前的 debug 与 release 构建; 最终 APK 摘要以 P4 收集时为准):
+
+| 设备 | API | 安装 | 冷启动 | 本里程碑新路径 |
+| --- | --- | --- | --- | --- |
+| Sony G8441 (BH900ASK9E) | 28 | debug + release 各多次 | 首页 / 查看器 直开 (设计稿 3.5) | 完整 instrumentation 75 用例通过; 首页 -> 编辑图像 -> 系统选择器 -> 编辑器 (20 MP) |
+| Sony XQ-AT72 (QV710AF65F) | 31 | debug 多次 | 首页, 查看器 | 完整 instrumentation 75 用例通过 (两轮); 亮 / 暗 / 130% / 阿拉伯语 RTL 截图; 查看器 -> 编辑 -> 导出入口; 转换器整页 |
+| Redmi 22120RN86C (bek749scrwv4wo8h) | 33 | debug | 首页 | 完整 instrumentation 75 用例通过 (小屏滚动断言修正后) |
+| Xiaomi 23046RP50C (968e9f18) | 35 | debug + release 各多次 | 首页 / 查看器 直开 (设计稿 3.5) | 完整 instrumentation 75 用例通过; 中文界面下 首页 -> 编辑图像 -> 编辑器 |
+| OnePlus OPD2413 (63751f63) | 35 | 未完成 (adb 安装需在设备上手动确认) | - | - |
+| AVD_API_33 (模拟器, 1080 x 2340) | 33 | release | 查看器直开 | README 截图重采; 浅色模式状态栏图标缺陷在此发现并修复 |
 
 ---
 
