@@ -55,7 +55,6 @@
     <string name="image_editor_brush_highlighter">Resaltador</string>
     <string name="image_editor_brush_mosaic">Mosaico</string>
     <string name="image_editor_brush_pen">Lápiz</string>
-    <string name="image_editor_brush_tool">Tipo de pincel</string>
     <string name="image_editor_brush_width">Grosor del pincel</string>
     <string name="image_editor_contrast">Contraste</string>
     <string name="image_editor_crop">Recortar</string>
@@ -125,7 +124,6 @@
     <string name="standalone_home_edit_summary">Recortar, girar, ajustar colores, dibujar y añadir texto</string>
     <string name="standalone_home_host_missing">AutoJs6 no está instalado</string>
     <string name="standalone_home_host_summary">Abrir el gestor de archivos y elegir una acción</string>
-    <string name="standalone_home_open_archive">Abrir un archivo comprimido</string>
     <string name="standalone_home_open_failed">No se pudo abrir o guardar el archivo seleccionado</string>
     <string name="standalone_home_open_host">Usar con AutoJs6</string>
     <string name="standalone_home_pending_summary">%1$s aún no se ha guardado</string>

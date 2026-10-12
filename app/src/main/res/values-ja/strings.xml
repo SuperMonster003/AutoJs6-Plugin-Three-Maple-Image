@@ -55,7 +55,6 @@
     <string name="image_editor_brush_highlighter">蛍光ペン</string>
     <string name="image_editor_brush_mosaic">モザイク</string>
     <string name="image_editor_brush_pen">ペン</string>
-    <string name="image_editor_brush_tool">ブラシの種類</string>
     <string name="image_editor_brush_width">ブラシの太さ</string>
     <string name="image_editor_contrast">コントラスト</string>
     <string name="image_editor_crop">切り抜き</string>
@@ -125,7 +124,6 @@
     <string name="standalone_home_edit_summary">トリミング, 回転, 色調整, ブラシと文字</string>
     <string name="standalone_home_host_missing">AutoJs6 がインストールされていません</string>
     <string name="standalone_home_host_summary">ファイル管理から操作を選択</string>
-    <string name="standalone_home_open_archive">圧縮ファイルを開く</string>
     <string name="standalone_home_open_failed">選択したファイルを開くか保存できません</string>
     <string name="standalone_home_open_host">AutoJs6 で使用</string>
     <string name="standalone_home_pending_summary">%1$s はまだ保存されていません</string>

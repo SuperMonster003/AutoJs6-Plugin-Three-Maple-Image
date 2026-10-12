@@ -55,7 +55,6 @@
     <string name="image_editor_brush_highlighter">قلم تمييز</string>
     <string name="image_editor_brush_mosaic">فسيفساء</string>
     <string name="image_editor_brush_pen">قلم</string>
-    <string name="image_editor_brush_tool">نوع الفرشاة</string>
     <string name="image_editor_brush_width">عرض الفرشاة</string>
     <string name="image_editor_contrast">التباين</string>
     <string name="image_editor_crop">اقتصاص</string>
@@ -125,7 +124,6 @@
     <string name="standalone_home_edit_summary">قص وتدوير وضبط الألوان ورسم وإضافة نص</string>
     <string name="standalone_home_host_missing">لم يتم تثبيت AutoJs6</string>
     <string name="standalone_home_host_summary">فتح مدير الملفات واختيار إجراء</string>
-    <string name="standalone_home_open_archive">فتح أرشيف</string>
     <string name="standalone_home_open_failed">تعذر فتح الملف المحدد أو حفظه</string>
     <string name="standalone_home_open_host">الاستخدام مع AutoJs6</string>
     <string name="standalone_home_pending_summary">لم يتم حفظ %1$s بعد</string>

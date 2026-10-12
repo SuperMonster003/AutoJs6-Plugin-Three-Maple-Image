@@ -55,7 +55,6 @@
     <string name="image_editor_brush_highlighter">Маркер</string>
     <string name="image_editor_brush_mosaic">Мозаика</string>
     <string name="image_editor_brush_pen">Карандаш</string>
-    <string name="image_editor_brush_tool">Тип кисти</string>
     <string name="image_editor_brush_width">Толщина кисти</string>
     <string name="image_editor_contrast">Контрастность</string>
     <string name="image_editor_crop">Обрезка</string>
@@ -125,7 +124,6 @@
     <string name="standalone_home_edit_summary">Обрезка, поворот, цветокоррекция, кисть и текст</string>
     <string name="standalone_home_host_missing">AutoJs6 не установлен</string>
     <string name="standalone_home_host_summary">Открыть файловый менеджер и выбрать действие</string>
-    <string name="standalone_home_open_archive">Открыть архив</string>
     <string name="standalone_home_open_failed">Не удалось открыть или сохранить выбранный файл</string>
     <string name="standalone_home_open_host">Использовать с AutoJs6</string>
     <string name="standalone_home_pending_summary">%1$s еще не сохранен</string>

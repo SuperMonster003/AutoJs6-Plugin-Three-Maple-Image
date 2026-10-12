@@ -55,7 +55,6 @@
     <string name="image_editor_brush_highlighter">荧光笔</string>
     <string name="image_editor_brush_mosaic">马赛克</string>
     <string name="image_editor_brush_pen">画笔</string>
-    <string name="image_editor_brush_tool">画笔类型</string>
     <string name="image_editor_brush_width">画笔宽度</string>
     <string name="image_editor_contrast">对比度</string>
     <string name="image_editor_crop">裁剪</string>
@@ -125,7 +124,6 @@
     <string name="standalone_home_edit_summary">裁剪, 旋转, 调色, 画笔与文字</string>
     <string name="standalone_home_host_missing">尚未安装 AutoJs6</string>
     <string name="standalone_home_host_summary">打开文件管理器并选择文件操作</string>
-    <string name="standalone_home_open_archive">打开压缩档案</string>
     <string name="standalone_home_open_failed">无法打开或保存所选文件</string>
     <string name="standalone_home_open_host">在 AutoJs6 中使用</string>
     <string name="standalone_home_pending_summary">%1$s 尚未保存</string>

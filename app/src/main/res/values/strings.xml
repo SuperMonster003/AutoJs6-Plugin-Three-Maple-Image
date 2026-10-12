@@ -55,7 +55,6 @@
     <string name="image_editor_brush_highlighter">Highlighter</string>
     <string name="image_editor_brush_mosaic">Mosaic</string>
     <string name="image_editor_brush_pen">Pen</string>
-    <string name="image_editor_brush_tool">Brush type</string>
     <string name="image_editor_brush_width">Brush width</string>
     <string name="image_editor_contrast">Contrast</string>
     <string name="image_editor_crop">Crop</string>
@@ -125,7 +124,6 @@
     <string name="standalone_home_edit_summary">Crop, rotate, adjust colors, draw and add text</string>
     <string name="standalone_home_host_missing">AutoJs6 is not installed</string>
     <string name="standalone_home_host_summary">Open the file manager and choose a file action</string>
-    <string name="standalone_home_open_archive">Open an archive</string>
     <string name="standalone_home_open_failed">The selected file could not be opened or saved</string>
     <string name="standalone_home_open_host">Use with AutoJs6</string>
     <string name="standalone_home_pending_summary">%1$s is not saved yet</string>

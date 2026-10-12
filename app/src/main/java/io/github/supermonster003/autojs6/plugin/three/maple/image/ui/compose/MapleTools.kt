@@ -201,6 +201,7 @@ internal fun MapleSegmented(
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    tagPrefix: String = "maple.segment",
 ) {
     SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
         options.forEachIndexed { index, label ->
@@ -209,7 +210,7 @@ internal fun MapleSegmented(
                 onClick = { onSelect(index) },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
                 enabled = enabled,
-                modifier = Modifier.testTag("maple.segment.$index"),
+                modifier = Modifier.testTag("$tagPrefix.$index"),
             ) { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) }
         }
     }
@@ -253,6 +254,8 @@ internal fun MapleChipFlow(
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    tagPrefix: String = "maple.chip",
 ) {
     FlowRow(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         options.forEachIndexed { index, label ->
@@ -260,7 +263,8 @@ internal fun MapleChipFlow(
                 selected = index == selectedIndex,
                 onClick = { onSelect(index) },
                 label = { Text(label) },
-                modifier = Modifier.testTag("maple.chip.$index"),
+                enabled = enabled,
+                modifier = Modifier.testTag("$tagPrefix.$index"),
             )
         }
     }

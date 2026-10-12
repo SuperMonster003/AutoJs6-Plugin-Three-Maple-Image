@@ -55,7 +55,6 @@
     <string name="image_editor_brush_highlighter">형광펜</string>
     <string name="image_editor_brush_mosaic">모자이크</string>
     <string name="image_editor_brush_pen">펜</string>
-    <string name="image_editor_brush_tool">브러시 유형</string>
     <string name="image_editor_brush_width">브러시 너비</string>
     <string name="image_editor_contrast">대비</string>
     <string name="image_editor_crop">자르기</string>
@@ -125,7 +124,6 @@
     <string name="standalone_home_edit_summary">자르기, 회전, 색상 조정, 브러시와 텍스트</string>
     <string name="standalone_home_host_missing">AutoJs6가 설치되지 않았습니다</string>
     <string name="standalone_home_host_summary">파일 관리자에서 파일 작업 선택</string>
-    <string name="standalone_home_open_archive">압축 파일 열기</string>
     <string name="standalone_home_open_failed">선택한 파일을 열거나 저장할 수 없습니다</string>
     <string name="standalone_home_open_host">AutoJs6에서 사용</string>
     <string name="standalone_home_pending_summary">%1$s 아직 저장되지 않았습니다</string>
