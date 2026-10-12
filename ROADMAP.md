@@ -1,103 +1,463 @@
-# Image Viewer Roadmap
+# 3-Maple Image Roadmap
 
-更新日期: 2026-09-04
+更新日期: 2026-10-12
 
-本文档是 Image Viewer 从单文件只读查看器逐步演进为更完整图像浏览方案的执行清单. 每个条目只有在代码/测试与可验证的验收条件同时满足后才可勾选.
+本文是 `AutoJs6-Plugin-Three-Maple-Image` (3-Maple Image: AutoJs6 文件管理器与独立入口的图片查看, 编辑与格式转换插件) 从 "单文件工具" 演进为 "完整相册应用" 的可执行状态表. 它取代 2026-09-04 版的 Image Viewer 路线图 (M0-M4, 见附录 F), 以 2026-10-12 的四轮需求拍板 (第 1 节) 为依据, 参照 [Simple Gallery](https://github.com/SimpleMobileTools/Simple-Gallery) 与 [Fossify Gallery](https://github.com/FossifyOrg/Gallery) 的功能集和交互设计 (附录 A), 但不复制它们的任何代码或资源 (两者为 GPL-3.0, 本仓库为 MPL-2.0).
 
-## 状态与证据规则
+使用方式:
 
-- `[x]`: 已完成, 且本仓库存在可复核证据 (代码, 测试或生成产物).
-- `[ ]`: 尚未完成; 括号中的 `插件` / `API` / `宿主` / `测试` / `发布` 表示主要落点.
-- 未勾选条目属于规划意向, 不代表当前版本能力; 依赖宿主或协议的条目需等待对应仓库先行支持.
+1. 每次会话开始时, 从 "里程碑总览" (第 4 节) 选取一个或多个未完成条目, 按里程碑顺序推进; 单次会话可完成多个小节, 除非单个小节已足够繁杂.
+2. 条目完成后勾选 `[x]`, 并在条目后追加证据 (提交 hash / 测试类名 / 设备型号与 API / 样本文件名), 证据等级见附录 D. 未勾选条目属于规划意向, 不代表当前版本能力.
+3. 条目前缀标明主要落点: `(插件)` 本仓库, `(宿主)` `D:/idea-projects/AutoJs6`, `(索引)` `D:/idea-projects/AutoJs6-Official-Plugins-Index`, `(文档)` AutoJs6-Documentation / AutoJs6-TypeScript-Declarations / AutoJs6-Plugin-Ace-Editor / AutoJs6-Plugin-Offline-Docs 四个关联仓库, `(设计)` 设计文档, `(测试)`, `(发布)`.
+4. 涉及宿主公开契约 (explorer-action 协议, 脚本 API) 的条目, 完成后必须同步宿主 `docs/dev/`, 宿主 `.changelog` (10 种语言) 与本仓库 `.changelog`.
+5. 第 2 节 "派生技术决策" 可在进入对应里程碑前推翻 (推翻点已逐条标注), 之后视同固定; 附录 C "待决事项" 在进入对应里程碑前由维护者拍板, 拍板结果回填到第 1 节或第 2 节.
+6. 工程约定 (构建, 资源, 文档生成, 提交计数, 图标) 以仓库 `AGENTS.md`, `docs/development/repository-standard.md` 与 `../COMMON_AGENTS.md` 为准, 本文只记录 "改什么" 与证据. 所有文案 (10 种语言) 只用 ASCII 标点.
 
-## 总览
+---
 
-| 里程碑 | 状态 | 核心结果 | 主要落点 |
-|---|---|---|---|
-| M0 基线 | 已完成 | 单文件只读查看与安全校验 | 插件 |
-| M1 浏览与手势 | 已完成 | 同目录翻页, 双击智能缩放, GIF 控制与视图旋转 | 插件/API/宿主 |
-| M2 图像信息与输出 | 已完成 | EXIF 面板与方向纠正, 打印/PDF, 缩放倍率指示及解码色彩信息 | 插件 |
-| M3 格式与协议 | 待发布 | HEIF/AVIF、明确降级、大图分块、协议多选与 v1.1.0 发布候选已完成; 待正式发布 | 插件/API/宿主/发布 |
-| M4 沉浸式界面 | 待发布 | 全出血查看器、浮层顶栏与页码、图标操作栏、详情底部面板、edge-to-edge 适配已完成; 待截图重采与 v1.2.0 发布 | 插件/发布 |
+## 1. 固定决策
+
+以下决策由维护者于 2026-10-12 经四轮选择题确认, 后续里程碑不再重新讨论.
+
+| 编号 | 决策 | 含义 |
+| --- | --- | --- |
+| D1 | 媒体库范围: 完整相册 | 独立应用扫描设备媒体库 (MediaStore) 提供相册与媒体网格. 从 AutoJs6 调用插件显示单张图片时不主动申请存储权限 (除非当时的操作确实需要); 独立启动时主动申请一次存储权限, 用户拒绝后不重复打扰, 设置页保留 "存储权限" 管理入口; 没有权限时仍可使用基础功能 (系统文件选择器选图/选文件夹后查看, 编辑, 转换), 无权限状态要有专门的界面设计. |
+| D2 | 仅图片 | 网格, 查看器, 编辑器与转换器只收录受支持的图像格式, 视频完全不出现. 视频由 3-Amber Player 负责. |
+| D3 | 保存语义: 新文件默认 + 可选覆盖 | 编辑与转换默认生成新文件; 保存对话框提供 "覆盖原图" 选项 (默认关闭). 宿主入口的覆盖走宿主托管的替换事务 (协议 v8/v9) 与宿主撤销 (v18); 独立入口对 MediaStore / SAF 文档就地覆盖, 并在本地保留一次撤销备份. |
+| D4 | UI 技术栈: Jetpack Compose | 全部界面迁移到 Compose (Material 3). `ZoomableImageView`, `TiledImageDrawable`, `ImageEditingView` 等绘制组件保留为 View, 以 `AndroidView` 嵌入. Three 系列独立设置页规范 (`../AUTOJS6_PLUGIN_STANDALONE_SETTINGS_AGENTS.md`) 的视觉与保存语义全部保留, 只换实现. |
+| D5 | 存储权限模型: MediaStore 默认 + 可选所有文件访问 | 默认只申请媒体读权限, 删除/改名/移动/回收站/收藏经 MediaStore 写请求 (Android 11+ 系统确认对话框). 设置页提供 "所有文件访问" 高级开关 (跳转系统设置, 默认关闭), 开启后解锁 .nomedia 隐藏文件夹, 文件系统直接浏览与免确认批量操作. |
+| D6 | 发布节奏: 先焕新后相册, 逐版发布 | 2.1.0 = 现有页面 Compose 化与视觉焕新 (功能不变); 3.0.0 = 相册 + 权限策略 + 查看器缩略图条; 3.1.0 管理操作; 3.2.0 编辑与输出; 3.3.0 查看器与设置全集; 3.4.0 脚本 API. 每个里程碑单独可发布. |
+| D7 | 管理操作范围 | 删除与回收站; 重命名 / 移动 / 复制; 收藏与隐藏 / 排除; 批量编辑输出. 四组全部纳入. |
+| D8 | 查看器附加功能 | 幻灯片; 设为壁纸 / 打印 / 转交 (含去元数据与缩小副本分享); 展示 GPS 坐标与地图跳转 (设置开关, 默认关闭, 改变现有 "坐标永不展示" 姿态); 手势与显示选项全部做成设置项; 双指旋转手势直接旋转图片 (旋转后提示保存, 保存后旋转才真正写入文件). |
+| D9 | 首页信息架构: 相册网格为首页 | 首页是文件夹/相册网格 (封面 + 名称 + 数量), 点入后是媒体网格, 再点进查看器. 顶栏: 搜索, 排序, 多选, 更多 (显示所有文件夹内容 / 收藏 / 回收站 / 设置). 不做底部导航. |
+| D10 | 宿主入口边界: 删除到宿主回收站 | 宿主新增 explorer-action 协议 v24: 只读查看动作可声明 "允许将当前目标移入宿主回收站", 复用 v16/v21 的身份校验与可撤销记录. 重命名 / 移动仍由宿主文件管理器负责. 两种入口的查看器都能删除. |
+| D11 | 编辑器扩展 | 预设滤镜; 编辑器内调整尺寸; 更多调整项 (曝光, 高光/阴影, 锐化, 晕影, 色调); 标注形状 (矩形, 椭圆, 箭头, 直线); 取色 (可考虑对接 3-Color Picker, 但要处理图片缩放与位置偏移导致的坐标转换). |
+| D12 | 脚本 API: 最小 UI 调用型 | 全局对象 `gallery`, 提供 `pick` (相册选图), `view` (打开查看器), `edit` (打开编辑器并取回输出), `convert` (调用插件转换器). 不做无头像素处理与媒体库查询. 排在最后一个里程碑 (3.4.0). |
+| D13 | 许可边界 | 只借鉴 Simple Gallery / Fossify Gallery 的功能清单与交互设计 (附录 A), 不复制其代码, 布局, 图标或字符串. 新增第三方依赖只接受 Apache-2.0 / MIT / BSD 类许可, 并登记到 `THIRD_PARTY_NOTICES.md`. |
+
+---
+
+## 2. 派生技术决策
+
+据第 1 节派生, 进入对应里程碑前可推翻, 之后视同固定.
+
+| 编号 | 决策 | 推翻点 |
+| --- | --- | --- |
+| T1 | Compose 基线: 与 AutoJs6-Plugin-Compose-UI 对齐, Compose BOM `2026.09.00` (Compose 1.12 线), `org.jetbrains.kotlin.plugin.compose` 随 Kotlin 2.2.21, `material3`, `activity-compose`, `navigation-compose` (仅独立首页内部导航), `ui-tooling` (debug), `ui-test-junit4`. BOM 版本只在 `gradle/libs.versions.toml` 单点声明. | M1.1 spike 发现 BOM 与 AGP 9 / 平台版本插件冲突时, 改用 Compose-UI 插件实测可用的其他 BOM. |
+| T2 | 原生库: Compose `ui-graphics` 传递依赖 `androidx.graphics:graphics-path` 自带 `libandroidx.graphics.path.so` (四 ABI, 各约 10 KB). 插件自身仍无原生代码, 不做 ABI 拆分, `supportedAbis` 保持空数组; `nativeAlignment` 门禁从 "禁止任何原生库" 改为 "原生库集合恰好为该文件 x 4 ABI, 未压缩且 16 KB 对齐" (做法同 Compose-UI 插件 `app/build.gradle.kts` 的 `allowedNativeLibraries`). | 无. 这是 D4 的直接后果. |
+| T3 | 图像加载: 查看器全图解码管线继续使用 Glide 5.0.5 (EXIF 规范化, HEIC/AVIF 探针, 分块渲染已验证); Compose 网格与缩略图条使用 Coil 3 (Apache-2.0, Compose 原生 `AsyncImage`, 支持 MediaStore 与 SAF URI, 自带内存/磁盘缓存). | M1.1 spike 证明 `glide-compose` 集成库与 Glide 5 兼容且无双缓存问题时, 统一为 Glide 单库. |
+| T4 | 导航: 保留现有 Activity 边界 (入口契约依赖 `ExplorerActionActivity`, `ExternalViewActivity`, `ImageViewerActivity`, `ImageEditorActivity`, `ImageConverterActivity`), 每个 Activity 以 `setContent` 承载 Compose. 独立首页 `HomeActivity` 内的 相册 -> 媒体网格 -> 搜索 -> 回收站 等页面用 `navigation-compose` 单 Activity 导航; 查看器与编辑器仍是独立 Activity. | M2 发现共享元素过渡或返回栈需要时, 把查看器并入首页 NavHost. |
+| T5 | 权限状态机 (Android-free 纯逻辑, 可 JVM 测试): 状态 `FULL` / `PARTIAL` (Android 14+ 仅所选照片) / `DENIED` / `NEVER_ASK` (系统不再弹窗) / `ALL_FILES`. 权限按 API: 24-28 `READ_EXTERNAL_STORAGE` + `WRITE_EXTERNAL_STORAGE`; 29 `READ_EXTERNAL_STORAGE` + `WRITE_EXTERNAL_STORAGE` 并声明 `requestLegacyExternalStorage` (Android 10 没有 `createWriteRequest`); 30-32 `READ_EXTERNAL_STORAGE`; 33+ `READ_MEDIA_IMAGES`; 34+ 另加 `READ_MEDIA_VISUAL_USER_SELECTED`. 写操作: Android 11+ `MediaStore.createWriteRequest` / `createDeleteRequest` / `createTrashRequest`; `ALL_FILES` 下直接文件操作. 独立首页首次启动申请一次并持久记录; 之后只在用户点击空状态 "授予权限" 或 设置 > 存储权限 时再申请; `NEVER_ASK` 时跳转系统应用详情. | M2.1 实机验证 Android 10 (API 29) 的 `requestLegacyExternalStorage` 路径不可用时, API 29 改为按文件捕获 `RecoverableSecurityException`. |
+| T6 | 媒体数据层: 直接查询 MediaStore (`Images.Media`, 相册 = `BUCKET_ID` / `BUCKET_DISPLAY_NAME`, Android 10+ 用 `RELATIVE_PATH`, 旧版本用 `DATA`), 分页查询, `ContentObserver` 增量刷新, 内存缓存; 不引入持久媒体缓存数据库. 只收录 `ImageFormatSupport` 目录中的 MIME/扩展名, 排除 pending 与 trashed 项 (回收站视图除外). | M2.3 性能验收 (5 万张媒体库) 不达标时, 引入 Room 持久缓存 (Simple Gallery 做法). |
+| T7 | 无权限模式: 用户经 `ACTION_OPEN_DOCUMENT_TREE` 授权的文件夹 (持久授权) 作为 "已授权文件夹" 相册, 以 `DocumentFile` 枚举 (含子目录) 并复用同一网格与查看器; `ACTION_OPEN_DOCUMENT` 单图入口保留. 设置页可移除授权. 这也是 Android 14+ 部分访问状态下的补充路径. | 无. |
+| T8 | 本地持久化: 收藏, 排除目录, 置顶目录, 自建回收站索引与权限申请记录使用 Room (`androidx.room` 2.8.1), 库文件位于插件私有目录, `allowBackup=false` 已排除备份. 键为 MediaStore ID + 内容指纹 (大小 + 修改时间 + 相对路径摘要), 排除/置顶目录按相对路径 (`RELATIVE_PATH` 或 bucket) 存储; 不存绝对路径以外的任何文件内容. | M3.1 认为 Room 过重时, 改为 DataStore + JSON. |
+| T9 | 收藏: 本地收藏表为主 (切换无系统对话框); Android 11+ 的 `IS_FAVORITE` 同步作为可选开关 (`createFavoriteRequest` 每次都要系统确认, 不适合作为默认). | M3.3 维护者要求与系统相册互通时, 改为同步系统收藏为默认. |
+| T10 | 回收站: Android 11+ 使用系统回收站 (`createTrashRequest`, `IS_TRASHED`, 30 天后系统自动清理), 回收站视图用 `QUERY_ARG_MATCH_TRASHED` 列出并提供恢复 / 永久删除; Android 9-10 自建回收站 (私有目录 `files/recycle-bin/` + Room 索引, 30 天过期, 启动时清理, 容量上限随可用空间). 设置 "启用回收站" 关闭时直接删除 (二次确认). | 无. |
+| T11 | 覆盖保存 (D3): 宿主入口 `edit-image` / `convert-image` 动作改为 `ACCESS_MANAGE_TARGET` (v9: 替换 + 受控同级创建), 替换走 v8 生命周期 (`prepareTargetReplacement -> openOutput -> openPendingOutput 读回校验 -> commitOutput`), 完成后用 v18 `undoTargetReplacement` 提供 Snackbar "撤销"; 独立入口: MediaStore 项经 `createWriteRequest` 后以 `openOutputStream(uri, "wt")` 覆盖, SAF 文档直接覆盖, 覆盖前把原文件复制到私有目录作为单份撤销备份 (上限 256 MiB, 下一次覆盖替换). 覆盖选项不记忆, 每次默认关闭. | M4.4 维护者要求记忆选择时, 增加设置 "默认覆盖原图" (默认关). |
+| T12 | 批量输出: 独立入口在前台 Activity 协程中逐张处理并写入 MediaStore (同相册, 安全后缀), 进度对话框可取消 (以文件为原子单位); 宿主入口新增多目标转换动作, 使用 v15 批量输出事务 (全部成功才一起发布). 不引入前台服务. | M3.5 批量规模超过前台可承受范围时, 新增前台服务并按红线 R4 记录权限豁免. |
+| T13 | 宿主协议 v24 (D10): 新增目录键 `targetTrash` (仅只读 Activity 动作可声明), 会话末尾追加 `moveTargetsToTrashSubset(in List<String> targetIds)`: 允许移动请求目标的子集 (多选浏览时只删当前页), 不要求输出证明, 复用 v16 身份校验与 v21 批次记录以支持撤销. 宿主文档 `docs/dev/explorer-action-protocol-v24.md`. | 维护者审阅 v24 设计后可改为放宽 `moveTargetsToTrash` 的空输出列表语义. |
+| T14 | GPS (D8): 新增设置 "显示位置信息" (默认关). 开启后详情面板显示十进制与度分秒坐标并提供 "在地图中打开" (`geo:` URI); 关闭时沿用现状 (只提示存在). 输出侧 `ExifMetadataPolicy` 默认继续移除 GPS; 保存/转换对话框在该设置开启时出现 "保留位置信息" 复选 (默认关). | 无. |
+| T15 | 手势旋转保存 (D8): 查看器双指旋转时实时跟随, 松手吸附到 90 度倍数并提示 "保存旋转"; JPEG 经 EXIF 方向标记无损更新, 其他格式重编码 (提示会重新压缩); 写入复用 T11 的覆盖路径. 设置可关闭提示或关闭旋转手势. | 无. |
+| T16 | 取色 (D11): 编辑器内放大镜取色为主路径: 长按画布进入取色, 通过 `ImageEditingView` 变换矩阵的逆矩阵把触点映射到位图像素并采样真实颜色 (不受缩放插值与滤镜预览影响), 结果用于画笔 / 文字 / 形状颜色. 3-Color Picker 目前只把结果写入剪贴板且控制面 AIDL 没有回传接口, 对接方案列入附录 C Q1. | Q1 拍板后更新. |
+| T17 | 脚本 API 形态 (D12): 参照 3-Folio EPUB 三层接入: 宿主 `plugin-api/gallery-api` (AIDL `IGalleryPlugin`: `getInfo`, `pick`, `view`, `edit`, `convert` 会话 + `IGalleryCallback` 回传), 宿主 `core/plugin/gallery/` 客户端, augment 全局对象 `gallery`; 带 UI 的调用由宿主经 Binder 取得一次性 token 后自行 `startActivity` 启动插件 Activity (插件服务不从后台启动 Activity); `convert` 无 UI, 经 PFD 传输. 结果以脚本可见路径返回 (宿主脚本自身持有存储权限, 插件不扩大脚本的访问权). | M6.1 契约评审时可调整 AIDL 形状. |
+| T18 | 协议声明: 2.1.0 保持 v12 与最低宿主 5276 不变; 3.2.0 起全部动作统一声明 v24 (若 v24 尚未发布则 v23), `REQUIRED_HOST_VERSION` 提升到发布 v24 的宿主 versionCode, changelog 以 `hint` 说明. | 无. |
+| T19 | 测试策略: 策略类保持 Android-free 并以 JVM 单元测试覆盖; 界面用 `compose-ui-test` instrumentation 替换现有基于 View 的用例; 设备矩阵见附录 E; CI 继续在 API 35 模拟器运行完整 instrumentation. | 无. |
+
+---
+
+## 3. 设计红线 (所有里程碑必须遵守)
+
+- R1 许可: 不从 Simple Gallery / Fossify Gallery 复制任何代码, 布局, 图标, 字符串或动画参数; 参考截图只存于仓库外 (`.bak/design-reference/`), 不入库. 新依赖只接受 Apache-2.0 / MIT / BSD 类许可并登记 `THIRD_PARTY_NOTICES.md`.
+- R2 权限: 宿主入口 (`ExplorerActionActivity`) 与外部 `ACTION_VIEW` 入口永不触发运行时权限申请. 独立入口按 T5 最多自动申请一次. "所有文件访问" 只能由用户在设置页主动开启. 不申请 `INTERNET`, 不申请前台服务与通知权限 (T12 推翻时按 R4 走审查).
+- R3 源文件: 任何写入源文件的行为 (覆盖, 旋转保存, 删除, 改名, 移动) 都必须由用户当次明确触发并可撤销 (宿主 v18/v21 记录, 系统回收站, 本地撤销备份); 宿主入口的全部写操作只经宿主事务, 不猜测路径, 不放宽 `ImageRequestPolicy` / `ImageToolsRequestPolicy` / `ImageContentValidator` 的任何校验.
+- R4 新权限: 新增任何权限 (含普通权限) 必须在本节记录豁免理由并经维护者审查后才可排期.
+- R5 安全校验只增不减: 入口校验, URI 结构校验, 大小上限, 格式探针, 输出大小限制保持现有强度; 新增能力需补充对应拒绝路径用例.
+- R6 纯逻辑可测: 权限状态机, 排序/分组, 回收站过期, 批量冲突命名, 滤镜矩阵, 手势几何等保持 Android-free, 由 JVM 单元测试覆盖.
+- R7 文案与文档: 界面文本全部走 `strings.xml` 并同步 10 种语言 (默认与 `values-en` 一致, 按 name 升序, ASCII 标点); README / CHANGELOG / 插件说明只改 `.readme` / `.changelog` 的 JSON 源与 `plugin_instruction.md`, 再运行 `py .python/generate_markdown.py`.
+- R8 视觉规范: 中性灰阶表面 + 主题色控件, 外观四项 (语言 / 夜间模式 / 主题色 / 启动器图标) 的顺序, 密度与保存语义按 Three 设置页规范; 图标工作台 (`.icons/recipe.json`) 产物不改; 不引入 Material You 动态取色 (附录 B).
+- R9 工程门禁: 每个里程碑发布前运行 `py D:/idea-projects/prepush_check.py`, `.python/check_markdown.bat`, `py -3 -m unittest discover -s .python/tests`, `py .python/generate_icon_studio.py --check`, Gradle `--max-workers=2` 的 `:app:testDebugUnitTest :app:lintDebug :app:assembleDebug`, release 构建经 `appendDigestToReleasedFiles`. 提交前 `VERSION_BUILD` 写为当前可达提交数 + 1.
+
+---
+
+## 4. 里程碑总览
+
+| 里程碑 | 版本 | 主题 | 状态 |
+| --- | --- | --- | --- |
+| M1 | v2.1.0 | Compose 焕新: 四类页面迁移, 视觉系统, 功能集不变 | 未开始 |
+| M2 | v3.0.0 | 相册: 权限策略, MediaStore 数据层, 相册/媒体网格, 查看器分页与缩略图条, 无权限模式, 宿主 "以相册浏览" | 未开始 |
+| M3 | v3.1.0 | 管理操作: 多选, 删除与回收站 (含宿主 v24), 重命名/移动/复制, 收藏/排除/置顶/隐藏, 搜索, 排序与分组, 批量输出 | 未开始 |
+| M4 | v3.2.0 | 编辑与输出: 编辑器重做与五项扩展, 覆盖保存与撤销, 手势旋转保存, 转换器重做, 协议升级 | 未开始 |
+| M5 | v3.3.0 | 查看器与设置全集: 幻灯片, 壁纸/分享副本, GPS 与地图, 手势与显示选项, 扩展详情, 平板/横屏, 无障碍与性能 | 未开始 |
+| M6 | v3.4.0 | 脚本 API `gallery`: 宿主契约, 插件服务, augment, 四仓库文档 | 未开始 |
 
 依赖顺序:
 
 ```text
-M0 ──> M1 (手势与显示) ──> M2 ──> M4 (沉浸式界面)
-        └──────────────> M3
-explorer-action v12 readSiblings ──> M1 (同目录浏览, 已完成)
-explorer-action v4+ 多目标与选择工具栏 ──> M3 (显式多选组, 已完成)
+M1 (Compose 基础设施, 主题, 页面迁移)
+ -> M2 (权限 + 数据层 + 网格 + 分页查看器)
+     -> M3 (管理操作, 依赖网格多选与 Room)
+     -> M4 (编辑器重做, 覆盖保存; 手势旋转保存依赖 M2 的旋转手势与 M4 的覆盖路径)
+         -> M5 (查看器与设置全集, 依赖 M3 的收藏/回收站入口与 M4 的输出路径)
+             -> M6 (脚本 API, 依赖查看器/编辑器/转换器契约稳定)
+宿主 v24 (M3.2) 可与 M2 并行开发; 脚本 API 宿主侧 (M6.1) 可与 M5 并行开发.
 ```
 
-## M0: 基线能力 (v1.0.x, 已完成)
+发布门禁 (每个里程碑的 "(发布)" 条目都指向本清单):
 
-- [x] (插件) 通过 `org.autojs.plugin.EXPLORER_ACTION` 注册 explorer-action 协议版本 2 服务, 以主要动作 (primary, 优先级 100) 承接 BMP / GIF / JFIF / JPE / JPEG / JPG / PNG / WEBP 单文件点击查看.
-- [x] (插件) `onBind` 无条件返回绑定对象, 兼容宿主不携带 action 的绑定方式, 插件中心不再出现 onNullBinding 启用失败.
-- [x] (插件) 入口安全校验 (`ImageRequestPolicy` + `ImageContentValidator`): 动作标识, 协议版本, 调用来源, content URI 结构, ClipData, 文件名, MIME 类型, 声明大小, 父目录从属关系逐项核验, 并二次核对解码边界与实际大小, 单文件上限 8 TiB.
-- [x] (插件) 查看器 (`ZoomableImageView`): 适应屏幕, 以手指为中心的捏合缩放 (1 至 5 倍), 单指平移与边界约束, 双击复原, 点按隐藏/唤出控件; 信息栏显示 MIME 类型, 大小与分辨率, 提供 `重置缩放`, `分享`, `使用其他应用打开` (排除自身).
-- [x] (插件) 双入口隔离: 受宿主插件权限保护的文件管理器入口与公开只读 `ACTION_VIEW` 入口相互独立, 查看器界面不导出; 不申请存储与网络权限, 禁用明文流量.
-- [x] (插件) 界面, 插件信息, 使用说明, README 与 CHANGELOG 覆盖 10 种语言.
-- [x] (测试) `ImageRequestPolicyTest` 单元用例覆盖入口校验策略, `ExplorerActionServiceInstrumentationTest` 覆盖服务目录与绑定行为.
-- [x] (发布) README 与 CHANGELOG 采用 `.python/generate_markdown.py` 多语言生成方案, 内置全角符号, 源布局, 版本一致性与 strings.xml 描述一致性校验.
+- P1 `version.properties` 的 `VERSION_NAME` 更新, `VERSION_BUILD` = 提交数 + 1; 10 种语言 `.changelog/lang_*.json` 补齐该版本的 `hint` / `feature` / `fix` / `improvement` / `dependency`, 日期为发布当日.
+- P2 `.readme/lang_*.json` (功能亮点, 使用步骤, FAQ, 安全, 插件接口), 11 份 `plugin_instruction.md`, `strings.xml` 描述与 README 一致性校验通过; 界面有变化时重采 `docs/images/screenshots` (Android 13 模拟器, 1080 x 2340, 合成素材, 明暗背景可读).
+- P3 R9 全部门禁通过; 附录 E 设备矩阵中每台在线设备完成冒烟 (安装, 冷启动, 本里程碑新路径各一次), 记录型号 / API / APK 摘要.
+- P4 release APK 经 `appendDigestToReleasedFiles` 收集, 生成 `SHA256SUMS`, 创建轻量 tag `vX.Y.Z` 与 GitHub Release (APK + SHA256SUMS), 复核下载产物哈希.
+- P5 官方索引 `release-manifests/io.github.supermonster003.autojs6.plugin.three.maple.image/<versionCode>.json` 登记 (顶层 `supportedAbis`, `requiresHostVersion` 与实际一致), 运行索引生成脚本与其 `generate_markdown.py`.
+- P6 宿主侧有改动时, 宿主 `.changelog` 10 种语言与 `docs/dev/` 同步, 并说明最低宿主版本变化.
 
-验收条件: 在版本代码不低于 5269 的 AutoJs6 中启用插件后, 点击 8 种受支持扩展名的单个图像可稳定在只读查看器中打开, 上述任一安全校验均不可被构造的调用绕过. (已满足)
+---
 
-## M1: 浏览与手势体验
+## 5. M1: v2.1.0 Compose 焕新
 
-- [x] (API/宿主/插件) 同目录连续浏览: 使用精确的 explorer-action v12 API 工件, 最低宿主构建提升至 5276, 并以单文件, 只读动作声明 `readSiblings`; 仅通过宿主 `HOST_SESSION` 分页枚举和打开同目录直属文件, 过滤非支持格式, 不可读项与符号链接, 按自然文件名排序后在选中图像周围保留最多 128 页. `ZoomableImageView.onPageSwipe` 已接通, 在 1 倍缩放下左右滑动切换上一张/下一张, 标题与元数据随之刷新. 兄弟页契约只持有宿主相对路由, 渲染时经不可导出, 不授予 URI 权限且仅存于本进程的 `HostSessionImageProvider` 桥接 Glide, 不产生可转发的 URI, 因而禁用分享与外部打开; 越出会话授权范围的目标一律不展示 (`ExplorerSiblingImageClient` + `ImageSiblingDiscoveryPolicy` + `ImageViewerContract`).
-- [x] (插件) 双击智能缩放: 双击在 1 倍与以双击点为中心的 2.5 倍之间切换, 已放大状态下双击恢复 1 倍; 单击改为确认后触发, 不会与双击或捏合手势冲突 (`ImageZoomState` + `ZoomableImageView`).
-- [x] (插件) GIF 播放控制: Glide 返回实际多帧 `GifDrawable` 或其他 `Animatable` 时才显示 暂停/继续 控件, GIF 在显示层设置为无限循环, 静态图与单帧 GIF 不显示该控件; 用户暂停状态在 Activity 重建后保留, 翻页, 加载失败与销毁均会清理旧动画, 全程不改动源文件 (`ImageAnimationPlayback` + `ImageViewerActivity`).
-- [x] (插件) 视图旋转: 提供顺时针 90 度步进旋转按钮, 按旋转后的宽高重新执行 fit-center, 已放大时保留倍率及视口中心对应的源图像锚点, 并对旋转后的映射矩形继续执行四边平移约束; 方向仅影响显示且不重新加载图像或动画, 在同页 Activity 重建后保留, 切换图像或重置缩放时恢复原始方向 (`ImageRotationState` + `ZoomableImageView` + `ImageViewerActivity`).
-- [x] (测试) 同目录浏览具备分页会话枚举, 自然名称排序, 非图像/不可读/符号链接过滤, 128 页有界窗口, 恶意相对路径与越界内部路由拒绝用例; Android instrumentation 同时覆盖 v12 请求完整性, catalog 声明与 1 倍翻页路由 (`ImageSiblingDiscoveryPolicyTest` + `ExplorerActionV12InstrumentationTest` + `ExplorerActionServiceInstrumentationTest` + `ZoomableImageViewInstrumentationTest`).
-- [x] (测试) 双击缩放具备纯状态单元用例与 Android View instrumentation 用例, 覆盖 1 倍 / 2.5 倍切换, 双击焦点保持及矩阵复原 (`ImageZoomStateTest` + `ZoomableImageViewInstrumentationTest`).
-- [x] (测试) GIF 控件具备纯播放状态单元用例, 并以真实单帧/两帧 GIF 在 Android 9 / 12 / 15 instrumentation 中覆盖 Glide 解码, 动图控件可见, 静态图与单帧 GIF 控件隐藏, 暂停/继续以及 Activity 重建后保持暂停 (`ImageAnimationPlaybackStateTest` + `ImageAnimationControllerInstrumentationTest` + `ImageViewerAnimationInstrumentationTest`).
-- [x] (测试) 旋转具备纯状态单元用例与 Android View / Activity instrumentation 用例, 覆盖任意正负步数归一化, 0 / 90 / 180 / 270 度适屏矩阵, 非正方形图像的旋转尺寸, 旋转后双击焦点与四边平移约束, 放大倍率及视口中心锚点保持, 重置恢复原始方向, GIF 暂停互不干扰和同页重建状态保持 (`ImageRotationStateTest` + `ZoomableImageViewInstrumentationTest` + `ImageViewerAnimationInstrumentationTest`).
+目标: 把首页, 设置/关于/发行历史, 查看器, 编辑器, 转换器五类页面全部迁移到 Compose 并按统一视觉系统重做, 功能集与入口契约不变; 建立 M2 起所需的 Compose 基础设施. 允许修正明显的可用性问题 (如编辑器纯文字工具栏), 不新增能力.
 
-验收条件: 在支持 `readSiblings` 的宿主中, 包含多张受支持图像的目录可流畅左右翻页且不越出宿主会话授权范围; 双击行为可预期且与捏合缩放互不干扰; 动图控制与旋转均不影响只读保证. (已满足)
+### 5.1 准备与 spike
 
-## M2: 图像信息与输出
+- [ ] (设计) 新建 `docs/design/ui-redesign.md`: 信息架构图 (2.1.0 与 3.x 两张), 每个页面的线框 (文字或内联 SVG), 组件清单 (顶栏, 底部动作栏, 底部面板, 网格单元, 对话框, 空状态), 设计 token 对照表 (颜色角色, 字号, 间距, 圆角, 触控目标, 对应 Three 设置页规范条款), 手势清单. Simple Gallery (QV770340J7 已安装 `com.simplemobiletools.gallery.pro`) 与 Fossify Gallery 的参考截图存 `.bak/design-reference/`, 文档只写观察结论 (R1).
+- [ ] (插件) Compose 依赖接入 (T1): `gradle/libs.versions.toml` 增加 BOM 与库别名, `app/build.gradle.kts` 应用 `org.jetbrains.kotlin.plugin.compose` 并开启 `buildFeatures.compose`; `build.gradle.kts` 根声明随平台版本插件 (升级到已发布的 1.9.1 或更高) 提供的 Kotlin 版本. 验收: debug 与 release (R8 收缩) 构建通过, APK 体积与冷启动时间记录到 `docs/design/ui-redesign.md` 的 "基线" 小节.
+- [ ] (插件) 原生库门禁调整 (T2): `nativeAlignment { expectNoNativeLibraries }` 改为允许恰好 `libandroidx.graphics.path.so` x `arm64-v8a` / `armeabi-v7a` / `x86_64` / `x86`, 校验未压缩与 16 KB 对齐 (ELF `PT_LOAD` 与 zip 数据偏移); `docs/16kb.md`, `AGENTS.md` "ABI-independent managed code" 段落, `appendDigestToReleasedFiles` 校验同步. 验收: 对齐报告 JSON 列出且仅列出四个库; 16 KB 页设备 (在线租用 SM-A566B, `getconf PAGE_SIZE = 16384`) 关闭兼容模式冷启动正常.
+- [ ] (插件) 图像加载 spike (T3): 在 Compose 网格原型中分别用 Coil 3 与 `glide-compose` 加载 2000 张 MediaStore 缩略图, 记录首屏时间, 滚动掉帧与内存峰值; 按结果定稿 T3 并回填本表. 验收: `docs/design/ui-redesign.md` 记录数据与结论.
+- [ ] (插件) 主题系统移植: 把 `AppConfiguration` 的 HCT 派生规则 (chroma 规则, tone 40/100 与 80/20) 与中性表面色映射为 Compose `ColorScheme`, 提供 `MapleTheme` (跟随宿主 / 系统 / 本地的语言与夜间解析复用 `ApplicationSettingsResolver`); 保留 View 控件 tint 工厂给 `AndroidView` 嵌入组件. 验收: 极端种子 (`#FFDEAD`, 纯白, 纯黑, 高饱和红绿蓝) 下按钮文字对比度 >= 4.5:1 的 JVM 用例; 亮/暗切换不重启业务任务.
+- [ ] (插件) 共享 Compose 组件库 (`ui/compose/`): 设置分组与双行设置行 (72 dp, 24 dp 留白, 64 dp 文字起点, 整行点击, 开关行单次触发), 居中选择对话框 (24 dp 圆角, 560 dp 上限, 85% 高度, 先选后确定), 主题色选择器 (16 色网格 + HEX/RGB 输入 + 局部预览), 顶栏, 底部动作按钮 (图标 + 小字标签), 空状态, 进度与错误提示. 验收: `compose-ui-test` 覆盖对话框 "选择不保存 / 取消无变化 / 确定只保存一次 / 重建后值一致".
 
-- [x] (插件) EXIF 元数据面板: 经 `androidx.exifinterface` 只读解析拍摄时间, 设备型号, 曝光参数与方向标记, 在信息栏的按需展开面板中呈现; 检测到 GPS 元数据时只保留并提示“存在”状态, 不读取, 保存或展示坐标. 面板展开状态在同页 Activity 重建后保留, 切换页面时重置 (`ImageExifMetadataReader` + `ImageExifValueFormatter` + `ImageContentValidator` + `ImageViewerActivity`).
-- [x] (插件) EXIF 方向自动纠正: 静态图经锁定版本 Glide 5.0.5 的 `Downsampler` 在解码阶段规范化全部 8 种 EXIF 旋转/镜像方向, 查看器矩阵只叠加用户请求的 90 度视图旋转, 因而不会重复应用源方向; 重置与 Activity 重建只处理用户变换, 源方向纠正始终保留. 信息栏分辨率同步按 90 / 270 度方向交换宽高, 全程不改写源文件 (`ImageExifOrientationCorrection` + `ImageContentValidator` + `ZoomableImageView` + `ImageViewerActivity`).
-- [x] (插件) 打印与导出 PDF: `打印 / 保存 PDF` 经 Android `PrintManager` 与单页 `PrintDocumentAdapter` 打开系统打印面板, 可直接交给打印服务或另存为 PDF. 已由 Glide 完成 EXIF 规范化的当前 drawable 在点击时复制为内存快照; 静态图保留纠正结果, GIF 采用当时可见帧, 再以与查看器共享的 fit-center 四分之一转矩阵叠加用户手动旋转. 输出始终包含完整图像, 临时缩放和平移不作为裁剪, 写入过程在专用线程中直接写系统提供的 `ParcelFileDescriptor`, 不创建插件中间文件 (`ImageFitCenterTransform` + `ImagePrintSnapshot` + `ImagePrintPdfWriter` + `ImagePrintDocumentAdapter` + `ImageViewerActivity`).
-- [x] (插件) 缩放倍率指示与解码色彩信息: `ZoomableImageView` 在捏合期间持续上报真实倍率, 并在手势结束或双击缩放后显示 900 ms 的本地化倍率浮层; 重置, 翻页, 加载失败与销毁会立即清除浮层. Android 8.0 及以上仅采用 `BitmapFactory.Options.outConfig` 与 `outColorSpace` 的真实解码输出, 将已知像素配置映射为 bpp 并对色彩空间名称执行长度, 控制字符与双向控制符校验; Android 7.x, 解码器未提供或值不安全时整段省略, 不按扩展名, MIME 或 EXIF 猜测 (`ImageZoomIndicatorFormatter` + `ImageDecodedColorMetadataPolicy` + `ImageContentValidator` + `ZoomableImageView` + `ImageViewerActivity`).
-- [x] (测试) EXIF 解析与面板用例覆盖无 EXIF, 损坏 EXIF, 含 GPS 样本, 私有内容提供器读取, 字段格式化, 展开/收起及 Activity 重建状态; Android 9 / 12 / 15 定向 instrumentation 均通过 (`ImageExifValueFormatterTest` + `ImageExifMetadataInstrumentationTest` + `ImageViewerExifInstrumentationTest`).
-- [x] (测试) EXIF 方向纠正以非对称四色 JPEG 逐像素覆盖 8 种方向标记, 同时验证旋转/镜像, 纠正后分辨率, 私有内容提供器 Activity 路径, 手动旋转叠加, 重建恢复与重置; Android 9 / 12 / 13 / 15 定向 instrumentation 均通过 (`ImageExifOrientationCorrectionTest` + `ExifJpegTestFixture` + `ImageExifOrientationInstrumentationTest`).
-- [x] (测试) 打印路径覆盖四种旋转矩阵, 非法几何, 安全 PDF 文件名, 预取消写入, 单页 PDF 签名与页数, 非对称双色图的顺时针像素方向, 快照释放及插件私有目录写入前后零变化; Android 9 / 12 / 13 / 15 定向 instrumentation 均通过 (`ImageFitCenterTransformTest` + `ImagePrintNamesTest` + `ImagePrintPdfInstrumentationTest` + `ImageExifOrientationInstrumentationTest`).
-- [x] (测试) 倍率与解码色彩信息具备纯格式化, 小数本地化, 非法范围, 色彩空间空白折叠, 长度与控制符拒绝用例; Android View / Activity instrumentation 覆盖真实双指手势的开始, 更新和结束事件, 双击倍率, 900 ms 自动隐藏, 真实 JPEG 的 32 bpp 与 sRGB 输出及最终信息栏呈现, Android 9 / 12 / 13 / 15 定向用例均通过 (`ImageZoomIndicatorFormatterTest` + `ImageDecodedColorMetadataPolicyTest` + `ZoomableImageViewInstrumentationTest` + `ImageExifMetadataInstrumentationTest` + `ImageViewerExifInstrumentationTest`).
+### 5.2 页面迁移 (功能集不变)
 
-验收条件: 含 EXIF 的照片可查看关键拍摄信息且方向显示正确; 打印/导出产物与纠正方向及手动旋转一致; 捏合与双击缩放可即时获知倍率, 解码器可提供时能看到经安全处理的 bpp 与输出色彩空间; 全部能力不写入源文件或插件私有磁盘, PDF 字节只流向用户在系统打印框架中选择的目标. (已满足)
+- [ ] (插件) 首页 `HomeActivity`: Compose 版 hero + "开始使用" (查看 / 编辑 / 转换 / 保存处理结果) + "信息" (设置 / 在 AutoJs6 中使用); 保留 SAF 选图, 会话恢复与未保存结果拦截. 验收: `StandaloneHomeInstrumentationTest` 迁移到 Compose 语义树并通过.
+- [ ] (插件) 设置页 / 关于 / 发行历史: 按 Three 设置页规范 (第 2-12 节 MUST 条款) 用 5.1 组件重做, 语言 / 夜间模式 / 主题色 / 启动器图标顺序不变, 摘要显示当前值, 启动器图标四选项文案不变; 关于页保留圆角图标容器; 发行历史保留多语言与英文回退. 验收: TalkBack 读出标题 / 摘要 / 角色 / 状态; 大字号与 RTL (阿拉伯语) 不裁切; 键盘可达.
+- [ ] (插件) 查看器 `ImageViewerActivity`: 浮层顶栏 (文件名 + 页码 + 菜单), 底部元数据与四个图标按钮 (详情 / 旋转 / 分享 / 其他应用), GIF 悬浮按钮, 倍率提示, 详情底部面板改为 Compose (`ModalBottomSheet` 或自绘 sheet), 图像面为 `AndroidView(ZoomableImageView)`; 2.1.0 仍由 `ZoomableImageView.onPageSwipe` 切页 (分页与缩略图条留给 M2); edge-to-edge 插边与刘海处理不回退. 验收: 现有 `ImageViewer*` / `ZoomableImageView*` / `TiledImageDrawable*` / `ModernImageFormat*` / `MultiSelection*` instrumentation 迁移后在 API 28 / 33 / 35 通过.
+- [ ] (插件) 编辑器 `ImageEditorActivity`: 工具栏改为图标 + 标签的可横向滚动工具条并分组 (变换: 裁剪 / 左转 / 右转 / 微调 / 水平翻转 / 垂直翻转; 调整: 亮度 / 对比度 / 饱和度 / 色温; 绘制: 画笔; 文字), 底部参数面板 (滑条, 比例选择, 画笔类型与宽度, 马赛克强度, 颜色按钮) 与确认/取消改为 Compose, 画布为 `AndroidView(ImageEditingView)`; 保存与文字对话框 Compose 化; `ImageEditorViewModel`, 历史, 配置变更恢复, 输出事务不变. 验收: 编辑器 JVM 用例全部保留; `StandaloneImageWorkInstrumentationTest` 与 `ExplorerActionV12InstrumentationTest` 的编辑路径通过; 每个工具触控目标 >= 48 dp.
+- [ ] (插件) 转换器 `ImageConverterActivity`: 表单 (格式, 质量, 目标文件大小, 无损 WebP, 尺寸模式四选一与参数, JPEG 背景, 安全 EXIF) 与实时预估 (分辨率, 预计大小, 输出后缀) 改为 Compose; `ImageConversionOptions`, `ImageTargetFileSize`, `PngOutputOptimizer` 不变. 验收: 转换 JVM 用例全部保留; 配置变更保留草稿.
+- [ ] (插件) 图标资源统一: 24 dp 线性 vector (Material Symbols, Apache-2.0) 替换 `ic_save_white_48dp.png` / `ic_undo_white_48dp.png` 等 PNG 与风格不一的 vector; `THIRD_PARTY_NOTICES.md` 登记来源. 验收: `res/drawable` 无 PNG 图标; lint 无 `IconMissingDensityFolder` 等图标告警.
+- [ ] (插件) 入口 Activity (`ExplorerActionActivity`, `ExternalViewActivity`, `WakeActivity`) 与服务目录不变, 协议仍为 v12 / 最低宿主 5276 (T18). 验收: `ExplorerActionServiceTest` 与 `ExplorerActionServiceInstrumentationTest` 不改断言即通过.
 
-## M3: 格式, 协议与发布物料
+### 5.3 测试与质量
 
-- [x] (插件) 现代格式支持: 以单一格式目录注册并验证 AVIF / BMP / GIF / HEIC / HEIF / JFIF / JPE / JPEG / JPG / PNG / WEBP 共 11 种扩展名及对应 MIME 家族; 对旧版宿主可能提供的 `*/*` / `application/octet-stream` 仅在扩展名白名单内规范化, 具体 MIME 冲突仍拒绝. HEIC / HEIF 以 Android 9、AVIF 以 Android 12 为最低版本, 并使用缓存的微型真实图片执行本地边界解码探针, 避免仅凭版本或 MIME 声明误判. 直接打开与同目录翻页均在打开内容描述符前检查能力, 不满足最低版本或平台解码器不可用时显示对应本地化提示而非静默失败 (`ImageFormatSupport` + `ImageRequestPolicy` + `ImageContentValidator` + `ImageSiblingDiscoveryPolicy` + `ImageViewerActivity`).
-- [x] (测试) 现代格式用例覆盖 11 项目录一致性, 扩展名/MIME 家族与通配 MIME 规范化, 版本门槛, 解码器拒绝路径及同目录回退; Android instrumentation 以微型真实 HEIC / AVIF 样本验证平台边界解码和 Glide 加载, 并验证旧系统显示精确最低版本且不会打开宿主兄弟文件描述符. Android 9 / 12 / 13 / 15 完整 instrumentation 各 46 项均通过 (`ImageFormatSupportTest` + `ImageRequestPolicyTest` + `ImageSiblingDiscoveryPolicyTest` + `ExplorerActionV12InstrumentationTest` + `ModernImageFormatInstrumentationTest`).
-- [x] (插件) 超大图分块渲染: JPEG、PNG 与静态 HEIC / HEIF 在超过当前画布纹理上限或按设备内存等级限定的 32–64 MiB 完整 ARGB 解码预算时进入 `BitmapRegionDecoder` 管线; 先显示边长不超过 2048 且不超过 4 MP 的有界低采样预览, 放大后按当前矩阵和可见源区域选择幂次采样级别并异步解码约 512 x 512 像素瓦片. LRU 瓦片缓存按内存等级限制在 12–32 MiB, 单线程区域解码不会阻塞界面, 翻页、Activity 销毁与内存压力会取消待处理任务并释放位图、解码器及文件描述符. 分块 Drawable 在编码坐标与 EXIF 规范化坐标之间处理全部 8 种方向, 因而继续复用现有的焦点捏合、平移、双击缩放、90 度视图旋转、倍率提示和打印预览; 直接 content URI 与宿主会话兄弟页均接通, 不支持区域解码或可能为动画的格式保留原有 Glide 路径 (`ImageLargeImagePolicy` + `TiledImageDrawable` + `ZoomableImageView` + `ImageViewerActivity`).
-- [x] (测试) 大图管线具备纹理/内存阈值、格式准入、溢出安全字节估算、预览/瓦片采样、可见瓦片边界与中心优先顺序的纯策略用例, 并逐角验证全部 8 种 EXIF 坐标变换. Android instrumentation 以逐行流式生成且压缩文件小于 2 MiB 的 5000 x 4000 真实 PNG 验证 20 MP 源图不会整图分配, 适屏预览为 sample=4, 2.5 倍放大切换至 sample=2 可见瓦片, 四象限像素正确, 缓存可裁剪, 旋转保持倍率, 宿主翻页成功且旧 Drawable / 描述符释放; 另以真实转置 EXIF JPEG 验证分块显示与 Glide 规范化方向一致, 并从 Android 9 起以真实静态 HEIC 验证平台区域解码器准入. Android 9 / 12 / 13 / 15 完整 instrumentation 各 46 项均通过 (`ImageLargeImagePolicyTest` + `ImageExifOrientationTransformTest` + `LargePngTestFixture` + `TiledImageDrawableInstrumentationTest`).
-- [x] (API/宿主/插件) 显式多选图像组: 保留现有 `view-image` 单目标主要动作及 `readSiblings` 同目录浏览, 另以 v12 目录声明只读 `view-images` 多目标选择工具栏动作. AutoJs6 已有的 explorer-action v4+ 多目标链路会按选择顺序发送同一父目录下最多 128 个目标 Bundle、同序 ClipData 与多目标 HOST_SESSION; 插件逐项校验动作/协议/宿主版本、目标 ID、直属 content URI、文件名、类型、大小、时间、顺序、唯一性和 Binder 描述符, 并在内容边界与实际大小复核全部通过后, 仅将宿主明确授权的目标按原选择顺序交给查看器. 1 倍左右滑动只在显式选择组内翻页, 每页仍可缩放、旋转、查看元数据、打印、分享或交给其他应用; 传递给私有查看器的 ClipData 继续仅含只读 URI, 入站多目标会话在完成交接后立即关闭 (`PluginRuntimeInfo` + `ImageRequestPolicy` + `ExplorerActionActivity` + `ImageViewerContract`).
-- [x] (测试) 多选目录与协议用例验证两个动作的基数、位置、只读能力、格式目录及 `readSiblings` 隔离; 请求用例覆盖 1 / 2 / 129 个目标, 选择顺序, 单目标无会话, 多目标必需会话, 单/多动作混淆, 聚合 MIME、ClipData 调序, 重复 ID, 嵌套 URI, 不支持格式, 首项目元数据与内部交接篡改. Android UI instrumentation 以两张真实纯色 PNG 验证显式选择顺序、前后翻页、像素内容、翻页缩放复位、当前页转发按钮与逐页内容描述符读取. Android 9 / 12 / 13 / 15 完整 instrumentation 各 46 项均通过, Android 13 另连续稳定复跑 3 轮 (`ExplorerActionServiceInstrumentationTest` + `ExplorerActionV12InstrumentationTest` + `MultiSelectionInstrumentationTest`).
-- [x] (发布) 界面截图物料: `docs/images/screenshots` 提供 Android 13 模拟器中的五张真实运行截图, 全部使用专为文档生成的几何合成图像与文件名, 覆盖文件管理器单文件入口、两项显式多选、查看器主界面与实时元数据、沉浸式 2.5 倍缩放及系统分享面板. README 模板以两列响应式 HTML 表格接入相同资产, 10 种语言分别生成标题、说明、替代文本与图注; 原始 PNG 均为 1080 x 2340、不含嵌入 profile/comment 且 alpha 全不透明, 明暗背景浏览器渲染均通过 (`docs/images/screenshots/README.md` + `.readme/template_readme.md` + `.readme/lang_*.json`).
-- [x] (发布) v1.1.0 发布候选准备: `version.properties` 已更新为 versionName 1.1.0 / versionCode 6, 10 种语言 CHANGELOG 与 25 份生成文档一致且幂等; JVM 51 项、Android 9 / 12 / 13 / 15 各 46 项、lint、R8 release 构建、签名/对齐校验及 release APK Android 13 冷启动冒烟均通过. 本地候选 APK、R8 mapping、SHA-256 清单与剩余人工门禁见 `docs/release/v1.1.0.md`.
-- [ ] (发布) v1.1.0 正式对外发布: 在最终提交上重新构建并刷新校验和, 创建 `v1.1.0` 标签与 GitHub Release, 上传签名 APK 并复核下载产物.
+- [ ] (测试) instrumentation 迁移: 所有基于 View id / `contentDescription` 的断言改为 Compose 语义 (`testTag` / `contentDescription`), 新增 `compose-ui-test` 依赖; 保留夹具 (`AnimatedGifTestFixture`, `ExifJpegTestFixture`, `LargePngTestFixture`, `ModernImageTestFixture`). 验收: API 28 / 31 / 33 / 35 四台真机完整 instrumentation 通过, CI API 35 通过.
+- [ ] (测试) 视觉回归: 对首页, 设置页, 查看器, 编辑器, 转换器各采一组亮/暗/大字号/RTL 截图存 `.bak/visual/2.1.0/` (不入库), 人工核对设计文档线框. 验收: 文档记录核对日期与设备.
+- [ ] (测试) 性能基线: 冷启动 (首页 / 查看器直开) 与编辑器打开 20 MP 图的耗时在 API 28 与 35 设备各测 5 次取中位数, 不劣于 2.0.1 的 110%. 验收: 数据写入 `docs/design/ui-redesign.md`.
 
-验收条件: 新格式在受支持设备上可正常打开且在不受支持设备上提示清晰; 超大图可流畅浏览; 从同一目录显式多选的图像可按宿主选择顺序成组打开且不扩展至未选文件; README 截图在 GitHub 深浅色模式下显示正常.
+### 5.4 发布
 
-## M4: 沉浸式界面与交互重构 (v1.2.0)
+- [ ] (发布) 按第 4 节 P1-P5 发布 v2.1.0; changelog `feature` 描述 "界面全面改为 Material 3 风格" 与编辑器工具栏变化, `dependency` 记录 Compose BOM, Coil 或 glide-compose, Room 不在本版; `hint` 说明 APK 新增 Compose 自带的 `libandroidx.graphics.path.so`.
 
-- [x] (插件) 全出血沉浸式布局: 查看器根布局改为 `CoordinatorLayout`, `ZoomableImageView` 去除内边距铺满整个窗口并延伸至状态栏与导航栏下方; Activity 启用 `enableEdgeToEdge`, 以 `WindowInsetsCompat` 的 systemBars + displayCutout 分别为顶栏 (内边距与高度), 底栏, 悬浮按钮, 详情面板与倍率提示施加插边, 图像本身不受插边影响; 专用主题 `AppTheme.Viewer` 设置深色窗口背景与 `shortEdges` 刘海模式, Android 7 上导航栏保留暗色 scrim 以保证白色图标可见 (`ImageViewerActivity` + `activity_image_viewer.xml` + `styles.xml`).
-- [x] (插件) 浮层顶栏与溢出菜单: `MaterialToolbar` 以半透明主色覆盖在图像上方, 标题为文件名, 打开多张图像时副标题显示 `当前页 / 总页数`; 右上角菜单 (`menu_image_viewer.xml`) 收纳 `重置缩放` (始终可用) 与 `打印 / 保存 PDF` (图像就绪后启用), 为后续菜单项预留位置 (`ImageViewerActivity` + `menu_image_viewer.xml`).
-- [x] (插件) 图标操作栏与悬浮控件: 底栏改为半透明表面, 上方一行元数据摘要, 下方 `详情` / `旋转` / `分享` / `其他应用` 四个图标 + 小字标签按钮 (`Widget.App.BottomActionButton`, `iconGravity=textTop`), 每个按钮的 `contentDescription` 沿用原完整文案; GIF 暂停/继续改为底栏上方的 48dp 悬浮圆形图标按钮, 仅在动画可控且控件可见时显示, 点按图像同时切换顶栏、底栏与悬浮按钮 (`ImageAnimationPlayback.renderImageAnimationPlayback` + `ImageViewerActivity`).
-- [x] (插件) 详情底部面板: 元数据与 EXIF 移入 `BottomSheetBehavior` 驱动的可拖拽面板, 含拖拽把手, 文件名, 元数据摘要与 EXIF 文本 (无 EXIF 时显示明确提示); 只要元数据读取成功即可打开, 下滑、点按图像或系统返回键均可关闭, 展开状态仍在同页 Activity 重建后保留并在翻页时重置. 面板与底栏均声明可点击以阻止触摸穿透至图像 (`ImageViewerActivity` + `activity_image_viewer.xml`).
-- [x] (测试) 受影响的 Android instrumentation 用例由按钮文字断言迁移到 `contentDescription`, 由 `reset_zoom` / `print_image` 视图迁移到工具栏菜单项, 由 `exif_details` 可见性迁移到 `details_sheet`; Android 9 与 Android 15 定向复跑 7 个受影响类共 17 项均通过, JVM 单元测试与 lint 无新增问题 (`ImageViewerExifInstrumentationTest` + `ImageViewerAnimationInstrumentationTest` + `ImageAnimationControllerInstrumentationTest` + `ImageExifOrientationInstrumentationTest` + `TiledImageDrawableInstrumentationTest` + `ModernImageFormatInstrumentationTest` + `MultiSelectionInstrumentationTest`).
-- [x] (发布) 文案与文档同步: 11 种语言资源新增 `label_details` / `label_rotate` / `label_open_with` / `page_counter` / `exif_unavailable`; 10 种语言 README 源 (要点, 使用提示, FAQ), 11 份 `plugin_instruction.md` 与 10 种语言 CHANGELOG 已按新界面改写并重新生成; `version.properties` 更新为 versionName 1.2.0 / versionCode 7.
-- [ ] (发布) 截图重采: `docs/images/screenshots` 中查看器主界面、2.5 倍缩放与分享面板三张截图仍为旧界面, 需在 Android 13 模拟器以相同合成素材重新采集并保持 1080 x 2340 规格.
-- [ ] (发布) v1.2.0 正式对外发布: 完成完整 instrumentation 复跑与 release 构建后刷新校验和, 创建 `v1.2.0` 标签与 GitHub Release.
+验收条件: 五类页面全部为 Compose 实现且无功能回退; 入口契约, 协议版本与最低宿主不变; 原生库门禁按 T2 收紧后通过; 四台真机 instrumentation 与 CI 通过; 10 种语言文案与文档同步.
 
-验收条件: 图像在含刘海与手势导航的设备上铺满屏幕且浮层控件不被系统栏遮挡; 点按图像可隐藏全部浮层获得纯净视图; 多图会话可见页码; 详情面板可通过拖拽、点图与返回键关闭且重建后状态一致; 日/夜间主题下浮层可读. (功能部分已满足, 待截图与发布)
+---
 
-## 边界 (非目标)
+## 6. M2: v3.0.0 相册
 
-- 不提供编辑能力: 裁剪, 涂鸦, 格式转换与压缩等写操作永久超出范围, 由宿主或专业应用负责; M1/M2 的旋转与方向纠正仅影响显示, 不写文件.
-- 不做媒体库: 不扫描相册, 不建立索引, 不接收父目录文件系统路径或可扩展目录 URI; 单击后的同目录浏览仅使用宿主 `readSiblings` 会话枚举直属文件并按相对名称只读打开, 多选浏览仅接受宿主明确列出的同父目录目标且不会自行补充未选文件.
-- 不访问网络: 查看器永不加载远程资源, 不上传任何数据; 插件不申请网络权限并禁用明文流量.
-- 不脱离宿主运行: 不添加桌面入口; 外部 `ACTION_VIEW` 入口仅承接只读查看请求, 不代表插件具备独立的文件管理能力.
+目标: 独立应用首页变为相册网格, 建立权限策略与 MediaStore 数据层, 查看器支持分页与缩略图条, 无权限时仍可用; 宿主侧新增 "以相册浏览" 目录动作.
+
+### 6.1 权限与数据层
+
+- [ ] (插件) `MediaPermissionPolicy` (T5, Android-free): 输入 API 级别, 授权结果, 历史申请记录, `shouldShowRationale`, 所有文件访问状态, 输出状态与下一步动作 (申请 / 跳系统设置 / 管理所选照片 / 无动作). 验收: JVM 用例覆盖 API 24 / 28 / 29 / 30 / 33 / 34 / 36 x 首次 / 拒绝一次 / 永久拒绝 / 部分访问 / 全量 / 所有文件访问.
+- [ ] (插件) 申请流程: 独立首页首次启动 (或从未申请过) 申请一次; 结果持久记录 (Room, T8); 之后不自动申请; 空状态按钮与 设置 > 存储权限 可再申请; `NEVER_ASK` 跳转应用详情; Android 14+ 部分访问显示 "管理所选照片" 入口. 验收: `compose-ui-test` 验证二次启动不弹系统对话框 (用 `UiAutomator` 探测系统权限窗口); 宿主入口与 `ACTION_VIEW` 入口冷启动不出现权限对话框 (R2).
+- [ ] (插件) 设置 > 存储权限 页: 当前状态摘要 (完整 / 部分 / 未授予 / 所有文件访问), 授予 / 管理所选照片 / 打开系统设置 按钮, "所有文件访问" 开关 (D5, 跳 `ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION`, 返回后刷新), 已授权文件夹列表 (T7, 可移除). 文案说明每一项的用途与限制. 验收: 每种状态的界面截图入 `.bak/visual/3.0.0/`; 开关状态与 `Environment.isExternalStorageManager()` 一致.
+- [ ] (插件) `MediaStoreRepository` (T6): 相册列表 (bucket 聚合: 名称, 数量, 封面 = 最新项, 相对路径), 相册内媒体分页查询, 全部媒体, 排序 (名称 / 修改时间 / 拍摄时间 / 大小, 升降), 过滤 (`ImageFormatSupport` 目录, 排除 0 字节 / pending / trashed), `ContentObserver` 增量刷新与节流. 验收: Robolectric 或 instrumentation 用例以注入的 1000 项媒体库验证聚合, 排序, 过滤与刷新; 不查询 `DATA` 以外的路径字段 (Android 10+ 用 `RELATIVE_PATH`).
+- [ ] (插件) `AuthorizedFolderRepository` (T7): 持久化 SAF 树授权, `DocumentFile` 递归枚举 (深度与数量上限, 符号链接不跟随), 与 MediaStore 相册同一数据模型. 验收: 用例覆盖授权失效 (卷移除) 时的空状态与移除入口.
+
+### 6.2 相册与网格界面
+
+- [ ] (插件) 首页相册网格 (D9): 封面 + 名称 + 数量, 列数随窄/宽屏变化 (2 / 3 / 4), 顶栏 (标题, 排序, 更多: 显示所有文件夹内容 / 设置), "已授权文件夹" 分组, 空状态 / 无权限状态 / 部分访问状态三种设计, 下拉刷新. 验收: 5.1 设计文档线框一致; 无权限状态在 API 33 设备拒绝后可用 (选图 / 选文件夹 / 编辑 / 转换 全部可达).
+- [ ] (插件) 媒体网格: 方形缩略图 (Coil 3 或 Glide, 占位与淡入), 列数设置 (3 / 4 / 5 / 6, 捏合调整), 文件类型角标 (GIF / HEIC / AVIF / WEBP), 快速滚动条与日期气泡, 点按进入查看器, 长按进入多选 (M3 补操作). 验收: 2000 项网格快速滚动 jank < 5% (`FrameMetrics` 统计写入文档); 回到网格时滚动位置保留.
+- [ ] (插件) "显示所有文件夹内容" 平铺视图与排序记忆 (全局默认 + 每相册单独记忆). 验收: 设置重建后排序保留.
+- [ ] (插件) 导航 (T4): `HomeActivity` 内 `navigation-compose` 路由 相册 -> 媒体网格, 返回栈与系统返回手势一致, 预测性返回 (Android 14+) 启用. 验收: 深层页面旋转屏幕不丢失路由与滚动位置.
+
+### 6.3 分页查看器与手势
+
+- [ ] (插件) 查看器分页: `HorizontalPager` 承载每页 `AndroidView(ZoomableImageView)`, 1 倍时水平滑动交给 Pager, 放大后交给图像 (嵌套滚动协调), 预加载相邻 1 页, 翻页后缩放复位; 数据源抽象 `ViewerSource` 统一 MediaStore 相册 / 已授权文件夹 / 宿主会话兄弟 / 宿主显式多选 / 单 URI 五种来源. 验收: 五种来源各一条 instrumentation; 20 MP PNG 翻页不整图分配 (沿用 `TiledImageDrawable`).
+- [ ] (插件) 底部缩略图条: 当前页高亮并居中, 点击跳页, 随浮层一起隐藏; 宿主单图入口使用 `readSiblings` 会话枚举, 显式多选使用选中组. 验收: 128 页会话滚动流畅; 隐藏/显示状态在重建后一致.
+- [ ] (插件) 双指旋转手势 (D8, 显示层): `ZoomableImageView` 识别双指旋转并实时跟随, 松手吸附到最近 90 度倍数并与现有 `ImageRotationState` 合并; 旋转后在底栏显示 "保存旋转" 提示条 (3.0.0 只提供 "撤销" 与 "关闭", 真正保存在 M4 的 T15); 设置可关闭手势. 验收: `ImageRotationStateTest` 扩展角度吸附用例; instrumentation 以双指事件验证吸附与倍率保持.
+- [ ] (插件) 查看器从网格进入与返回的位置同步 (返回时网格滚动到当前页). 验收: instrumentation 验证第 50 项打开后翻到第 60 项返回, 网格第 60 项可见.
+
+### 6.4 宿主协同
+
+- [ ] (插件) 目录动作 "以相册浏览" (`browse-directory`): 目录声明 `TARGET_DIRECTORY` + `CARDINALITY_SINGLE` + `ACCESS_READ_ONLY` + `PLACEMENT_OVERFLOW` + Activity, 使用宿主会话 `listChildren` 分页枚举 (子目录显示为文件夹块, 图片按目录过滤), 缩略图经 `openFile` 解码并走私有 `HostSessionImageProvider`; 不申请权限, 不披露路径; 该模式下管理操作不可用 (M3 的宿主回收站除外). 验收: `ExplorerActionCatalogPolicy` 单元测试 (宿主侧, 只读) 确认目录动作被接受; QV770340J7 上从文件管理器目录菜单打开相册.
+- [ ] (宿主) 核对目录会话对子目录 `relativePath` 分页的现有约束 (深度, 128 页上限), 必要时在 `docs/dev/` 补充说明; 宿主代码无需改动时记录结论. 验收: 结论写入宿主 `docs/dev/explorer-action-protocol-v23.md` 之后的说明或新建 `explorer-action-directory-browsing.md`.
+- [ ] (宿主) `PluginInstallWizardCatalog` 标题与分类不变; 若插件说明 (`plugin_instruction.md`) 新增相册用法, 核对插件中心渲染. 验收: 宿主 `PluginInstallWizardCatalogTest` 通过.
+
+### 6.5 性能与测试
+
+- [ ] (测试) 大库性能: 在 968e9f18 (API 35) 与 QV770340J7 (API 33) 注入 5 万张合成图片 (脚本生成, 测试后清理), 记录首页首屏, 相册打开, 滚动掉帧, 内存峰值; 不达标则触发 T6 推翻点. 验收: 数据写入 `docs/design/ui-redesign.md` "性能" 小节.
+- [ ] (测试) 权限矩阵: API 24 AVD, API 29 AVD, 真机 28 / 31 / 33 / 35, 在线 API 36 各走一遍 首次申请 / 拒绝 / 永久拒绝 / 部分访问 (34+) / 所有文件访问 并截图. 验收: 矩阵表写入设计文档, 每格有日期.
+- [ ] (测试) JVM 与 instrumentation 全量通过; CI 通过.
+
+### 6.6 发布
+
+- [ ] (发布) 按 P1-P6 发布 v3.0.0; changelog `hint` 说明独立启动会申请一次媒体权限及拒绝后的可用范围, `feature` 覆盖相册网格, 分页与缩略图条, 旋转手势, 已授权文件夹, 存储权限设置页, 宿主 "以相册浏览"; README 新增相册与权限 FAQ; 截图重采 (首页网格, 媒体网格, 查看器缩略图条, 无权限状态).
+
+验收条件: 独立首页为相册网格且在完整 / 部分 / 无权限三种状态下都可用; 宿主入口与外部入口不触发权限申请; 查看器五种来源分页与缩略图条一致; 5 万张库滚动流畅; 协议仍为 v12.
+
+---
+
+## 7. M3: v3.1.0 管理操作
+
+目标: 多选与四组管理操作 (D7), 搜索, 排序与分组, 宿主回收站 (D10).
+
+### 7.1 多选与通用操作
+
+- [ ] (插件) 多选模式: 长按进入, 点按切换, 拖动范围选择, 全选 / 反选, 顶栏计数, 底部操作栏 (删除 / 分享 / 移动 / 复制 / 收藏 / 更多: 重命名 (单选) / 详情 / 批量转换); 相册网格也可多选 (排除 / 置顶 / 隐藏). 验收: 1000 项全选性能; 旋转屏幕保留选择.
+- [ ] (插件) `MediaWriteCoordinator`: 封装 Android 11+ `createWriteRequest` / `createDeleteRequest` / `createTrashRequest` 的 `IntentSender` 往返 (批量一次确认), Android 9-10 的直接写, `ALL_FILES` 下的直接文件操作; 失败逐项报告, 成功后触发 MediaStore 扫描与网格刷新. 验收: 三种路径各有 instrumentation (API 28 / 29 AVD / 33).
+
+### 7.2 删除与回收站
+
+- [ ] (插件) 删除 (T10): 单张 / 多选删除进入回收站 (Android 11+ 系统; 9-10 自建), 设置 "启用回收站" 关闭时直接删除并二次确认; 删除后 Snackbar "撤销" (系统回收站: 恢复; 自建: 还原文件). 验收: `RecycleBinPolicyTest` (过期, 容量, 命名冲突) JVM; API 28 与 33 instrumentation 验证删除 -> 回收站可见 -> 恢复 -> 原位置一致.
+- [ ] (插件) 回收站视图: 虚拟相册 (更多菜单入口), 剩余天数角标, 恢复 / 永久删除 / 清空, 空状态. 验收: 系统回收站项目经 `QUERY_ARG_MATCH_TRASHED` 列出 (API 30+); 自建回收站 30 天过期用例.
+- [ ] (宿主) 协议 v24 (T13): `ExplorerActionCatalogKeys.TARGET_TRASH`, 会话方法 `moveTargetsToTrashSubset`, 目录策略 (只读 Activity 动作, 单或多目标), 身份复核, v21 批次记录与 `undoTargetTrashBatch` 复用, Explorer 刷新; `docs/dev/explorer-action-protocol-v24.md`; 宿主 `.changelog` 10 种语言. 验收: 宿主 `ExplorerActionCatalogPolicyTest` 与会话单元测试覆盖接受形状, 拒绝写动作 / 非会话目标 / 重复 ID; 宿主 versionCode 记入 T18.
+- [ ] (插件) 宿主入口删除: `view-image` / `view-images` / `browse-directory` 声明 `targetTrash`, 查看器删除按钮在宿主来源下调用 v24 并以 Snackbar 撤销 (v21 批次); 删除后翻到下一页或关闭. 验收: `ExplorerActionV12InstrumentationTest` 升级为 v24 用例; QV770340J7 宿主实机验证删除进入宿主回收站并可撤销.
+
+### 7.3 重命名 / 移动 / 复制
+
+- [ ] (插件) 重命名: 单张, 校验非法字符 / 重名 / 扩展名变更提示, MediaStore `DISPLAY_NAME` 更新 (需要写请求). 验收: JVM 文件名策略用例; instrumentation.
+- [ ] (插件) 移动与复制: 目标相册选择器 (最近使用置顶, 新建相册), 冲突策略 (自动后缀 / 跳过 / 替换, 默认询问一次后应用到全部), 进度与取消; Android 10+ 移动 = `RELATIVE_PATH` 更新, 9 = 复制后删除; 复制 = `insert` + 流复制 + 元数据保留 (修改时间, 可选 EXIF 原样). 验收: 跨卷 (内置 / SD) 用例; 失败中途可恢复 (已完成项不重复).
+
+### 7.4 收藏, 排除, 置顶, 隐藏
+
+- [ ] (插件) 收藏 (T9): 查看器与多选的收藏切换, "收藏" 虚拟相册, 本地 Room 表; 可选 "同步系统收藏" 开关 (Android 11+). 验收: 文件被移动/重命名后收藏按内容指纹保留的用例.
+- [ ] (插件) 排除目录 (本地名单) 与 "管理排除目录" 页; 置顶目录 (相册网格置顶区); 排除项在 "显示所有文件夹内容" 中也不出现. 验收: Room 迁移测试; 排除后计数与封面重算.
+- [ ] (插件) 隐藏目录 (.nomedia) 与 "显示隐藏目录" 开关: 仅 `ALL_FILES` 状态可用, 否则按钮显示原因与开启入口; 隐藏目录内容经文件系统枚举. 验收: API 33 开启所有文件访问后隐藏 / 取消隐藏往返; 未开启时无写入.
+
+### 7.5 搜索, 排序与分组
+
+- [ ] (插件) 搜索: 顶栏搜索相册名 (首页) 与文件名 (相册内 / 全局切换), 结果网格复用, 去抖与取消. 验收: 5 万库全局搜索首屏 < 500 ms (数据入文档).
+- [ ] (插件) 排序对话框: 名称 / 修改时间 / 拍摄时间 (EXIF, 回落修改时间) / 大小 / 随机, 升降序, "仅本相册" 复选; 分组: 无 / 按日 / 按月 (粘性标题, 显示数量), 相册网格排序 (名称 / 修改时间 / 数量 / 自定义置顶). 验收: `MediaSortPolicyTest` JVM (自然排序, 空值, 稳定性); UI 用例.
+
+### 7.6 批量编辑输出
+
+- [ ] (插件) 批量转换 (T12, 独立入口): 多选 -> 批量转换对话框 (格式 / 质量 / 尺寸模式 / 移除 EXIF / 旋转 90 度步进), 进度对话框 (已完成 / 失败 / 取消), 输出写入同相册并加安全后缀, 失败项列表可重试. 验收: 100 张混合格式批量在 API 28 与 35 完成; 中途取消不留半成品.
+- [ ] (宿主) 核对 v15 批量输出对 "多目标 + 选择工具栏 + `OUTPUT_CREATE_SIBLING`" 图像转换动作的接受条件 (`ExplorerActionOutputPolicy`), 必要时放宽并补单元测试与 `docs/dev/explorer-action-output-transactions.md`. 验收: 宿主单元测试.
+- [ ] (插件) 宿主入口批量转换动作 `convert-images` (多目标, 选择工具栏): 每张一个输出事务, `prepareOutputBatch` / `commitOutputBatch` 全部成功才发布, 失败整体回滚并提示. 验收: `ExplorerActionV12InstrumentationTest` 新增批量用例; 实机验证宿主文件管理器多选 -> 批量转换.
+
+### 7.7 测试与发布
+
+- [ ] (测试) 全量 JVM / instrumentation / CI; 设备矩阵冒烟 (删除 / 回收站 / 移动 / 收藏 / 搜索 各一次).
+- [ ] (发布) 按 P1-P6 发布 v3.1.0; `hint` 说明回收站行为按 Android 版本不同, 宿主入口删除需要支持 v24 的宿主版本.
+
+验收条件: 四组管理操作在三种权限状态下行为明确 (无权限时按钮禁用并说明); 所有删除可撤销; 宿主入口删除进入宿主回收站; 搜索与排序在大库下流畅.
+
+---
+
+## 8. M4: v3.2.0 编辑与输出
+
+目标: 编辑器按新设计重做并落地 D11 五项扩展, 覆盖保存与撤销 (D3), 手势旋转保存 (D8), 转换器重做, 协议升级 (T18).
+
+### 8.1 编辑器重做
+
+- [ ] (插件) 编辑器信息架构: 顶栏 (返回 / 撤销 / 重做 / 对比 (长按显示原图) / 保存), 底部一级分组 (变换 / 调整 / 滤镜 / 绘制 / 标注 / 文字), 二级工具条, 参数面板; 画布支持捏合缩放与平移 (编辑态下与工具手势互斥); 全部触控目标 >= 48 dp. 验收: 设计文档线框一致; 现有 JVM 用例保留.
+- [ ] (插件) 预设滤镜 (D11): 12-16 个自研滤镜 (黑白, 复古, 冷调, 暖调, 胶片, 褪色, 高对比, 柔和, 反转, 褐色, 鲜艳, 哑光 等) 以 `ColorMatrix` 组合或小型查找表实现 (Android-free `FilterPreset`), 强度滑条, 底部缩略图条用降采样预览, 可与调整叠加后一次应用. 验收: `FilterPresetTest` 验证矩阵可逆性与强度 0 为恒等; 2000 x 2000 预览刷新 < 50 ms.
+- [ ] (插件) 更多调整项 (D11): 曝光, 高光, 阴影, 色调 (hue), 锐化, 晕影; `ColorMatrix` 可表达的项走矩阵, 锐化与晕影在 API 31+ 用 `RenderEffect`, 旧版本用自研卷积 / 径向遮罩; 多项叠加预览后一次应用进入历史. 验收: `ImageEditingEngineAdjustmentTest` 覆盖边界值; 20 MP 应用时间与内存数据入文档.
+- [ ] (插件) 编辑器内调整尺寸 (D11): 宽 / 高 / 百分比 / 锁定比例, 复用 `ImageConversionOptions` 尺寸策略与像素预算, 作为历史条目可撤销. 验收: JVM 用例; 超预算提示与转换器一致.
+- [ ] (插件) 标注形状 (D11): 矩形 / 椭圆 / 箭头 / 直线, 拖动创建, 句柄调整, 线宽 / 颜色 / 填充 (空心 / 实心), 与画笔共享颜色与线宽记忆, 确认前可删除. 验收: `ShapeGeometryTest` (句柄命中, 最小尺寸, 箭头几何); instrumentation 绘制与撤销.
+- [ ] (插件) 取色 (T16): 放大镜取色 (长按画布, 逆矩阵采样原位图), HEX 显示, 应用到当前颜色目标; 附录 C Q1 拍板后补 3-Color Picker 对接. 验收: 缩放 3 倍并平移后取色与位图像素一致的 instrumentation.
+- [ ] (插件) 画笔与文字的既有功能迁移 (类型, 宽度记忆, 马赛克强度, 文字样式与拖动) 不回退. 验收: 现有 `ImageEditingEngineBrushTest` / `ImageEditingEngineTextTest` / `EditorTextStyleSettingsTest` 通过.
+
+### 8.2 覆盖保存与撤销
+
+- [ ] (插件) 保存对话框: 格式 (跟随源 / JPEG / PNG / WebP), 质量, 无损 WebP, "覆盖原图" (D3, 默认关), 位置信息保留 (T14, 条件显示), 文件名预览. 验收: `EditorSavePolicyTest` 扩展.
+- [ ] (插件) 宿主入口覆盖 (T11): `edit-image` / `convert-image` 改为 `ACCESS_MANAGE_TARGET`, 替换生命周期含读回校验, 失败 `abortOutput`; 成功后 Snackbar "撤销覆盖" 调用 v18 `undoTargetReplacement`, 单次有效. 验收: `ExplorerActionV12InstrumentationTest` 新增替换 / 撤销 / 身份变化拒绝用例; 实机验证.
+- [ ] (插件) 独立入口覆盖 (T11): MediaStore `createWriteRequest` 后 `openOutputStream(uri, "wt")`; SAF 文档直接覆盖; 覆盖前复制原文件为单份撤销备份 (256 MiB 上限, 超限时提示不可撤销并要求二次确认); Snackbar 撤销还原. 验收: API 28 / 33 instrumentation; 备份在下次覆盖时被替换.
+- [ ] (插件) 手势旋转保存 (T15): 查看器 "保存旋转" 提示条接通: JPEG 更新 EXIF 方向 (无损, 保留其他元数据), 其他格式重编码 (提示质量); 写入复用上一条的覆盖路径 (宿主来源: v9 替换; MediaStore / SAF: 就地覆盖 + 备份); 设置 "旋转后提示保存" 可关闭. 验收: 非对称四色 JPEG 旋转保存后 8 方向像素比对; `ImageExifOrientationInstrumentationTest` 扩展.
+
+### 8.3 转换器重做
+
+- [ ] (插件) 转换器界面按新设计重做 (与批量转换共用表单组件), 预估区与输出后缀预览保留; 新增 "覆盖原图" 选项 (同 8.2 路径). 验收: 现有转换 JVM 用例通过; 配置变更保留草稿与执行中任务.
+
+### 8.4 协议升级
+
+- [ ] (插件) 目录统一声明 v24 (T18), `REQUIRED_HOST_VERSION` 提升到发布 v24 的宿主 versionCode, `plugin_requires_host_version` 资源, `libs/explorer-action-api.aar` 更新为宿主当前工件, 旧宿主上的回退说明写入 README FAQ. 验收: `ExplorerActionServiceTest` 断言版本; 索引清单 `requiresHostVersion` 一致.
+
+### 8.5 测试与发布
+
+- [ ] (测试) 全量 JVM / instrumentation / CI; 设备矩阵冒烟 (滤镜 / 形状 / 取色 / 覆盖 / 旋转保存).
+- [ ] (发布) 按 P1-P6 发布 v3.2.0; `hint` 说明最低宿主版本提升与覆盖原图的撤销范围.
+
+验收条件: 编辑器五项扩展可用且全部进入撤销历史; 覆盖只在用户勾选时发生且在两种入口均可撤销; 旋转保存对 JPEG 无损; 协议 v24 下旧宿主行为有明确说明.
+
+---
+
+## 9. M5: v3.3.0 查看器与设置全集
+
+目标: 落地 D8 其余附加功能与 Fossify 同级的查看器 / 网格设置项, 扩展详情, 平板与横屏, 无障碍与性能收尾.
+
+### 9.1 查看器附加功能
+
+- [ ] (插件) 幻灯片: 间隔 (秒), 随机 / 循环 / 反向, 包含 GIF, 动画 (无 / 淡入淡出 / 滑动), 播放期间屏幕常亮并隐藏浮层, 点按暂停, 结束提示. 验收: `SlideshowPolicyTest` (顺序, 循环, 边界); instrumentation 验证常亮标志与暂停.
+- [ ] (插件) 设为壁纸: 主屏 / 锁屏 / 两者 (`WallpaperManager`, Android 7+ flags), 复用裁剪工具按屏幕比例裁剪, 失败回落 `ACTION_ATTACH_DATA`. 验收: API 28 / 35 实机设置成功 (人工记录).
+- [ ] (插件) 分享与转交: 原图分享, "去除元数据的副本" (临时文件经 `FileProvider`, 分享后清理), "缩小副本" (长边 1080 / 1920 / 自定义), 打印 / PDF 保留, 其他应用打开 / 用其他应用编辑 (排除自身). 验收: 副本 EXIF 为空的用例; 临时文件在 24 小时后清理.
+- [ ] (插件) GPS 与地图 (T14): 设置 "显示位置信息" (默认关), 详情面板坐标 (十进制 + 度分秒) 与 "在地图中打开"; `ImageExifMetadata` 展示路径按设置切换, 输出策略不变; 相关测试 (`ImageExifMetadataInstrumentationTest`, `ImageViewerExifInstrumentationTest`, `ExifMetadataPolicyTest`) 增加开启 / 关闭两态. 验收: 关闭态与 2.0.1 行为逐字一致.
+- [ ] (插件) 扩展详情叠加: 设置可选字段 (路径, 大小, 分辨率, 拍摄 / 修改时间, 相机, 曝光, 焦距, ISO, 位置) 以半透明文字叠加在查看器底部, 随浮层隐藏. 验收: 字段选择持久化; 长路径换行不遮挡缩略图条.
+
+### 9.2 手势与显示选项 (全部为设置项)
+
+- [ ] (插件) 查看器: 一指缩放 (双击后拖动), 屏幕边缘点击翻页, 下滑关闭, 左侧滑动调亮度, 双击 1:1 或 2.5 倍, 最大倍率 (5 / 10 / 原始像素), 旋转手势开关, 旋转后提示保存, 方向 (跟随系统 / 锁定 / 按图片比例), 全屏黑底, 最高亮度, 自动隐藏系统栏, 屏幕常亮, 缩略图条显示, 以最高质量显示 (关闭降采样预览). 验收: 每项有 JVM 策略用例或 instrumentation; 默认值与 3.0.0 行为一致.
+- [ ] (插件) 网格与相册: 列数 (竖 / 横分别), 缩略图圆角 / 间距, 裁剪为方形或保持比例, 显示文件类型角标, 显示数量, 相册封面策略 (最新 / 最早 / 自定义), 文件夹名单行, 水平滚动 (可选), 动图缩略图播放. 验收: 设置重建后网格立即生效.
+- [ ] (插件) 回收站 / 收藏 / 隐藏 / 排除 的入口开关集中到 "媒体管理" 分组; 全部设置分组顺序: 外观 (4 项) -> 相册与网格 -> 查看器 -> 编辑与输出 -> 媒体管理 -> 存储权限 -> 关于. 验收: 设置页截图入 `.bak/visual/3.3.0/`; TalkBack 遍历.
+
+### 9.3 平板, 横屏与多窗口
+
+- [ ] (插件) 宽屏 (>= 840 dp) 相册 | 网格 双栏, 横屏查看器缩略图条移到侧边, 多窗口与折叠屏 (SM-F971B 在线) 尺寸变化不丢状态. 验收: 968e9f18 / 63751f63 平板与在线折叠屏截图与操作记录.
+- [ ] (插件) 键盘 / D-pad: 网格焦点可见, 方向键翻页, 删除键进入删除确认. 验收: AVD 键盘测试.
+
+### 9.4 无障碍与性能
+
+- [ ] (插件) TalkBack: 网格项读出文件名与日期, 多选状态, 查看器按钮角色; 动效尊重 "移除动画"; 对比度复核. 验收: Accessibility Scanner 无严重问题 (记录截图).
+- [ ] (插件) 性能收尾: 启动 / 网格 / 查看器 / 编辑器基线对比 2.1.0 与 3.0.0 数据, 修复回归; 缩略图缓存大小策略 (按可用空间); 内存压力下释放. 验收: 数据入文档.
+- [ ] (测试) 全量 JVM / instrumentation / CI / lint (全量 lint 需按宿主 AGENTS 说明临时加大内存).
+
+### 9.5 发布
+
+- [ ] (发布) 按 P1-P5 发布 v3.3.0; README 功能亮点与截图全面更新为相册形态; FAQ 覆盖权限, 回收站, 覆盖, 位置信息.
+
+验收条件: Fossify 对照表 (附录 A) 中标记为 M5 的条目全部可用; 全部设置项有默认值且与之前版本行为一致; 平板与折叠屏布局正确; 无障碍扫描通过.
+
+---
+
+## 10. M6: v3.4.0 脚本 API `gallery`
+
+目标: 落地 D12 / T17, 让 AutoJs6 脚本以一次性授权事务调用插件的相册选图, 查看器, 编辑器与转换器.
+
+### 10.1 宿主契约
+
+- [ ] (宿主) `plugin-api/gallery-api`: AIDL `IGalleryPlugin` (`getInfo`, `openPicker`, `openViewer`, `openEditor`, `convert`) 与 `IGalleryCallback` (`onResult(generation, seq, Bundle)`), 键常量, 协议版本 1, 错误码; `docs/dev/gallery-plugin-protocol-v1.md`. 验收: 契约评审记录; AIDL 事务号固定.
+- [ ] (宿主) `core/plugin/gallery/` 客户端: 绑定, 租约与死亡处理, token 与 `startActivity` 启动插件 Activity (T17), 结果路径校验 (必须位于脚本可访问的共享存储或脚本指定输出目录), 超时与取消. 验收: 宿主单元测试.
+- [ ] (宿主) augment `gallery`: `pick(options)`, `view(paths, options)`, `edit(path, options)`, `convert(path, options)` 的同步与 `*Async` (Promise) 形态, 事件 (`view` 会话的 `page` / `close`), 错误 `GalleryError` (`PLUGIN_UNAVAILABLE` 家族复用 `AidlPluginHost.buildSelectionFailure`); 注册到 `ScriptRuntime`; 示例脚本. 验收: 宿主 Rhino 测试; 插件缺失时错误文案可读.
+
+### 10.2 插件服务
+
+- [ ] (插件) `GalleryPluginService` (`org.autojs.plugin.GALLERY`, `org.autojs.permission.PLUGIN` 保护): 会话管理, token 校验, `PickerActivity` / 查看器 / 编辑器的脚本启动模式 (返回结果而非写回宿主事务), `convert` 无 UI 路径复用转换策略与 PFD 输入输出. 验收: `GalleryServiceContractTest` instrumentation (非法 token, 重复会话, 超时).
+- [ ] (插件) 结果与权限边界: `pick` 返回绝对路径仅限 MediaStore 项 (插件自身已授权) 或脚本通过宿主传入的路径; 无权限时 `pick` 返回 `PERMISSION_REQUIRED` 并可打开设置页; 不扩大脚本访问范围 (T17). 验收: 用例覆盖三种权限状态.
+
+### 10.3 文档与声明
+
+- [ ] (文档) `AutoJs6-Documentation/api/gallery.md` (+ 类型页), `AutoJs6-TypeScript-Declarations/aj6-int-gallery.d.ts`, Ace Editor 声明再生成 (`:app:generateAutoJs6LspDeclarations`), Offline Docs 同步 (10 种语言 changelog `improvement` + `generate_markdown.py`); 宿主与四仓库版本按 AGENTS 规则递增. 验收: 文档校验器 (`normalize-markdown.py` 等) 通过.
+- [ ] (索引) 索引清单 `capabilities` 增加 `gallery` 协议版本.
+
+### 10.4 发布
+
+- [ ] (测试) 宿主 + 插件联调: 示例脚本在 QV770340J7 与 968e9f18 跑通 pick / view / edit / convert.
+- [ ] (发布) 按 P1-P6 发布 v3.4.0 与对应宿主版本; changelog 写明脚本 API 的权限边界.
+
+验收条件: 四个调用在宿主已安装并启用插件时可用, 缺失时错误清晰; 脚本不能借 API 读取其本身无权访问的文件; 文档, d.ts, 离线文档与 Ace 声明同步.
+
+---
+
+## 附录 A. 参考功能对照 (Simple Gallery / Fossify Gallery -> 3-Maple Image)
+
+只对照功能与交互, 不涉及实现 (R1). "暂缓" 见附录 B.
+
+| 参考功能 | 落点 |
+| --- | --- |
+| 文件夹 / 相册网格, 封面与数量, 显示所有文件夹内容 | M2 |
+| 媒体网格列数 / 圆角 / 间距 / 方形裁剪 / 类型角标 / 数量 | M2 (基础), M5 (设置) |
+| 快速滚动条与日期提示 | M2 |
+| 排序 (名称 / 修改 / 拍摄 / 大小 / 随机), 每文件夹单独排序, 分组 (日 / 月) | M3 |
+| 搜索 (文件夹 / 文件) | M3 |
+| 多选, 全选, 拖动选择 | M3 |
+| 删除, 回收站 (30 天), 恢复, 永久删除 | M3 |
+| 重命名, 移动, 复制, 新建文件夹 | M3 |
+| 收藏与收藏相册 | M3 |
+| 置顶文件夹, 排除文件夹, 隐藏 (.nomedia) 与显示隐藏 | M3 (隐藏需所有文件访问) |
+| 批量: 旋转, 转换, 调整大小, 移除 EXIF | M3 |
+| 查看器: 捏合 / 双击 / 一指缩放, 深度缩放, 边缘点击翻页, 下滑关闭, 亮度手势 | M1 已有基础, M5 设置 |
+| 旋转手势与保存旋转 | M2 (手势), M4 (保存) |
+| 方向锁定 / 强制方向 / 按比例旋转 | M5 |
+| 全屏黑底, 最高亮度, 自动隐藏系统栏, 屏幕常亮 | M5 |
+| 幻灯片 (间隔 / 随机 / 循环 / 反向 / 动画 / 含 GIF) | M5 |
+| 设为壁纸 (主屏 / 锁屏 / 两者) | M5 |
+| 分享, 分享缩小版本, 去除元数据 | M5 |
+| 打印 | 已有 (M2 2026-09) |
+| 详情 (路径, 大小, 分辨率, 日期, EXIF, GPS), 扩展详情叠加 | 已有 + M5 |
+| 显示在地图上 | M5 (T14 开关) |
+| 编辑器: 裁剪 (自由 / 预设比例), 旋转, 翻转, 绘制, 滤镜, 调整大小 | 已有 + M4 |
+| 覆盖原图 / 另存 | M4 |
+| 用其他应用编辑 / 打开 | 已有 + M5 |
+| 修复 "拍摄日期" | 暂缓 |
+| 视频 (播放, 缩略图, 时长) | 不做 (D2) |
+| 应用锁 (PIN / 图案 / 指纹), 受保护隐藏文件夹 | 暂缓 |
+| 媒体管理应用 / 所有文件访问 | M2 (可选开关, D5) |
+| Material You 动态取色 | 暂缓 (R8) |
+| RAW / SVG / JPEG XL / 全景 | 暂缓 |
+| 收藏导入 / 导出 | 暂缓 |
+| 设备间同步 / 云 | 不做 |
+
+---
+
+## 附录 B. 已评估暂缓
+
+- 视频收录与播放: 与 D2 冲突, 由 3-Amber Player 负责.
+- 所有文件访问为主路径: 与 D5 / R2 冲突; 仅作为可选开关.
+- Material You 动态取色: 与 Three 系列统一视觉 (R8) 冲突.
+- 应用锁 (PIN / 图案 / 指纹) 与受保护隐藏文件夹: 需要 `BiometricPrompt` 与独立的安全评审, 维护者未选择; 如需实施以独立评审重启.
+- RAW (DNG 等), SVG, JPEG XL, 全景 / 360 查看: 需新增解码依赖或原生库, 与 T2 "插件无自有原生代码" 冲突; 待格式需求明确后评估.
+- 收藏导入 / 导出, 修复拍摄日期, 桌面小部件, 快捷方式: 低频需求, 维护者未选择.
+- 后台批处理前台服务: T12 推翻点触发时按 R4 审查.
+- Room 持久媒体缓存: T6 推翻点触发时启用.
+- 系统收藏同步为默认: T9 推翻点.
+- 无头脚本处理 (滤镜 / 马赛克 / 水印) 与媒体库查询 API: 与 D12 "最小 UI 调用型" 冲突, 且前者与宿主 `images` 重叠, 后者会把插件权限间接开放给脚本.
+- 3-Color Picker 回传契约对接: 见附录 C Q1.
+- 图层 / 非破坏性编辑: 超出编辑器定位.
+
+---
+
+## 附录 C. 待决事项
+
+| 编号 | 事项 | 拍板时机 | 建议 |
+| --- | --- | --- | --- |
+| Q1 | 编辑器取色是否对接 3-Color Picker: 需要 3-Color Picker 新增结果回传 (当前只写剪贴板), 并把屏幕坐标经编辑器逆矩阵映射到位图像素重新采样; 还是只做自研放大镜 (T16) | 进入 M4 前 | 3.2.0 只做自研; 对接作为 3-Color Picker 的独立需求另行排期 |
+| Q2 | 收藏存储: 本地表为主 (T9) 还是 Android 11+ 以系统 `IS_FAVORITE` 为主 | 进入 M3 前 | 本地为主 |
+| Q3 | 网格图像加载库: Coil 3 (T3 默认) 还是 Glide 单库 | M1.1 spike 后 | 以 spike 数据定 |
+| Q4 | Android 10 (API 29) 写路径: `requestLegacyExternalStorage` (T5) 还是逐文件 `RecoverableSecurityException` | M2.1 AVD 验证后 | 前者 |
+| Q5 | 宿主 v24 形状: 新方法 `moveTargetsToTrashSubset` (T13) 还是放宽 `moveTargetsToTrash` 空输出语义 | 进入 M3.2 前 | 新方法, 保持 v16 语义不变 |
+| Q6 | 2.1.0 是否顺带把查看器切页改为 `HorizontalPager` (提前 M2 的 6.3) | 进入 M1.2 前 | 不提前, 2.1.0 严格功能不变 |
+| Q7 | 覆盖选项是否记忆 (T11) | 进入 M4.2 前 | 不记忆 |
+| Q8 | 自建回收站 (API 24-29) 的容量上限与清理策略细节 | 进入 M3.2 前 | 可用空间的 10% 且不超过 2 GiB, 启动时与删除前清理 |
+| Q9 | `gallery.pick` 在部分访问 (Android 14+) 状态下是否自动弹出系统 "管理所选照片" | 进入 M6 前 | 不自动弹, 返回 `PERMISSION_REQUIRED` 并附设置入口 |
+
+---
+
+## 附录 D. 证据等级
+
+- E1 代码与配置: 提交 hash 可追溯, 相关文件在仓库中.
+- E2 JVM 单元测试: 测试类名, 用例数, 运行命令.
+- E3 instrumentation: 测试类名 + 设备型号 + API 级别 (真机或 AVD) + 日期.
+- E4 人工验收: 设备, 步骤, 结果, 截图路径 (`.bak/visual/<version>/`, 不入库).
+- E5 发布产物: APK 文件名, SHA-256, tag, GitHub Release 链接, 索引清单文件名.
+
+勾选 `[x]` 的条目至少满足 E1 + (E2 或 E3); 涉及界面的条目另需 E4; "(发布)" 条目需 E5.
+
+---
+
+## 附录 E. 基线快照与设备矩阵
+
+基线 (2026-10-12):
+
+- 插件: `master@da1c739`, 56 次提交, `VERSION_NAME=2.0.1`, `VERSION_BUILD=56`; 已发布索引清单 `33.json` (v2.0.0, versionCode 33); 协议 v12, 最低宿主 5276; 平台版本插件 1.9.0 (本地最新 1.9.1).
+- 宿主: `AutoJs6 master@4ec4d55c63`, 6.8.0, versionCode 5352 (`VERSION_BUILD` 3700 + `VERSION_CODE_OFFSET` 1652), explorer-action 协议 v23, `hostFileInfoVersion` 1.
+- Compose 参照: AutoJs6-Plugin-Compose-UI, BOM `2026.09.00`, `graphics-path` 1.0.1, Kotlin 2.2.21.
+- 参考应用: Simple Gallery Pro (`com.simplemobiletools.gallery.pro`, 已安装于 QV770340J7), Fossify Gallery (GitHub `FossifyOrg/Gallery`, GPL-3.0).
+
+设备矩阵 (详见 `../COMMON_AGENTS.md`, 设备不一定实时在线):
+
+| 设备 | API | 用途 |
+| --- | --- | --- |
+| Sony G8441 (BH900ASK9E) | 28 | 自建回收站, 旧权限模型, 低内存 |
+| Sony XQ-AT72 (QV710AF65F) | 31 | MediaStore 写请求, 系统回收站 |
+| Sony XQ-DQ72 (QV770340J7) | 33 | `READ_MEDIA_IMAGES`, 宿主联调, Simple Gallery 对照 (注意该机 debug 宿主的 ART JIT 缺陷, 日常用 release 宿主) |
+| Redmi 22120RN86C (bek749scrwv4wo8h) | 33 | 小屏 720 x 1650 布局 |
+| Xiaomi 23046RP50C (968e9f18) | 35 | 平板双栏, 大库性能, 部分访问 |
+| OnePlus OPD2413 (63751f63) | 35 | 平板横屏, 仅 arm64 |
+| AVD | 24, 29, 37 | 最低 API, Android 10 写路径, 最新 API |
+| 在线 Samsung SM-A566B | 36 | 16 KB 页, Android 16 权限 |
+| 在线 Samsung SM-F971B | 37 | 折叠屏尺寸变化 |
+
+---
+
+## 附录 F. 旧路线图归档
+
+2026-09-04 版 Image Viewer 路线图的 M0 基线, M1 浏览与手势, M2 图像信息与输出, M3 格式与协议, M4 沉浸式界面均已完成并随 Image Viewer 1.0.0-1.3.1 与 3-Maple Image 2.0.0 发布 (逐项验收记录见 `git log --follow ROADMAP.md` 中 `da1c739` 及之前的版本). 其中两条未勾选的发布条目 (v1.1.0 / v1.2.0 正式发布与截图重采) 已被 2.0.0 发布取代; 截图重采并入本文 M1 的 P2. 旧文 "边界 (非目标)" 中 "不提供编辑能力", "不做媒体库", "不脱离宿主运行" 三条自 2.0.0 合并 Image Tools 与本轮 D1 起不再适用; "不访问网络" 继续有效 (R2).
