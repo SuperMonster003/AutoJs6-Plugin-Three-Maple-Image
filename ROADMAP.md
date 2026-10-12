@@ -119,7 +119,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 5.1 准备与 spike
 
-- [ ] (设计) 新建 `docs/design/ui-redesign.md`: 信息架构图 (2.1.0 与 3.x 两张), 每个页面的线框 (文字或内联 SVG), 组件清单 (顶栏, 底部动作栏, 底部面板, 网格单元, 对话框, 空状态), 设计 token 对照表 (颜色角色, 字号, 间距, 圆角, 触控目标, 对应 Three 设置页规范条款), 手势清单. Simple Gallery (QV770340J7 已安装 `com.simplemobiletools.gallery.pro`) 与 Fossify Gallery 的参考截图存 `.bak/design-reference/`, 文档只写观察结论 (R1).
+- [ ] (设计) 新建 `docs/design/ui-redesign.md`: 信息架构图 (2.1.0 与 3.x 两张), 每个页面的线框 (文字或内联 SVG), 组件清单 (顶栏, 底部动作栏, 底部面板, 网格单元, 对话框, 空状态), 设计 token 对照表 (颜色角色, 字号, 间距, 圆角, 触控目标, 对应 Three 设置页规范条款), 手势清单. Simple Gallery (QV770340J7 已安装 `com.simplemobiletools.gallery.pro`) 与 Fossify Gallery 的参考截图存 `.bak/design-reference/`, 文档只写观察结论 (R1). 进度 (2026-10-13): 草案 v1 已提交, 参考截图 35 张 (Simple Gallery) + 8 张 (现版插件) 存于 `.bak/design-reference/`, 2.0.0 基线数据已填入 3.2 节; 待维护者审阅第 14 节评审问题 R1-R8 后勾选.
 - [ ] (插件) Compose 依赖接入 (T1): `gradle/libs.versions.toml` 增加 BOM 与库别名, `app/build.gradle.kts` 应用 `org.jetbrains.kotlin.plugin.compose` 并开启 `buildFeatures.compose`; `build.gradle.kts` 根声明随平台版本插件 (升级到已发布的 1.9.1 或更高) 提供的 Kotlin 版本. 验收: debug 与 release (R8 收缩) 构建通过, APK 体积与冷启动时间记录到 `docs/design/ui-redesign.md` 的 "基线" 小节.
 - [ ] (插件) 原生库门禁调整 (T2): `nativeAlignment { expectNoNativeLibraries }` 改为允许恰好 `libandroidx.graphics.path.so` x `arm64-v8a` / `armeabi-v7a` / `x86_64` / `x86`, 校验未压缩与 16 KB 对齐 (ELF `PT_LOAD` 与 zip 数据偏移); `docs/16kb.md`, `AGENTS.md` "ABI-independent managed code" 段落, `appendDigestToReleasedFiles` 校验同步. 验收: 对齐报告 JSON 列出且仅列出四个库; 16 KB 页设备 (在线租用 SM-A566B, `getconf PAGE_SIZE = 16384`) 关闭兼容模式冷启动正常.
 - [ ] (插件) 图像加载 spike (T3): 在 Compose 网格原型中分别用 Coil 3 与 `glide-compose` 加载 2000 张 MediaStore 缩略图, 记录首屏时间, 滚动掉帧与内存峰值; 按结果定稿 T3 并回填本表. 验收: `docs/design/ui-redesign.md` 记录数据与结论.
