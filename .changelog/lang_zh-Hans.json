@@ -5,11 +5,20 @@
   "changelog_label_improvement": "优化",
   "changelog_label_dependency": "依赖",
   "$data": {
-    "v2.0.1": {
-      "released_date": "2026/10/05",
+    "v2.1.0": {
+      "released_date": "2026/10/13",
+      "hint": [
+        "APK 新增 Jetpack Compose 自带的原生库 libandroidx.graphics.path.so (arm64-v8a, armeabi-v7a, x86_64, x86 各一份, 约 10 KB), 插件本身仍不含原生代码, 仍为单一通用 APK"
+      ],
       "improvement": [
         "插件中心图标采用统一工作台调整后的尺寸, 位置, 亮暗图稿与圆形底色, 保留可重建原稿和参数",
         "Android 系统应用信息图标与图标工作台共用图稿和亮暗底色, 保留插件中心透明图稿及现有启动器选项"
+      ],
+      "dependency": [
+        "附加 Jetpack Compose BOM 版本 2026.09.00, 用于界面迁移",
+        "附加 Glide Compose 集成库 版本 1.0.0-beta10, 用于 Compose 界面的图像加载",
+        "升级 Glide 版本 5.0.5 -> 5.0.9",
+        "升级 AutoJs6 Gradle Platform Versions 与 Native Alignment 插件版本 1.9.0 -> 1.9.1"
       ]
     },
     "v2.0.0": {

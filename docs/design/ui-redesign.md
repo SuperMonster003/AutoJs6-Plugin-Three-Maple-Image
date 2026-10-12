@@ -94,10 +94,28 @@ Simple Gallery 的 "高级编辑器" (第三方 SDK 界面, 仅作形态参考):
 | release APK 体积 (v2.0.0, versionCode 33) | 2,184,255 B | `releases/autojs6-plugin-three-maple-image-v2.0.0-6be55e7e.apk`, 与设备上 `base.apk` 一致 |
 | 首页冷启动 TotalTime (5 次) | 185 / 145 / 143 / 144 / 140 ms, 中位数 144 ms | `am force-stop` 后 `am start -W -n .../.launcher.AdaptiveAutoIconAlias` |
 | 查看器冷启动 TotalTime (1 次) | 124 ms | `am start -W -a android.intent.action.VIEW -d content://media/external/images/media/<id> -t image/jpeg --grant-read-uri-permission -n .../.ExternalViewActivity` (3000 x 4000 JPEG) |
-| Compose 接入后 APK 体积 | 待 5.1 spike 填写 | 同上 |
-| Compose 接入后冷启动 | 待 5.1 spike 填写 | 同上, 2.1.0 验收线为 2.0.1 的 110% (ROADMAP 5.3) |
+| Compose 接入后 debug APK 体积 (未收缩) | 17,436,682 B (含 Coil 与 glide-compose 两个候选) / 16,915,485 B (定稿 Glide 后) | `assembleDebug`, 2026-10-13 |
+| Compose 接入后 release APK 体积 (尚无 Compose 页面) | 2,397,161 B (+212,906 B, 来自 Glide 5.0.9, activity-compose 与四个 ABI 的 graphics-path 库; 未引用的 Compose 代码已被 R8 移除) | `assembleRelease`, 2026-10-13; 第一个 Compose 页面迁移后再记录一次 |
+| Compose 接入后冷启动 (尚无 Compose 页面) | 首页 362 / 142 / 157 / 145 / 173 ms, 中位数 157 ms (基线 144 ms 的 109%); 查看器 116 ms (基线 124 ms) | release 构建, 同设备同方法, 2026-10-13; 第一个 Compose 页面迁移后再记录一次, 2.1.0 验收线为 2.0.1 的 110% (ROADMAP 5.3) |
 
 `am start -W` 的 TotalTime 只计到首帧, 不含图像解码; 数值仅用于同设备前后对比.
+
+### 3.4 图像加载 spike (ROADMAP T3, 2026-10-13)
+
+设备 QV770340J7, debug 构建, `ComposeSpikeActivity` (4 列 `LazyVerticalGrid`, MediaStore 最新 2000 张图片, 每格 `ContentScale.Crop`); 每个加载库各跑 2 轮: 冷启动 -> 等待首批网格单元出现 -> `gfxinfo reset` -> 12 次下滑 + 6 次上滑 -> 读取 `gfxinfo` 与 `meminfo`. 候选: Coil 3.6.3 (`AsyncImage`) 与 Glide Compose 1.0.0-beta10 (`GlideImage`, 自带 Glide 5.0.9).
+
+| 指标 | Coil 第 1 轮 | Coil 第 2 轮 | Glide 第 1 轮 | Glide 第 2 轮 |
+| --- | --- | --- | --- | --- |
+| `am start -W` TotalTime | 340 ms | 337 ms | 357 ms | 411 ms |
+| onCreate 到首批网格单元 | 287 ms | 252 ms | 266 ms | 310 ms |
+| 渲染帧数 | 1736 | 1762 | 1821 | 1712 |
+| 掉帧 (数量 / 比例) | 23 / 1.32% | 17 / 0.96% | 9 / 0.49% | 18 / 1.05% |
+| 帧耗时 p90 / p99 | 9 / 20 ms | 9 / 18 ms | 6 / 15 ms | 9 / 19 ms |
+| TOTAL PSS | 605 MB | 288 MB | 358 MB | 339 MB |
+| Graphics | 498 MB | 189 MB | 69 MB | 69 MB |
+| Java Heap | 16 MB | 15 MB | 143 MB | 120 MB |
+
+结论: 首帧与掉帧两者在同一水平 (差异小于轮间波动); 内存行为差异明显: Coil 默认使用硬件位图, 图形内存在 189-498 MB 之间波动且不受 Java 堆上限约束, 在 G8441 这类低内存设备上风险更高; Glide 的位图位于按内存等级限定的 Java 堆 LruCache, PSS 稳定在 340-360 MB. 加上 Glide 已承担查看器的 EXIF 规范化, HEIC/AVIF 探针与分块渲染, 以及 MediaStore 缩略图加载器, 最终选择 Glide 单库 (`glide-compose` 1.0.0-beta10, Glide 5.0.5 -> 5.0.9). 代价: 集成库仍为 beta, Glide 升级后需复跑 EXIF 方向与现代格式 instrumentation (ROADMAP 5.3). Coil 不再引入.
 
 ### 3.3 观察到的可用性缺陷 (2.1.0 允许顺带修正)
 

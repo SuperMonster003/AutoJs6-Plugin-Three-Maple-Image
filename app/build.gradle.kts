@@ -2,6 +2,8 @@ import com.android.build.api.variant.FilterConfiguration
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.RelativePath
 import org.gradle.api.provider.Property
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 
 plugins {
     id("io.github.supermonster003.autojs6-native-alignment")
@@ -10,6 +12,7 @@ plugins {
     id("org.autojs.build.signs")
     id("org.autojs.build.jvm-convention")
     id("com.android.application")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 val globalApplicationId = "io.github.supermonster003.autojs6.plugin.three.maple.image"
@@ -78,6 +81,7 @@ android {
 
     buildFeatures {
         aidl = true
+        compose = true
         resValues = true
         viewBinding = true
     }
@@ -144,9 +148,25 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.material)
 
+    // Jetpack Compose (ROADMAP D4 / T1): the BOM is the single version source; activity-compose follows it.
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.animation)
+    implementation(libs.compose.activity)
+    implementation(libs.compose.ui.tooling.preview)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
+    // ROADMAP T3: Glide stays the single image pipeline; its Compose integration drives grids and thumbnail strips.
+    implementation(libs.glide.compose)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.test.ext.junit)
     androidTestImplementation(libs.test.runner)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
 }
 
 tasks {
@@ -181,8 +201,12 @@ extra {
     versions.handleIfNeeded(project, "", listOf(buildTypeDebug, buildTypeRelease))
 }
 
-// Reject accidental native dependencies on every ABI.
-nativeAlignment { expectNoNativeLibraries.set(true) }
+// Native code inventory (ROADMAP T2): the plugin has no native code of its own, but Compose ui-graphics depends on
+// androidx.graphics:graphics-path, whose libandroidx.graphics.path.so is packaged for four ABIs. The APK stays one
+// universal package without ABI splits; the shared gate keeps the 16 KB alignment checks for the 64-bit ABIs and
+// verifySignedReleaseArtifacts below asserts that exactly these libraries are present and stored uncompressed.
+val allowedNativeLibraries = listOf("arm64-v8a", "armeabi-v7a", "x86_64", "x86").map { "lib/$it/libandroidx.graphics.path.so" }
+nativeAlignment { expectNoNativeLibraries.set(false) }
 
 
 // Fail before collection when credentials, keystore or the actual APK set are incomplete.
@@ -208,6 +232,13 @@ val verifySignedReleaseArtifacts = tasks.register("verifySignedReleaseArtifacts"
             isIgnoreExitValue = true
         }.result.get()
         check(result.exitValue == 0) { "Release APK signature verification failed" }
+        ZipFile(apks.single()).use { zip ->
+            val natives = zip.entries().asSequence().filter { it.name.startsWith("lib/") }.toList()
+            check(natives.map { it.name }.sorted() == allowedNativeLibraries.sorted()) {
+                "Unexpected native library set: ${natives.map { it.name }.sorted()}"
+            }
+            check(natives.all { it.method == ZipEntry.STORED }) { "Native libraries must be stored uncompressed" }
+        }
     }
 }
 tasks.named("appendDigestToReleasedFiles") { dependsOn(verifySignedReleaseArtifacts) }

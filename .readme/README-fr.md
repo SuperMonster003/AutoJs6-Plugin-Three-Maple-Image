@@ -237,12 +237,17 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
-#### v2.0.1
+#### v2.1.0
 
-###### 2026/10/05
+###### 2026/10/13
 
+* `Note` L'APK contient désormais libandroidx.graphics.path.so, une bibliothèque native fournie avec Jetpack Compose (environ 10 KB pour chacune des ABI arm64-v8a, armeabi-v7a, x86_64 et x86) ; le plugin lui-même ne contient toujours aucun code natif et reste un APK universel unique
 * `Amélioration` Les icônes du centre de plugins utilisent les tailles, positions, images claires et sombres et fonds circulaires réglés dans Icon Studio, avec les sources et paramètres permettant de les reproduire
 * `Amélioration` Les icônes des informations d'application Android utilisent les illustrations et les fonds clairs et sombres d'Icon Studio, en conservant les images transparentes du centre de plugins et les choix du lanceur
+* `Dépendance` Ajout de Jetpack Compose BOM 2026.09.00 pour la migration de l'interface
+* `Dépendance` Ajout de l'intégration Glide Compose 1.0.0-beta10 pour le chargement des images dans les écrans Compose
+* `Dépendance` Mise à jour de Glide 5.0.5 -> 5.0.9
+* `Dépendance` Mise à jour des plugins AutoJs6 Gradle Platform Versions et Native Alignment 1.9.0 -> 1.9.1
 
 #### v2.0.0
 

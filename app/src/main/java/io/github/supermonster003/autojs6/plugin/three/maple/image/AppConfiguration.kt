@@ -220,6 +220,8 @@ internal object AppColorPolicy {
 }
 
 internal data class AppThemePalette(
+    /** Resolved opaque theme seed (own choice, host accent or the #FFDEAD fallback); Compose derives overlay accents from it. */
+    val seed: Int,
     val primary: Int,
     val onPrimary: Int,
     val accent: Int,
@@ -247,6 +249,7 @@ internal data class AppThemePalette(
             val primary = roles.primary
             val accent = AppColorPolicy.readableAccent(ThemeAccentRoles.fromSeed(accentSeed, dark).primary, background)
             return AppThemePalette(
+                seed = themeSeed,
                 primary = primary,
                 onPrimary = roles.onPrimary,
                 accent = accent,

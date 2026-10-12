@@ -237,12 +237,17 @@ required host build: 5276
 
 ******
 
-#### v2.0.1
+#### v2.1.0
 
-###### 2026/10/05
+###### 2026/10/13
 
+* `ヒント` APK に Jetpack Compose 付属のネイティブライブラリ libandroidx.graphics.path.so (arm64-v8a, armeabi-v7a, x86_64, x86 の各約 10 KB) が含まれるようになり, プラグイン自体はネイティブコードを含まず単一の汎用 APK のまま
 * `改善` プラグインセンターのアイコンに Icon Studio で調整したサイズ, 位置, 明暗の図稿と円形背景を適用し, 再生成可能な原稿とパラメーターを保持
 * `改善` Android のアプリ情報アイコンに Icon Studio と共通の図案と明暗の背景色を使用し, プラグインセンターの透明な図案と既存のランチャー設定を維持
+* `依存関係` ユーザーインターフェース移行のために Jetpack Compose BOM 2026.09.00 を追加
+* `依存関係` Compose 画面での画像読み込みのために Glide Compose 統合ライブラリ 1.0.0-beta10 を追加
+* `依存関係` Glide を 5.0.5 -> 5.0.9 に更新
+* `依存関係` AutoJs6 Gradle Platform Versions および Native Alignment プラグインを 1.9.0 -> 1.9.1 に更新
 
 #### v2.0.0
 

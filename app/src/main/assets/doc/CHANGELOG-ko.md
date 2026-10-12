@@ -4,12 +4,17 @@
 
 ******
 
-## v2.0.1
+## v2.1.0
 
-###### 2026/10/05
+###### 2026/10/13
 
+* `힌트` APK에 Jetpack Compose가 포함하는 네이티브 라이브러리 libandroidx.graphics.path.so (arm64-v8a, armeabi-v7a, x86_64, x86 각 약 10 KB)가 추가되며, 플러그인 자체는 여전히 네이티브 코드를 포함하지 않고 단일 범용 APK로 유지
 * `개선` 플러그인 센터 아이콘에 Icon Studio에서 조정한 크기, 위치, 밝은 이미지와 어두운 이미지 및 원형 배경을 적용하고 재생성 가능한 원본과 매개변수를 유지
 * `개선` Android 앱 정보 아이콘에 Icon Studio의 그림과 밝은 배경 및 어두운 배경을 사용하고 플러그인 센터의 투명 그림과 기존 런처 옵션을 유지
+* `의존성` 사용자 인터페이스 이전을 위해 Jetpack Compose BOM 2026.09.00 추가
+* `의존성` Compose 화면의 이미지 로딩을 위해 Glide Compose 통합 라이브러리 1.0.0-beta10 추가
+* `의존성` Glide 5.0.5 -> 5.0.9 업그레이드
+* `의존성` AutoJs6 Gradle Platform Versions 및 Native Alignment 플러그인 1.9.0 -> 1.9.1 업그레이드
 
 ## v2.0.0
 

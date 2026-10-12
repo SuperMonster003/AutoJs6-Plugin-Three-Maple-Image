@@ -4,12 +4,17 @@
 
 ******
 
-## v2.0.1
+## v2.1.0
 
-###### 2026/10/05
+###### 2026/10/13
 
+* `提示` APK 新增 Jetpack Compose 自帶的原生程式庫 libandroidx.graphics.path.so (arm64-v8a, armeabi-v7a, x86_64, x86 各一份, 約 10 KB), 外掛程式本身仍不含原生程式碼, 仍為單一通用 APK
 * `優化` 外掛程式中心圖示採用統一工作台調整後的尺寸, 位置, 明暗圖稿與圓形底色, 保留可重建原稿和參數
 * `優化` Android 系統應用程式資訊圖示與圖示工作台共用圖稿及明暗底色, 保留外掛程式中心透明圖稿與現有啟動器選項
+* `依賴` 附加 Jetpack Compose BOM 2026.09.00, 用於介面遷移
+* `依賴` 附加 Glide Compose 整合程式庫 1.0.0-beta10, 用於 Compose 介面的圖像載入
+* `依賴` 升級 Glide 5.0.5 -> 5.0.9
+* `依賴` 升級 AutoJs6 Gradle Platform Versions 與 Native Alignment 外掛程式 1.9.0 -> 1.9.1
 
 ## v2.0.0
 
