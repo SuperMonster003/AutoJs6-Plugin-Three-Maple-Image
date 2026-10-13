@@ -18,10 +18,14 @@ import java.util.UUID
 class StandaloneImageWorkInstrumentationTest {
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
 
-    @Test fun mergedCatalogKeepsAllFourActionsAndOutputContracts() {
+    @Test fun mergedCatalogKeepsAllActionsAndOutputContracts() {
         @Suppress("DEPRECATION")
         val actions = requireNotNull(threeMapleImageActionCatalog().getParcelableArrayList<android.os.Bundle>(ExplorerActionCatalogKeys.ACTIONS))
-        assertEquals(setOf("view-image", "view-images", "edit-image", "convert-image"), actions.map { it.getString(ExplorerActionCatalogKeys.ID) }.toSet())
+        // The four merged actions plus the read-only "View as album" directory action (ROADMAP 6.4).
+        assertEquals(
+            setOf("view-image", "view-images", "browse-directory", "edit-image", "convert-image"),
+            actions.map { it.getString(ExplorerActionCatalogKeys.ID) }.toSet(),
+        )
         for (action in actions.filter { it.getString(ExplorerActionCatalogKeys.ID) in setOf("edit-image", "convert-image") }) {
             assertEquals(ExplorerActionValues.CARDINALITY_SINGLE, action.getInt(ExplorerActionCatalogKeys.CARDINALITY))
             assertEquals(ExplorerActionValues.OUTPUT_CREATE_SIBLING, action.getInt(ExplorerActionCatalogKeys.OUTPUT_MODE))

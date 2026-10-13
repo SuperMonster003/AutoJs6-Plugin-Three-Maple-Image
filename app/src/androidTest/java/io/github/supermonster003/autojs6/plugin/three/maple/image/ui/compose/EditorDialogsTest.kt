@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import org.junit.Assert.assertEquals
@@ -39,7 +40,8 @@ class EditorDialogsTest {
         }
         compose.onNodeWithTag("maple.dialog.confirm").assertIsNotEnabled()
         compose.onNodeWithTag("maple.editor.text.input").performTextInput("Maple")
-        compose.onNodeWithTag("maple.editor.text.outline").performClick()
+        // Small phones (G8441, 360 x 640 dp) with the keyboard up keep the switch below the scrolling viewport.
+        compose.onNodeWithTag("maple.editor.text.outline").performScrollTo().performClick()
         compose.waitForIdle()
         assertEquals("Maple", state.text)
         assertTrue(state.outline)
@@ -63,7 +65,7 @@ class EditorDialogsTest {
             }
         }
         compose.onNodeWithTag("maple.chip.0").assertIsSelected()
-        compose.onNodeWithTag("maple.chip.3").performClick()
+        compose.onNodeWithTag("maple.chip.3").performScrollTo().performClick()
         compose.waitForIdle()
         assertEquals(3, state.formatIndex)
         assertEquals(1, changes)
@@ -71,7 +73,7 @@ class EditorDialogsTest {
         compose.onNodeWithTag("maple.editor.save.lossless").assertDoesNotExist()
         state.losslessAvailable = true
         compose.waitForIdle()
-        compose.onNodeWithTag("maple.editor.save.lossless").performClick()
+        compose.onNodeWithTag("maple.editor.save.lossless").performScrollTo().performClick()
         compose.waitForIdle()
         assertTrue(state.webpLossless)
         assertEquals(2, changes)
