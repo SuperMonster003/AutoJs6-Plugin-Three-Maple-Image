@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -72,15 +73,22 @@ internal fun MapleFastScroller(
             visible = false
         }
     }
-    val info = gridState.layoutInfo
-    val visibleCount = info.visibleItemsInfo.size
-    val first = gridState.firstVisibleItemIndex
-    val scrollableItems = (itemCount - visibleCount).coerceAtLeast(1)
-    val fraction = (first.toFloat() / scrollableItems).coerceIn(0f, 1f)
+    // The scroll position is read in the placement phase (thumb offset) or behind derived state, so scrolling
+    // moves the thumb without recomposing the scroller on every frame.
+    val canScroll by remember(gridState, itemCount) {
+        derivedStateOf {
+            val visibleCount = gridState.layoutInfo.visibleItemsInfo.size
+            itemCount > visibleCount && visibleCount > 0
+        }
+    }
     val thumbHeightPx = with(density) { MapleFastScrollerDefaults.thumbHeight.roundToPx() }
     val travelPx = (trackHeightPx - thumbHeightPx).coerceAtLeast(0)
-    val thumbOffsetPx = (travelPx * fraction).roundToInt()
-    val canScroll = itemCount > visibleCount && visibleCount > 0
+    val thumbOffsetPx: () -> Int = {
+        val visibleCount = gridState.layoutInfo.visibleItemsInfo.size
+        val scrollableItems = (itemCount - visibleCount).coerceAtLeast(1)
+        val fraction = (gridState.firstVisibleItemIndex.toFloat() / scrollableItems).coerceIn(0f, 1f)
+        (travelPx * fraction).roundToInt()
+    }
 
     fun jumpTo(y: Float) {
         if (travelPx <= 0) return
@@ -124,7 +132,7 @@ internal fun MapleFastScroller(
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .offset { IntOffset(0, thumbOffsetPx) }
+                        .offset { IntOffset(0, thumbOffsetPx()) }
                         .padding(end = 4.dp)
                         .size(MapleFastScrollerDefaults.thumbWidth, MapleFastScrollerDefaults.thumbHeight)
                         .background(
@@ -134,7 +142,7 @@ internal fun MapleFastScroller(
                 )
             }
         }
-        val bubble = if (dragging) label(first) else null
+        val bubble = if (dragging) label(gridState.firstVisibleItemIndex) else null
         if (bubble != null) {
             Text(
                 text = bubble,
@@ -142,7 +150,7 @@ internal fun MapleFastScroller(
                 color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .offset { IntOffset(0, thumbOffsetPx) }
+                    .offset { IntOffset(0, thumbOffsetPx()) }
                     .padding(end = MapleFastScrollerDefaults.trackWidth + 4.dp)
                     .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
                     .padding(horizontal = 12.dp, vertical = 8.dp)

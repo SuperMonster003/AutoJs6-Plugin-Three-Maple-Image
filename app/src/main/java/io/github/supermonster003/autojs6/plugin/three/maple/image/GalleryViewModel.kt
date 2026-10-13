@@ -3,6 +3,7 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 internal enum class AlbumKind {
     MEDIA,
@@ -72,6 +74,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     private var gridJob: Job? = null
     private var reloadJob: Job? = null
     private var revealJob: Job? = null
+    private var folderOrder: Triple<List<MediaItem>, MediaSort, List<MediaItem>>? = null
 
     val albums: StateFlow<GalleryUiState> = _albums.asStateFlow()
     val grid: StateFlow<MediaGridUiState> = _grid.asStateFlow()
@@ -97,10 +100,6 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         _albums.update { state -> state.copy(albumSort = sort, albums = sortAlbums(state.albums, sort)) }
     }
 
-    /**
-     * [retryOnce] covers the moments right after a runtime grant, when MediaStore may still answer the first query
-     * with the old permission state (a SecurityException or an empty cursor): one delayed retry before giving up.
-     */
     /** Pull to refresh on the album grid: reload while the current albums stay visible. */
     fun refreshAlbums() {
         _albums.update { it.copy(refreshing = true) }
@@ -115,6 +114,10 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         openAlbum(album, keepSort = true)
     }
 
+    /**
+     * [retryOnce] covers the moments right after a runtime grant, when MediaStore may still answer the first query
+     * with the old permission state (a SecurityException or an empty cursor): one delayed retry before giving up.
+     */
     fun reload(retryOnce: Boolean = false) {
         reloadJob?.cancel()
         reloadJob = viewModelScope.launch {
@@ -191,12 +194,16 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         } else {
             preferences.sortFor(album.kind, album.id) ?: preferences.defaultSort
         }
+        val current = _grid.value
+        val sameAlbum = current.album?.id == album.id && current.album.kind == album.kind
         _grid.value = MediaGridUiState(
             album = album,
+            // A refresh or a change-triggered reload keeps the current cells until the first page replaces them.
+            items = if (sameAlbum && sort == current.sort) current.items else emptyList(),
             loading = true,
             sort = sort,
             columns = preferences.mediaColumns,
-            refreshing = _grid.value.refreshing && _grid.value.album?.id == album.id,
+            refreshing = current.refreshing && sameAlbum,
         )
         loadPage(reset = true)
     }
@@ -220,7 +227,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
 
     fun loadMore() {
         val state = _grid.value
-        if (state.loading || state.endReached || state.album == null) return
+        if (state.loading || state.endReached || state.album == null || gridJob?.isActive == true) return
         loadPage(reset = false)
     }
 
@@ -252,7 +259,8 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     private fun loadPage(reset: Boolean): Job? {
         val album = _grid.value.album ?: return null
         val job = viewModelScope.launch {
-            _grid.update { it.copy(loading = true) }
+            // Appending a page while the grid flings must not emit an extra state (one recomposition per page).
+            if (reset) _grid.update { if (it.loading) it else it.copy(loading = true) }
             val offset = if (reset) 0 else _grid.value.items.size
             val sort = _grid.value.sort
             val page: List<MediaItem>
@@ -263,7 +271,8 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                 val folder = album.folder
                 val cached = folder?.let { runCatching { folderRepository.enumerateCached(it) }.getOrNull() } ?: (emptyList<MediaItem>() to DocumentTreeLimit.NONE)
                 limit = cached.second
-                page = MediaCatalog.sort(cached.first, sort).drop(offset).take(PAGE_SIZE)
+                val ordered = folderOrdered(cached.first, sort)
+                page = ordered.subList(offset.coerceAtMost(ordered.size), (offset + PAGE_SIZE).coerceAtMost(ordered.size))
             }
             _grid.update { state ->
                 if (state.album?.id != album.id) return@update state
@@ -278,6 +287,14 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         }
         gridJob = job
         return job
+    }
+
+    /** Folder pages are slices of one sorted copy (an authorized folder may hold up to 20000 images). */
+    private suspend fun folderOrdered(items: List<MediaItem>, sort: MediaSort): List<MediaItem> {
+        folderOrder?.let { (source, cachedSort, ordered) -> if (source === items && cachedSort == sort) return ordered }
+        val ordered = withContext(Dispatchers.Default) { MediaCatalog.sort(items, sort) }
+        folderOrder = Triple(items, sort, ordered)
+        return ordered
     }
 
     private fun sortAlbums(albums: List<AlbumSummary>, sort: MediaSort): List<AlbumSummary> {

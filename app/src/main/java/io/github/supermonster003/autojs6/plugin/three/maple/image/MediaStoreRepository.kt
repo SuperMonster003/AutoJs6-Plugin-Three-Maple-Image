@@ -38,6 +38,12 @@ internal class MediaStoreRepository(
     @Volatile
     private var cachedAll: List<MediaItem>? = null
 
+    /** The last name-ordered album, so name pages are slices instead of a fresh sort of the album per page. */
+    @Volatile
+    private var cachedNameOrder: NameOrder? = null
+
+    private class NameOrder(val source: List<MediaItem>, val bucketId: Long, val sort: MediaSort, val items: List<MediaItem>)
+
     val collection: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
     } else {
@@ -48,13 +54,18 @@ internal class MediaStoreRepository(
     /** Every cataloged image on the device, newest change first; cached until [invalidate] or a change event. */
     suspend fun loadAll(): List<MediaItem> {
         cachedAll?.let { return it }
-        val rows = withContext(Dispatchers.IO) { query(selection = null, selectionArgs = null, sort = MediaSort.DEFAULT, limit = null, offset = 0) }
-        val cataloged = MediaCatalog.filter(rows, supports)
+        val cataloged = withContext(Dispatchers.IO) {
+            MediaCatalog.filter(query(selection = null, selectionArgs = null, sort = MediaSort.DEFAULT, limit = null, offset = 0), supports)
+        }
         cachedAll = cataloged
         return cataloged
     }
 
-    suspend fun loadBuckets(): List<MediaBucket> = MediaCatalog.buckets(loadAll())
+    /** Aggregation runs off the main thread: a library of tens of thousands of images takes a noticeable while. */
+    suspend fun loadBuckets(): List<MediaBucket> {
+        val all = loadAll()
+        return withContext(Dispatchers.Default) { MediaCatalog.buckets(all) }
+    }
 
     /**
      * One page of an album in the requested order. Date and size pages come from the provider so large albums stay
@@ -63,8 +74,8 @@ internal class MediaStoreRepository(
      */
     suspend fun loadBucket(bucketId: Long, sort: MediaSort = MediaSort.DEFAULT, limit: Int, offset: Int = 0): List<MediaItem> {
         if (sort.field == MediaSortField.NAME) {
-            val album = loadAll().filter { bucketId == MediaCatalog.ALL_BUCKETS || it.bucketId == bucketId }
-            return MediaCatalog.sort(album, sort).drop(offset).take(limit)
+            val album = nameOrdered(bucketId, sort)
+            return album.subList(offset.coerceAtMost(album.size), (offset + limit).coerceAtMost(album.size))
         }
         return withContext(Dispatchers.IO) {
             val rows = query(
@@ -78,6 +89,16 @@ internal class MediaStoreRepository(
         }
     }
 
+    private suspend fun nameOrdered(bucketId: Long, sort: MediaSort): List<MediaItem> {
+        val all = loadAll()
+        cachedNameOrder?.let { cached -> if (cached.source === all && cached.bucketId == bucketId && cached.sort == sort) return cached.items }
+        val items = withContext(Dispatchers.Default) {
+            MediaCatalog.sort(all.filter { bucketId == MediaCatalog.ALL_BUCKETS || it.bucketId == bucketId }, sort)
+        }
+        cachedNameOrder = NameOrder(all, bucketId, sort, items)
+        return items
+    }
+
     private fun bucketSelection(bucketId: Long): String? =
         if (bucketId == MediaCatalog.ALL_BUCKETS) null else "${MediaStore.Images.Media.BUCKET_ID} = ?"
 
@@ -86,9 +107,7 @@ internal class MediaStoreRepository(
 
     /** Every image of one album in the requested order; the viewer pages through this list (ROADMAP 6.3). */
     suspend fun loadBucketAll(bucketId: Long, sort: MediaSort = MediaSort.DEFAULT): List<MediaItem> {
-        if (sort.field == MediaSortField.NAME) {
-            return MediaCatalog.sort(loadAll().filter { bucketId == MediaCatalog.ALL_BUCKETS || it.bucketId == bucketId }, sort)
-        }
+        if (sort.field == MediaSortField.NAME) return nameOrdered(bucketId, sort)
         return withContext(Dispatchers.IO) {
             val rows = query(
                 selection = bucketSelection(bucketId),
@@ -103,6 +122,7 @@ internal class MediaStoreRepository(
 
     fun invalidate() {
         cachedAll = null
+        cachedNameOrder = null
     }
 
     /**

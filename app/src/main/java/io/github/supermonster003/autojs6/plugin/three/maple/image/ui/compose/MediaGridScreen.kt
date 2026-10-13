@@ -155,9 +155,12 @@ internal fun MediaGridScreen(
                     verticalArrangement = Arrangement.spacedBy(MapleGridDefaults.mediaGap),
                     modifier = Modifier.fillMaxSize().testTag("maple.media.grid"),
                 ) {
-                    items(state.items, key = { it.id }) { item ->
+                    items(state.items, key = { it.id }, contentType = { MEDIA_CELL }) { item ->
+                        // A remembered Uri keeps the cell skippable when a page is appended (a fresh Uri instance
+                        // would recompose every visible cell).
+                        val model = remember(item.contentUri) { Uri.parse(item.contentUri) }
                         MapleMediaCell(
-                            model = Uri.parse(item.contentUri),
+                            model = model,
                             description = item.displayName,
                             badge = mediaTypeBadge(item.mimeType),
                             onClick = { onOpen(item) },
@@ -181,6 +184,7 @@ internal fun MediaGridScreen(
 }
 
 private const val LOAD_MORE_THRESHOLD = 72
+private const val MEDIA_CELL = "media"
 private const val PINCH_IN_STEP = 1.3f
 private const val PINCH_OUT_STEP = 0.77f
 
