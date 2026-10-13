@@ -279,6 +279,18 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v3.0.0
+
+###### 2026/10/13
+
+* `Aviso` Al abrirse por sí sola, la aplicación pide una vez acceso a fotos (fotos y videos en Android 13+, almacenamiento en versiones anteriores) para mostrar los álbumes; si lo rechaza no vuelve a pedirlo por sí misma, ver, editar y convertir siguen funcionando con el selector del sistema, y puede concederlo después desde el inicio o en Ajustes > Permiso de almacenamiento. Abrir imágenes desde AutoJs6 u otras aplicaciones nunca pide permisos
+* `Función` La pantalla de inicio pasa a ser una vista de álbumes: imágenes del dispositivo agrupadas por carpeta (portada, nombre, cantidad) o una vista plana del contenido de todas las carpetas; la cuadrícula ofrece 3-6 columnas (menú o pellizco), orden por nombre, fecha de modificación, fecha de captura o tamaño recordado por álbum, barra de desplazamiento rápido con indicación de fecha y deslizar para actualizar
+* `Función` El visor recorre todo el álbum deslizando a izquierda y derecha, una tira de miniaturas salta a una página al tocarla y la cuadrícula vuelve a la última imagen vista
+* `Función` Gire una imagen con dos dedos; al soltar se ajusta al cuarto de vuelta más cercano, solo cambia la visualización, se puede deshacer y se desactiva en Ajustes > Visor
+* `Función` La nueva página Permiso de almacenamiento en Ajustes muestra el acceso actual, lo vuelve a conceder, gestiona las fotos seleccionadas en Android 14+, añade o quita carpetas autorizadas (se muestran como álbumes incluso sin acceso a fotos) y ofrece el opcional Acceso a todos los archivos
+* `Función` El menú de carpeta del gestor de archivos de AutoJs6 incorpora Ver como álbum, que muestra las imágenes de la carpeta en cuadrícula y abre sus subcarpetas
+* `Dependencia` Se añade Navigation Compose 2.10.2 para la navegación entre el inicio y las páginas de álbum
+
 #### v2.1.0
 
 ###### 2026/10/13
@@ -309,13 +321,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 * `Función` Image Viewer e Image Tools se combinan en 3-Maple Image para ver, editar y convertir imágenes
 * `Función` Una pantalla de inicio independiente permite abrir, editar o convertir imágenes locales y guardar el resultado en el destino elegido
 * `Función` Los ajustes comunes ofrecen idioma, modo oscuro, color y cuatro opciones de icono del lanzador
-
-#### v1.3.1
-
-###### 2026/09/19
-
-* `Corrección` Advertencias de lectura de SDK XML v4 con AGP 9.1 y comprobaciones de alineación nativa de APK activadas por error al ensamblar pruebas unitarias JVM, mediante los plugins de compilación compartidos 1.8.3
-* `Mejora` compileSdk y targetSdk suben a 37 (Android 17); el comportamiento del plugin no depende del nuevo objetivo
 
 ##### Historial completo
 

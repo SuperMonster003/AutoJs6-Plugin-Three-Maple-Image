@@ -5,6 +5,22 @@
   "changelog_label_improvement": "Improved",
   "changelog_label_dependency": "Dependency",
   "$data": {
+    "v3.0.0": {
+      "released_date": "2026/10/13",
+      "hint": [
+        "Launched on its own, the app asks once for photo access (photos and videos on Android 13+, storage on older versions) to show your albums; if you refuse it never asks again by itself, viewing, editing and converting keep working through the system picker, and you can grant access later from the home screen or Settings > Storage permission. Opening images from AutoJs6 or other apps never asks for any permission"
+      ],
+      "feature": [
+        "The home screen becomes an album view: images on the device grouped by folder (cover, name, count), or a flat view of all folder contents; the image grid offers 3-6 columns (menu or pinch), sorting by name, date modified, date taken or size remembered per album, a fast scroller with a date hint and pull to refresh",
+        "The viewer pages through the whole album with left and right swipes, a thumbnail strip jumps to a page on tap, and the grid returns to the last image viewed",
+        "Rotate an image with two fingers; it snaps to the nearest quarter turn on release, changes the display only, can be undone and can be turned off in Settings > Viewer",
+        "A new Storage permission page in Settings shows the current access, grants it again, manages selected photos on Android 14+, adds or removes authorized folders (shown as albums even without photo access) and offers the optional All files access",
+        "The folder menu of the AutoJs6 file manager gains View as album, which shows the folder's images as a grid and opens its subfolders"
+      ],
+      "dependency": [
+        "Added Navigation Compose 2.10.2 for navigation between the home screen and album pages"
+      ]
+    },
     "v2.1.0": {
       "released_date": "2026/10/13",
       "hint": [

@@ -279,6 +279,18 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v3.0.0
+
+###### 2026/10/13
+
+* `Hint` Launched on its own, the app asks once for photo access (photos and videos on Android 13+, storage on older versions) to show your albums; if you refuse it never asks again by itself, viewing, editing and converting keep working through the system picker, and you can grant access later from the home screen or Settings > Storage permission. Opening images from AutoJs6 or other apps never asks for any permission
+* `Added` The home screen becomes an album view: images on the device grouped by folder (cover, name, count), or a flat view of all folder contents; the image grid offers 3-6 columns (menu or pinch), sorting by name, date modified, date taken or size remembered per album, a fast scroller with a date hint and pull to refresh
+* `Added` The viewer pages through the whole album with left and right swipes, a thumbnail strip jumps to a page on tap, and the grid returns to the last image viewed
+* `Added` Rotate an image with two fingers; it snaps to the nearest quarter turn on release, changes the display only, can be undone and can be turned off in Settings > Viewer
+* `Added` A new Storage permission page in Settings shows the current access, grants it again, manages selected photos on Android 14+, adds or removes authorized folders (shown as albums even without photo access) and offers the optional All files access
+* `Added` The folder menu of the AutoJs6 file manager gains View as album, which shows the folder's images as a grid and opens its subfolders
+* `Dependency` Added Navigation Compose 2.10.2 for navigation between the home screen and album pages
+
 #### v2.1.0
 
 ###### 2026/10/13
@@ -309,13 +321,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Added` Image Viewer and Image Tools are combined in 3-Maple Image, with viewing, editing and format conversion in one app
 * `Added` A standalone home screen opens local images, starts editing or conversion, and saves the result to a chosen destination
 * `Added` Language, dark mode, theme color and four launcher icon choices are available in the shared settings layout
-
-#### v1.3.1
-
-###### 2026/09/19
-
-* `Fixed` SDK XML v4 parsing warnings with AGP 9.1 and APK native alignment checks incorrectly triggered by JVM unit-test assembly tasks, using shared build plugins 1.8.3
-* `Improved` Raise compileSdk and targetSdk to 37 (Android 17); the plugin's behavior does not depend on the new target
 
 ##### Full history
 

@@ -279,6 +279,18 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
+#### v3.0.0
+
+###### 2026/10/13
+
+* `Note` Lancée seule, l'application demande une fois l'accès aux photos (photos et vidéos sur Android 13+, stockage sur les versions antérieures) pour afficher les albums; en cas de refus elle ne le redemande plus d'elle-même, l'affichage, la retouche et la conversion restent possibles via le sélecteur du système, et l'accès peut être accordé plus tard depuis l'accueil ou Paramètres > Autorisation de stockage. Ouvrir des images depuis AutoJs6 ou d'autres applications ne demande jamais d'autorisation
+* `Fonctionnalité` L'écran d'accueil devient une vue en albums: images de l'appareil regroupées par dossier (couverture, nom, nombre) ou vue à plat du contenu de tous les dossiers; la grille propose 3 à 6 colonnes (menu ou pincement), un tri par nom, date de modification, date de prise de vue ou taille mémorisé par album, une barre de défilement rapide avec indication de date et l'actualisation par glissement
+* `Fonctionnalité` La visionneuse parcourt tout l'album par glissement à gauche et à droite, une bande de miniatures saute à une page au toucher et la grille revient à la dernière image vue
+* `Fonctionnalité` Faites pivoter une image à deux doigts; au relâchement elle se cale sur le quart de tour le plus proche, ne change que l'affichage, peut être annulée et se désactive dans Paramètres > Visionneuse
+* `Fonctionnalité` Une nouvelle page Autorisation de stockage dans les Paramètres affiche l'accès actuel, l'accorde de nouveau, gère les photos sélectionnées sur Android 14+, ajoute ou retire des dossiers autorisés (affichés comme albums même sans accès aux photos) et propose l'option Accès à tous les fichiers
+* `Fonctionnalité` Le menu de dossier du gestionnaire de fichiers d'AutoJs6 gagne Afficher comme album, qui montre les images du dossier en grille et ouvre ses sous-dossiers
+* `Dépendance` Ajout de Navigation Compose 2.10.2 pour la navigation entre l'accueil et les pages d'album
+
 #### v2.1.0
 
 ###### 2026/10/13
@@ -309,13 +321,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 * `Fonctionnalité` Image Viewer et Image Tools sont réunis dans 3-Maple Image pour afficher, retoucher et convertir les images
 * `Fonctionnalité` Un écran d'accueil autonome permet de choisir une image, de la retoucher ou convertir et d'enregistrer le résultat à l'emplacement choisi
 * `Fonctionnalité` Les paramètres communs proposent la langue, le mode sombre, la couleur et quatre icônes de lanceur
-
-#### v1.3.1
-
-###### 2026/09/19
-
-* `Correctif` Avertissements de lecture SDK XML v4 avec AGP 9.1 et contrôles d'alignement natif des APK déclenchés par erreur lors de l'assemblage des tests unitaires JVM, avec les plugins de compilation partagés 1.8.3
-* `Amélioration` compileSdk et targetSdk passent à 37 (Android 17) ; le comportement du plugin ne dépend pas de la nouvelle cible
 
 ##### Historique complet
 
