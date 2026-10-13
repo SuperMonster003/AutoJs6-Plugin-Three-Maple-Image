@@ -52,7 +52,12 @@ internal object MediaStoreTestImages {
 
     fun cleanUp(context: Context, uris: List<Uri>, folder: String) {
         uris.forEach { uri -> runCatching { context.contentResolver.delete(uri, null, null) } }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) legacyFolder(folder).deleteRecursively()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            legacyFolder(folder).deleteRecursively()
+        } else {
+            // The provider removed the files with their rows; the empty folder would otherwise stay behind.
+            runCatching { legacyFolder(folder).delete() }
+        }
     }
 
     fun solidPng(color: Int): ByteArray {
