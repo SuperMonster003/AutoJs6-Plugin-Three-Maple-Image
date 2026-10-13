@@ -52,6 +52,7 @@ class ZoomableImageView @JvmOverloads constructor(
     private var lastScaleFocusX = 0f
     private var lastScaleFocusY = 0f
     private var gestureHadMultiplePointers = false
+    private var edgeOverflowX = 0f
 
     private val scaleDetector = ScaleGestureDetector(
         context,
@@ -60,6 +61,7 @@ class ZoomableImageView @JvmOverloads constructor(
                 ensureBaseMatrix()
                 if (drawable == null) return false
                 gestureHadMultiplePointers = true
+                parent?.requestDisallowInterceptTouchEvent(true)
                 lastScaleFocusX = detector.focusX
                 lastScaleFocusY = detector.focusY
                 onZoomInteraction?.invoke(zoom, true)
@@ -176,7 +178,9 @@ class ZoomableImageView @JvmOverloads constructor(
             activePointerId = event.getPointerId(0)
             lastTouchX = event.x
             lastTouchY = event.y
-            parent?.requestDisallowInterceptTouchEvent(true)
+            edgeOverflowX = 0f
+            // At 1x a horizontal drag belongs to the pager around this view; zoomed in, the image pans itself.
+            parent?.requestDisallowInterceptTouchEvent(isZoomedIn)
         } else if (
             event.pointerCount > 1 ||
             event.actionMasked == MotionEvent.ACTION_POINTER_DOWN ||
@@ -194,6 +198,7 @@ class ZoomableImageView @JvmOverloads constructor(
                     val pointerIndex = event.findPointerIndex(activePointerId).takeIf { it >= 0 } ?: 0
                     val touchX = event.getX(pointerIndex)
                     val touchY = event.getY(pointerIndex)
+                    trackEdgeOverflow(touchX - lastTouchX)
                     displayMatrix.postTranslate(touchX - lastTouchX, touchY - lastTouchY)
                     constrainDisplayMatrix()
                     lastTouchX = touchX
@@ -217,10 +222,15 @@ class ZoomableImageView @JvmOverloads constructor(
                 }
             }
 
-            MotionEvent.ACTION_UP,
-            MotionEvent.ACTION_CANCEL,
-            -> {
+            MotionEvent.ACTION_UP -> {
                 activePointerId = MotionEvent.INVALID_POINTER_ID
+                parent?.requestDisallowInterceptTouchEvent(false)
+                finishEdgeOverflow()
+            }
+
+            MotionEvent.ACTION_CANCEL -> {
+                activePointerId = MotionEvent.INVALID_POINTER_ID
+                edgeOverflowX = 0f
                 parent?.requestDisallowInterceptTouchEvent(false)
             }
         }
@@ -333,6 +343,33 @@ class ZoomableImageView @JvmOverloads constructor(
         }
         onPageSwipe?.invoke(if (distanceX < 0f) DIRECTION_NEXT else DIRECTION_PREVIOUS)
         return true
+    }
+
+    private val isZoomedIn: Boolean
+        get() = zoom > MIN_ZOOM + ZOOM_EPSILON
+
+    /**
+     * While zoomed in, horizontal drag that the pan constraint swallows at an image edge accumulates here; a drag
+     * that keeps pushing past the edge flips the page on release (ROADMAP 6.3 nested scroll coordination).
+     */
+    private fun trackEdgeOverflow(distanceX: Float) {
+        if (distanceX == 0f || gestureHadMultiplePointers || drawable !== configuredDrawable) return
+        mappedDrawableRect.set(drawableRect)
+        displayMatrix.mapRect(mappedDrawableRect)
+        val atEdge = if (distanceX > 0f) {
+            mappedDrawableRect.left >= paddingLeft - EDGE_EPSILON
+        } else {
+            mappedDrawableRect.right <= width - paddingRight + EDGE_EPSILON
+        }
+        val sameDirection = edgeOverflowX == 0f || (edgeOverflowX > 0f) == (distanceX > 0f)
+        edgeOverflowX = if (atEdge && sameDirection) edgeOverflowX + distanceX else 0f
+    }
+
+    private fun finishEdgeOverflow() {
+        val overflow = edgeOverflowX
+        edgeOverflowX = 0f
+        if (!isZoomedIn || gestureHadMultiplePointers || abs(overflow) < swipeDistanceThreshold) return
+        onPageSwipe?.invoke(if (overflow < 0f) DIRECTION_NEXT else DIRECTION_PREVIOUS)
     }
 
     private fun ensureBaseMatrix() {
@@ -454,5 +491,6 @@ class ZoomableImageView @JvmOverloads constructor(
 
         private const val SWIPE_DISTANCE_DP = 72f
         private const val SWIPE_VELOCITY_DP = 160f
+        private const val EDGE_EPSILON = 0.5f
     }
 }

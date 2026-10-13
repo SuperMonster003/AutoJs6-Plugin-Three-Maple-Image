@@ -248,5 +248,6 @@
     <string name="theme_picker_invalid">#RRGGBB, RRGGBB または rgb(r, g, b) を入力してください. RGB の値は 0..255 です.</string>
     <string name="theme_picker_presets">プリセット色</string>
     <string name="theme_picker_preview">プレビュー</string>
+    <string name="viewer_thumbnail_description">%2$d ページ中 %1$d ページ目</string>
     <string name="zoom_indicator">%1$s倍</string>
 </resources>

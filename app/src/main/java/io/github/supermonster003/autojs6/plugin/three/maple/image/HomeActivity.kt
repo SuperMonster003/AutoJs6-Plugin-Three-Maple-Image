@@ -1,8 +1,6 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
-import android.content.ClipData
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -148,16 +146,24 @@ class HomeActivity : ConfiguredActivity() {
         }
     }
 
-    /** Opens one grid item in the viewer through the external entry, which already handles single content URIs. */
+    /** Opens one grid item in the paged viewer with the whole album as its source (ROADMAP 6.3). */
     private fun openImage(item: MediaItem) {
-        val uri = Uri.parse(item.contentUri)
-        val intent = Intent(this, ExternalViewActivity::class.java).apply {
-            action = Intent.ACTION_VIEW
-            setDataAndType(uri, item.mimeType.takeIf { it.startsWith("image/") } ?: "image/*")
-            clipData = ClipData.newRawUri(item.displayName, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val grid = gallery.grid.value
+        val album = grid.album
+        val start = ViewerSource.request(item)
+        val spec = when {
+            album == null -> null
+            album.kind == AlbumKind.MEDIA -> ViewerSourceSpec.MediaAlbum(album.id, grid.sort, item.id)
+            album.folder != null -> ViewerSourceSpec.AuthorizedFolder(album.folder.treeUri, grid.sort, item.id)
+            else -> null
         }
-        runCatching { startActivity(intent) }.onFailure { showMessage(R.string.standalone_home_open_failed) }
+        val request = if (spec == null) {
+            ImageViewerLaunchRequest.single(start, editable = true)
+        } else {
+            ImageViewerLaunchRequest.gallery(start, spec)
+        }
+        runCatching { startActivity(ImageViewerContract.viewerIntent(this, request)) }
+            .onFailure { showMessage(R.string.standalone_home_open_failed) }
     }
 
     private fun openHost() {

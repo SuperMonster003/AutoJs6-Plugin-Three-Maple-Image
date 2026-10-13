@@ -117,7 +117,7 @@ class ImageExifOrientationInstrumentationTest {
             ).use { scenario ->
                 awaitViewerOrientation(scenario, expectedManualDegrees = 0)
                 scenario.onActivity { activity ->
-                    val image = activity.findViewById<ZoomableImageView>(R.id.image)
+                    val image = requireNotNull(activity.currentImageViewForTesting())
                     val decoded = requireBitmap(image)
                     assertCornerColors(orientationCase.decodedCorners, bitmapCornerColors(decoded))
                     assertCornerColors(
@@ -138,7 +138,7 @@ class ImageExifOrientationInstrumentationTest {
 
                 awaitViewerOrientation(scenario, expectedManualDegrees = 90)
                 scenario.onActivity { activity ->
-                    val image = activity.findViewById<ZoomableImageView>(R.id.image)
+                    val image = requireNotNull(activity.currentImageViewForTesting())
                     val decoded = requireBitmap(image)
                     assertCornerColors(orientationCase.decodedCorners, bitmapCornerColors(decoded))
                     assertCornerColors(
@@ -182,8 +182,8 @@ class ImageExifOrientationInstrumentationTest {
         var observedState = "not observed"
         while (!ready && SystemClock.uptimeMillis() < deadline) {
             scenario.onActivity { activity ->
-                val image = activity.findViewById<ZoomableImageView>(R.id.image)
-                val bitmap = (image.drawable as? BitmapDrawable)?.bitmap
+                val image = activity.currentImageViewForTesting()
+                val bitmap = (image?.drawable as? BitmapDrawable)?.bitmap
                 val metadataText = activity.viewerStateForTesting.metadataText
                 val printEnabled = activity.viewerStateForTesting.printEnabled
                 val expectedResolution = activity.getString(
@@ -192,11 +192,11 @@ class ImageExifOrientationInstrumentationTest {
                     ExifJpegTestFixture.PATTERN_WIDTH,
                 )
                 observedState = "bitmap=${bitmap?.width}x${bitmap?.height}, " +
-                    "view=${image.width}x${image.height}, " +
-                    "manualRotation=${image.currentRotationDegreesForTesting}, " +
+                    "view=${image?.width}x${image?.height}, " +
+                    "manualRotation=${image?.currentRotationDegreesForTesting}, " +
                     "printEnabled=$printEnabled, " +
                     "metadata=$metadataText"
-                ready = bitmap != null &&
+                ready = image != null && bitmap != null &&
                     bitmap.height > bitmap.width &&
                     image.width > 0 &&
                     image.height > 0 &&

@@ -248,5 +248,6 @@
     <string name="theme_picker_invalid">أدخل #RRGGBB أو RRGGBB أو rgb(r, g, b). يجب أن تكون قيم RGB بين 0 و255.</string>
     <string name="theme_picker_presets">ألوان جاهزة</string>
     <string name="theme_picker_preview">معاينة</string>
+    <string name="viewer_thumbnail_description">الصفحة %1$d من %2$d</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

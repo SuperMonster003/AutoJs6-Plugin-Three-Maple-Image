@@ -23,11 +23,17 @@ internal data class ImageViewerLaunchRequest(
     val hostTargetId: String? = null,
     /** True only for the standalone and external entries, where the viewer may hand the image to the editor (R5). */
     val editable: Boolean = false,
+    /** Gallery album the viewer enumerates itself; [pages] then holds only the start page (ROADMAP 6.3). */
+    val source: ViewerSourceSpec? = null,
 ) {
     init {
         require(pages.size in 1..ImageSiblingDiscoveryPolicy.MAX_PAGES)
         require(startIndex in pages.indices)
         require((hostSession == null) == (hostTargetId == null))
+        if (source != null) {
+            require(hostSession == null)
+            require(pages.size == 1)
+        }
         if (hostSession == null) {
             require(pages.all { it.hostRelativePath == null })
         } else {
@@ -49,6 +55,10 @@ internal data class ImageViewerLaunchRequest(
             require(images.isNotEmpty())
             return ImageViewerLaunchRequest(images.map { image -> ImageViewerPage(image) })
         }
+
+        /** The standalone gallery's entry: the tapped item plus the album the viewer enumerates itself. */
+        fun gallery(start: ImageViewerRequest, spec: ViewerSourceSpec): ImageViewerLaunchRequest =
+            ImageViewerLaunchRequest(pages = listOf(ImageViewerPage(start)), editable = true, source = spec)
     }
 }
 
@@ -69,6 +79,22 @@ internal object ImageViewerContract {
         "io.github.supermonster003.autojs6.plugin.three.maple.image.extra.HOST_REQUEST"
     private const val EXTRA_EDITABLE =
         "io.github.supermonster003.autojs6.plugin.three.maple.image.extra.EDITABLE"
+    private const val EXTRA_SOURCE =
+        "io.github.supermonster003.autojs6.plugin.three.maple.image.extra.SOURCE"
+
+    /** Result extras of a gallery-sourced viewer: the item the user left on, so the grid can scroll to it. */
+    const val EXTRA_RESULT_ITEM_ID =
+        "io.github.supermonster003.autojs6.plugin.three.maple.image.extra.RESULT_ITEM_ID"
+    const val EXTRA_RESULT_INDEX =
+        "io.github.supermonster003.autojs6.plugin.three.maple.image.extra.RESULT_INDEX"
+    private const val SOURCE_KIND = "kind"
+    private const val SOURCE_KIND_MEDIA = "media"
+    private const val SOURCE_KIND_FOLDER = "folder"
+    private const val SOURCE_BUCKET_ID = "bucketId"
+    private const val SOURCE_TREE_URI = "treeUri"
+    private const val SOURCE_SORT_FIELD = "sortField"
+    private const val SOURCE_SORT_ASCENDING = "sortAscending"
+    private const val SOURCE_START_ITEM_ID = "startItemId"
     private const val HOST_TARGET_ID = "targetId"
     private const val HOST_RELATIVE_PATHS = "relativePaths"
 
@@ -121,6 +147,13 @@ internal object ImageViewerContract {
                 ?: return null
         }
 
+        val sourceBundle = intent.parcelableBundleExtra(EXTRA_SOURCE)
+        val source = if (sourceBundle == null) {
+            null
+        } else {
+            readSourceSpec(sourceBundle, hasHost = hostBundle != null, pageCount = count) ?: return null
+        }
+
         val pages = (0 until count).map { index ->
             val item = clipData.getItemAt(index)
             val uri = item.uri ?: return null
@@ -155,8 +188,32 @@ internal object ImageViewerContract {
             hostSession = hostSession,
             hostTargetId = hostTargetId,
             editable = hostSession == null && intent.getBooleanExtra(EXTRA_EDITABLE, false),
+            source = source,
         )
     }.getOrNull()
+
+    private fun readSourceSpec(bundle: Bundle, hasHost: Boolean, pageCount: Int): ViewerSourceSpec? {
+        if (hasHost || pageCount != 1) return null
+        val field = bundle.getString(SOURCE_SORT_FIELD)
+            ?.let { name -> MediaSortField.entries.firstOrNull { it.name == name } }
+            ?: return null
+        val sort = MediaSort(field, bundle.getBoolean(SOURCE_SORT_ASCENDING, false))
+        if (!bundle.containsKey(SOURCE_START_ITEM_ID)) return null
+        val startItemId = bundle.getLong(SOURCE_START_ITEM_ID)
+        return when (bundle.getString(SOURCE_KIND)) {
+            SOURCE_KIND_MEDIA -> {
+                if (!bundle.containsKey(SOURCE_BUCKET_ID)) return null
+                ViewerSourceSpec.MediaAlbum(bundle.getLong(SOURCE_BUCKET_ID), sort, startItemId)
+            }
+            SOURCE_KIND_FOLDER -> {
+                val treeUri = bundle.getString(SOURCE_TREE_URI)
+                    ?.takeIf { isPlainContentUri(Uri.parse(it)) }
+                    ?: return null
+                ViewerSourceSpec.AuthorizedFolder(treeUri, sort, startItemId)
+            }
+            else -> null
+        }
+    }
 
     fun closeAttachedHostSession(intent: Intent?) {
         val binder = runCatching {
@@ -194,6 +251,26 @@ internal object ImageViewerContract {
         putExtra(EXTRA_PAGE_DECLARED_SIZES, request.pages.map { it.image.declaredSize }.toLongArray())
         putExtra(EXTRA_START_INDEX, request.startIndex)
         putExtra(EXTRA_EDITABLE, request.editable)
+        request.source?.let { spec ->
+            putExtra(
+                EXTRA_SOURCE,
+                Bundle().apply {
+                    putString(SOURCE_SORT_FIELD, spec.sort.field.name)
+                    putBoolean(SOURCE_SORT_ASCENDING, spec.sort.ascending)
+                    putLong(SOURCE_START_ITEM_ID, spec.startItemId)
+                    when (spec) {
+                        is ViewerSourceSpec.MediaAlbum -> {
+                            putString(SOURCE_KIND, SOURCE_KIND_MEDIA)
+                            putLong(SOURCE_BUCKET_ID, spec.bucketId)
+                        }
+                        is ViewerSourceSpec.AuthorizedFolder -> {
+                            putString(SOURCE_KIND, SOURCE_KIND_FOLDER)
+                            putString(SOURCE_TREE_URI, spec.treeUri)
+                        }
+                    }
+                },
+            )
+        }
         request.hostSession?.let { session ->
             putExtra(
                 EXTRA_HOST_REQUEST,

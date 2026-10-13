@@ -7,6 +7,10 @@ import android.net.Uri
 import android.provider.DocumentsContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.concurrent.ConcurrentHashMap
+
+/** Last enumeration per tree URI in this process: the grid fills it, the viewer reads it (ROADMAP 6.3). */
+private val folderEnumerationCache = ConcurrentHashMap<String, Pair<List<MediaItem>, DocumentTreeLimit>>()
 
 /** A folder the user authorized through the system folder picker (ROADMAP T7). */
 internal data class AuthorizedFolder(
@@ -80,6 +84,17 @@ internal class AuthorizedFolderRepository(
             )
         }
         items to result.limit
+    }
+
+    /** The cached enumeration of [folder], if this process produced one. */
+    fun cached(folder: AuthorizedFolder): Pair<List<MediaItem>, DocumentTreeLimit>? = folderEnumerationCache[folder.treeUri]
+
+    /** [enumerate] through the process-wide cache, so opening a folder in the viewer does not walk the tree again. */
+    suspend fun enumerateCached(folder: AuthorizedFolder): Pair<List<MediaItem>, DocumentTreeLimit> =
+        folderEnumerationCache[folder.treeUri] ?: enumerate(folder).also { folderEnumerationCache[folder.treeUri] = it }
+
+    fun invalidateCache() {
+        folderEnumerationCache.clear()
     }
 
     private fun children(tree: Uri, documentId: String): List<DocumentEntry> {

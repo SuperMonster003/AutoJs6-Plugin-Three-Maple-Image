@@ -248,5 +248,6 @@
     <string name="theme_picker_invalid">Введите #RRGGBB, RRGGBB или rgb(r, g, b). Значения RGB должны быть от 0 до 255.</string>
     <string name="theme_picker_presets">Готовые цвета</string>
     <string name="theme_picker_preview">Предпросмотр</string>
+    <string name="viewer_thumbnail_description">Страница %1$d из %2$d</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

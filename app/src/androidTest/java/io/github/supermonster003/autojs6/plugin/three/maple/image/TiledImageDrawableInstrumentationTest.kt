@@ -248,7 +248,7 @@ class TiledImageDrawableInstrumentationTest {
             ).use { scenario ->
                 awaitActivityTiledPage(scenario, SELECTED_NAME)
                 scenario.onActivity { activity ->
-                    val image = activity.findViewById<ZoomableImageView>(R.id.image)
+                    val image = requireNotNull(activity.currentImageViewForTesting())
                     firstDrawable = image.drawable as TiledImageDrawable
                     assertTrue(image.toggleDoubleTapZoom(image.width / 2f, image.height / 2f))
                     assertEquals(ImageZoomState.DOUBLE_TAP_ZOOM, image.currentZoomForTesting)
@@ -256,8 +256,8 @@ class TiledImageDrawableInstrumentationTest {
                 awaitCondition("activity high-resolution tiles") {
                     var ready = false
                     scenario.onActivity { activity ->
-                        val drawable = activity.findViewById<ZoomableImageView>(R.id.image)
-                            .drawable as? TiledImageDrawable
+                        val drawable = activity.currentImageViewForTesting()
+                            ?.drawable as? TiledImageDrawable
                         ready = drawable != null &&
                             drawable.lastRequestedSampleSizeForTesting <
                             drawable.previewSampleSizeForTesting &&
@@ -266,7 +266,7 @@ class TiledImageDrawableInstrumentationTest {
                     ready
                 }
                 scenario.onActivity { activity ->
-                    val image = activity.findViewById<ZoomableImageView>(R.id.image)
+                    val image = requireNotNull(activity.currentImageViewForTesting())
                     activity.rotateForTesting()
                     assertEquals(90, image.currentRotationDegreesForTesting)
                     assertEquals(ImageZoomState.DOUBLE_TAP_ZOOM, image.currentZoomForTesting)
@@ -275,11 +275,11 @@ class TiledImageDrawableInstrumentationTest {
 
                 awaitActivityTiledPage(scenario, SIBLING_NAME)
                 scenario.onActivity { activity ->
-                    secondDrawable = activity.findViewById<ZoomableImageView>(R.id.image)
+                    secondDrawable = requireNotNull(activity.currentImageViewForTesting())
                         .drawable as TiledImageDrawable
                     assertNotSame(firstDrawable, secondDrawable)
                     assertTrue(requireNotNull(firstDrawable).isClosedForTesting)
-                    assertEquals(0, activity.findViewById<ZoomableImageView>(R.id.image).currentRotationQuarterTurns)
+                    assertEquals(0, requireNotNull(activity.currentImageViewForTesting()).currentRotationQuarterTurns)
                 }
                 assertTrue(session.openedPaths.count { it == SIBLING_NAME } >= 2)
             }
@@ -297,10 +297,10 @@ class TiledImageDrawableInstrumentationTest {
         awaitCondition("tiled Activity page $expectedName") {
             var ready = false
             scenario.onActivity { activity ->
-                val image = activity.findViewById<ZoomableImageView>(R.id.image)
+                val image = activity.currentImageViewForTesting()
                 val metadata = activity.viewerStateForTesting.metadataText
                 ready = activity.viewerStateForTesting.printEnabled &&
-                    image.drawable is TiledImageDrawable &&
+                    image?.drawable is TiledImageDrawable &&
                     activity.titleText() == expectedName &&
                     metadata.contains("${LargePngTestFixture.WIDTH}") &&
                     metadata.contains("${LargePngTestFixture.HEIGHT}")

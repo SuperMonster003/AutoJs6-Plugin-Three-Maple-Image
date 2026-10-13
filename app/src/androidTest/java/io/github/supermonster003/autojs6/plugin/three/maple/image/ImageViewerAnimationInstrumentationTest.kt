@@ -74,14 +74,14 @@ class ImageViewerAnimationInstrumentationTest {
             ).use { scenario ->
                 awaitAnimationControl(scenario, R.string.action_pause_animation)
                 scenario.onActivity { activity ->
-                    val drawable = activity.findViewById<ZoomableImageView>(R.id.image).drawable
+                    val drawable = requireNotNull(activity.currentImageViewForTesting()).drawable
                     assertTrue(drawable is GifDrawable && drawable.frameCount == 2)
                     assertTrue((drawable as GifDrawable).isRunning)
                     activity.toggleAnimationForTesting()
                     assertEquals(ImageAnimationPlayback.PAUSED, activity.viewerStateForTesting.animation)
                     assertFalse(drawable.isRunning)
                     activity.rotateForTesting()
-                    assertEquals(90, activity.findViewById<ZoomableImageView>(R.id.image)
+                    assertEquals(90, requireNotNull(activity.currentImageViewForTesting())
                         .currentRotationDegreesForTesting)
                     assertFalse(drawable.isRunning)
                 }
@@ -90,10 +90,10 @@ class ImageViewerAnimationInstrumentationTest {
 
                 awaitAnimationControl(scenario, R.string.action_resume_animation)
                 scenario.onActivity { activity ->
-                    val drawable = activity.findViewById<ZoomableImageView>(R.id.image).drawable
+                    val drawable = requireNotNull(activity.currentImageViewForTesting()).drawable
                     assertTrue(drawable is GifDrawable)
                     assertFalse((drawable as GifDrawable).isRunning)
-                    val image = activity.findViewById<ZoomableImageView>(R.id.image)
+                    val image = requireNotNull(activity.currentImageViewForTesting())
                     assertEquals(90, image.currentRotationDegreesForTesting)
                     activity.resetZoomForTesting()
                     assertEquals(0, image.currentRotationDegreesForTesting)

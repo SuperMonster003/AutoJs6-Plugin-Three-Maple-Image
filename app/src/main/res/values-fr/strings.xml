@@ -248,5 +248,6 @@
     <string name="theme_picker_invalid">Saisissez #RRGGBB, RRGGBB ou rgb(r, g, b). Les valeurs RGB doivent être comprises entre 0 et 255.</string>
     <string name="theme_picker_presets">Couleurs prédéfinies</string>
     <string name="theme_picker_preview">Aperçu</string>
+    <string name="viewer_thumbnail_description">Page %1$d sur %2$d</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

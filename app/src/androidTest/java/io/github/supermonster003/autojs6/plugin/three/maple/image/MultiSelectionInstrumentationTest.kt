@@ -67,7 +67,7 @@ class MultiSelectionInstrumentationTest {
             ).use { scenario ->
                 awaitPage(scenario, RED_NAME, RED)
                 scenario.onActivity { activity ->
-                    val image = activity.findViewById<ZoomableImageView>(R.id.image)
+                    val image = requireNotNull(activity.currentImageViewForTesting())
                     assertTrue(image.toggleDoubleTapZoom(image.width / 2f, image.height / 2f))
                     assertEquals(ImageZoomState.DOUBLE_TAP_ZOOM, image.currentZoomForTesting)
                     image.onPageSwipe?.invoke(ZoomableImageView.DIRECTION_NEXT)
@@ -75,7 +75,7 @@ class MultiSelectionInstrumentationTest {
 
                 awaitPage(scenario, BLUE_NAME, BLUE)
                 scenario.onActivity { activity ->
-                    val image = activity.findViewById<ZoomableImageView>(R.id.image)
+                    val image = requireNotNull(activity.currentImageViewForTesting())
                     assertEquals(ImageZoomState.MIN_ZOOM, image.currentZoomForTesting)
                     assertTrue(activity.viewerStateForTesting.canForward)
                     image.onPageSwipe?.invoke(ZoomableImageView.DIRECTION_PREVIOUS)
@@ -104,7 +104,7 @@ class MultiSelectionInstrumentationTest {
             var ready = false
             scenario.onActivity { activity ->
                 val title = activity.viewerStateForTesting.title
-                val drawable = activity.findViewById<ZoomableImageView>(R.id.image).drawable
+                val drawable = activity.currentImageViewForTesting()?.drawable
                     as? BitmapDrawable
                 val bitmap = drawable?.bitmap
                 ready = title == expectedName && bitmap != null &&

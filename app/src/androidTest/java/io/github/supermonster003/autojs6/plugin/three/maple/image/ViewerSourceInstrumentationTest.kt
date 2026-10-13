@@ -1,0 +1,316 @@
+package io.github.supermonster003.autojs6.plugin.three.maple.image
+
+import android.Manifest
+import android.content.ContentUris
+import android.content.ContentValues
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.os.ParcelFileDescriptor
+import android.provider.MediaStore
+import androidx.compose.ui.test.ComposeTimeoutException
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.test.core.app.ActivityScenario
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
+import kotlinx.coroutines.runBlocking
+import org.autojs.plugin.explorer.api.IExplorerActionHostSession
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.io.File
+import java.io.FileOutputStream
+import java.util.UUID
+
+/** ROADMAP 6.3: one instrumentation per viewer source kind that is not covered by the host-entry tests. */
+@RunWith(AndroidJUnit4::class)
+class ViewerSourceInstrumentationTest {
+
+    @get:Rule
+    val compose = createEmptyComposeRule()
+
+    @get:Rule
+    val permission: GrantPermissionRule = GrantPermissionRule.grant(*mediaPermissions())
+
+    private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
+
+    @After
+    fun resetLoader() {
+        ViewerSourceLoader.factoryForTesting = null
+    }
+
+    /** A MediaStore album is enumerated inside the viewer: pager starts on the tapped item, the strip jumps pages. */
+    @Test
+    fun mediaAlbumSourcePagesTheWholeBucketFromTheTappedItem() {
+        val folder = "MapleViewerTest-" + UUID.randomUUID().toString().take(8)
+        val inserted = listOf(Color.RED, Color.GREEN, Color.BLUE).mapIndexed { index, color ->
+            insertImage(folder, "page-${index + 1}.png", color)
+        }
+        try {
+            val ids = inserted.map { ContentUris.parseId(it) }.toSet()
+            val items = runBlocking { MediaStoreRepository(context).loadAll() }.filter { it.id in ids }
+            assertEquals("inserted rows are cataloged", 3, items.size)
+            val sort = MediaSort(MediaSortField.NAME, ascending = true)
+            val ordered = MediaCatalog.sort(items, sort)
+            val start = ordered[1]
+            val request = ImageViewerLaunchRequest.gallery(
+                ViewerSource.request(start),
+                ViewerSourceSpec.MediaAlbum(start.bucketId, sort, start.id),
+            )
+            ActivityScenario.launchActivityForResult<ImageViewerActivity>(
+                ImageViewerContract.viewerIntent(context, request),
+            ).use { scenario ->
+                awaitSource(scenario) { it.kind == ViewerSourceKind.MEDIA_ALBUM && it.pages.size == 3 }
+                scenario.onActivity { activity ->
+                    val source = requireNotNull(activity.sourceForTesting)
+                    assertEquals(ordered.map { it.displayName }, source.pages.map { it.image.displayName })
+                    assertEquals(1, source.startIndex)
+                    assertTrue(source.editable)
+                }
+                awaitPage(scenario, index = 1, title = start.displayName)
+                scenario.onActivity { activity ->
+                    assertTrue(activity.viewerStateForTesting.canEdit)
+                    assertEquals("2 / 3", activity.viewerStateForTesting.subtitle)
+                }
+                compose.onNodeWithTag("maple.viewer.strip").assertIsDisplayed()
+                compose.onNodeWithTag("maple.viewer.strip.1").assertIsSelected()
+                compose.onNodeWithTag("maple.viewer.strip.2").performClick()
+                awaitPage(scenario, index = 2, title = ordered[2].displayName)
+                compose.onNodeWithTag("maple.viewer.strip.2").assertIsSelected()
+                scenario.onActivity { activity -> activity.finish() }
+                val result = scenario.result
+                assertEquals(ordered[2].id, result.resultData.getLongExtra(ImageViewerContract.EXTRA_RESULT_ITEM_ID, -1L))
+                assertEquals(2, result.resultData.getIntExtra(ImageViewerContract.EXTRA_RESULT_INDEX, -1))
+            }
+        } finally {
+            inserted.forEach { uri -> runCatching { context.contentResolver.delete(uri, null, null) } }
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                legacyFolder(folder).deleteRecursively()
+            }
+        }
+    }
+
+    /** An authorized folder resolves through the injected enumeration; overlay visibility survives recreation. */
+    @Test
+    fun authorizedFolderSourceUsesTheEnumerationAndKeepsTheStripStateAcrossRecreate() {
+        val fixture = HostFixture(context, listOf("alpha.png" to Color.RED, "beta.png" to Color.GREEN, "gamma.png" to Color.BLUE))
+        try {
+            val treeUri = "content://com.android.externalstorage.documents/tree/primary%3APictures"
+            val items = fixture.items(bucketId = -7L)
+            val sort = MediaSort(MediaSortField.NAME, ascending = true)
+            var requestedTree: String? = null
+            ViewerSourceLoader.factoryForTesting = {
+                ViewerSourceLoader(
+                    loadAlbum = { _, _ -> error("album enumeration must not run for a folder source") },
+                    loadFolder = { tree, requestedSort -> requestedTree = tree; MediaCatalog.sort(items, requestedSort) },
+                )
+            }
+            val start = items[2]
+            val request = ImageViewerLaunchRequest.gallery(
+                ViewerSource.request(start),
+                ViewerSourceSpec.AuthorizedFolder(treeUri, sort, start.id),
+            )
+            ActivityScenario.launchActivityForResult<ImageViewerActivity>(
+                ImageViewerContract.viewerIntent(context, request),
+            ).use { scenario ->
+                awaitSource(scenario) { it.kind == ViewerSourceKind.AUTHORIZED_FOLDER && it.pages.size == 3 }
+                assertEquals(treeUri, requestedTree)
+                awaitPage(scenario, index = 2, title = "gamma.png")
+                scenario.onActivity { activity -> activity.flipPageForTesting(ZoomableImageView.DIRECTION_PREVIOUS) }
+                awaitPage(scenario, index = 1, title = "beta.png")
+                compose.onNodeWithTag("maple.viewer.strip.1").assertIsSelected()
+                scenario.onActivity { activity -> activity.toggleControlsForTesting() }
+                compose.onNodeWithTag("maple.viewer.strip").assertDoesNotExist()
+
+                scenario.recreate()
+
+                awaitSource(scenario) { it.pages.size == 3 }
+                awaitPage(scenario, index = 1, title = "beta.png")
+                scenario.onActivity { activity ->
+                    assertFalse(activity.viewerStateForTesting.controlsVisible)
+                    activity.toggleControlsForTesting()
+                }
+                compose.onNodeWithTag("maple.viewer.strip").assertIsDisplayed()
+                compose.onNodeWithTag("maple.viewer.strip.1").assertIsSelected()
+            }
+        } finally {
+            fixture.close()
+        }
+    }
+
+    /** A single URI stays a one-page viewer without a strip. */
+    @Test
+    fun singleSourceHasOnePageAndNoStrip() {
+        val fixture = HostFixture(context, listOf("solo.png" to Color.MAGENTA))
+        try {
+            val request = ImageViewerLaunchRequest.single(fixture.items(bucketId = -1L).single().let(ViewerSource::request), editable = true)
+            ActivityScenario.launchActivityForResult<ImageViewerActivity>(
+                ImageViewerContract.viewerIntent(context, request),
+            ).use { scenario ->
+                awaitSource(scenario) { it.kind == ViewerSourceKind.SINGLE && it.pages.size == 1 }
+                awaitPage(scenario, index = 0, title = "solo.png")
+                scenario.onActivity { activity ->
+                    assertEquals(1, activity.viewerStateForTesting.pageCount)
+                    assertEquals(null, activity.viewerStateForTesting.subtitle)
+                }
+                compose.onNodeWithTag("maple.viewer.strip").assertDoesNotExist()
+            }
+        } finally {
+            fixture.close()
+        }
+    }
+
+    // region Helpers
+
+    /** The compose rule drives the frame clock, so polling goes through [ComposeTestRule.waitUntil]. */
+    private fun awaitSource(scenario: ActivityScenario<ImageViewerActivity>, predicate: (ViewerSource) -> Boolean) {
+        try {
+            compose.waitUntil(TIMEOUT_MILLIS) {
+                var ready = false
+                scenario.onActivity { activity -> ready = activity.sourceForTesting?.let(predicate) == true }
+                ready
+            }
+        } catch (_: ComposeTimeoutException) {
+            fail("Timed out waiting for the viewer source")
+        }
+    }
+
+    private fun awaitPage(scenario: ActivityScenario<ImageViewerActivity>, index: Int, title: String) {
+        var observed = ""
+        try {
+            compose.waitUntil(TIMEOUT_MILLIS) {
+                var ready = false
+                scenario.onActivity { activity ->
+                    val state = activity.viewerStateForTesting
+                    observed = "index=${state.pageIndex} title=${state.title} print=${state.printEnabled} error=${state.errorText}"
+                    ready = state.pageIndex == index && state.title == title && state.printEnabled
+                }
+                ready
+            }
+        } catch (_: ComposeTimeoutException) {
+            fail("Timed out waiting for page $index ($title): $observed")
+        }
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+    }
+
+    private fun insertImage(folder: String, name: String, color: Int): Uri {
+        val resolver = context.contentResolver
+        val bytes = solidPng(color)
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, name)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/" + folder)
+            values.put(MediaStore.Images.Media.IS_PENDING, 1)
+            val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            val uri = requireNotNull(resolver.insert(collection, values))
+            requireNotNull(resolver.openOutputStream(uri)).use { stream -> stream.write(bytes) }
+            resolver.update(uri, ContentValues().apply { put(MediaStore.Images.Media.IS_PENDING, 0) }, null, null)
+            return uri
+        }
+        val file = File(legacyFolder(folder).apply { mkdirs() }, name)
+        FileOutputStream(file).use { stream -> stream.write(bytes) }
+        @Suppress("DEPRECATION")
+        values.put(MediaStore.Images.Media.DATA, file.absolutePath)
+        values.put(MediaStore.Images.Media.SIZE, file.length())
+        values.put(MediaStore.Images.Media.WIDTH, PIXELS)
+        values.put(MediaStore.Images.Media.HEIGHT, PIXELS)
+        @Suppress("DEPRECATION")
+        return requireNotNull(resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values))
+    }
+
+    @Suppress("DEPRECATION")
+    private fun legacyFolder(folder: String): File =
+        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), folder)
+
+    /** Files in the app cache exposed through the host image provider, so folder and single sources need no SAF tree. */
+    private class HostFixture(context: android.content.Context, pages: List<Pair<String, Int>>) {
+        private val directory = File(context.cacheDir, "viewer-source-" + UUID.randomUUID()).apply { mkdirs() }
+        private val files = pages.associate { (name, color) ->
+            name to File(directory, name).also { file -> file.writeBytes(solidPng(color)) }
+        }
+        private val token: String
+        private val names = pages.map { it.first }
+
+        init {
+            val session = object : IExplorerActionHostSession.Default() {
+                override fun openFile(targetId: String?, relativePath: String?): ParcelFileDescriptor? =
+                    files[relativePath]?.let { ParcelFileDescriptor.open(it, ParcelFileDescriptor.MODE_READ_ONLY) }
+            }
+            val seed = ImageViewerLaunchRequest(
+                pages = listOf(
+                    ImageViewerPage(
+                        image = ImageViewerRequest(Uri.parse("content://viewer-source.test/selected.png"), "selected.png", 1L, "image/png"),
+                        hostRelativePath = "",
+                    ),
+                ) + names.mapIndexed { index, name ->
+                    ImageViewerPage(
+                        image = ImageViewerRequest(ImageViewerContract.hostImageUri(index + 1), name, requireNotNull(files[name]).length(), "image/png"),
+                        hostRelativePath = name,
+                    )
+                },
+                hostSession = session,
+                hostTargetId = "viewer-source-fixture",
+            )
+            token = HostSessionImageRegistry.register(seed)
+        }
+
+        fun items(bucketId: Long): List<MediaItem> = names.mapIndexed { index, name ->
+            MediaItem(
+                id = 1_000L + index,
+                displayName = name,
+                mimeType = "image/png",
+                sizeBytes = requireNotNull(files[name]).length(),
+                width = PIXELS,
+                height = PIXELS,
+                dateModifiedSeconds = 1_700_000_000L + index,
+                dateTakenMillis = null,
+                bucketId = bucketId,
+                bucketName = "fixture",
+                relativePath = "fixture/",
+                contentUri = HostSessionImageRegistry.imageUri(token, index + 1).toString(),
+            )
+        }
+
+        fun close() {
+            HostSessionImageRegistry.unregister(token)
+            directory.deleteRecursively()
+        }
+    }
+
+    // endregion
+
+    private companion object {
+        const val TIMEOUT_MILLIS = 15_000L
+        const val PIXELS = 64
+
+        fun mediaPermissions(): Array<String> = buildList {
+            add(MediaPermissionPolicy.readPermission(Build.VERSION.SDK_INT))
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }.toTypedArray()
+
+        fun solidPng(color: Int): ByteArray {
+            val bitmap = Bitmap.createBitmap(PIXELS, PIXELS, Bitmap.Config.ARGB_8888)
+            bitmap.eraseColor(color)
+            return java.io.ByteArrayOutputStream().use { stream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                bitmap.recycle()
+                stream.toByteArray()
+            }
+        }
+    }
+}

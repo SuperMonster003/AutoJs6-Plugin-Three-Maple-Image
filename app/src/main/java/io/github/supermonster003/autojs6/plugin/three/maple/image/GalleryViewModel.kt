@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,7 +56,6 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     private val folderRepository = AuthorizedFolderRepository(application)
     private val _albums = MutableStateFlow(GalleryUiState())
     private val _grid = MutableStateFlow(MediaGridUiState())
-    private val folderCache = HashMap<Long, Pair<List<MediaItem>, DocumentTreeLimit>>()
     private var access: MediaPermissionResolution? = null
     private var gridJob: Job? = null
     private var reloadJob: Job? = null
@@ -66,7 +66,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     init {
         viewModelScope.launch {
             media.changes().collect {
-                folderCache.clear()
+                folderRepository.invalidateCache()
                 reload()
                 _grid.value.album?.let { openAlbum(it, keepSort = true) }
             }
@@ -77,20 +77,31 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         val changed = access?.state != resolution.state
         access = resolution
         _albums.update { it.copy(access = resolution) }
-        if (changed || _albums.value.loading) reload()
+        if (changed || _albums.value.loading) reload(retryOnce = changed)
     }
 
     fun setAlbumSort(sort: MediaSort) {
         _albums.update { state -> state.copy(albumSort = sort, albums = sortAlbums(state.albums, sort)) }
     }
 
-    fun reload() {
+    /**
+     * [retryOnce] covers the moments right after a runtime grant, when MediaStore may still answer the first query
+     * with the old permission state (a SecurityException or an empty cursor): one delayed retry before giving up.
+     */
+    fun reload(retryOnce: Boolean = false) {
         reloadJob?.cancel()
         reloadJob = viewModelScope.launch {
             _albums.update { it.copy(loading = it.albums.isEmpty() && it.folders.isEmpty(), failed = false) }
             val resolution = access
             val buckets = if (resolution?.canReadMediaStore == true) {
-                runCatching { media.loadBuckets() }.onFailure { _albums.update { s -> s.copy(failed = true) } }.getOrDefault(emptyList())
+                var loaded = runCatching { media.loadBuckets() }.getOrNull()
+                if (retryOnce && loaded.isNullOrEmpty()) {
+                    delay(GRANT_SETTLE_MILLIS)
+                    media.invalidate()
+                    loaded = runCatching { media.loadBuckets() }.getOrNull()
+                }
+                if (loaded == null) _albums.update { s -> s.copy(failed = true) }
+                loaded.orEmpty()
             } else {
                 media.invalidate()
                 emptyList()
@@ -101,7 +112,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                 AlbumSummary(AlbumKind.MEDIA, bucket.id, name, bucket.count, bucket.cover.contentUri, bucket.relativePath)
             }
             val folders = folderRepository.list().map { folder ->
-                val cached = folderCache[folder.bucketId]
+                val cached = folderRepository.cached(folder)
                 AlbumSummary(
                     kind = AlbumKind.FOLDER,
                     id = folder.bucketId,
@@ -120,8 +131,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
 
     private fun enumerateFolder(summary: AlbumSummary) = viewModelScope.launch {
         val folder = summary.folder ?: return@launch
-        val result = runCatching { folderRepository.enumerate(folder) }.getOrNull() ?: (emptyList<MediaItem>() to DocumentTreeLimit.NONE)
-        folderCache[summary.id] = result
+        val result = runCatching { folderRepository.enumerateCached(folder) }.getOrNull() ?: (emptyList<MediaItem>() to DocumentTreeLimit.NONE)
         _albums.update { state ->
             state.copy(folders = state.folders.map { if (it.id == summary.id) it.copy(count = result.first.size, coverUri = result.first.firstOrNull()?.contentUri) else it })
         }
@@ -162,7 +172,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                 page = runCatching { media.loadBucket(album.id, sort, PAGE_SIZE, offset) }.getOrDefault(emptyList())
             } else {
                 val folder = album.folder
-                val cached = folderCache[album.id] ?: (folder?.let { runCatching { folderRepository.enumerate(it) }.getOrNull() } ?: (emptyList<MediaItem>() to DocumentTreeLimit.NONE)).also { folderCache[album.id] = it }
+                val cached = folder?.let { runCatching { folderRepository.enumerateCached(it) }.getOrNull() } ?: (emptyList<MediaItem>() to DocumentTreeLimit.NONE)
                 limit = cached.second
                 page = MediaCatalog.sort(cached.first, sort).drop(offset).take(PAGE_SIZE)
             }
@@ -190,5 +200,6 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
 
     companion object {
         const val PAGE_SIZE = 120
+        private const val GRANT_SETTLE_MILLIS = 800L
     }
 }

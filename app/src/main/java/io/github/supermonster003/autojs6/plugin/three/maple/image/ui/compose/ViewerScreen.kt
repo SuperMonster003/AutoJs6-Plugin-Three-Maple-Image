@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -31,10 +33,13 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -54,6 +59,8 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ZoomableImageV
 internal data class ViewerUiState(
     val title: String = "",
     val subtitle: String? = null,
+    val pageIndex: Int = 0,
+    val pageCount: Int = 0,
     val metadataText: String = "",
     val detailsSummary: String = "",
     val exifText: String = "",
@@ -81,36 +88,53 @@ internal class ViewerCallbacks(
     val onPrint: () -> Unit,
     val onReleaseHistory: () -> Unit,
     val onToggleAnimation: () -> Unit,
+    /** The pager settled on or crossed into another page. */
+    val onPageChanged: (Int) -> Unit,
+    /** A thumbnail was tapped. */
+    val onSelectPage: (Int) -> Unit,
+)
+
+/** What one pager page renders: the zoomable View plus its own loading and error state. */
+internal interface ViewerPageSurface {
+    val view: ZoomableImageView
+    val loading: Boolean
+    val errorText: String?
+}
+
+/**
+ * Pager state owned by the Activity so programmatic page changes (edge swipes of a zoomed image, thumbnail taps,
+ * test hooks) can drive it; [count] reads the page list the Activity resolved.
+ */
+internal class ViewerPagerState(initialPage: Int, private val count: () -> Int) : PagerState(initialPage, 0f) {
+    override val pageCount: Int get() = count()
+}
+
+/** The resolved page list as the pager sees it; page surfaces are acquired and released per composed page. */
+internal class ViewerPagerUi(
+    val state: PagerState,
+    val pageCount: Int,
+    val pageKey: (Int) -> Any,
+    val acquire: (Int) -> ViewerPageSurface,
+    val release: (Int) -> Unit,
+    val thumbnail: (Int) -> Any?,
+    val thumbnailDescription: (Int) -> String,
 )
 
 /**
- * Immersive viewer (design draft 7.3 / 7.4): the zoomable View fills the window, the top bar, metadata line,
- * five-button action bar, GIF control and zoom badge are translucent overlays, and the details panel is a modal
- * bottom sheet. A tap on the image toggles every overlay (wired on the View by the Activity).
+ * Immersive viewer (design draft 7.3 / 7.4): a HorizontalPager of zoomable Views fills the window, the top bar,
+ * metadata line, thumbnail strip, five-button action bar, GIF control and zoom badge are translucent overlays, and
+ * the details panel is a modal bottom sheet. A tap on the image toggles every overlay (wired on the View by the
+ * Activity). While [pager] is null the page list is still being enumerated.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ViewerScreen(state: ViewerUiState, imageView: ZoomableImageView, callbacks: ViewerCallbacks) {
+internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks: ViewerCallbacks) {
     val canvas = MapleTheme.canvas
     Box(modifier = Modifier.fillMaxSize().background(canvas.viewerCanvas)) {
-        AndroidView(factory = { imageView }, modifier = Modifier.fillMaxSize())
-        if (state.loading && state.errorText == null) {
+        if (pager == null) {
             MapleLoading(dark = true)
-        }
-        if (state.errorText != null) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = state.errorText,
-                    color = canvas.errorOnScrim,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(horizontal = 32.dp)
-                        .background(canvas.scrimStrong, MaterialTheme.shapes.medium)
-                        .padding(16.dp)
-                        .testTag("maple.viewer.error"),
-                )
-            }
+        } else {
+            ViewerPager(pager, callbacks.onPageChanged)
         }
         AnimatedVisibility(
             visible = state.controlsVisible,
@@ -157,6 +181,16 @@ internal fun ViewerScreen(state: ViewerUiState, imageView: ZoomableImageView, ca
             }
             AnimatedVisibility(visible = state.controlsVisible, enter = fadeIn(), exit = fadeOut()) {
                 Column(modifier = Modifier.fillMaxWidth()) {
+                    if (pager != null && pager.pageCount > 1) {
+                        MapleThumbnailStrip(
+                            count = pager.pageCount,
+                            current = state.pageIndex,
+                            key = pager.pageKey,
+                            model = pager.thumbnail,
+                            description = pager.thumbnailDescription,
+                            onSelect = callbacks.onSelectPage,
+                        )
+                    }
                     Text(
                         text = state.metadataText,
                         style = MaterialTheme.typography.bodyMedium,
@@ -244,6 +278,65 @@ internal fun ViewerScreen(state: ViewerUiState, imageView: ZoomableImageView, ca
                 )
                 Spacer(Modifier.height(24.dp))
                 Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
+            }
+        }
+    }
+}
+
+/**
+ * The pager keeps the current page and one neighbour on each side composed (preload), so a 1x horizontal swipe
+ * lands on the next page without a blank frame; the zoomable View decides per gesture whether the pager may
+ * intercept (see ZoomableImageView.onTouchEvent).
+ */
+@Composable
+private fun ViewerPager(pager: ViewerPagerUi, onPageChanged: (Int) -> Unit) {
+    LaunchedEffect(pager) {
+        snapshotFlow { pager.state.currentPage }.collect { page -> onPageChanged(page) }
+    }
+    HorizontalPager(
+        state = pager.state,
+        modifier = Modifier.fillMaxSize().testTag("maple.viewer.pager"),
+        beyondViewportPageCount = 1,
+        pageSpacing = 8.dp,
+        key = pager.pageKey,
+    ) { index ->
+        ViewerPage(pager, index)
+    }
+}
+
+@Composable
+private fun ViewerPage(pager: ViewerPagerUi, index: Int) {
+    val canvas = MapleTheme.canvas
+    var surface by remember { mutableStateOf<ViewerPageSurface?>(null) }
+    DisposableEffect(pager, index) {
+        surface = pager.acquire(index)
+        onDispose {
+            surface = null
+            pager.release(index)
+        }
+    }
+    val current = surface
+    Box(modifier = Modifier.fillMaxSize().testTag("maple.viewer.page.$index")) {
+        if (current != null) {
+            AndroidView(factory = { current.view }, modifier = Modifier.fillMaxSize())
+            if (current.loading && current.errorText == null) {
+                MapleLoading(dark = true)
+            }
+            val error = current.errorText
+            if (error != null) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = error,
+                        color = canvas.errorOnScrim,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(horizontal = 32.dp)
+                            .background(canvas.scrimStrong, MaterialTheme.shapes.medium)
+                            .padding(16.dp)
+                            .testTag("maple.viewer.error"),
+                    )
+                }
             }
         }
     }

@@ -109,7 +109,7 @@ class ImageViewerExifInstrumentationTest {
         scenario: ActivityScenario<ImageViewerActivity>,
     ) {
         scenario.onActivity { activity ->
-            val image = activity.findViewById<ZoomableImageView>(R.id.image)
+            val image = requireNotNull(activity.currentImageViewForTesting())
             assertTrue(image.toggleDoubleTapZoom(image.width / 2f, image.height / 2f))
             val indicator = requireNotNull(activity.viewerStateForTesting.zoomIndicatorText)
             val zoom = requireNotNull(

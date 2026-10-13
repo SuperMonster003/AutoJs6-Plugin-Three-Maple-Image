@@ -113,7 +113,7 @@ class ModernImageFormatInstrumentationTest {
             ImageViewerContract.viewerIntent(context, launch),
         ).use { scenario ->
             scenario.onActivity { activity ->
-                activity.findViewById<ZoomableImageView>(R.id.image).onPageSwipe?.invoke(1)
+                requireNotNull(activity.currentImageViewForTesting()).onPageSwipe?.invoke(1)
                 assertEquals("frame.avif", activity.titleText())
                 assertEquals(
                     activity.getString(

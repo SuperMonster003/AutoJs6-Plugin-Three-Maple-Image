@@ -7,6 +7,7 @@ import android.content.ComponentCallbacks2
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
@@ -22,6 +23,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.AndroidUiDispatcher
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -29,6 +31,8 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerCallbacks
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerPagerState
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerPagerUi
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerUiState
 import kotlinx.coroutines.CoroutineScope
@@ -36,27 +40,37 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
 /**
- * Read-only image viewer. The decoding pipeline (direct content URIs, host session siblings, tiled large images,
- * EXIF normalization through Glide) is unchanged; the overlay chrome is a Compose [ViewerScreen] driven by one
- * [ViewerUiState], while the zoomable surface stays the [ZoomableImageView] hosted through AndroidView.
+ * Read-only image viewer. The launching intent resolves to a [ViewerSource] (ROADMAP 6.3): intent-borne page lists
+ * for the host and external entries, or an album spec the viewer enumerates itself for the standalone gallery. A
+ * HorizontalPager keeps the current page and both neighbours composed; every composed page owns a [ViewerPageHost]
+ * with its [ZoomableImageView] and decode job (direct content URIs, host session siblings, tiled large images, EXIF
+ * normalization through Glide). The overlay chrome is a Compose [ViewerScreen] driven by one [ViewerUiState].
  */
 class ImageViewerActivity : ConfiguredActivity() {
 
-    private lateinit var imageView: ZoomableImageView
     private lateinit var launchRequest: ImageViewerLaunchRequest
-    private lateinit var animationController: ImageAnimationController
+    private var source: ViewerSource? = null
+    private var pagerState: ViewerPagerState? = null
+    private var pagerUi by mutableStateOf<ViewerPagerUi?>(null)
+    private val hosts = HashMap<Int, ViewerPageHost>()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    private var pageJob: Job? = null
-    private var tiledImageDrawable: TiledImageDrawable? = null
+
+    /** Pager animations need a frame clock, which the plain main dispatcher does not carry. */
+    private val frameScope = CoroutineScope(SupervisorJob() + AndroidUiDispatcher.Main)
+    private var sourceJob: Job? = null
+    private var pageJumpJob: Job? = null
+    private var zoomIndicatorJob: Job? = null
+    private var jumpTarget = -1
     private var hostImageSessionToken: String? = null
     private var currentIndex = -1
-    private var loadGeneration = 0
     private var hostSessionClosed = false
+    private var restoredIndex = -1
     private var restoredAnimationIndex = -1
     private var restoredAnimationPaused = false
     private var restoredRotationIndex = -1
@@ -98,107 +112,112 @@ class ImageViewerActivity : ConfiguredActivity() {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) LEGACY_NAVIGATION_SCRIM else Color.TRANSPARENT,
             ),
         )
-        imageView = ZoomableImageView(this).apply {
-            id = R.id.image
-            contentDescription = getString(R.string.image_content_description)
-            setOnClickListener {
-                if (uiState.detailsExpanded) setExifDetailsExpanded(false) else setControlsVisible(!uiState.controlsVisible)
-            }
-            onPageSwipe = { direction -> showPage(currentIndex + direction) }
-            onZoomInteraction = ::showZoomIndicator
-        }
-        animationController = ImageAnimationController { playback ->
-            uiState = uiState.copy(animation = playback)
-        }
+        readRestoredState(savedInstanceState)
         val callbacks = ViewerCallbacks(
             onBack = ::finish,
             onToggleDetails = { setExifDetailsExpanded(!uiState.detailsExpanded) },
             onDismissDetails = { setExifDetailsExpanded(false) },
-            onRotate = { imageView.rotateClockwise90() },
+            onRotate = { currentHost()?.view?.rotateClockwise90() },
             onEdit = ::editImage,
             onShare = ::shareImage,
             onOpenWith = ::openWithAnotherApp,
-            onResetZoom = { hideZoomIndicator(); imageView.resetZoom() },
+            onResetZoom = { hideZoomIndicator(); currentHost()?.view?.resetZoom() },
             onPrint = ::printImage,
             onReleaseHistory = ::showReleaseHistory,
-            onToggleAnimation = { animationController.toggle() },
+            onToggleAnimation = { currentHost()?.animation?.toggle() },
+            onPageChanged = ::onPagerPageChanged,
+            onSelectPage = ::jumpToPage,
+        )
+        uiState = uiState.copy(
+            title = launchRequest.startPage.image.displayName,
+            metadataText = getString(R.string.metadata_loading),
+            detailsSummary = getString(R.string.metadata_loading),
+            exifText = getString(R.string.exif_unavailable),
+            controlsVisible = savedInstanceState?.getBoolean(STATE_CONTROLS_VISIBLE, true) ?: true,
         )
         setContent {
             MapleTheme(palette = appPalette) {
-                ViewerScreen(state = uiState, imageView = imageView, callbacks = callbacks)
+                ViewerScreen(state = uiState, pager = pagerUi, callbacks = callbacks)
             }
         }
+        sourceJob = scope.launch {
+            val resolved = ViewerSourceLoader.create(this@ImageViewerActivity).load(launchRequest)
+            if (!isFinishing && !isDestroyed) installSource(resolved)
+        }
+    }
 
-        val restoredIndex = savedInstanceState?.getInt(STATE_CURRENT_INDEX, -1)
-            ?.takeIf { it in launchRequest.pages.indices }
-        restoredAnimationIndex = savedInstanceState
-            ?.getInt(STATE_ANIMATION_INDEX, -1)
-            ?.takeIf { it in launchRequest.pages.indices }
-            ?: -1
-        restoredAnimationPaused = savedInstanceState
-            ?.getBoolean(STATE_ANIMATION_PAUSED, false)
-            ?: false
-        restoredRotationIndex = savedInstanceState
-            ?.getInt(STATE_ROTATION_INDEX, -1)
-            ?.takeIf { it in launchRequest.pages.indices }
-            ?: -1
+    private fun readRestoredState(savedInstanceState: Bundle?) {
+        restoredIndex = savedInstanceState?.getInt(STATE_CURRENT_INDEX, -1) ?: -1
+        restoredAnimationIndex = savedInstanceState?.getInt(STATE_ANIMATION_INDEX, -1) ?: -1
+        restoredAnimationPaused = savedInstanceState?.getBoolean(STATE_ANIMATION_PAUSED, false) ?: false
+        restoredRotationIndex = savedInstanceState?.getInt(STATE_ROTATION_INDEX, -1) ?: -1
         restoredRotationQuarterTurns = savedInstanceState
             ?.getInt(STATE_ROTATION_QUARTER_TURNS, ImageRotationState.ORIGINAL_QUARTER_TURNS)
             ?: ImageRotationState.ORIGINAL_QUARTER_TURNS
-        restoredExpandedDetailsIndex = savedInstanceState
-            ?.getInt(STATE_EXPANDED_DETAILS_INDEX, -1)
-            ?.takeIf { it in launchRequest.pages.indices }
-            ?: -1
-        showPage(restoredIndex ?: launchRequest.startIndex)
+        restoredExpandedDetailsIndex = savedInstanceState?.getInt(STATE_EXPANDED_DETAILS_INDEX, -1) ?: -1
+    }
+
+    private fun installSource(resolved: ViewerSource) {
+        source = resolved
+        val count = resolved.pages.size
+        if (restoredIndex !in resolved.pages.indices) restoredIndex = -1
+        if (restoredAnimationIndex !in resolved.pages.indices) restoredAnimationIndex = -1
+        if (restoredRotationIndex !in resolved.pages.indices) restoredRotationIndex = -1
+        if (restoredExpandedDetailsIndex !in resolved.pages.indices) restoredExpandedDetailsIndex = -1
+        val initial = restoredIndex.takeIf { it >= 0 } ?: resolved.startIndex
+        val state = ViewerPagerState(initial) { count }
+        pagerState = state
+        pagerUi = ViewerPagerUi(
+            state = state,
+            pageCount = count,
+            pageKey = { index -> resolved.pages[index].image.targetUri.toString() },
+            acquire = ::acquirePage,
+            release = ::releasePage,
+            thumbnail = ::thumbnailModel,
+            thumbnailDescription = { index -> getString(R.string.viewer_thumbnail_description, index + 1, count) },
+        )
+        onPageChanged(initial)
     }
 
     override fun onStart() {
         super.onStart()
-        if (::animationController.isInitialized) {
-            imageView.post {
-                if (!isFinishing && !isDestroyed) animationController.reapplyRequestedPlayback()
-            }
+        val host = currentHost() ?: return
+        host.view.post {
+            if (isFinishing || isDestroyed) return@post
+            // Glide restarts animated drawables on lifecycle start; keep the user's pause and the neighbours quiet.
+            host.animation.reapplyRequestedPlayback()
+            hosts.values.forEach { other -> if (other !== host) (other.view.drawable as? Animatable)?.stop() }
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        if (::launchRequest.isInitialized && currentIndex in launchRequest.pages.indices) {
+        val host = currentHost()
+        if (::launchRequest.isInitialized && currentIndex >= 0) {
             outState.putInt(STATE_CURRENT_INDEX, currentIndex)
         }
-        if (
-            ::animationController.isInitialized &&
-            animationController.playback != ImageAnimationPlayback.UNAVAILABLE
-        ) {
+        if (host != null && host.animation.playback != ImageAnimationPlayback.UNAVAILABLE) {
             outState.putInt(STATE_ANIMATION_INDEX, currentIndex)
-            outState.putBoolean(
-                STATE_ANIMATION_PAUSED,
-                animationController.playback == ImageAnimationPlayback.PAUSED,
-            )
+            outState.putBoolean(STATE_ANIMATION_PAUSED, host.animation.playback == ImageAnimationPlayback.PAUSED)
         }
-        if (
-            ::imageView.isInitialized &&
-            imageView.currentRotationQuarterTurns != ImageRotationState.ORIGINAL_QUARTER_TURNS
-        ) {
+        if (host != null && host.view.currentRotationQuarterTurns != ImageRotationState.ORIGINAL_QUARTER_TURNS) {
             outState.putInt(STATE_ROTATION_INDEX, currentIndex)
-            outState.putInt(STATE_ROTATION_QUARTER_TURNS, imageView.currentRotationQuarterTurns)
+            outState.putInt(STATE_ROTATION_QUARTER_TURNS, host.view.currentRotationQuarterTurns)
         }
-        if (uiState.detailsExpanded && ::launchRequest.isInitialized && currentIndex in launchRequest.pages.indices) {
+        if (uiState.detailsExpanded && currentIndex >= 0) {
             outState.putInt(STATE_EXPANDED_DETAILS_INDEX, currentIndex)
         }
+        outState.putBoolean(STATE_CONTROLS_VISIBLE, uiState.controlsVisible)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
-        pageJob?.cancel()
+        sourceJob?.cancel()
+        pageJumpJob?.cancel()
+        zoomIndicatorJob?.cancel()
+        hosts.values.toList().forEach { host -> host.release(this) }
+        hosts.clear()
         scope.cancel()
-        if (::imageView.isInitialized) {
-            animationController.clear()
-            releaseTiledImage()
-            Glide.with(applicationContext).clear(imageView)
-            imageView.onPageSwipe = null
-            imageView.onZoomInteraction = null
-            imageView.removeCallbacks(hideZoomIndicatorRunnable)
-        }
+        frameScope.cancel()
         HostSessionImageRegistry.unregister(hostImageSessionToken)
         hostImageSessionToken = null
         if (!isChangingConfigurations) {
@@ -212,12 +231,12 @@ class ImageViewerActivity : ConfiguredActivity() {
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         if (level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) {
-            tiledImageDrawable?.trimTileCache()
+            hosts.values.forEach { host -> host.tiledImage?.trimTileCache() }
         }
     }
 
     override fun onLowMemory() {
-        tiledImageDrawable?.trimTileCache()
+        hosts.values.forEach { host -> host.tiledImage?.trimTileCache() }
         super.onLowMemory()
     }
 
@@ -227,60 +246,216 @@ class ImageViewerActivity : ConfiguredActivity() {
     internal val viewerStateForTesting: ViewerUiState
         get() = uiState
 
+    @get:VisibleForTesting
+    internal val sourceForTesting: ViewerSource?
+        get() = source
+
+    /** The zoomable surface of the current page, or null while the page list is still being enumerated. */
+    @VisibleForTesting
+    internal fun currentImageViewForTesting(): ZoomableImageView? = currentHost()?.view
+
     @VisibleForTesting
     internal fun toggleDetailsForTesting() = setExifDetailsExpanded(!uiState.detailsExpanded)
 
     @VisibleForTesting
-    internal fun rotateForTesting(): Boolean = imageView.rotateClockwise90()
+    internal fun rotateForTesting(): Boolean = currentHost()?.view?.rotateClockwise90() == true
 
     @VisibleForTesting
     internal fun resetZoomForTesting() {
         hideZoomIndicator()
-        imageView.resetZoom()
+        currentHost()?.view?.resetZoom()
     }
 
     @VisibleForTesting
-    internal fun toggleAnimationForTesting() = animationController.toggle()
+    internal fun toggleAnimationForTesting() {
+        currentHost()?.animation?.toggle()
+    }
+
+    @VisibleForTesting
+    internal fun flipPageForTesting(direction: Int) = flipPage(direction)
+
+    @VisibleForTesting
+    internal fun toggleControlsForTesting() = setControlsVisible(!uiState.controlsVisible)
 
     // endregion
 
-    private fun setPrintEnabled(enabled: Boolean) {
-        uiState = uiState.copy(printEnabled = enabled)
+    // region Pages
+
+    private fun currentHost(): ViewerPageHost? = hosts[currentIndex]
+
+    private fun acquirePage(index: Int): ViewerPageHost = hosts.getOrPut(index) { createHost(index) }
+
+    private fun createHost(index: Int): ViewerPageHost {
+        val source = requireNotNull(source)
+        val page = source.pages[index]
+        val view = ZoomableImageView(this).apply {
+            id = R.id.image
+            contentDescription = getString(R.string.image_content_description)
+            setOnClickListener {
+                if (uiState.detailsExpanded) setExifDetailsExpanded(false) else setControlsVisible(!uiState.controlsVisible)
+            }
+            onPageSwipe = ::flipPage
+        }
+        val host = ViewerPageHost(index, page, view) { playback ->
+            if (index == currentIndex) uiState = uiState.copy(animation = playback)
+        }
+        view.onZoomInteraction = { zoom, gestureInProgress ->
+            if (index == currentIndex) showZoomIndicator(zoom, gestureInProgress)
+        }
+        startLoad(host)
+        return host
     }
 
-    private fun showPage(index: Int) {
-        if (index !in launchRequest.pages.indices || index == currentIndex) return
-        pageJob?.cancel()
-        animationController.clear()
-        releaseTiledImage()
-        Glide.with(this).clear(imageView)
-        loadGeneration += 1
-        val generation = loadGeneration
-        currentIndex = index
-        val page = launchRequest.pages[index]
+    private fun releasePage(index: Int) {
+        if (index == currentIndex) return // the current page is never released while shown
+        hosts.remove(index)?.release(this)
+    }
 
-        imageView.resetZoom()
+    /** The pager crossed into [index]; intermediate pages of a programmatic jump are skipped. */
+    private fun onPagerPageChanged(index: Int) {
+        if (jumpTarget >= 0 && index != jumpTarget) return
+        if (index == jumpTarget) jumpTarget = -1
+        onPageChanged(index)
+    }
+
+    private fun onPageChanged(index: Int) {
+        val source = source ?: return
+        if (index !in source.pages.indices || index == currentIndex) return
+        val previous = currentHost()
+        currentIndex = index
+        previous?.let(::parkPage)
         hideZoomIndicator()
+        val host = acquirePage(index)
+        when {
+            host.tiledDeferred -> startLoad(host)
+            host.ready -> host.view.drawable?.let { drawable ->
+                host.animation.attach(drawable, startPaused = consumeRestoredAnimationPause(index))
+            }
+        }
+        publishResult()
+        syncCurrentPage(pageChanged = true)
+    }
+
+    /** A page that stopped being current: stop its animation, reset its zoom and give a tiled decode back. */
+    private fun parkPage(host: ViewerPageHost) {
+        host.animation.clear()
+        (host.view.drawable as? Animatable)?.stop()
+        host.view.resetZoom()
+        if (host.tiledImage != null) {
+            host.releaseTiledImage()
+            host.tiledDeferred = true
+            host.loading = true
+            host.ready = false
+        }
+    }
+
+    private fun flipPage(direction: Int) {
+        jumpToPage(currentIndex + direction)
+    }
+
+    private fun jumpToPage(index: Int) {
+        val source = source ?: return
+        val state = pagerState ?: return
+        val target = index.coerceIn(0, source.pages.size - 1)
+        if (target == currentIndex) return
+        pageJumpJob?.cancel()
+        jumpTarget = target
+        onPageChanged(target)
+        pageJumpJob = frameScope.launch {
+            try {
+                state.animateScrollToPage(target)
+            } finally {
+                if (jumpTarget == target) jumpTarget = -1
+            }
+        }
+    }
+
+    private fun publishResult() {
+        val source = source ?: return
+        val itemId = source.itemId(currentIndex) ?: return
+        setResult(
+            RESULT_OK,
+            Intent()
+                .putExtra(ImageViewerContract.EXTRA_RESULT_ITEM_ID, itemId)
+                .putExtra(ImageViewerContract.EXTRA_RESULT_INDEX, currentIndex),
+        )
+    }
+
+    private fun thumbnailModel(index: Int): Any? {
+        val page = source?.pages?.getOrNull(index) ?: return null
+        // A page this platform cannot decode gets no thumbnail request either (host pages would open the file for nothing).
+        if (ImagePlatformDecodeSupport.unsupported(page.image) != null) return null
+        if (page.hostRelativePath.isNullOrEmpty()) return page.image.targetUri
+        val token = hostImageSessionToken ?: return null
+        return runCatching { HostSessionImageRegistry.imageUri(token, index) }.getOrNull()
+    }
+
+    /** Mirrors the current page host into the overlay state; [pageChanged] resets the details sheet. */
+    private fun syncCurrentPage(pageChanged: Boolean) {
+        val source = source ?: return
+        val index = currentIndex.takeIf { it in source.pages.indices } ?: return
+        val page = source.pages[index]
+        val host = hosts[index]
+        val metadata = host?.metadata
+        val metadataText = when {
+            host == null || !host.metadataRead -> getString(R.string.metadata_loading)
+            metadata == null -> getString(R.string.metadata_unavailable)
+            else -> formatMetadata(page.image, metadata)
+        }
+        val detailsAvailable = metadata != null
+        val restoreExpanded = detailsAvailable && restoredExpandedDetailsIndex == index
+        if (restoreExpanded) restoredExpandedDetailsIndex = -1
+        val expanded = when {
+            restoreExpanded -> true
+            pageChanged -> false
+            else -> uiState.detailsExpanded && detailsAvailable
+        }
         val canForward = page.hostRelativePath.isNullOrEmpty()
         uiState = uiState.copy(
             title = page.image.displayName,
-            subtitle = launchRequest.pages.size.takeIf { it > 1 }?.let { pageCount ->
+            subtitle = source.pages.size.takeIf { it > 1 }?.let { pageCount ->
                 getString(R.string.page_counter, index + 1, pageCount)
             },
-            metadataText = getString(R.string.metadata_loading),
-            detailsSummary = getString(R.string.metadata_loading),
-            exifText = getString(R.string.exif_unavailable),
-            detailsAvailable = false,
-            detailsExpanded = false,
-            loading = true,
-            errorText = null,
-            printEnabled = false,
+            pageIndex = index,
+            pageCount = source.pages.size,
+            metadataText = metadataText,
+            detailsSummary = metadataText,
+            exifText = metadata?.exif?.let(::formatExifDetails) ?: getString(R.string.exif_unavailable),
+            detailsAvailable = detailsAvailable,
+            detailsExpanded = expanded,
+            loading = host?.loading ?: true,
+            errorText = host?.errorText,
+            printEnabled = host?.ready == true,
             canForward = canForward,
-            canEdit = canForward && launchRequest.editable,
+            canEdit = canForward && source.editable,
+            animation = host?.animation?.playback ?: ImageAnimationPlayback.UNAVAILABLE,
         )
+    }
+
+    private fun syncIfCurrent(host: ViewerPageHost) {
+        if (host.index == currentIndex) syncCurrentPage(pageChanged = false)
+    }
+
+    // endregion
+
+    // region Loading
+
+    private fun isLive(host: ViewerPageHost, generation: Int): Boolean =
+        host.generation == generation && hosts[host.index] === host && !isFinishing && !isDestroyed
+
+    private fun startLoad(host: ViewerPageHost) {
+        host.job?.cancel()
+        host.generation += 1
+        val generation = host.generation
+        host.loading = true
+        host.errorText = null
+        host.ready = false
+        host.tiledDeferred = false
+        val page = host.page
 
         ImagePlatformDecodeSupport.unsupported(page.image)?.let { unavailable ->
-            uiState = uiState.copy(metadataText = getString(R.string.metadata_unavailable))
+            host.metadata = null
+            host.metadataRead = true
             val message = when (unavailable.reason) {
                 ModernImageUnavailableReason.ANDROID_VERSION -> getString(
                     R.string.error_image_format_requires_android,
@@ -292,87 +467,101 @@ class ImageViewerActivity : ConfiguredActivity() {
                     unavailable.format.displayLabel,
                 )
             }
-            showLoadFailure(message)
+            failHost(host, message)
             return
         }
 
-        val limits = imageView.largeImageLimits(memoryClassMebibytes)
+        val limits = host.view.largeImageLimits(memoryClassMebibytes)
         if (page.hostRelativePath.isNullOrEmpty()) {
-            loadDirectPage(index, page, generation, limits)
+            loadDirectPage(host, generation, limits)
         } else {
-            loadHostPage(index, page, generation, limits)
+            loadHostPage(host, generation, limits)
         }
     }
 
-    private fun loadDirectPage(
-        index: Int,
-        page: ImageViewerPage,
-        generation: Int,
-        limits: ImageBitmapLimits,
-    ) {
-        pageJob = scope.launch(Dispatchers.IO) {
-            var tiledCandidate: TiledImageDrawable? = null
-            try {
-                val metadata = ImageContentValidator.readDisplayMetadata(contentResolver, page.image)
-                tiledCandidate = metadata?.let { createTiledImage(page, it, limits) }
-                withContext(Dispatchers.Main.immediate) {
-                    if (generation != loadGeneration || isFinishing || isDestroyed) {
-                        return@withContext
-                    }
-                    showMetadata(page.image, metadata)
-                    val candidate = tiledCandidate
-                    if (candidate == null) {
-                        startGlideLoad(page.image.targetUri, index, generation)
-                    } else {
-                        installTiledImage(candidate, index, generation)
-                        tiledCandidate = null
-                    }
-                }
-            } finally {
-                tiledCandidate?.close()
+    private fun loadDirectPage(host: ViewerPageHost, generation: Int, limits: ImageBitmapLimits) {
+        val page = host.page
+        host.job = scope.launch {
+            val metadata = withContext(Dispatchers.IO) {
+                ImageContentValidator.readDisplayMetadata(contentResolver, page.image)
+            }
+            if (!isLive(host, generation)) return@launch
+            host.metadata = metadata
+            host.metadataRead = true
+            syncIfCurrent(host)
+            if (metadata != null && shouldTile(page, metadata, limits)) {
+                installTiledOrDefer(host, generation, metadata, limits)
+            } else {
+                startGlideLoad(host, page.image.targetUri, generation)
             }
         }
     }
 
-    private fun loadHostPage(
-        index: Int,
-        page: ImageViewerPage,
-        generation: Int,
-        limits: ImageBitmapLimits,
-    ) {
-        pageJob = scope.launch(Dispatchers.IO) {
-            var tiledCandidate: TiledImageDrawable? = null
-            try {
-                val metadata = openHostDescriptor(page)?.use { descriptor ->
+    private fun loadHostPage(host: ViewerPageHost, generation: Int, limits: ImageBitmapLimits) {
+        val page = host.page
+        host.job = scope.launch {
+            val metadata = withContext(Dispatchers.IO) {
+                openHostDescriptor(page)?.use { descriptor ->
                     ImageContentValidator.readHostMetadata(descriptor, page.image)
                 }
-                tiledCandidate = metadata?.let { createTiledImage(page, it, limits) }
-                val imageUri = if (metadata != null && tiledCandidate == null) {
-                    runCatching {
-                        HostSessionImageRegistry.imageUri(requireNotNull(hostImageSessionToken), index)
-                    }.getOrNull()
-                } else {
-                    null
+            }
+            if (!isLive(host, generation)) return@launch
+            host.metadata = metadata
+            host.metadataRead = true
+            syncIfCurrent(host)
+            when {
+                metadata == null -> failHost(host)
+                shouldTile(page, metadata, limits) -> installTiledOrDefer(host, generation, metadata, limits)
+                else -> {
+                    val imageUri = hostGlideModel(host)
+                    if (imageUri == null) failHost(host) else startGlideLoad(host, imageUri, generation)
                 }
-                withContext(Dispatchers.Main.immediate) {
-                    if (generation != loadGeneration || isFinishing || isDestroyed) {
-                        return@withContext
-                    }
-                    showMetadata(page.image, metadata)
-                    when {
-                        metadata == null -> showLoadFailure()
-                        tiledCandidate != null -> {
-                            installTiledImage(requireNotNull(tiledCandidate), index, generation)
-                            tiledCandidate = null
-                        }
-                        imageUri == null -> showLoadFailure()
-                        else -> startGlideLoad(imageUri, index, generation)
-                    }
-                }
-            } finally {
-                tiledCandidate?.close()
             }
         }
+    }
+
+    /**
+     * Tiled pages decode only while current: a neighbour keeps its spinner until the user lands on it, so at most
+     * one tile cache budget is live (ROADMAP 6.3 acceptance: 20 MP PNG paging without a full-image allocation).
+     */
+    private suspend fun installTiledOrDefer(
+        host: ViewerPageHost,
+        generation: Int,
+        metadata: ImageMetadata,
+        limits: ImageBitmapLimits,
+    ) {
+        if (host.index != currentIndex) {
+            host.tiledDeferred = true
+            host.loading = true
+            return
+        }
+        val drawable = withContext(Dispatchers.IO) { createTiledImage(host.page, metadata, limits) }
+        if (!isLive(host, generation)) {
+            drawable?.close()
+            return
+        }
+        if (drawable == null) {
+            val model = if (host.page.hostRelativePath.isNullOrEmpty()) host.page.image.targetUri else hostGlideModel(host)
+            if (model == null) failHost(host) else startGlideLoad(host, model, generation)
+            return
+        }
+        installTiledImage(host, drawable, generation)
+    }
+
+    private fun hostGlideModel(host: ViewerPageHost): Any? = runCatching {
+        HostSessionImageRegistry.imageUri(requireNotNull(hostImageSessionToken), host.index)
+    }.getOrNull()
+
+    private fun shouldTile(page: ImageViewerPage, metadata: ImageMetadata, limits: ImageBitmapLimits): Boolean {
+        val width = metadata.width ?: return false
+        val height = metadata.height ?: return false
+        return ImageLargeImagePolicy.shouldUseTiling(
+            width = width,
+            height = height,
+            mimeType = page.image.mimeType,
+            sdkInt = Build.VERSION.SDK_INT,
+            limits = limits,
+        )
     }
 
     private fun createTiledImage(
@@ -380,22 +569,8 @@ class ImageViewerActivity : ConfiguredActivity() {
         metadata: ImageMetadata,
         limits: ImageBitmapLimits,
     ): TiledImageDrawable? {
-        val width = metadata.width ?: return null
-        val height = metadata.height ?: return null
-        if (
-            !ImageLargeImagePolicy.shouldUseTiling(
-                width = width,
-                height = height,
-                mimeType = page.image.mimeType,
-                sdkInt = Build.VERSION.SDK_INT,
-                limits = limits,
-            )
-        ) {
-            return null
-        }
         val descriptor = if (page.hostRelativePath.isNullOrEmpty()) {
-            runCatching { contentResolver.openFileDescriptor(page.image.targetUri, "r") }
-                .getOrNull()
+            runCatching { contentResolver.openFileDescriptor(page.image.targetUri, "r") }.getOrNull()
         } else {
             openHostDescriptor(page)
         } ?: return null
@@ -406,29 +581,18 @@ class ImageViewerActivity : ConfiguredActivity() {
         )
     }
 
-    private fun installTiledImage(
-        drawable: TiledImageDrawable,
-        pageIndex: Int,
-        generation: Int,
-    ) {
-        tiledImageDrawable = drawable
-        imageView.setImageDrawable(drawable)
-        uiState = uiState.copy(loading = false, errorText = null)
-        setPrintEnabled(true)
-        imageView.post {
-            if (generation == loadGeneration && !isFinishing && !isDestroyed) {
-                imageView.restoreRotationQuarterTurns(consumeRestoredRotation(pageIndex))
+    private fun installTiledImage(host: ViewerPageHost, drawable: TiledImageDrawable, generation: Int) {
+        host.tiledImage = drawable
+        host.view.setImageDrawable(drawable)
+        host.loading = false
+        host.errorText = null
+        host.ready = true
+        syncIfCurrent(host)
+        host.view.post {
+            if (isLive(host, generation)) {
+                host.view.restoreRotationQuarterTurns(consumeRestoredRotation(host.index))
             }
         }
-    }
-
-    private fun releaseTiledImage() {
-        val drawable = tiledImageDrawable ?: return
-        tiledImageDrawable = null
-        if (::imageView.isInitialized && imageView.drawable === drawable) {
-            imageView.setImageDrawable(null)
-        }
-        drawable.close()
     }
 
     private fun openHostDescriptor(page: ImageViewerPage): ParcelFileDescriptor? = runCatching {
@@ -443,16 +607,22 @@ class ImageViewerActivity : ConfiguredActivity() {
         }
     }.getOrNull()
 
-    private fun startGlideLoad(
-        model: Any,
-        pageIndex: Int,
-        generation: Int,
-    ) {
-        uiState = uiState.copy(loading = true, errorText = null)
+    private fun startGlideLoad(host: ViewerPageHost, model: Any, generation: Int) {
+        if (!isLive(host, generation)) return
+        host.loading = true
+        host.errorText = null
+        syncIfCurrent(host)
         // Glide 5's static-image Downsampler applies all eight EXIF rotation/mirror variants.
         // ZoomableImageView therefore tracks only the user's additional quarter turns.
+        // The target is the window, stated explicitly: a page the pager has premeasured but not laid out would
+        // otherwise make Glide fall back to the screen's longer edge on both axes, and the decode is additionally
+        // capped at the full-decode budget for formats that cannot be tiled.
+        val metrics = resources.displayMetrics
+        val budgetPixels = host.view.largeImageLimits(memoryClassMebibytes).fullDecodeBudgetBytes / BYTES_PER_PIXEL
         Glide.with(this)
             .load(model)
+            .override(metrics.widthPixels.coerceAtLeast(1), metrics.heightPixels.coerceAtLeast(1))
+            .downsample(BudgetedDownsampleStrategy(budgetPixels))
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     error: GlideException?,
@@ -460,9 +630,7 @@ class ImageViewerActivity : ConfiguredActivity() {
                     target: Target<Drawable>,
                     isFirstResource: Boolean,
                 ): Boolean {
-                    if (generation == loadGeneration && !isFinishing && !isDestroyed) {
-                        showLoadFailure()
-                    }
+                    if (isLive(host, generation)) failHost(host)
                     return false
                 }
 
@@ -473,89 +641,40 @@ class ImageViewerActivity : ConfiguredActivity() {
                     dataSource: DataSource,
                     isFirstResource: Boolean,
                 ): Boolean {
-                    if (generation == loadGeneration && !isFinishing && !isDestroyed) {
-                        uiState = uiState.copy(loading = false, errorText = null)
-                        imageView.post {
-                            if (generation == loadGeneration && !isFinishing && !isDestroyed) {
-                                imageView.restoreRotationQuarterTurns(consumeRestoredRotation(pageIndex))
-                                animationController.attach(
-                                    resource,
-                                    startPaused = consumeRestoredAnimationPause(pageIndex),
-                                )
-                                setPrintEnabled(true)
-                            }
+                    if (!isLive(host, generation)) return false
+                    host.loading = false
+                    host.errorText = null
+                    syncIfCurrent(host)
+                    // The target installs the drawable (and starts an animatable) after this callback returns.
+                    host.view.post {
+                        if (!isLive(host, generation)) return@post
+                        host.ready = true
+                        host.view.restoreRotationQuarterTurns(consumeRestoredRotation(host.index))
+                        if (host.index == currentIndex) {
+                            host.animation.attach(resource, startPaused = consumeRestoredAnimationPause(host.index))
+                            syncCurrentPage(pageChanged = false)
+                        } else {
+                            (resource as? Animatable)?.stop()
                         }
                     }
                     return false
                 }
             })
-            .into(imageView)
+            .into(host.view)
     }
 
-    private fun showMetadata(request: ImageViewerRequest, metadata: ImageMetadata?) {
-        val text = if (metadata == null) {
-            getString(R.string.metadata_unavailable)
-        } else {
-            val size = Formatter.formatFileSize(this, metadata.byteSize)
-            val resolution = if (metadata.width != null && metadata.height != null) {
-                getString(R.string.metadata_resolution, metadata.width, metadata.height)
-            } else {
-                getString(R.string.metadata_resolution_unknown)
-            }
-            val decodedColor = formatDecodedColor(metadata.decodedColor)
-            if (decodedColor == null) {
-                getString(R.string.metadata_summary, request.mimeType, size, resolution)
-            } else {
-                getString(R.string.metadata_summary_with_color, request.mimeType, size, resolution, decodedColor)
-            }
-        }
-        uiState = uiState.copy(metadataText = text, detailsSummary = text)
-        showExifDetails(metadata)
-    }
-
-    private fun formatDecodedColor(metadata: ImageDecodedColorMetadata?): String? = metadata?.let {
-        buildList {
-            it.bitsPerPixel?.let { bitsPerPixel ->
-                add(getString(R.string.metadata_decoded_bit_depth, bitsPerPixel))
-            }
-            it.colorSpaceName?.let { colorSpaceName ->
-                add(getString(R.string.metadata_color_space, colorSpaceName))
-            }
-        }.takeIf { fields -> fields.isNotEmpty() }?.joinToString(" · ")
-    }
-
-    private fun showZoomIndicator(zoom: Float, gestureInProgress: Boolean) {
-        val formattedZoom = ImageZoomIndicatorFormatter.format(zoom, resources.configuration.locales[0])
-            ?: return hideZoomIndicator()
-        imageView.removeCallbacks(hideZoomIndicatorRunnable)
-        uiState = uiState.copy(zoomIndicatorText = getString(R.string.zoom_indicator, formattedZoom))
-        if (!gestureInProgress) {
-            imageView.postDelayed(hideZoomIndicatorRunnable, ZOOM_INDICATOR_DURATION_MILLIS)
-        }
-    }
-
-    private fun hideZoomIndicator() {
-        if (!::imageView.isInitialized) return
-        imageView.removeCallbacks(hideZoomIndicatorRunnable)
-        uiState = uiState.copy(zoomIndicatorText = null)
-    }
-
-    private val hideZoomIndicatorRunnable = Runnable {
-        uiState = uiState.copy(zoomIndicatorText = null)
-    }
-
-    private fun showLoadFailure(
+    private fun failHost(
+        host: ViewerPageHost,
         message: CharSequence = getText(R.string.error_cannot_read_image),
     ) {
-        animationController.clear()
-        hideZoomIndicator()
-        uiState = uiState.copy(
-            detailsAvailable = false,
-            detailsExpanded = false,
-            loading = false,
-            errorText = message.toString(),
-            printEnabled = false,
-        )
+        host.animation.clear()
+        host.loading = false
+        host.errorText = message.toString()
+        host.ready = false
+        if (host.index == currentIndex) {
+            hideZoomIndicator()
+            syncCurrentPage(pageChanged = false)
+        }
     }
 
     private fun consumeRestoredAnimationPause(pageIndex: Int): Boolean {
@@ -574,15 +693,34 @@ class ImageViewerActivity : ConfiguredActivity() {
         }
     }
 
-    private fun showExifDetails(metadata: ImageMetadata?) {
-        val details = metadata?.exif?.let(::formatExifDetails)
-        uiState = uiState.copy(
-            exifText = details ?: getString(R.string.exif_unavailable),
-            detailsAvailable = metadata != null,
-        )
-        val restoreExpanded = restoredExpandedDetailsIndex == currentIndex
-        if (restoreExpanded) restoredExpandedDetailsIndex = -1
-        setExifDetailsExpanded(restoreExpanded && metadata != null)
+    // endregion
+
+    // region Metadata text
+
+    private fun formatMetadata(request: ImageViewerRequest, metadata: ImageMetadata): String {
+        val size = Formatter.formatFileSize(this, metadata.byteSize)
+        val resolution = if (metadata.width != null && metadata.height != null) {
+            getString(R.string.metadata_resolution, metadata.width, metadata.height)
+        } else {
+            getString(R.string.metadata_resolution_unknown)
+        }
+        val decodedColor = formatDecodedColor(metadata.decodedColor)
+        return if (decodedColor == null) {
+            getString(R.string.metadata_summary, request.mimeType, size, resolution)
+        } else {
+            getString(R.string.metadata_summary_with_color, request.mimeType, size, resolution, decodedColor)
+        }
+    }
+
+    private fun formatDecodedColor(metadata: ImageDecodedColorMetadata?): String? = metadata?.let {
+        buildList {
+            it.bitsPerPixel?.let { bitsPerPixel ->
+                add(getString(R.string.metadata_decoded_bit_depth, bitsPerPixel))
+            }
+            it.colorSpaceName?.let { colorSpaceName ->
+                add(getString(R.string.metadata_color_space, colorSpaceName))
+            }
+        }.takeIf { fields -> fields.isNotEmpty() }?.joinToString(" · ")
     }
 
     private fun formatExifDetails(exif: ImageExifMetadata): String? {
@@ -615,6 +753,30 @@ class ImageViewerActivity : ConfiguredActivity() {
         else -> getString(R.string.exif_orientation_clockwise, orientation.rotationDegrees)
     }
 
+    // endregion
+
+    // region Overlay state
+
+    private fun showZoomIndicator(zoom: Float, gestureInProgress: Boolean) {
+        val formattedZoom = ImageZoomIndicatorFormatter.format(zoom, resources.configuration.locales[0])
+            ?: return hideZoomIndicator()
+        zoomIndicatorJob?.cancel()
+        zoomIndicatorJob = null
+        uiState = uiState.copy(zoomIndicatorText = getString(R.string.zoom_indicator, formattedZoom))
+        if (!gestureInProgress) {
+            zoomIndicatorJob = scope.launch {
+                delay(ZOOM_INDICATOR_DURATION_MILLIS)
+                uiState = uiState.copy(zoomIndicatorText = null)
+            }
+        }
+    }
+
+    private fun hideZoomIndicator() {
+        zoomIndicatorJob?.cancel()
+        zoomIndicatorJob = null
+        if (uiState.zoomIndicatorText != null) uiState = uiState.copy(zoomIndicatorText = null)
+    }
+
     private fun setExifDetailsExpanded(expanded: Boolean) {
         uiState = uiState.copy(detailsExpanded = expanded && uiState.detailsAvailable)
     }
@@ -623,8 +785,13 @@ class ImageViewerActivity : ConfiguredActivity() {
         uiState = uiState.copy(controlsVisible = visible)
     }
 
+    // endregion
+
+    // region Actions
+
     private fun editImage() {
-        if (editBusy || !launchRequest.editable) return
+        val source = source ?: return
+        if (editBusy || !source.editable) return
         val page = currentShareablePage() ?: return
         scope.launch { editHandoff.edit(page.targetUri) }
     }
@@ -641,11 +808,13 @@ class ImageViewerActivity : ConfiguredActivity() {
     }
 
     private fun printImage() {
-        val page = launchRequest.pages.getOrNull(currentIndex) ?: return
-        val drawable = imageView.drawable ?: return showPrintPreparationFailure()
+        val source = source ?: return
+        val page = source.pages.getOrNull(currentIndex) ?: return
+        val view = currentHost()?.view ?: return showPrintPreparationFailure()
+        val drawable = view.drawable ?: return showPrintPreparationFailure()
         val snapshot = ImagePrintSnapshot.capture(
             drawable = drawable,
-            rotationQuarterTurns = imageView.currentRotationQuarterTurns,
+            rotationQuarterTurns = view.currentRotationQuarterTurns,
         ) ?: return showPrintPreparationFailure()
         val printManager = getSystemService(PRINT_SERVICE) as? PrintManager
         if (printManager == null) {
@@ -705,7 +874,7 @@ class ImageViewerActivity : ConfiguredActivity() {
     }
 
     private fun currentShareablePage(): ImageViewerRequest? {
-        val page = launchRequest.pages.getOrNull(currentIndex) ?: return null
+        val page = source?.pages?.getOrNull(currentIndex) ?: return null
         return page.image.takeIf { page.hostRelativePath.isNullOrEmpty() }
     }
 
@@ -733,6 +902,8 @@ class ImageViewerActivity : ConfiguredActivity() {
         launchRequest.hostSession?.let { session -> runCatching { session.close() } }
     }
 
+    // endregion
+
     private companion object {
         const val STATE_CURRENT_INDEX = "currentIndex"
         const val STATE_ANIMATION_INDEX = "animationIndex"
@@ -740,7 +911,9 @@ class ImageViewerActivity : ConfiguredActivity() {
         const val STATE_ROTATION_INDEX = "rotationIndex"
         const val STATE_ROTATION_QUARTER_TURNS = "rotationQuarterTurns"
         const val STATE_EXPANDED_DETAILS_INDEX = "expandedDetailsIndex"
+        const val STATE_CONTROLS_VISIBLE = "controlsVisible"
         const val ZOOM_INDICATOR_DURATION_MILLIS = 900L
+        const val BYTES_PER_PIXEL = 4L
         const val LEGACY_NAVIGATION_SCRIM = 0x66000000
     }
 }

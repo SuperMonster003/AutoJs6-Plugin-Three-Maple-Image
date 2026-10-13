@@ -78,6 +78,23 @@ internal class MediaStoreRepository(
         }
     }
 
+    /** Every image of one album in the requested order; the viewer pages through this list (ROADMAP 6.3). */
+    suspend fun loadBucketAll(bucketId: Long, sort: MediaSort = MediaSort.DEFAULT): List<MediaItem> {
+        if (sort.field == MediaSortField.NAME) {
+            return MediaCatalog.sort(loadAll().filter { it.bucketId == bucketId }, sort)
+        }
+        return withContext(Dispatchers.IO) {
+            val rows = query(
+                selection = "${MediaStore.Images.Media.BUCKET_ID} = ?",
+                selectionArgs = arrayOf(bucketId.toString()),
+                sort = sort,
+                limit = null,
+                offset = 0,
+            )
+            MediaCatalog.filter(rows, supports)
+        }
+    }
+
     fun invalidate() {
         cachedAll = null
     }
