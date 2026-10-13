@@ -6,4 +6,10 @@
         <item quantity="many">%1$d изображений</item>
         <item quantity="other">%1$d изображения</item>
     </plurals>
+    <plurals name="gallery_selected_count">
+        <item quantity="one">Выбран %1$d</item>
+        <item quantity="few">Выбрано %1$d</item>
+        <item quantity="many">Выбрано %1$d</item>
+        <item quantity="other">Выбрано %1$d</item>
+    </plurals>
 </resources>

@@ -3,4 +3,7 @@
     <plurals name="gallery_image_count">
         <item quantity="other">%1$d 枚の画像</item>
     </plurals>
+    <plurals name="gallery_selected_count">
+        <item quantity="other">%1$d 件選択</item>
+    </plurals>
 </resources>

@@ -116,13 +116,15 @@ internal fun MapleBottomActionBar(
     actions: List<MapleAction>,
     modifier: Modifier = Modifier,
     overlay: Boolean = false,
+    /** Pads for the navigation bar; the overlay bar always does, a page bar does when it sits at the window bottom. */
+    navigationBarInset: Boolean = overlay,
 ) {
     require(actions.size in 1..5) { "MapleBottomActionBar supports 1 to 5 actions" }
     val canvas = MapleTheme.canvas
     val background = if (overlay) canvas.scrim else MaterialTheme.colorScheme.surface
     val contentColor = if (overlay) canvas.onScrim else MaterialTheme.colorScheme.onSurfaceVariant
     val disabledColor = if (overlay) canvas.onScrimDisabled else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-    val insets = if (overlay) Modifier.windowInsetsPadding(WindowInsets.navigationBars) else Modifier
+    val insets = if (navigationBarInset) Modifier.windowInsetsPadding(WindowInsets.navigationBars) else Modifier
     Row(
         modifier = modifier
             .fillMaxWidth()

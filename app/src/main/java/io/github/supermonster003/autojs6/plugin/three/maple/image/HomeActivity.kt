@@ -19,6 +19,7 @@ import androidx.navigation.navArgument
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumGridCallbacks
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumGridScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaGridCallbacks
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaGridScreen
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -30,6 +31,7 @@ import kotlinx.coroutines.launch
 class HomeActivity : ConfiguredActivity() {
     private lateinit var actions: HomeActions
     private lateinit var permissionGate: MediaPermissionGate
+    private lateinit var operations: GalleryOperations
     private val gallery by viewModels<GalleryViewModel>()
     private val requestPhotoAccess = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
         permissionGate.recordResult(grants)
@@ -65,6 +67,7 @@ class HomeActivity : ConfiguredActivity() {
         actions = HomeActions(this)
         actions.restore(savedInstanceState)
         permissionGate = MediaPermissionGate(this)
+        operations = GalleryOperations(this, gallery)
         if (savedInstanceState == null) requestPhotoAccessOnce()
         val callbacks = AlbumGridCallbacks(
             onOpenAlbum = { album -> navigate?.invoke("album/${album.kind.name}/${album.id}") },
@@ -108,14 +111,29 @@ class HomeActivity : ConfiguredActivity() {
                         }
                         MediaGridScreen(
                             state = grid,
-                            onBack = { controller.popBackStack() },
-                            onOpen = ::openImage,
-                            onLoadMore = gallery::loadMore,
-                            onSort = gallery::setGridSort,
-                            onRevealed = gallery::clearReveal,
-                            onColumns = gallery::setColumns,
-                            onRefresh = gallery::refreshGrid,
+                            callbacks = MediaGridCallbacks(
+                                onBack = {
+                                    gallery.clearSelection()
+                                    controller.popBackStack()
+                                },
+                                onOpen = ::openImage,
+                                onLoadMore = gallery::loadMore,
+                                onSort = gallery::setGridSort,
+                                onRevealed = gallery::clearReveal,
+                                onColumns = gallery::setColumns,
+                                onRefresh = gallery::refreshGrid,
+                                onToggle = gallery::toggleSelection,
+                                onDragStart = gallery::beginDragSelection,
+                                onDragTo = gallery::dragSelectionTo,
+                                onDragEnd = gallery::endDragSelection,
+                                onClearSelection = gallery::clearSelection,
+                                onSelectAll = gallery::selectAll,
+                                onInvertSelection = gallery::invertSelection,
+                            ),
+                            selectionActions = operations.actionsFor(grid),
+                            snackbarHostState = operations.snackbar,
                         )
+                        operations.Dialogs()
                     }
                 }
             }

@@ -3,4 +3,7 @@
     <plurals name="gallery_image_count">
         <item quantity="other">%1$d 張圖片</item>
     </plurals>
+    <plurals name="gallery_selected_count">
+        <item quantity="other">已選取 %1$d 項</item>
+    </plurals>
 </resources>

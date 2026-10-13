@@ -4,4 +4,8 @@
         <item quantity="one">%1$d image</item>
         <item quantity="other">%1$d images</item>
     </plurals>
+    <plurals name="gallery_selected_count">
+        <item quantity="one">%1$d selected</item>
+        <item quantity="other">%1$d selected</item>
+    </plurals>
 </resources>

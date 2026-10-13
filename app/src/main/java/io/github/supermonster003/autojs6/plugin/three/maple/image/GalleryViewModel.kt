@@ -56,7 +56,11 @@ internal data class MediaGridUiState(
     val reveal: Long? = null,
     val columns: Int = GalleryPreferences.DEFAULT_COLUMNS,
     val refreshing: Boolean = false,
-)
+    /** Ids selected in the grid (ROADMAP 7.1); kept across rotation and refreshes of the same album. */
+    val selection: Set<Long> = emptySet(),
+) {
+    val selecting: Boolean get() = selection.isNotEmpty()
+}
 
 /**
  * State of the standalone gallery (ROADMAP 6.2): the album list built from MediaStore buckets and authorized folders,
@@ -75,6 +79,9 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     private var reloadJob: Job? = null
     private var revealJob: Job? = null
     private var folderOrder: Triple<List<MediaItem>, MediaSort, List<MediaItem>>? = null
+    private var selectionJob: Job? = null
+    private var dragBase: Set<Long>? = null
+    private var dragAnchor: Long? = null
 
     val albums: StateFlow<GalleryUiState> = _albums.asStateFlow()
     val grid: StateFlow<MediaGridUiState> = _grid.asStateFlow()
@@ -222,6 +229,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             sort = sort,
             columns = preferences.mediaColumns,
             refreshing = current.refreshing && sameAlbum,
+            selection = if (sameAlbum) current.selection else emptySet(),
         )
         loadPage(reset = true)
     }
@@ -272,6 +280,88 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
 
     fun clearReveal() {
         _grid.update { if (it.reveal == null) it else it.copy(reveal = null) }
+    }
+
+    // ---- selection (ROADMAP 7.1) ----
+
+    fun toggleSelection(id: Long) {
+        _grid.update { it.copy(selection = MediaSelection.toggle(it.selection, id)) }
+    }
+
+    fun clearSelection() {
+        selectionJob?.cancel()
+        _grid.update { if (it.selection.isEmpty()) it else it.copy(selection = emptySet()) }
+    }
+
+    /** Removes ids that no longer exist after a delete or move (the rest stays selected). */
+    fun deselect(ids: Collection<Long>) {
+        _grid.update { state -> state.copy(selection = state.selection.filterTo(LinkedHashSet()) { it !in ids }) }
+    }
+
+    /** A long press: selects [id] and anchors a drag range there. */
+    fun beginDragSelection(id: Long) {
+        val base = _grid.value.selection
+        dragBase = base
+        dragAnchor = id
+        _grid.update { it.copy(selection = LinkedHashSet(base).apply { add(id) }) }
+    }
+
+    fun dragSelectionTo(id: Long) {
+        val base = dragBase ?: return
+        val anchor = dragAnchor ?: return
+        _grid.update { state -> state.copy(selection = MediaSelection.range(base, state.items.map { it.id }, anchor, id)) }
+    }
+
+    fun endDragSelection() {
+        dragBase = null
+        dragAnchor = null
+    }
+
+    /** Selects every image of the album, including pages the grid has not loaded yet. */
+    fun selectAll() {
+        selectionJob?.cancel()
+        selectionJob = viewModelScope.launch {
+            val all = allAlbumItems()
+            _grid.update { it.copy(selection = all.mapTo(LinkedHashSet()) { item -> item.id }) }
+        }
+    }
+
+    fun invertSelection() {
+        selectionJob?.cancel()
+        selectionJob = viewModelScope.launch {
+            val all = allAlbumItems()
+            _grid.update { it.copy(selection = MediaSelection.invert(all.map { item -> item.id }, it.selection)) }
+        }
+    }
+
+    /** The selected images in album order, resolved from the loaded pages or, if needed, the whole album. */
+    suspend fun selectedItems(): List<MediaItem> {
+        val state = _grid.value
+        val ids = state.selection
+        if (ids.isEmpty()) return emptyList()
+        val loaded = state.items.filter { it.id in ids }
+        if (loaded.size == ids.size) return loaded
+        return allAlbumItems().filter { it.id in ids }
+    }
+
+    private suspend fun allAlbumItems(): List<MediaItem> {
+        val state = _grid.value
+        val album = state.album ?: return emptyList()
+        if (state.endReached) return state.items
+        return if (album.kind != AlbumKind.FOLDER) {
+            runCatching { media.loadBucketAll(album.id, state.sort) }.getOrDefault(state.items)
+        } else {
+            val folder = album.folder ?: return state.items
+            val cached = runCatching { folderRepository.enumerateCached(folder) }.getOrNull() ?: return state.items
+            folderOrdered(cached.first, state.sort)
+        }
+    }
+
+    /** After a write batch: the library changed now, so reload without waiting for the settled change event. */
+    fun refreshAfterWrite() {
+        media.invalidate()
+        folderRepository.invalidateCache()
+        reloadAfterChange()
     }
 
     private fun loadPage(reset: Boolean): Job? {

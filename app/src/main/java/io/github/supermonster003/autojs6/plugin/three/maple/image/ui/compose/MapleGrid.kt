@@ -1,5 +1,6 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onLongClick
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -120,7 +123,11 @@ internal fun MapleAlbumCell(
     }
 }
 
-/** Media cell: square thumbnail with an optional type badge at the top end (design draft 8.2). */
+/**
+ * Media cell: square thumbnail with an optional type badge at the top end (design draft 8.2). In selection mode
+ * (ROADMAP 7.1) a mark at the top start shows the state and a selected thumbnail shrinks behind a tinted frame;
+ * [onLongClick] is the accessibility action that starts selecting (touch long presses come from the grid).
+ */
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 internal fun MapleMediaCell(
@@ -128,17 +135,44 @@ internal fun MapleMediaCell(
     description: String,
     modifier: Modifier = Modifier,
     badge: String? = null,
+    selectionMode: Boolean = false,
+    selected: Boolean = false,
+    onLongClick: (() -> Unit)? = null,
+    onLongClickLabel: String? = null,
     onClick: () -> Unit,
 ) {
     val canvas = MapleTheme.canvas
+    // Outside selection mode the cell stays free of animation state, which keeps flinging a large album cheap.
+    val inset = if (selectionMode) animateDpAsState(if (selected) SELECTED_INSET else 0.dp, label = "selectionInset").value else 0.dp
     Box(
         modifier = modifier
             .aspectRatio(1f)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable(role = Role.Button, onClick = onClick)
-            .semantics { contentDescription = description },
+            .background(if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant)
+            .clickable(role = if (selectionMode) Role.Checkbox else Role.Button, onClick = onClick)
+            .semantics {
+                contentDescription = description
+                if (selectionMode) this.selected = selected
+                if (onLongClick != null) onLongClick(label = onLongClickLabel) { onLongClick(); true }
+            },
     ) {
-        GlideImage(model = model, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+        GlideImage(
+            model = model,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize().padding(inset).then(if (selected) Modifier.clip(RoundedCornerShape(SELECTED_CORNER)) else Modifier),
+        )
+        if (selectionMode) {
+            Icon(
+                painter = painterResource(if (selected) R.drawable.ic_check_circle_24 else R.drawable.ic_radio_button_unchecked_24),
+                contentDescription = null,
+                tint = if (selected) MaterialTheme.colorScheme.primary else canvas.onScrim,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(6.dp)
+                    .size(24.dp)
+                    .background(if (selected) MaterialTheme.colorScheme.onPrimary else canvas.scrim, CircleShape),
+            )
+        }
         if (badge != null) {
             Text(
                 text = badge,
@@ -153,6 +187,9 @@ internal fun MapleMediaCell(
         }
     }
 }
+
+private val SELECTED_INSET = 10.dp
+private val SELECTED_CORNER = 8.dp
 
 /** One-line permission status with an action at the end (design draft 8.1, `MaplePermissionBanner`). */
 @Composable

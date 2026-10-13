@@ -4,8 +4,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
@@ -20,7 +24,12 @@ internal fun MapleScreen(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     onBack: (() -> Unit)? = null,
+    /** Replaces the back arrow (selection mode shows a close icon); defaults to the back arrow. */
+    navigationIcon: Painter? = null,
+    navigationContentDescription: String? = null,
     actions: @Composable RowScope.() -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
+    snackbarHostState: SnackbarHostState? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
@@ -31,12 +40,14 @@ internal fun MapleScreen(
             MapleTopBar(
                 title = title,
                 subtitle = subtitle,
-                navigationIcon = if (onBack != null) painterResource(R.drawable.ic_arrow_back_24) else null,
-                navigationContentDescription = stringResource(R.string.standalone_navigation_back),
+                navigationIcon = if (onBack != null) navigationIcon ?: painterResource(R.drawable.ic_arrow_back_24) else null,
+                navigationContentDescription = navigationContentDescription ?: stringResource(R.string.standalone_navigation_back),
                 onNavigationClick = onBack,
                 actions = actions,
             )
         },
+        bottomBar = bottomBar,
+        snackbarHost = { if (snackbarHostState != null) SnackbarHost(snackbarHostState, modifier = Modifier.testTag("maple.snackbar")) },
         content = content,
     )
 }

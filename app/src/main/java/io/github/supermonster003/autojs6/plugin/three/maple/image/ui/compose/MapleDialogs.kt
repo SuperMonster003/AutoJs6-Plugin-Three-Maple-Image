@@ -53,7 +53,8 @@ internal fun MapleDialog(
     onDismissRequest: () -> Unit,
     confirmText: String,
     onConfirm: () -> Unit,
-    dismissText: String,
+    /** Null for information dialogs that only close. */
+    dismissText: String?,
     modifier: Modifier = Modifier,
     confirmEnabled: Boolean = true,
     scrollable: Boolean = true,
@@ -98,11 +99,13 @@ internal fun MapleDialog(
                             ) { Text(neutralText) }
                             Spacer(Modifier.weight(1f))
                         }
-                        TextButton(
-                            onClick = onDismissRequest,
-                            modifier = Modifier.defaultMinSize(minHeight = MapleDialogDefaults.buttonMinHeight).testTag("maple.dialog.cancel"),
-                        ) { Text(dismissText) }
-                        Spacer(Modifier.width(8.dp))
+                        if (dismissText != null) {
+                            TextButton(
+                                onClick = onDismissRequest,
+                                modifier = Modifier.defaultMinSize(minHeight = MapleDialogDefaults.buttonMinHeight).testTag("maple.dialog.cancel"),
+                            ) { Text(dismissText) }
+                            Spacer(Modifier.width(8.dp))
+                        }
                         TextButton(
                             onClick = onConfirm,
                             enabled = confirmEnabled,
