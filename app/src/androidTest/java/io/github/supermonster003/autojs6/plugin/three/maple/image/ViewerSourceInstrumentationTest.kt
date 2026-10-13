@@ -280,6 +280,7 @@ class ViewerSourceInstrumentationTest {
     // endregion
 
     private companion object {
-        const val TIMEOUT_MILLIS = 15_000L
+        // Upper bound only: the shared CI emulator renders the paged viewer in software and is much slower.
+        const val TIMEOUT_MILLIS = 30_000L
     }
 }

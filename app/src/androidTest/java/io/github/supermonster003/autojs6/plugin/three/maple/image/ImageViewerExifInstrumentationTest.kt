@@ -156,7 +156,8 @@ class ImageViewerExifInstrumentationTest {
     }
 
     private companion object {
-        const val LOAD_TIMEOUT_MILLIS = 10_000L
+        // Upper bound only: the shared CI emulator renders the paged viewer in software and is much slower.
+        const val LOAD_TIMEOUT_MILLIS = 30_000L
         const val POLL_INTERVAL_MILLIS = 50L
         const val ZOOM_INDICATOR_SETTLE_MILLIS = 1_100L
     }

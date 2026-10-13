@@ -168,7 +168,8 @@ class MultiSelectionInstrumentationTest {
         const val BLUE_NAME = "selected-blue.png"
         const val FIXTURE_WIDTH = 48
         const val FIXTURE_HEIGHT = 32
-        const val PAGE_TIMEOUT_MILLIS = 10_000L
+        // Upper bound only: the shared CI emulator renders the paged viewer in software and is much slower.
+        const val PAGE_TIMEOUT_MILLIS = 30_000L
         const val POLL_INTERVAL_MILLIS = 50L
         val RED: Int = Color.rgb(220, 25, 35)
         val BLUE: Int = Color.rgb(30, 70, 220)

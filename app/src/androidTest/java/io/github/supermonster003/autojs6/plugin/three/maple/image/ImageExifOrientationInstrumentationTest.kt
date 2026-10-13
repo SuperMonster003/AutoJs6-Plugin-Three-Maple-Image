@@ -296,7 +296,8 @@ class ImageExifOrientationInstrumentationTest {
         )
 
         private const val LOAD_TIMEOUT_SECONDS = 10L
-        private const val LOAD_TIMEOUT_MILLIS = 10_000L
+        // Upper bound only: the shared CI emulator renders the paged viewer in software and is much slower.
+        private const val LOAD_TIMEOUT_MILLIS = 30_000L
         private const val POLL_INTERVAL_MILLIS = 50L
         private const val COLOR_TOLERANCE = 48
     }
