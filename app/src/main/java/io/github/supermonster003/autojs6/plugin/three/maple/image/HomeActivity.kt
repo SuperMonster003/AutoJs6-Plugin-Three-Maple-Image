@@ -125,6 +125,16 @@ class HomeActivity : ConfiguredActivity() {
 
     private var navigate: ((String) -> Unit)? = null
 
+    override fun onStart() {
+        super.onStart()
+        gallery.setVisible(true)
+    }
+
+    override fun onStop() {
+        gallery.setVisible(false)
+        super.onStop()
+    }
+
     override fun onResume() {
         super.onResume()
         updatePhotoAccess()

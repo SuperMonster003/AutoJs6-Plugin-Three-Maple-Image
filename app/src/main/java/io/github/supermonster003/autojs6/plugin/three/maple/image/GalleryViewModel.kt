@@ -79,14 +79,32 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     val albums: StateFlow<GalleryUiState> = _albums.asStateFlow()
     val grid: StateFlow<MediaGridUiState> = _grid.asStateFlow()
 
+    /** Set by the Activity between onStart and onStop; changes seen while hidden reload once on return. */
+    private var visible = false
+    private var stale = false
+
     init {
         viewModelScope.launch {
             media.changes().collect {
                 folderRepository.invalidateCache()
-                reload()
-                _grid.value.album?.let { openAlbum(it, keepSort = true) }
+                // A hidden gallery must not rescan the library for every settled change (a bulk import keeps
+                // notifying for minutes); it only remembers that the lists are stale.
+                if (visible) reloadAfterChange() else stale = true
             }
         }
+    }
+
+    fun setVisible(value: Boolean) {
+        visible = value
+        if (value && stale) {
+            stale = false
+            reloadAfterChange()
+        }
+    }
+
+    private fun reloadAfterChange() {
+        reload()
+        _grid.value.album?.let { openAlbum(it, keepSort = true) }
     }
 
     fun setAccess(resolution: MediaPermissionResolution) {

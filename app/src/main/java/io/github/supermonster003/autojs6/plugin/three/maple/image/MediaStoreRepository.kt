@@ -14,11 +14,10 @@ import android.os.Looper
 import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -141,20 +140,12 @@ internal class MediaStoreRepository(
     }
 
     /**
-     * Emits after MediaStore reports a change, at most once per [throttleMillis]; bursts (a camera burst, a bulk
-     * delete) collapse into one emission. The cache is dropped before each emission.
+     * Emits after MediaStore reports changes, once they settle for [quietMillis] and at least every [maxWaitMillis]
+     * while they keep coming (a camera burst, a bulk import or delete, a media rescan); see [settle]. The cache is
+     * dropped before each emission.
      */
-    fun changes(throttleMillis: Long = DEFAULT_THROTTLE_MILLIS): Flow<Unit> = flow {
-        var lastEmission = 0L
-        rawChanges().collect {
-            val now = System.currentTimeMillis()
-            val wait = throttleMillis - (now - lastEmission)
-            if (wait > 0) delay(wait)
-            invalidate()
-            lastEmission = System.currentTimeMillis()
-            emit(Unit)
-        }
-    }
+    fun changes(quietMillis: Long = DEFAULT_QUIET_MILLIS, maxWaitMillis: Long = DEFAULT_MAX_WAIT_MILLIS): Flow<Unit> =
+        rawChanges().settle(quietMillis, maxWaitMillis).onEach { invalidate() }
 
     private fun rawChanges(): Flow<Unit> = callbackFlow {
         val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
@@ -266,7 +257,8 @@ internal class MediaStoreRepository(
     }
 
     companion object {
-        const val DEFAULT_THROTTLE_MILLIS = 400L
+        const val DEFAULT_QUIET_MILLIS = 500L
+        const val DEFAULT_MAX_WAIT_MILLIS = 5_000L
 
         /** Change observers registered right now; the shared scan is only published while one keeps it fresh. */
         private val observers = AtomicInteger()
