@@ -190,7 +190,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 6.6 发布
 
-- [ ] (发布) 按 P1-P6 发布 v3.0.0; changelog `hint` 说明独立启动会申请一次媒体权限及拒绝后的可用范围, `feature` 覆盖相册网格, 分页与缩略图条, 旋转手势, 已授权文件夹, 存储权限设置页, 宿主 "以相册浏览"; README 新增相册与权限 FAQ; 截图重采 (首页网格, 媒体网格, 查看器缩略图条, 无权限状态). 进度 (2026-10-13, 维护者决定先准备, 大库真机达标后再改 `VERSION_NAME`): P2 README 10 种语言新增相册首页, 分页查看器与缩略图条, 按需权限, 以相册浏览四条亮点与三条相册 / 权限 FAQ, 修正两条答非所问的 FAQ 与使用步骤中的旧名, 补两条安全要点 (提交 `bb08354`); 截图重采 4 张 (`gallery-albums.png`, `gallery-media-grid.png`, `viewer-thumbnail-strip.png`, `gallery-no-permission.png`, Android 13 模拟器 1080 x 2340, 合成素材, 采集说明与 SHA-256 在 `docs/images/screenshots/README.md`); P1 changelog 10 种语言草稿 (hint / feature / dependency) 在 `docs/release/v3.0.0.md`, 改版本号时并入 `.changelog`. 待办: P1 版本号与 changelog 并入, P3 冒烟, P4 / P5 (维护者), P6 宿主两处改动提交.
+- [ ] (发布) 按 P1-P6 发布 v3.0.0; changelog `hint` 说明独立启动会申请一次媒体权限及拒绝后的可用范围, `feature` 覆盖相册网格, 分页与缩略图条, 旋转手势, 已授权文件夹, 存储权限设置页, 宿主 "以相册浏览"; README 新增相册与权限 FAQ; 截图重采 (首页网格, 媒体网格, 查看器缩略图条, 无权限状态). 进度 (2026-10-13, 维护者决定先准备, 大库真机达标后再改 `VERSION_NAME`): P2 README 10 种语言新增相册首页, 分页查看器与缩略图条, 按需权限, 以相册浏览四条亮点与三条相册 / 权限 FAQ, 修正两条答非所问的 FAQ 与使用步骤中的旧名, 补两条安全要点 (提交 `bb08354`); 截图重采 4 张 (`gallery-albums.png`, `gallery-media-grid.png`, `viewer-thumbnail-strip.png`, `gallery-no-permission.png`, Android 13 模拟器 1080 x 2340, 合成素材, 采集说明与 SHA-256 在 `docs/images/screenshots/README.md`); P1 changelog 10 种语言草稿 (hint / feature / dependency) 在 `docs/release/v3.0.0.md`, 改版本号时并入 `.changelog`. 补充 (2026-10-13): 大库真机达标后 P1 完成 (`VERSION_NAME=3.0.0`, changelog 并入 10 种语言, 提交 `2e71913`); P3: R9 门禁 (`prepush_check.py --lint` 6 / 6, 图标检查, Python 测试) 通过, 冒烟 5 台真机通过 (附录 E, XQ-AT72 因维护者占用未做). 待办: P4 / P5 (维护者), P6 宿主两处改动提交.
 
 验收条件: 独立首页为相册网格且在完整 / 部分 / 无权限三种状态下都可用; 宿主入口与外部入口不触发权限申请; 查看器五种来源分页与缩略图条一致; 5 万张库滚动流畅; 协议仍为 v12.
 
@@ -467,6 +467,18 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 | Xiaomi 23046RP50C (968e9f18) | 35 | debug + release 各多次 | 首页 / 查看器 直开 (设计稿 3.5) | 完整 instrumentation 75 用例通过; 中文界面下 首页 -> 编辑图像 -> 编辑器 |
 | OnePlus OPD2413 (63751f63) | 35 | debug (ColorOS 安装确认页由 adb 点按 `Install`) | 首页 | 完整 instrumentation 75 用例通过 (平板横屏) |
 | AVD_API_33 (模拟器, 1080 x 2340) | 33 | release | 查看器直开 | README 截图重采; 浅色模式状态栏图标缺陷在此发现并修复 |
+
+
+冒烟记录 (3.0.0 候选, 2026-10-13, 提交 `2e71913` 的 release 构建 `autojs6-plugin-three-maple-image-v3.0.0.apk`, versionCode 103, 3,600,127 B, SHA-256 `c00299deb324df8635de8409fe673e9129b15aa14451ab7fd1e8a6b8aebf19a6`; 最终 APK 摘要以 P4 收集时为准). 每台: 覆盖安装到 debug 构建之上, 冷启动首页 (`am start -W` TotalTime 与系统 "Fully drawn"), 打开第一个至少 2 张的相册 -> 点第一张进入查看器 -> 左滑翻到下一页:
+
+| 设备 | API | 安装 | 冷启动 TotalTime / Fully drawn | 本里程碑新路径 |
+| --- | --- | --- | --- | --- |
+| Sony G8441 (BH900ASK9E, 横屏) | 28 | 覆盖安装成功 | 3068 ms (首次冷启动, 系统刚完成安装) / 606 ms | 相册 "0" (171 张) -> 查看器 -> 翻页成功 |
+| Sony XQ-DQ72 (QV770340J7) | 33 | 覆盖安装成功 | 186 / 208 ms | Screenshots (447 张) -> 查看器 -> 翻页成功 |
+| Redmi 22120RN86C (bek749scrwv4wo8h) | 33 | 覆盖安装成功 | 555 / 615 ms | Screenshots (3 张) -> 查看器 -> 翻页成功 |
+| Xiaomi 23046RP50C (968e9f18, 中文) | 35 | 覆盖安装成功 | 221 / 245 ms | Screenshots (4 张) -> 查看器 -> 翻页成功 (HyperOS 偶尔吞掉启动后第一次注入点按, 脚本重试) |
+| OnePlus OPD2413 (63751f63) | 35 | 覆盖安装成功 (ColorOS 安装确认由脚本点按) | 162 / 169 ms | Screenshots (15 张) -> 查看器 -> 翻页成功 |
+| Sony XQ-AT72 (QV710AF65F) | 31 | 未做: 维护者占用该机手动测试 Ace 编辑器 | - | 同一功能集的 debug 构建全量 89 例已通过 (6.5) |
 
 ---
 
