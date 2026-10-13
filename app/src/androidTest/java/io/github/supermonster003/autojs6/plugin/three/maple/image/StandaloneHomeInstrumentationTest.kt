@@ -4,16 +4,18 @@ import android.content.ComponentName
 import android.content.Intent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,19 +47,33 @@ class StandaloneHomeInstrumentationTest {
         val matches = manager.queryIntentActivities(launcher, 0)
         assertEquals(1, matches.size)
         assertEquals(context.packageName + ".HomeActivity", matches.single().activityInfo.targetActivity)
-        for (name in listOf("HomeActivity", "AppSettingsActivity", "AboutActivity", "ReleaseHistoryActivity")) {
+        for (name in listOf("HomeActivity", "AppSettingsActivity", "AboutActivity", "ReleaseHistoryActivity", "StoragePermissionActivity")) {
             assertFalse(name, manager.getActivityInfo(ComponentName(context.packageName, context.packageName + "." + name), 0).exported)
         }
     }
 
-    @Test fun homeShowsItsIdentityAndEveryEntryRow() {
-        ActivityScenario.launch(HomeActivity::class.java).use {
+    /** ROADMAP 6.2: the home is the album grid; the 2.1.0 file-picker actions live in the menu and the no-permission state. */
+    @Test fun homeShowsTheGalleryAndKeepsEveryFileActionReachable() {
+        ActivityScenario.launch(HomeActivity::class.java).use { scenario ->
             compose.onNodeWithText(context.getString(R.string.app_name)).assertIsDisplayed()
-            compose.onNodeWithText(context.getString(R.string.plugin_description)).assertIsDisplayed()
-            for (tag in listOf("maple.home.view", "maple.home.edit", "maple.home.convert", "maple.home.settings", "maple.home.openHost")) {
-                compose.onNodeWithTag(tag).performScrollTo().assertIsDisplayed().assertIsEnabled()
+            compose.waitUntil(10_000) {
+                compose.onAllNodes(hasTestTag("maple.gallery.grid")).fetchSemanticsNodes().isNotEmpty() ||
+                    compose.onAllNodes(hasTestTag("maple.gallery.noPermission")).fetchSemanticsNodes().isNotEmpty() ||
+                    compose.onAllNodes(hasTestTag("maple.gallery.empty")).fetchSemanticsNodes().isNotEmpty()
             }
-            compose.onNodeWithText(context.getString(R.string.standalone_settings_title)).performScrollTo().assertIsDisplayed()
+            var canRead = false
+            scenario.onActivity { canRead = it.photoAccess?.canReadMediaStore == true }
+            if (!canRead) {
+                compose.onNodeWithTag("maple.gallery.noPermission").assertIsDisplayed()
+                compose.onNodeWithTag("maple.gallery.grant").assertIsDisplayed().assertIsEnabled()
+                compose.onNodeWithTag("maple.gallery.chooseFolder").assertIsDisplayed()
+                compose.onNodeWithTag("maple.gallery.chooseImage").assertIsDisplayed()
+            }
+            compose.onNodeWithTag("maple.gallery.more").assertIsDisplayed().performClick()
+            for (tag in listOf("maple.gallery.menu.view", "maple.gallery.menu.edit", "maple.gallery.menu.convert", "maple.gallery.menu.openHost", "maple.gallery.menu.settings")) {
+                compose.onNodeWithTag(tag).assertIsDisplayed().assertIsEnabled()
+            }
+            assertTrue(compose.onAllNodes(hasTestTag("maple.gallery.sort")).fetchSemanticsNodes().isNotEmpty())
         }
     }
 }

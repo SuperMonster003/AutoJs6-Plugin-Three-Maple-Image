@@ -1,22 +1,46 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
+import android.content.ClipData
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.HomeScreen
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumGridCallbacks
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumGridScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaGridScreen
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
+/**
+ * Standalone home (ROADMAP 6.2): the album grid with the media grid behind it in a NavHost, the one-time photo
+ * access request, and the file-picker flows of 2.1.0 reachable from the menu and the no-permission state.
+ */
 class HomeActivity : ConfiguredActivity() {
     private lateinit var actions: HomeActions
     private lateinit var permissionGate: MediaPermissionGate
+    private val gallery by viewModels<GalleryViewModel>()
     private val requestPhotoAccess = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
         permissionGate.recordResult(grants)
-        photoAccess = permissionGate.resolve()
+        updatePhotoAccess()
+    }
+    private val pickFolder = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+        if (uri != null) {
+            AuthorizedFolderRepository(this).add(uri)
+            gallery.reload()
+        }
     }
 
     /** Current photo access as the gallery sees it; refreshed on resume and after the system dialog. */
@@ -33,26 +57,66 @@ class HomeActivity : ConfiguredActivity() {
         actions.restore(savedInstanceState)
         permissionGate = MediaPermissionGate(this)
         if (savedInstanceState == null) requestPhotoAccessOnce()
+        val callbacks = AlbumGridCallbacks(
+            onOpenAlbum = { album -> navigate?.invoke("album/${album.kind.name}/${album.id}") },
+            onAlbumSort = gallery::setAlbumSort,
+            onGrant = ::requestPhotoAccess,
+            onManageSelected = ::requestPhotoAccess,
+            onChooseFolder = { runCatching { pickFolder.launch(null) }.onFailure { showMessage(R.string.standalone_home_open_failed) } },
+            onChooseImage = { actions.choose(HomeActions.MODE_VIEW) },
+            onEditImage = { actions.choose(HomeActions.MODE_EDIT) },
+            onConvertImage = { actions.choose(HomeActions.MODE_CONVERT) },
+            onSaveOutput = { runWork { actions.prepareExport() } },
+            onOpenHost = ::openHost,
+            onSettings = { startActivity(Intent(this, AppSettingsActivity::class.java)) },
+            onRetry = gallery::reload,
+        )
         setContent {
             MapleTheme(palette = appPalette) {
-                HomeScreen(
-                    state = actions.uiState,
-                    onView = { actions.choose(HomeActions.MODE_VIEW) },
-                    onEdit = { actions.choose(HomeActions.MODE_EDIT) },
-                    onConvert = { actions.choose(HomeActions.MODE_CONVERT) },
-                    onSaveOutput = { runWork { actions.prepareExport() } },
-                    onSettings = { startActivity(Intent(this, AppSettingsActivity::class.java)) },
-                    onOpenHost = ::openHost,
-                )
-                actions.Dialogs()
+                val controller = rememberNavController()
+                navigate = { route -> controller.navigate(route) }
+                val albums by gallery.albums.collectAsState()
+                val grid by gallery.grid.collectAsState()
+                NavHost(navController = controller, startDestination = ROUTE_ALBUMS) {
+                    composable(ROUTE_ALBUMS) {
+                        AlbumGridScreen(state = albums, home = actions.uiState, callbacks = callbacks)
+                        actions.Dialogs()
+                    }
+                    composable(
+                        route = ROUTE_ALBUM,
+                        arguments = listOf(navArgument("kind") { type = NavType.StringType }, navArgument("id") { type = NavType.LongType }),
+                    ) { entry ->
+                        val kind = AlbumKind.valueOf(entry.arguments?.getString("kind") ?: AlbumKind.MEDIA.name)
+                        val id = entry.arguments?.getLong("id") ?: 0L
+                        LaunchedEffect(kind, id, albums.loading) {
+                            val album = gallery.findAlbum(kind, id)
+                            if (album != null && grid.album?.id != id) gallery.openAlbum(album)
+                        }
+                        MediaGridScreen(
+                            state = grid,
+                            onBack = { controller.popBackStack() },
+                            onOpen = ::openImage,
+                            onLoadMore = gallery::loadMore,
+                            onSort = gallery::setGridSort,
+                        )
+                    }
+                }
             }
         }
         actions.refresh()
     }
 
+    private var navigate: ((String) -> Unit)? = null
+
     override fun onResume() {
         super.onResume()
-        photoAccess = permissionGate.resolve()
+        updatePhotoAccess()
+    }
+
+    private fun updatePhotoAccess() {
+        val resolution = permissionGate.resolve()
+        photoAccess = resolution
+        gallery.setAccess(resolution)
     }
 
     /**
@@ -62,6 +126,7 @@ class HomeActivity : ConfiguredActivity() {
     private fun requestPhotoAccessOnce() {
         val resolution = permissionGate.resolve()
         photoAccess = resolution
+        gallery.setAccess(resolution)
         if (!resolution.autoRequestOnLaunch) return
         permissionGate.markRequested()
         permissionRequestsForTesting += 1
@@ -81,6 +146,18 @@ class HomeActivity : ConfiguredActivity() {
                 .onFailure { showMessage(R.string.standalone_home_open_failed) }
             MediaPermissionAction.NONE -> Unit
         }
+    }
+
+    /** Opens one grid item in the viewer through the external entry, which already handles single content URIs. */
+    private fun openImage(item: MediaItem) {
+        val uri = Uri.parse(item.contentUri)
+        val intent = Intent(this, ExternalViewActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            setDataAndType(uri, item.mimeType.takeIf { it.startsWith("image/") } ?: "image/*")
+            clipData = ClipData.newRawUri(item.displayName, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        runCatching { startActivity(intent) }.onFailure { showMessage(R.string.standalone_home_open_failed) }
     }
 
     private fun openHost() {
@@ -109,5 +186,10 @@ class HomeActivity : ConfiguredActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         actions.save(outState)
         super.onSaveInstanceState(outState)
+    }
+
+    private companion object {
+        const val ROUTE_ALBUMS = "albums"
+        const val ROUTE_ALBUM = "album/{kind}/{id}"
     }
 }

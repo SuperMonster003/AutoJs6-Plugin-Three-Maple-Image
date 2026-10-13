@@ -72,11 +72,11 @@ class MediaPermissionLaunchInstrumentationTest {
                 assertEquals("first launch asks once", 1, requests)
                 assertTrue("system permission dialog expected on top", foreignPackageOnTop(5_000))
                 dismissForeignWindow()
+                scenario.onActivity { activity -> assertEquals("dismissing the dialog does not close the door", MediaAccessState.DENIED, activity.photoAccess?.state) }
             } else {
                 assertEquals("already granted or restricted: no request", 0, requests)
             }
             assertTrue("the record remembers the first launch", record.requestedBefore || state != MediaAccessState.DENIED)
-            scenario.onActivity { activity -> assertEquals("dismissing the dialog does not close the door", MediaAccessState.DENIED, activity.photoAccess?.state) }
         }
         if (state != MediaAccessState.DENIED) record.markRequested()
         ActivityScenario.launch(HomeActivity::class.java).use { scenario ->

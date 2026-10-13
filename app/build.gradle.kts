@@ -161,6 +161,7 @@ dependencies {
     debugImplementation(libs.compose.ui.test.manifest)
     // ROADMAP T3: Glide stays the single image pipeline; its Compose integration drives grids and thumbnail strips.
     implementation(libs.glide.compose)
+    implementation(libs.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.test.ext.junit)

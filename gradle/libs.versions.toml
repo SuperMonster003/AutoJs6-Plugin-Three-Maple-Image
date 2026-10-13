@@ -98,6 +98,7 @@ recyclerview = "1.4.0"
 retrofit = "3.0.0"
 retrofit2-kotlin-coroutines-adapter = "0.9.2"
 room = "2.8.1"
+navigation = "2.10.2"
 roundedimageview = "2.3.0"
 rxandroid = "2.1.1"
 rxjava = "2.2.21"
@@ -132,6 +133,7 @@ bcpkix-jdk15on = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bc
 bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bcprov-jdk15on" }
 cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
 compose-activity = { module = "androidx.activity:activity-compose" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 compose-animation = { module = "androidx.compose.animation:animation" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 compose-foundation = { module = "androidx.compose.foundation:foundation" }

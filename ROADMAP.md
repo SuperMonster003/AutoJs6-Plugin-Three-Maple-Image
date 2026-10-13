@@ -164,10 +164,10 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 6.2 相册与网格界面
 
-- [ ] (插件) 首页相册网格 (D9): 封面 + 名称 + 数量, 列数随窄/宽屏变化 (2 / 3 / 4), 顶栏 (标题, 排序, 更多: 显示所有文件夹内容 / 设置), "已授权文件夹" 分组, 空状态 / 无权限状态 / 部分访问状态三种设计, 下拉刷新. 验收: 5.1 设计文档线框一致; 无权限状态在 API 33 设备拒绝后可用 (选图 / 选文件夹 / 编辑 / 转换 全部可达).
-- [ ] (插件) 媒体网格: 方形缩略图 (Coil 3 或 Glide, 占位与淡入), 列数设置 (3 / 4 / 5 / 6, 捏合调整), 文件类型角标 (GIF / HEIC / AVIF / WEBP), 快速滚动条与日期气泡, 点按进入查看器, 长按进入多选 (M3 补操作). 验收: 2000 项网格快速滚动 jank < 5% (`FrameMetrics` 统计写入文档); 回到网格时滚动位置保留.
+- [ ] (插件) 首页相册网格 (D9): 封面 + 名称 + 数量, 列数随窄/宽屏变化 (2 / 3 / 4), 顶栏 (标题, 排序, 更多: 显示所有文件夹内容 / 设置), "已授权文件夹" 分组, 空状态 / 无权限状态 / 部分访问状态三种设计, 下拉刷新. 验收: 5.1 设计文档线框一致; 无权限状态在 API 33 设备拒绝后可用 (选图 / 选文件夹 / 编辑 / 转换 全部可达). 进度 (2026-10-13): `GalleryViewModel` + `ui/compose/AlbumGridScreen.kt` + `MapleGrid.kt` (`MapleAlbumCell` 封面 4 dp 圆角 + 名称 16 sp + 数量 14 sp, `MaplePermissionBanner`): 列数按窗口宽度 2 / 3 / 4, 顶栏 排序 (名称 / 数量 升降) 与 更多 (查看 / 编辑 / 转换 / 保存处理结果 / 在 AutoJs6 中使用 / 设置), "已授权文件夹" 分组 (文件夹角标, 失效置灰), 无名称的根目录相册显示为 "存储根目录"; 无权限态 = `MapleEmptyState` (授予 / 打开应用设置 + 选择文件夹 / 选择图片) + 已授权文件夹 + 工具行; 部分访问态显示横幅 + "管理所选照片"; 空库态 + 重试. `StandaloneHomeInstrumentationTest` 改为相册首页断言并在 XQ-AT72 (API 31) 通过; 截图 `.bak/visual/3.0.0/gallery-albums.png`, `gallery-no-permission.png`. 待办: 下拉刷新, 部分访问态实机核对 (需 API 34+ 选择 "选择照片"), 设计稿线框核对记录.
+- [ ] (插件) 媒体网格: 方形缩略图 (Coil 3 或 Glide, 占位与淡入), 列数设置 (3 / 4 / 5 / 6, 捏合调整), 文件类型角标 (GIF / HEIC / AVIF / WEBP), 快速滚动条与日期气泡, 点按进入查看器, 长按进入多选 (M3 补操作). 验收: 2000 项网格快速滚动 jank < 5% (`FrameMetrics` 统计写入文档); 回到网格时滚动位置保留. 进度 (2026-10-13): `ui/compose/MediaGridScreen.kt` + `MapleMediaCell`: 4 列 2 dp 间隔方形缩略图 (Glide Compose), 类型角标 (GIF / HEIC / AVIF / WEBP), 点按经 `ExternalViewActivity` 打开查看器 (可编辑), 排序菜单 (名称 / 修改时间 / 拍摄时间 / 大小 升降), 每页 120 项按滚动位置续载, 已授权文件夹的深度 / 数量截断提示; 截图 `gallery-media-grid.png`, `gallery-viewer-from-grid.png`. 待办: 列数设置 (3-6) 与捏合调整, 快速滚动条与日期气泡, 2000 项 jank 统计, 长按多选 (M3).
 - [ ] (插件) "显示所有文件夹内容" 平铺视图与排序记忆 (全局默认 + 每相册单独记忆). 验收: 设置重建后排序保留.
-- [ ] (插件) 导航 (T4): `HomeActivity` 内 `navigation-compose` 路由 相册 -> 媒体网格, 返回栈与系统返回手势一致, 预测性返回 (Android 14+) 启用. 验收: 深层页面旋转屏幕不丢失路由与滚动位置.
+- [ ] (插件) 导航 (T4): `HomeActivity` 内 `navigation-compose` 路由 相册 -> 媒体网格, 返回栈与系统返回手势一致, 预测性返回 (Android 14+) 启用. 验收: 深层页面旋转屏幕不丢失路由与滚动位置. 进度 (2026-10-13): `navigation-compose` 2.10.2 接入, `HomeActivity` 内 NavHost: `albums` -> `album/{kind}/{id}` (kind = MEDIA / FOLDER), 返回键经 NavHost 弹栈, 查看器仍为独立 Activity; 待办: 预测性返回 (`enableOnBackInvokedCallback`) 与旋转后路由 / 滚动位置的 instrumentation.
 
 ### 6.3 分页查看器与手势
 
