@@ -2,6 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">戻る</string>
     <string name="action_convert_image">画像を変換</string>
+    <string name="action_dismiss_hint">閉じる</string>
     <string name="action_edit_image">画像を編集</string>
     <string name="action_hide_image_details">詳細を非表示</string>
     <string name="action_more">その他</string>
@@ -174,6 +175,7 @@
     <string name="standalone_settings_section_appearance">外観</string>
     <string name="standalone_settings_section_information">情報</string>
     <string name="standalone_settings_section_storage">ストレージ</string>
+    <string name="standalone_settings_section_viewer">ビューアー</string>
     <string name="standalone_settings_theme_color">テーマ色</string>
     <string name="standalone_settings_title">設定</string>
     <string name="standalone_update_release_history_summary">アプリに含まれるバージョン履歴を表示します</string>
@@ -248,6 +250,9 @@
     <string name="theme_picker_invalid">#RRGGBB, RRGGBB または rgb(r, g, b) を入力してください. RGB の値は 0..255 です.</string>
     <string name="theme_picker_presets">プリセット色</string>
     <string name="theme_picker_preview">プレビュー</string>
+    <string name="viewer_rotation_gesture_summary">ビューアーで 2 本指で画像を回転し, 指を離すと最も近い 90 度に合わせます</string>
+    <string name="viewer_rotation_gesture_title">2 本指で回転</string>
+    <string name="viewer_rotation_hint">%1$d° 回転しました (表示のみ). 回転の保存は今後のバージョンで提供します.</string>
     <string name="viewer_thumbnail_description">%2$d ページ中 %1$d ページ目</string>
     <string name="zoom_indicator">%1$s倍</string>
 </resources>

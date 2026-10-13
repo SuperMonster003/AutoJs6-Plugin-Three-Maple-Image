@@ -2,6 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">رجوع</string>
     <string name="action_convert_image">تحويل الصورة</string>
+    <string name="action_dismiss_hint">تجاهل</string>
     <string name="action_edit_image">تحرير الصورة</string>
     <string name="action_hide_image_details">إخفاء التفاصيل</string>
     <string name="action_more">المزيد</string>
@@ -174,6 +175,7 @@
     <string name="standalone_settings_section_appearance">المظهر</string>
     <string name="standalone_settings_section_information">المعلومات</string>
     <string name="standalone_settings_section_storage">التخزين</string>
+    <string name="standalone_settings_section_viewer">العارض</string>
     <string name="standalone_settings_theme_color">لون السمة</string>
     <string name="standalone_settings_title">الإعدادات</string>
     <string name="standalone_update_release_history_summary">عرض سجل الإصدارات المضمن في التطبيق</string>
@@ -248,6 +250,9 @@
     <string name="theme_picker_invalid">أدخل #RRGGBB أو RRGGBB أو rgb(r, g, b). يجب أن تكون قيم RGB بين 0 و255.</string>
     <string name="theme_picker_presets">ألوان جاهزة</string>
     <string name="theme_picker_preview">معاينة</string>
+    <string name="viewer_rotation_gesture_summary">أدر الصورة بإصبعين في العارض, وعند الإفلات تنطبق على أقرب ربع دورة</string>
+    <string name="viewer_rotation_gesture_title">التدوير بإصبعين</string>
+    <string name="viewer_rotation_hint">تم التدوير %1$d° للعرض فقط. سيتوفر حفظ التدوير في إصدار لاحق.</string>
     <string name="viewer_thumbnail_description">الصفحة %1$d من %2$d</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

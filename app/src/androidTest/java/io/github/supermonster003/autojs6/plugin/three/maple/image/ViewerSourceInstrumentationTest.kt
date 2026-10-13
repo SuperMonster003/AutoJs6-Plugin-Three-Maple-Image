@@ -155,8 +155,34 @@ class ViewerSourceInstrumentationTest {
                 scenario.onActivity { activity ->
                     assertEquals(1, activity.viewerStateForTesting.pageCount)
                     assertEquals(null, activity.viewerStateForTesting.subtitle)
+                    assertEquals(null, activity.viewerStateForTesting.rotationHint)
                 }
                 compose.onNodeWithTag("maple.viewer.strip").assertDoesNotExist()
+
+                // ROADMAP D8: a rotation shows the "viewing only" hint; Undo restores the orientation and hides it.
+                scenario.onActivity { activity -> assertTrue(activity.rotateForTesting()) }
+                compose.onNodeWithTag("maple.viewer.rotationHint").assertIsDisplayed()
+                scenario.onActivity { activity ->
+                    assertEquals(
+                        activity.getString(R.string.viewer_rotation_hint, 90),
+                        activity.viewerStateForTesting.rotationHint,
+                    )
+                }
+                compose.onNodeWithTag("maple.viewer.rotationHint.undo").performClick()
+                compose.waitUntil(TIMEOUT_MILLIS) {
+                    var done = false
+                    scenario.onActivity { activity ->
+                        done = activity.viewerStateForTesting.rotationHint == null &&
+                            activity.currentImageViewForTesting()?.currentRotationQuarterTurns == 0
+                    }
+                    done
+                }
+                scenario.onActivity { activity -> assertTrue(activity.rotateForTesting()) }
+                compose.onNodeWithTag("maple.viewer.rotationHint.dismiss").performClick()
+                compose.onNodeWithTag("maple.viewer.rotationHint").assertDoesNotExist()
+                scenario.onActivity { activity ->
+                    assertEquals(1, activity.currentImageViewForTesting()?.currentRotationQuarterTurns)
+                }
             }
         } finally {
             fixture.close()

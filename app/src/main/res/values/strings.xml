@@ -2,6 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">Back</string>
     <string name="action_convert_image">Convert image</string>
+    <string name="action_dismiss_hint">Dismiss</string>
     <string name="action_edit_image">Edit image</string>
     <string name="action_hide_image_details">Hide details</string>
     <string name="action_more">More</string>
@@ -174,6 +175,7 @@
     <string name="standalone_settings_section_appearance">Appearance</string>
     <string name="standalone_settings_section_information">Information</string>
     <string name="standalone_settings_section_storage">Storage</string>
+    <string name="standalone_settings_section_viewer">Viewer</string>
     <string name="standalone_settings_theme_color">Theme color</string>
     <string name="standalone_settings_title">Settings</string>
     <string name="standalone_update_release_history_summary">Read the version history included with this app</string>
@@ -248,6 +250,9 @@
     <string name="theme_picker_invalid">Enter #RRGGBB, RRGGBB or rgb(r, g, b). RGB values must be 0..255.</string>
     <string name="theme_picker_presets">Preset colors</string>
     <string name="theme_picker_preview">Preview</string>
+    <string name="viewer_rotation_gesture_summary">Rotate the image with two fingers in the viewer; it snaps to the nearest quarter turn</string>
+    <string name="viewer_rotation_gesture_title">Two-finger rotation</string>
+    <string name="viewer_rotation_hint">Rotated %1$d° for viewing only. Saving the rotation will come in a later version.</string>
     <string name="viewer_thumbnail_description">Page %1$d of %2$d</string>
     <string name="zoom_indicator">%1$sx</string>
 </resources>

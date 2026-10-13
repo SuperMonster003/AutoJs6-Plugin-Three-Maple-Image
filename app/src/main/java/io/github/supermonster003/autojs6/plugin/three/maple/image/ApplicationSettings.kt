@@ -35,6 +35,8 @@ internal data class ApplicationSettings(
     val customThemeColor: Int = AppSettingsPolicy.AUTOJS6_DEFAULT_THEME_COLOR,
     val darkMode: AppDarkMode = AppDarkMode.FOLLOW_AUTOJS6,
     val language: AppLanguage = AppLanguage.FOLLOW_AUTOJS6,
+    /** Two-finger rotation in the viewer (ROADMAP D8); display-only, so it does not touch the appearance revision. */
+    val viewerRotationGesture: Boolean = true,
 )
 
 internal object AppSettingsPolicy {
@@ -158,6 +160,7 @@ internal class ApplicationSettingsStore(context: Context) {
             preferences.getString(KEY_LANGUAGE, null),
             AppLanguage.FOLLOW_AUTOJS6,
         ),
+        viewerRotationGesture = preferences.getBoolean(KEY_VIEWER_ROTATION_GESTURE, true),
     )
 
     fun save(settings: ApplicationSettings) {
@@ -169,8 +172,14 @@ internal class ApplicationSettingsStore(context: Context) {
             )
             .putString(KEY_DARK_MODE, settings.darkMode.name)
             .putString(KEY_LANGUAGE, settings.language.name)
+            .putBoolean(KEY_VIEWER_ROTATION_GESTURE, settings.viewerRotationGesture)
             .putLong(KEY_REVISION, revision() + 1L)
             .apply()
+    }
+
+    /** Viewer gestures do not change appearance, so they skip the revision that recreates open activities. */
+    fun saveViewerRotationGesture(enabled: Boolean) {
+        preferences.edit().putBoolean(KEY_VIEWER_ROTATION_GESTURE, enabled).apply()
     }
 
     fun revision(): Long = preferences.getLong(KEY_REVISION, 0L)
@@ -181,6 +190,7 @@ internal class ApplicationSettingsStore(context: Context) {
         const val KEY_CUSTOM_THEME_COLOR = "custom-theme-color"
         const val KEY_DARK_MODE = "dark-mode"
         const val KEY_LANGUAGE = "language"
+        const val KEY_VIEWER_ROTATION_GESTURE = "viewer-rotation-gesture"
         const val KEY_REVISION = "revision"
     }
 }

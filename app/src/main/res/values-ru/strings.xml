@@ -2,6 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">Назад</string>
     <string name="action_convert_image">Преобразовать изображение</string>
+    <string name="action_dismiss_hint">Скрыть</string>
     <string name="action_edit_image">Редактировать изображение</string>
     <string name="action_hide_image_details">Скрыть сведения</string>
     <string name="action_more">Ещё</string>
@@ -174,6 +175,7 @@
     <string name="standalone_settings_section_appearance">Оформление</string>
     <string name="standalone_settings_section_information">Информация</string>
     <string name="standalone_settings_section_storage">Хранилище</string>
+    <string name="standalone_settings_section_viewer">Просмотр</string>
     <string name="standalone_settings_theme_color">Цвет темы</string>
     <string name="standalone_settings_title">Настройки</string>
     <string name="standalone_update_release_history_summary">Открыть встроенную историю версий приложения</string>
@@ -248,6 +250,9 @@
     <string name="theme_picker_invalid">Введите #RRGGBB, RRGGBB или rgb(r, g, b). Значения RGB должны быть от 0 до 255.</string>
     <string name="theme_picker_presets">Готовые цвета</string>
     <string name="theme_picker_preview">Предпросмотр</string>
+    <string name="viewer_rotation_gesture_summary">Поворачивайте изображение двумя пальцами в просмотре; после отпускания оно выравнивается по ближайшим 90 градусам</string>
+    <string name="viewer_rotation_gesture_title">Поворот двумя пальцами</string>
+    <string name="viewer_rotation_hint">Повернуто на %1$d° только для просмотра. Сохранение поворота появится в следующей версии.</string>
     <string name="viewer_thumbnail_description">Страница %1$d из %2$d</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

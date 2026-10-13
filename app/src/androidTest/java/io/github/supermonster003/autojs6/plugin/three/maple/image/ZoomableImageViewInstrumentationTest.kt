@@ -18,6 +18,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.cos
+import kotlin.math.sin
 
 @RunWith(AndroidJUnit4::class)
 class ZoomableImageViewInstrumentationTest {
@@ -326,6 +328,58 @@ class ZoomableImageViewInstrumentationTest {
         }
     }
 
+    /** ROADMAP 6.3 / D8: a two-finger twist follows the fingers, snaps to the nearest quarter turn and keeps the zoom. */
+    @Test
+    fun twoFingerRotationSnapsToTheNearestQuarterTurnAndKeepsTheZoom() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val context = instrumentation.targetContext
+        val bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888)
+        val rotations = mutableListOf<Int>()
+        lateinit var view: ZoomableImageView
+        try {
+            instrumentation.runOnMainSync {
+                view = ZoomableImageView(context).apply {
+                    setImageDrawable(BitmapDrawable(resources, bitmap))
+                    layout(0, 0, VIEW_SIZE, VIEW_SIZE)
+                    resetZoom()
+                    onRotationChanged = rotations::add
+                }
+                assertTrue(view.toggleDoubleTapZoom(VIEW_SIZE / 2f, VIEW_SIZE / 2f))
+                dispatchTwoFingerTwist(view, degrees = 80f)
+            }
+            awaitRotation(view, expectedDegrees = 90)
+            instrumentation.runOnMainSync {
+                assertEquals(ImageZoomState.DOUBLE_TAP_ZOOM, view.currentZoomForTesting, ROTATION_ZOOM_TOLERANCE)
+                assertEquals(listOf(1), rotations)
+
+                // A small twist snaps back without changing the orientation or reporting anything.
+                dispatchTwoFingerTwist(view, degrees = 20f)
+            }
+            awaitRotation(view, expectedDegrees = 90)
+            instrumentation.runOnMainSync {
+                assertEquals(listOf(1), rotations)
+                assertEquals(ImageZoomState.DOUBLE_TAP_ZOOM, view.currentZoomForTesting, ROTATION_ZOOM_TOLERANCE)
+
+                // Counter-clockwise past 45 degrees goes back one quarter turn; disabled, the twist is ignored.
+                dispatchTwoFingerTwist(view, degrees = -70f)
+            }
+            awaitRotation(view, expectedDegrees = 0)
+            instrumentation.runOnMainSync {
+                assertEquals(listOf(1, 0), rotations)
+                view.rotationGestureEnabled = false
+                dispatchTwoFingerTwist(view, degrees = 80f)
+            }
+            SystemClock.sleep(ROTATION_SETTLE_MILLIS)
+            instrumentation.runOnMainSync {
+                assertEquals(0, view.currentRotationDegreesForTesting)
+                assertEquals(listOf(1, 0), rotations)
+                assertFalse(view.undoRotation())
+            }
+        } finally {
+            bitmap.recycle()
+        }
+    }
+
     @Test
     fun restoredRotationBeforeLayoutSurvivesTheFirstFitCalculation() {
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
@@ -348,6 +402,66 @@ class ZoomableImageViewInstrumentationTest {
                 bitmap.recycle()
             }
         }
+    }
+
+    private fun awaitRotation(view: ZoomableImageView, expectedDegrees: Int) {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val deadline = SystemClock.uptimeMillis() + ROTATION_TIMEOUT_MILLIS
+        var observed = -1
+        while (SystemClock.uptimeMillis() < deadline) {
+            instrumentation.runOnMainSync { observed = view.currentRotationDegreesForTesting }
+            if (observed == expectedDegrees) {
+                SystemClock.sleep(ROTATION_SETTLE_MILLIS)
+                return
+            }
+            SystemClock.sleep(TAP_SETTLE_MILLIS)
+        }
+        assertEquals(expectedDegrees, observed)
+    }
+
+    /** Two fingers 100 px either side of the view center twisting by [degrees] (positive = clockwise on screen). */
+    private fun dispatchTwoFingerTwist(view: ZoomableImageView, degrees: Float) {
+        val center = VIEW_SIZE / 2f
+        val radius = 100f
+        fun fingers(angle: Float): Pair<FloatArray, FloatArray> {
+            val radians = Math.toRadians(angle.toDouble())
+            val dx = (radius * cos(radians)).toFloat()
+            val dy = (radius * sin(radians)).toFloat()
+            return floatArrayOf(center - dx, center + dx) to floatArrayOf(center - dy, center + dy)
+        }
+        val downTime = SystemClock.uptimeMillis()
+        val (startX, startY) = fingers(0f)
+        dispatchPointers(view, downTime, downTime, MotionEvent.ACTION_DOWN, floatArrayOf(startX[0]), floatArrayOf(startY[0]))
+        dispatchPointers(
+            view,
+            downTime,
+            downTime + PINCH_STEP_MILLIS,
+            MotionEvent.ACTION_POINTER_DOWN or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
+            startX,
+            startY,
+        )
+        val steps = 4
+        for (step in 1..steps) {
+            val (x, y) = fingers(degrees * step / steps)
+            dispatchPointers(view, downTime, downTime + PINCH_STEP_MILLIS * (1 + step), MotionEvent.ACTION_MOVE, x, y)
+        }
+        val (endX, endY) = fingers(degrees)
+        dispatchPointers(
+            view,
+            downTime,
+            downTime + PINCH_STEP_MILLIS * (2 + steps),
+            MotionEvent.ACTION_POINTER_UP or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
+            endX,
+            endY,
+        )
+        dispatchPointers(
+            view,
+            downTime,
+            downTime + PINCH_STEP_MILLIS * (3 + steps),
+            MotionEvent.ACTION_UP,
+            floatArrayOf(endX[0]),
+            floatArrayOf(endY[0]),
+        )
     }
 
     private fun dispatchDoubleTap(view: ZoomableImageView) {
@@ -550,5 +664,8 @@ class ZoomableImageViewInstrumentationTest {
         private const val DRAG_DURATION_MILLIS = 40L
         private const val PINCH_STEP_MILLIS = 40L
         private const val TAP_SETTLE_MILLIS = 50L
+        private const val ROTATION_SETTLE_MILLIS = 250L
+        private const val ROTATION_TIMEOUT_MILLIS = 5_000L
+        private const val ROTATION_ZOOM_TOLERANCE = 0.01f
     }
 }

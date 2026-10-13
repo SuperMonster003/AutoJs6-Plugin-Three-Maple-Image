@@ -17,4 +17,13 @@ internal object ImageRotationState {
         normalize(quarterTurns) * QUARTER_TURN_DEGREES
 
     fun swapsDimensions(quarterTurns: Int): Boolean = normalize(quarterTurns) % 2 != 0
+
+    /**
+     * Quarter turns a free rotation gesture snaps to (ROADMAP 6.3 / D8): the nearest multiple of 90 degrees, with
+     * exactly 45 degrees rounding clockwise; the result is a delta, not yet normalized.
+     */
+    fun snapQuarterTurns(degrees: Float): Int {
+        if (!degrees.isFinite()) return 0
+        return Math.round(degrees / QUARTER_TURN_DEGREES)
+    }
 }

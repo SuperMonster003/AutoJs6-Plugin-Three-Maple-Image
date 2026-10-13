@@ -37,11 +37,13 @@ internal class AppSettingsActivity : ConfiguredActivity() {
     private lateinit var hostResult: AutoJs6HostSettingsResult
     private var dialog by mutableStateOf<SettingsDialog?>(null)
     private var launcherIconSummary by mutableStateOf("")
+    private var viewerRotationGesture by mutableStateOf(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settingsStore = ApplicationSettingsStore(applicationContext)
         settings = settingsStore.load()
+        viewerRotationGesture = settings.viewerRotationGesture
         hostResult = AutoJs6HostSettingsClient.query(this)
         launcherIconSummary = getString(launcherIconLabels[LauncherIcons.current(this).ordinal])
         setContent {
@@ -58,6 +60,8 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     onDarkMode = { open(SettingsDialog.DarkMode) },
                     onThemeColor = { open(SettingsDialog.ThemeColor) },
                     onLauncherIcon = { open(SettingsDialog.LauncherIcon) },
+                    viewerRotationGesture = viewerRotationGesture,
+                    onViewerRotationGesture = ::updateViewerRotationGesture,
                     onStoragePermission = { startActivity(StoragePermissionActivity.intent(this)) },
                     onReleaseHistory = { startActivity(Intent(this, ReleaseHistoryActivity::class.java)) },
                     onAbout = { startActivity(Intent(this, AboutActivity::class.java)) },
@@ -65,6 +69,12 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                 Dialogs()
             }
         }
+    }
+
+    private fun updateViewerRotationGesture(enabled: Boolean) {
+        viewerRotationGesture = enabled
+        settings = settings.copy(viewerRotationGesture = enabled)
+        settingsStore.saveViewerRotationGesture(enabled)
     }
 
     private fun open(target: SettingsDialog) {

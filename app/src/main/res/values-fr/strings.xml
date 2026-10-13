@@ -2,6 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">Retour</string>
     <string name="action_convert_image">Convertir l\'image</string>
+    <string name="action_dismiss_hint">Ignorer</string>
     <string name="action_edit_image">Modifier l\'image</string>
     <string name="action_hide_image_details">Masquer les détails</string>
     <string name="action_more">Plus</string>
@@ -174,6 +175,7 @@
     <string name="standalone_settings_section_appearance">Apparence</string>
     <string name="standalone_settings_section_information">Informations</string>
     <string name="standalone_settings_section_storage">Stockage</string>
+    <string name="standalone_settings_section_viewer">Visionneuse</string>
     <string name="standalone_settings_theme_color">Couleur du thème</string>
     <string name="standalone_settings_title">Paramètres</string>
     <string name="standalone_update_release_history_summary">Consulter l\'historique des versions inclus dans l\'application</string>
@@ -248,6 +250,9 @@
     <string name="theme_picker_invalid">Saisissez #RRGGBB, RRGGBB ou rgb(r, g, b). Les valeurs RGB doivent être comprises entre 0 et 255.</string>
     <string name="theme_picker_presets">Couleurs prédéfinies</string>
     <string name="theme_picker_preview">Aperçu</string>
+    <string name="viewer_rotation_gesture_summary">Faites pivoter l\'image à deux doigts dans la visionneuse; elle s\'aligne sur le quart de tour le plus proche</string>
+    <string name="viewer_rotation_gesture_title">Rotation à deux doigts</string>
+    <string name="viewer_rotation_hint">Pivotée de %1$d° pour l\'affichage seulement. L\'enregistrement de la rotation arrivera dans une version ultérieure.</string>
     <string name="viewer_thumbnail_description">Page %1$d sur %2$d</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

@@ -78,6 +78,8 @@ class ImageViewerActivity : ConfiguredActivity() {
     private var restoredExpandedDetailsIndex = -1
     private var uiState by mutableStateOf(ViewerUiState())
     private var editBusy = false
+    private var rotationGestureEnabled = true
+    private var rotationHintDismissed = false
     private val editHandoff = StandaloneEditHandoff(
         activity = this,
         onBusy = { busy -> editBusy = busy },
@@ -113,6 +115,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             ),
         )
         readRestoredState(savedInstanceState)
+        rotationGestureEnabled = ApplicationSettingsStore(this).load().viewerRotationGesture
         val callbacks = ViewerCallbacks(
             onBack = ::finish,
             onToggleDetails = { setExifDetailsExpanded(!uiState.detailsExpanded) },
@@ -121,12 +124,14 @@ class ImageViewerActivity : ConfiguredActivity() {
             onEdit = ::editImage,
             onShare = ::shareImage,
             onOpenWith = ::openWithAnotherApp,
-            onResetZoom = { hideZoomIndicator(); currentHost()?.view?.resetZoom() },
+            onResetZoom = { hideZoomIndicator(); currentHost()?.view?.resetZoom(); syncRotationHint() },
             onPrint = ::printImage,
             onReleaseHistory = ::showReleaseHistory,
             onToggleAnimation = { currentHost()?.animation?.toggle() },
             onPageChanged = ::onPagerPageChanged,
             onSelectPage = ::jumpToPage,
+            onUndoRotation = { currentHost()?.view?.undoRotation() },
+            onDismissRotationHint = ::dismissRotationHint,
         )
         uiState = uiState.copy(
             title = launchRequest.startPage.image.displayName,
@@ -177,6 +182,15 @@ class ImageViewerActivity : ConfiguredActivity() {
             thumbnailDescription = { index -> getString(R.string.viewer_thumbnail_description, index + 1, count) },
         )
         onPageChanged(initial)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val enabled = ApplicationSettingsStore(this).load().viewerRotationGesture
+        if (enabled != rotationGestureEnabled) {
+            rotationGestureEnabled = enabled
+            hosts.values.forEach { host -> host.view.rotationGestureEnabled = enabled }
+        }
     }
 
     override fun onStart() {
@@ -264,7 +278,11 @@ class ImageViewerActivity : ConfiguredActivity() {
     internal fun resetZoomForTesting() {
         hideZoomIndicator()
         currentHost()?.view?.resetZoom()
+        syncRotationHint()
     }
+
+    @VisibleForTesting
+    internal fun currentRotationGestureEnabledForTesting(): Boolean? = currentHost()?.view?.rotationGestureEnabled
 
     @VisibleForTesting
     internal fun toggleAnimationForTesting() {
@@ -295,12 +313,19 @@ class ImageViewerActivity : ConfiguredActivity() {
                 if (uiState.detailsExpanded) setExifDetailsExpanded(false) else setControlsVisible(!uiState.controlsVisible)
             }
             onPageSwipe = ::flipPage
+            rotationGestureEnabled = this@ImageViewerActivity.rotationGestureEnabled
         }
         val host = ViewerPageHost(index, page, view) { playback ->
             if (index == currentIndex) uiState = uiState.copy(animation = playback)
         }
         view.onZoomInteraction = { zoom, gestureInProgress ->
             if (index == currentIndex) showZoomIndicator(zoom, gestureInProgress)
+        }
+        view.onRotationChanged = { _ ->
+            if (index == currentIndex) {
+                rotationHintDismissed = false
+                syncRotationHint()
+            }
         }
         startLoad(host)
         return host
@@ -325,6 +350,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         currentIndex = index
         previous?.let(::parkPage)
         hideZoomIndicator()
+        rotationHintDismissed = false
         val host = acquirePage(index)
         when {
             host.tiledDeferred -> startLoad(host)
@@ -429,7 +455,24 @@ class ImageViewerActivity : ConfiguredActivity() {
             canForward = canForward,
             canEdit = canForward && source.editable,
             animation = host?.animation?.playback ?: ImageAnimationPlayback.UNAVAILABLE,
+            rotationHint = rotationHintText(host),
         )
+    }
+
+    /** The current page's user rotation, as the hint bar text; null when unrotated or dismissed (ROADMAP D8). */
+    private fun rotationHintText(host: ViewerPageHost?): String? {
+        val turns = host?.view?.currentRotationQuarterTurns ?: ImageRotationState.ORIGINAL_QUARTER_TURNS
+        if (turns == ImageRotationState.ORIGINAL_QUARTER_TURNS || rotationHintDismissed) return null
+        return getString(R.string.viewer_rotation_hint, ImageRotationState.degrees(turns))
+    }
+
+    private fun syncRotationHint() {
+        uiState = uiState.copy(rotationHint = rotationHintText(currentHost()))
+    }
+
+    private fun dismissRotationHint() {
+        rotationHintDismissed = true
+        syncRotationHint()
     }
 
     private fun syncIfCurrent(host: ViewerPageHost) {
@@ -591,6 +634,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         host.view.post {
             if (isLive(host, generation)) {
                 host.view.restoreRotationQuarterTurns(consumeRestoredRotation(host.index))
+                syncIfCurrent(host)
             }
         }
     }

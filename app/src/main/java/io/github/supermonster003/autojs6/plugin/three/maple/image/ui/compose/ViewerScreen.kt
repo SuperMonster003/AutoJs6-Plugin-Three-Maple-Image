@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -31,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -74,6 +76,8 @@ internal data class ViewerUiState(
     val canEdit: Boolean = false,
     val animation: ImageAnimationPlayback = ImageAnimationPlayback.UNAVAILABLE,
     val zoomIndicatorText: String? = null,
+    /** "Rotated for viewing only" bar above the strip while the current page carries a user rotation. */
+    val rotationHint: String? = null,
 )
 
 internal class ViewerCallbacks(
@@ -92,6 +96,8 @@ internal class ViewerCallbacks(
     val onPageChanged: (Int) -> Unit,
     /** A thumbnail was tapped. */
     val onSelectPage: (Int) -> Unit,
+    val onUndoRotation: () -> Unit,
+    val onDismissRotationHint: () -> Unit,
 )
 
 /** What one pager page renders: the zoomable View plus its own loading and error state. */
@@ -181,6 +187,40 @@ internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks
             }
             AnimatedVisibility(visible = state.controlsVisible, enter = fadeIn(), exit = fadeOut()) {
                 Column(modifier = Modifier.fillMaxWidth()) {
+                    val rotationHint = state.rotationHint
+                    if (rotationHint != null) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(canvas.scrim)
+                                .padding(start = 16.dp, end = 4.dp)
+                                .testTag("maple.viewer.rotationHint"),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = rotationHint,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = canvas.onScrim,
+                                modifier = Modifier.weight(1f).padding(vertical = 8.dp),
+                            )
+                            TextButton(
+                                onClick = callbacks.onUndoRotation,
+                                modifier = Modifier.testTag("maple.viewer.rotationHint.undo"),
+                            ) {
+                                Text(stringResource(R.string.text_undo), color = canvas.accentOnScrim)
+                            }
+                            IconButton(
+                                onClick = callbacks.onDismissRotationHint,
+                                modifier = Modifier.testTag("maple.viewer.rotationHint.dismiss"),
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_close_24),
+                                    contentDescription = stringResource(R.string.action_dismiss_hint),
+                                    tint = canvas.onScrim,
+                                )
+                            }
+                        }
+                    }
                     if (pager != null && pager.pageCount > 1) {
                         MapleThumbnailStrip(
                             count = pager.pageCount,

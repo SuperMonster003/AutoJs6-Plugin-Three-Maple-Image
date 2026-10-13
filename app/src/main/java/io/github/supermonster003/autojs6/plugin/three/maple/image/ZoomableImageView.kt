@@ -1,5 +1,8 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Matrix
@@ -14,6 +17,7 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageZoomState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageZoomState.MIN_ZOOM
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageZoomState.ZOOM_EPSILON
 import kotlin.math.abs
+import kotlin.math.atan2
 
 /**
  * An image surface with focal-point pinch zoom, double-tap zoom, panning and page swipes at 1x.
@@ -31,6 +35,12 @@ class ZoomableImageView @JvmOverloads constructor(
 
     var onPageSwipe: ((direction: Int) -> Unit)? = null
     var onZoomInteraction: ((zoom: Float, gestureInProgress: Boolean) -> Unit)? = null
+
+    /** Fires after a rotation the user requested (button, two-finger gesture, undo) settled on a quarter turn. */
+    var onRotationChanged: ((quarterTurns: Int) -> Unit)? = null
+
+    /** Two-finger rotation (ROADMAP D8); when off, two fingers only pinch. */
+    var rotationGestureEnabled: Boolean = true
 
     private val baseMatrix = Matrix()
     private val displayMatrix = Matrix()
@@ -53,6 +63,10 @@ class ZoomableImageView @JvmOverloads constructor(
     private var lastScaleFocusY = 0f
     private var gestureHadMultiplePointers = false
     private var edgeOverflowX = 0f
+    private var rotationGestureActive = false
+    private var lastGestureAngle = 0f
+    private var gestureRotationDegrees = 0f
+    private var snapAnimator: ValueAnimator? = null
 
     private val scaleDetector = ScaleGestureDetector(
         context,
@@ -174,6 +188,7 @@ class ZoomableImageView @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+            snapAnimator?.end()
             gestureHadMultiplePointers = false
             activePointerId = event.getPointerId(0)
             lastTouchX = event.x
@@ -191,6 +206,7 @@ class ZoomableImageView @JvmOverloads constructor(
 
         scaleDetector.onTouchEvent(event)
         gestureDetector.onTouchEvent(event)
+        handleRotationGesture(event)
 
         when (event.actionMasked) {
             MotionEvent.ACTION_MOVE -> {
@@ -250,6 +266,25 @@ class ZoomableImageView @JvmOverloads constructor(
     }
 
     fun rotateClockwise90(): Boolean {
+        if (!rotateByQuarterTurns(1)) return false
+        onRotationChanged?.invoke(rotationQuarterTurns)
+        return true
+    }
+
+    /** Returns the user rotation to the original orientation without touching the magnification. */
+    fun undoRotation(): Boolean {
+        val turns = -rotationQuarterTurns
+        if (turns == 0 || !rotateByQuarterTurns(turns)) return false
+        onRotationChanged?.invoke(rotationQuarterTurns)
+        return true
+    }
+
+    /**
+     * Rotates by [turns] quarter turns around the viewport center, keeping the magnification and the source point
+     * under the center; the display matrix is rebuilt from the fit for the new orientation, so a free rotation
+     * applied by the gesture is absorbed exactly.
+     */
+    internal fun rotateByQuarterTurns(turns: Int): Boolean {
         ensureBaseMatrix()
         val currentDrawable = drawable?.takeIf { it === configuredDrawable } ?: return false
         val previousZoom = zoom
@@ -260,7 +295,7 @@ class ZoomableImageView @JvmOverloads constructor(
         if (hasSourceAnchor) inverse.mapPoints(sourceAnchor)
 
         val previousRotationQuarterTurns = rotationQuarterTurns
-        rotationQuarterTurns = ImageRotationState.clockwise(rotationQuarterTurns)
+        rotationQuarterTurns = ImageRotationState.normalize(rotationQuarterTurns + turns)
         if (!configureBaseMatrix(currentDrawable)) {
             rotationQuarterTurns = previousRotationQuarterTurns
             return false
@@ -347,6 +382,102 @@ class ZoomableImageView @JvmOverloads constructor(
 
     private val isZoomedIn: Boolean
         get() = zoom > MIN_ZOOM + ZOOM_EPSILON
+
+    // region Two-finger rotation (ROADMAP D8)
+
+    private fun handleRotationGesture(event: MotionEvent) {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                if (event.pointerCount == 2 && rotationGestureEnabled && drawable != null) {
+                    ensureBaseMatrix()
+                    rotationGestureActive = drawable === configuredDrawable
+                    lastGestureAngle = pointerAngle(event)
+                    gestureRotationDegrees = 0f
+                }
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+                if (rotationGestureActive && event.pointerCount >= 2) {
+                    val angle = pointerAngle(event)
+                    val delta = normalizeDegrees(angle - lastGestureAngle)
+                    lastGestureAngle = angle
+                    if (delta != 0f) {
+                        gestureRotationDegrees += delta
+                        displayMatrix.postRotate(
+                            delta,
+                            (event.getX(0) + event.getX(1)) / 2f,
+                            (event.getY(0) + event.getY(1)) / 2f,
+                        )
+                        constrainDisplayMatrix()
+                    }
+                }
+            }
+
+            MotionEvent.ACTION_POINTER_UP -> {
+                if (rotationGestureActive && event.pointerCount - 1 < 2) finishRotationGesture()
+            }
+
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_CANCEL,
+            -> if (rotationGestureActive) finishRotationGesture()
+        }
+    }
+
+    /** Snaps the free rotation to the nearest quarter turn with a short animation, then merges it into [rotationQuarterTurns]. */
+    private fun finishRotationGesture() {
+        rotationGestureActive = false
+        val total = gestureRotationDegrees
+        gestureRotationDegrees = 0f
+        val turns = ImageRotationState.snapQuarterTurns(total)
+        val remaining = turns * ImageRotationState.QUARTER_TURN_DEGREES - total
+        if (abs(remaining) < SNAP_EPSILON_DEGREES) {
+            commitGestureRotation(turns)
+            return
+        }
+        val centerX = contentCenterX
+        val centerY = contentCenterY
+        var applied = 0f
+        snapAnimator?.end()
+        snapAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = SNAP_DURATION_MILLIS
+            addUpdateListener { animator ->
+                val target = remaining * (animator.animatedValue as Float)
+                val step = target - applied
+                applied = target
+                if (step != 0f) {
+                    displayMatrix.postRotate(step, centerX, centerY)
+                    constrainDisplayMatrix()
+                }
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    if (snapAnimator === animation) snapAnimator = null
+                    commitGestureRotation(turns)
+                }
+            })
+            start()
+        }
+    }
+
+    private fun commitGestureRotation(turns: Int) {
+        if (!rotateByQuarterTurns(turns)) {
+            constrainDisplayMatrix()
+            return
+        }
+        if (turns != 0) onRotationChanged?.invoke(rotationQuarterTurns)
+    }
+
+    private fun pointerAngle(event: MotionEvent): Float =
+        Math.toDegrees(atan2((event.getY(1) - event.getY(0)).toDouble(), (event.getX(1) - event.getX(0)).toDouble())).toFloat()
+
+    private fun normalizeDegrees(degrees: Float): Float {
+        var value = degrees
+        while (value > 180f) value -= 360f
+        while (value < -180f) value += 360f
+        return value
+    }
+
+    // endregion
 
     /**
      * While zoomed in, horizontal drag that the pan constraint swallows at an image edge accumulates here; a drag
@@ -492,5 +623,7 @@ class ZoomableImageView @JvmOverloads constructor(
         private const val SWIPE_DISTANCE_DP = 72f
         private const val SWIPE_VELOCITY_DP = 160f
         private const val EDGE_EPSILON = 0.5f
+        private const val SNAP_DURATION_MILLIS = 160L
+        private const val SNAP_EPSILON_DEGREES = 0.5f
     }
 }

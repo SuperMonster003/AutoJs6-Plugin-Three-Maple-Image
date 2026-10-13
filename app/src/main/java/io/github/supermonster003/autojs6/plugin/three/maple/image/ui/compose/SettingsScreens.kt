@@ -47,6 +47,8 @@ internal fun SettingsScreen(
     onDarkMode: () -> Unit,
     onThemeColor: () -> Unit,
     onLauncherIcon: () -> Unit,
+    viewerRotationGesture: Boolean,
+    onViewerRotationGesture: (Boolean) -> Unit,
     onStoragePermission: () -> Unit,
     onReleaseHistory: () -> Unit,
     onAbout: () -> Unit,
@@ -81,6 +83,15 @@ internal fun SettingsScreen(
                 iconResource = R.drawable.ic_apps_24,
                 onClick = onLauncherIcon,
                 modifier = Modifier.testTag("maple.settings.launcherIcon"),
+            )
+            MapleSectionHeader(stringResource(R.string.standalone_settings_section_viewer))
+            MapleSwitchRow(
+                title = stringResource(R.string.viewer_rotation_gesture_title),
+                summary = stringResource(R.string.viewer_rotation_gesture_summary),
+                iconResource = R.drawable.ic_rotate_right_24,
+                checked = viewerRotationGesture,
+                onToggle = onViewerRotationGesture,
+                modifier = Modifier.testTag("maple.settings.viewerRotation"),
             )
             MapleSectionHeader(stringResource(R.string.standalone_settings_section_storage))
             MapleSettingsRow(

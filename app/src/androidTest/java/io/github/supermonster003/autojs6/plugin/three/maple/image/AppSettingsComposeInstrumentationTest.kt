@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.After
@@ -31,10 +32,10 @@ class AppSettingsComposeInstrumentationTest {
     @Test fun showsEveryAppearanceAndInformationRow() {
         for (resource in listOf(
             R.string.standalone_settings_language, R.string.standalone_settings_dark_mode,
-            R.string.standalone_settings_theme_color, R.string.launcher_icon_title,
+            R.string.standalone_settings_theme_color, R.string.launcher_icon_title, R.string.viewer_rotation_gesture_title,
             R.string.standalone_release_history_title, R.string.standalone_about_title,
         )) {
-            compose.onNodeWithText(context.getString(resource)).assertIsDisplayed()
+            compose.onNodeWithText(context.getString(resource)).performScrollTo().assertIsDisplayed()
         }
     }
 

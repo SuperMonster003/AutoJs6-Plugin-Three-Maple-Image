@@ -28,6 +28,23 @@ class ImageRotationStateTest {
     }
 
     @Test
+    fun freeRotationSnapsToTheNearestQuarterTurn() {
+        assertEquals(0, ImageRotationState.snapQuarterTurns(0f))
+        assertEquals(0, ImageRotationState.snapQuarterTurns(44.9f))
+        assertEquals(1, ImageRotationState.snapQuarterTurns(45f))
+        assertEquals(1, ImageRotationState.snapQuarterTurns(80f))
+        assertEquals(1, ImageRotationState.snapQuarterTurns(134.9f))
+        assertEquals(2, ImageRotationState.snapQuarterTurns(180f))
+        assertEquals(3, ImageRotationState.snapQuarterTurns(269f))
+        assertEquals(4, ImageRotationState.snapQuarterTurns(359f))
+        assertEquals(-1, ImageRotationState.snapQuarterTurns(-80f))
+        assertEquals(0, ImageRotationState.snapQuarterTurns(-44f))
+        assertEquals(-2, ImageRotationState.snapQuarterTurns(-200f))
+        assertEquals(0, ImageRotationState.snapQuarterTurns(Float.NaN))
+        assertEquals(3, ImageRotationState.normalize(ImageRotationState.ORIGINAL_QUARTER_TURNS + ImageRotationState.snapQuarterTurns(-80f)))
+    }
+
+    @Test
     fun onlyOddQuarterTurnsSwapDimensions() {
         assertFalse(ImageRotationState.swapsDimensions(0))
         assertTrue(ImageRotationState.swapsDimensions(1))
