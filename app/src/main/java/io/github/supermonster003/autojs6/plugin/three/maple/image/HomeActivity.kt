@@ -3,6 +3,7 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.compose.ReportDrawnWhen
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -89,6 +90,9 @@ class HomeActivity : ConfiguredActivity() {
                 val grid by gallery.grid.collectAsState()
                 NavHost(navController = controller, startDestination = ROUTE_ALBUMS) {
                     composable(ROUTE_ALBUMS) {
+                        // Reports "Fully drawn" once the album list (or the no-permission state) is on screen: the
+                        // startup metric of the large library check (ROADMAP 6.5).
+                        ReportDrawnWhen { !albums.loading }
                         AlbumGridScreen(state = albums, home = actions.uiState, callbacks = callbacks)
                         actions.Dialogs()
                     }
