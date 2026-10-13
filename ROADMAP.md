@@ -84,7 +84,7 @@
 | 里程碑 | 版本 | 主题 | 状态 |
 | --- | --- | --- | --- |
 | M1 | v2.1.0 | Compose 焕新: 四类页面迁移, 视觉系统, 功能集不变 | 已发布 v2.1.0 (2026-10-13, 基线 `dcd0e91`) |
-| M2 | v3.0.0 | 相册: 权限策略, MediaStore 数据层, 相册/媒体网格, 查看器分页与缩略图条, 无权限模式, 宿主 "以相册浏览" | 已发布 v3.0.0 (2026-10-13; 宿主 P6 两处文档 / 测试改动待提交) |
+| M2 | v3.0.0 | 相册: 权限策略, MediaStore 数据层, 相册/媒体网格, 查看器分页与缩略图条, 无权限模式, 宿主 "以相册浏览" | 已发布 v3.0.0 (2026-10-13) |
 | M3 | v3.1.0 + v3.1.1 | 管理操作: 3.1.0 = 多选, 删除与回收站, 重命名/移动/复制, 收藏; 3.1.1 = 排除/置顶/隐藏, 搜索, 排序与分组, 批量输出, 宿主 v24 入口删除 | 进行中 (2026-10-13 起) |
 | M4 | v3.2.0 | 编辑与输出: 编辑器重做与五项扩展, 覆盖保存与撤销, 手势旋转保存, 转换器重做, 协议升级 | 未开始 |
 | M5 | v3.3.0 | 查看器与设置全集: 幻灯片, 壁纸/分享副本, GPS 与地图, 手势与显示选项, 扩展详情, 平板/横屏, 无障碍与性能 | 未开始 |
@@ -190,7 +190,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 6.6 发布
 
-- [x] (发布) 按 P1-P6 发布 v3.0.0; changelog `hint` 说明独立启动会申请一次媒体权限及拒绝后的可用范围, `feature` 覆盖相册网格, 分页与缩略图条, 旋转手势, 已授权文件夹, 存储权限设置页, 宿主 "以相册浏览"; README 新增相册与权限 FAQ; 截图重采 (首页网格, 媒体网格, 查看器缩略图条, 无权限状态). 进度 (2026-10-13, 维护者决定先准备, 大库真机达标后再改 `VERSION_NAME`): P2 README 10 种语言新增相册首页, 分页查看器与缩略图条, 按需权限, 以相册浏览四条亮点与三条相册 / 权限 FAQ, 修正两条答非所问的 FAQ 与使用步骤中的旧名, 补两条安全要点 (提交 `bb08354`); 截图重采 4 张 (`gallery-albums.png`, `gallery-media-grid.png`, `viewer-thumbnail-strip.png`, `gallery-no-permission.png`, Android 13 模拟器 1080 x 2340, 合成素材, 采集说明与 SHA-256 在 `docs/images/screenshots/README.md`); P1 changelog 10 种语言草稿 (hint / feature / dependency) 在 `docs/release/v3.0.0.md`, 改版本号时并入 `.changelog`. 补充 (2026-10-13): 大库真机达标后 P1 完成 (`VERSION_NAME=3.0.0`, changelog 并入 10 种语言, 提交 `2e71913`); P3: R9 门禁 (`prepush_check.py --lint` 6 / 6, 图标检查, Python 测试) 通过, 冒烟 5 台真机通过 (附录 E, XQ-AT72 因维护者占用未做). 待办: P4 / P5 (维护者), P6 宿主两处改动提交. 发布 (2026-10-13): 推送 master 后 GitHub CI 前两轮因 CI 模拟器较慢与系统 ANR 对话框失败 (测试等待上限与权限对话框判定已加固, 提交 `8d31ffc`, `75cf982`), `75cf982` 全绿; 以 `75cf982` 构建 `autojs6-plugin-three-maple-image-v3.0.0-7507237a.apk` (versionCode 107, 3,600,395 B, SHA-256 `6c4670898b7f3e45d5427e7f5dd23791f9b2424a3226e9deeab4b287aab0ccf0`), OPD2413 复测冒烟通过, 轻量 tag `v3.0.0`, GitHub Release (Latest) https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/releases/tag/v3.0.0 (APK + SHA256SUMS, 下载复核通过), 官方索引清单 `107.json` 与生成的 `plugins.official.generated.json` (索引仓库提交 `416729d`, 已推送). 待办: P6 宿主两处改动提交.
+- [x] (发布) 按 P1-P6 发布 v3.0.0; changelog `hint` 说明独立启动会申请一次媒体权限及拒绝后的可用范围, `feature` 覆盖相册网格, 分页与缩略图条, 旋转手势, 已授权文件夹, 存储权限设置页, 宿主 "以相册浏览"; README 新增相册与权限 FAQ; 截图重采 (首页网格, 媒体网格, 查看器缩略图条, 无权限状态). 进度 (2026-10-13, 维护者决定先准备, 大库真机达标后再改 `VERSION_NAME`): P2 README 10 种语言新增相册首页, 分页查看器与缩略图条, 按需权限, 以相册浏览四条亮点与三条相册 / 权限 FAQ, 修正两条答非所问的 FAQ 与使用步骤中的旧名, 补两条安全要点 (提交 `bb08354`); 截图重采 4 张 (`gallery-albums.png`, `gallery-media-grid.png`, `viewer-thumbnail-strip.png`, `gallery-no-permission.png`, Android 13 模拟器 1080 x 2340, 合成素材, 采集说明与 SHA-256 在 `docs/images/screenshots/README.md`); P1 changelog 10 种语言草稿 (hint / feature / dependency) 在 `docs/release/v3.0.0.md`, 改版本号时并入 `.changelog`. 补充 (2026-10-13): 大库真机达标后 P1 完成 (`VERSION_NAME=3.0.0`, changelog 并入 10 种语言, 提交 `2e71913`); P3: R9 门禁 (`prepush_check.py --lint` 6 / 6, 图标检查, Python 测试) 通过, 冒烟 5 台真机通过 (附录 E, XQ-AT72 因维护者占用未做). 待办: P4 / P5 (维护者), P6 宿主两处改动提交. 发布 (2026-10-13): 推送 master 后 GitHub CI 前两轮因 CI 模拟器较慢与系统 ANR 对话框失败 (测试等待上限与权限对话框判定已加固, 提交 `8d31ffc`, `75cf982`), `75cf982` 全绿; 以 `75cf982` 构建 `autojs6-plugin-three-maple-image-v3.0.0-7507237a.apk` (versionCode 107, 3,600,395 B, SHA-256 `6c4670898b7f3e45d5427e7f5dd23791f9b2424a3226e9deeab4b287aab0ccf0`), OPD2413 复测冒烟通过, 轻量 tag `v3.0.0`, GitHub Release (Latest) https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/releases/tag/v3.0.0 (APK + SHA256SUMS, 下载复核通过), 官方索引清单 `107.json` 与生成的 `plugins.official.generated.json` (索引仓库提交 `416729d`, 已推送). P6 (2026-10-13): 宿主两处改动已由维护者提交 (宿主 `a5c93567b5` 测试, `a024ba3e19` 文档), 无行为变化, 最低宿主版本不变.
 
 验收条件: 独立首页为相册网格且在完整 / 部分 / 无权限三种状态下都可用; 宿主入口与外部入口不触发权限申请; 查看器五种来源分页与缩略图条一致; 5 万张库滚动流畅; 协议仍为 v12.
 
@@ -210,6 +210,9 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 - 移动 / 复制的 "新建相册" 建在 `Pictures/<名称>`.
 - "收藏" 虚拟相册有内容时显示为相册网格的第一项; "回收站" 从首页右上角更多菜单进入.
 - 长按进入多选随 7.1 交付 (3.0.0 长按无动作).
+- 查看器 (相册来源): 顶栏右侧新增心形 "收藏"; 底栏改为 详情 / 旋转 / 编辑 / 分享 / 删除, "其他应用" 移入右上角菜单, 重命名 / 移动 / 复制也在该菜单.
+- 已授权文件夹 (SAF) 中的图片支持删除 (经 `DocumentsContract` 直接删除, 不进回收站, 二次确认) 与重命名; 移动 / 复制 / 收藏仅用于媒体库相册.
+- 权限申请记录保留 SharedPreferences (偏离 T8): 首页冷启动时同步读取, 放进 Room 会在主线程打开数据库; Room 只承载收藏, 排除 / 置顶目录与自建回收站索引.
 
 ### 7.1 多选与通用操作
 
