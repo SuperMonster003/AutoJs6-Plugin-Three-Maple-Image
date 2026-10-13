@@ -46,6 +46,7 @@ internal fun MediaGridScreen(
     onOpen: (MediaItem) -> Unit,
     onLoadMore: () -> Unit,
     onSort: (MediaSort) -> Unit,
+    onRevealed: () -> Unit,
 ) {
     var sortOpen by remember { mutableStateOf(false) }
     val album = state.album
@@ -94,6 +95,15 @@ internal fun MediaGridScreen(
                         .distinctUntilChanged()
                         .filter { last -> !state.endReached && last >= state.items.size - LOAD_MORE_THRESHOLD }
                         .collect { onLoadMore() }
+                }
+                LaunchedEffect(state.reveal, state.items.size) {
+                    val target = state.reveal ?: return@LaunchedEffect
+                    val index = state.items.indexOfFirst { it.id == target }
+                    if (index < 0) return@LaunchedEffect
+                    val visible = gridState.layoutInfo.visibleItemsInfo
+                    val shown = visible.isNotEmpty() && index >= visible.first().index && index <= visible.last().index
+                    if (!shown) gridState.scrollToItem(index)
+                    onRevealed()
                 }
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(MapleGridDefaults.MEDIA_COLUMNS),

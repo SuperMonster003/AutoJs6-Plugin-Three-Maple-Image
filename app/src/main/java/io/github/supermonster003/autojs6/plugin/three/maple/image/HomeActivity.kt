@@ -41,9 +41,19 @@ class HomeActivity : ConfiguredActivity() {
         }
     }
 
+    /** The viewer reports the item it was left on; the grid scrolls there (ROADMAP 6.3 position sync). */
+    private val openViewer = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val data = result.data ?: return@registerForActivityResult
+        if (data.hasExtra(ImageViewerContract.EXTRA_RESULT_ITEM_ID)) {
+            gallery.reveal(data.getLongExtra(ImageViewerContract.EXTRA_RESULT_ITEM_ID, 0L))
+        }
+    }
+
     /** Current photo access as the gallery sees it; refreshed on resume and after the system dialog. */
     internal var photoAccess: MediaPermissionResolution? = null
         private set
+
+    internal val galleryForTesting: GalleryViewModel get() = gallery
 
     /** How many times this instance launched the system permission dialog (test hook). */
     internal var permissionRequestsForTesting: Int = 0
@@ -96,6 +106,7 @@ class HomeActivity : ConfiguredActivity() {
                             onOpen = ::openImage,
                             onLoadMore = gallery::loadMore,
                             onSort = gallery::setGridSort,
+                            onRevealed = gallery::clearReveal,
                         )
                     }
                 }
@@ -162,7 +173,7 @@ class HomeActivity : ConfiguredActivity() {
         } else {
             ImageViewerLaunchRequest.gallery(start, spec)
         }
-        runCatching { startActivity(ImageViewerContract.viewerIntent(this, request)) }
+        runCatching { openViewer.launch(ImageViewerContract.viewerIntent(this, request)) }
             .onFailure { showMessage(R.string.standalone_home_open_failed) }
     }
 

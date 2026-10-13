@@ -43,6 +43,8 @@ internal data class MediaGridUiState(
     val endReached: Boolean = false,
     val sort: MediaSort = MediaSort.DEFAULT,
     val limit: DocumentTreeLimit = DocumentTreeLimit.NONE,
+    /** Item the grid should scroll to (set when the viewer returns); cleared through [GalleryViewModel.clearReveal]. */
+    val reveal: Long? = null,
 )
 
 /**
@@ -59,6 +61,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     private var access: MediaPermissionResolution? = null
     private var gridJob: Job? = null
     private var reloadJob: Job? = null
+    private var revealJob: Job? = null
 
     val albums: StateFlow<GalleryUiState> = _albums.asStateFlow()
     val grid: StateFlow<MediaGridUiState> = _grid.asStateFlow()
@@ -160,9 +163,34 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         loadPage(reset = false)
     }
 
-    private fun loadPage(reset: Boolean) {
-        val album = _grid.value.album ?: return
-        gridJob = viewModelScope.launch {
+    /**
+     * Brings [itemId] into the loaded grid, loading further pages if the viewer went past them, then asks the grid
+     * to scroll there (ROADMAP 6.3 position sync); the grid acknowledges with [clearReveal].
+     */
+    fun reveal(itemId: Long) {
+        revealJob?.cancel()
+        revealJob = viewModelScope.launch {
+            repeat(MAX_REVEAL_PAGES) {
+                gridJob?.join()
+                val state = _grid.value
+                if (state.album == null) return@launch
+                if (state.items.any { it.id == itemId }) {
+                    _grid.update { it.copy(reveal = itemId) }
+                    return@launch
+                }
+                if (state.endReached) return@launch
+                loadPage(reset = false)?.join() ?: return@launch
+            }
+        }
+    }
+
+    fun clearReveal() {
+        _grid.update { if (it.reveal == null) it else it.copy(reveal = null) }
+    }
+
+    private fun loadPage(reset: Boolean): Job? {
+        val album = _grid.value.album ?: return null
+        val job = viewModelScope.launch {
             _grid.update { it.copy(loading = true) }
             val offset = if (reset) 0 else _grid.value.items.size
             val sort = _grid.value.sort
@@ -186,6 +214,8 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                 )
             }
         }
+        gridJob = job
+        return job
     }
 
     private fun sortAlbums(albums: List<AlbumSummary>, sort: MediaSort): List<AlbumSummary> {
@@ -201,5 +231,6 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     companion object {
         const val PAGE_SIZE = 120
         private const val GRANT_SETTLE_MILLIS = 800L
+        private const val MAX_REVEAL_PAGES = 100
     }
 }
