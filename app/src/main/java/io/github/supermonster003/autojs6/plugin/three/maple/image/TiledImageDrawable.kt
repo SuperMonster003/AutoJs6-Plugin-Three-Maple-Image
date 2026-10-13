@@ -98,6 +98,10 @@ internal class TiledImageDrawable private constructor(
     internal val loadedTileCountForTesting: Int
         get() = tileCache.size
 
+    /** Tile decodes queued or running whose result has not reached the main thread yet. */
+    internal val pendingTileCountForTesting: Int
+        get() = pendingKeys.size
+
     internal val isClosedForTesting: Boolean
         get() = closed.get()
 

@@ -183,6 +183,12 @@ class TiledImageDrawableInstrumentationTest {
                 rendered.recycle()
             }
 
+            // A decode still in flight would put its tile back after the trim (slow emulators under load).
+            awaitCondition("tile decodes settle") {
+                var settled = false
+                instrumentation.runOnMainSync { settled = drawable.pendingTileCountForTesting == 0 }
+                settled
+            }
             instrumentation.runOnMainSync { drawable.trimTileCache() }
             assertEquals(0, drawable.loadedTileCountForTesting)
         } finally {
