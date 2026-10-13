@@ -14,6 +14,8 @@ internal enum class ViewerSourceKind {
     HOST_SELECTION,
     /** The host's single-image entry with the directory siblings read through the host session. */
     HOST_SIBLINGS,
+    /** Images of one folder of the host directory browser (ROADMAP 6.4): host pages only, session borrowed. */
+    HOST_DIRECTORY,
     /** A MediaStore bucket of the standalone gallery, enumerated inside the viewer. */
     MEDIA_ALBUM,
     /** An authorized SAF folder of the standalone gallery, enumerated inside the viewer. */
@@ -63,7 +65,8 @@ internal class ViewerSource(
     companion object {
         fun fromRequest(request: ImageViewerLaunchRequest): ViewerSource = ViewerSource(
             kind = when {
-                request.hostSession != null -> ViewerSourceKind.HOST_SIBLINGS
+                request.hostSession != null ->
+                    if (request.pages.any { it.hostRelativePath == "" }) ViewerSourceKind.HOST_SIBLINGS else ViewerSourceKind.HOST_DIRECTORY
                 request.source is ViewerSourceSpec.MediaAlbum -> ViewerSourceKind.MEDIA_ALBUM
                 request.source is ViewerSourceSpec.AuthorizedFolder -> ViewerSourceKind.AUTHORIZED_FOLDER
                 request.pages.size > 1 -> ViewerSourceKind.HOST_SELECTION

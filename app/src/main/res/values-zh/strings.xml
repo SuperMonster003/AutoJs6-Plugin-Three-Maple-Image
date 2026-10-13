@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">返回</string>
+    <string name="action_browse_directory">以相册浏览</string>
     <string name="action_convert_image">转换图像</string>
     <string name="action_dismiss_hint">关闭提示</string>
     <string name="action_edit_image">编辑图像</string>
@@ -76,6 +77,9 @@
     <string name="gallery_sort_descending">降序</string>
     <string name="gallery_sort_name">名称</string>
     <string name="gallery_sort_size">大小</string>
+    <string name="host_directory_empty">此文件夹中没有图片</string>
+    <string name="host_directory_folder">文件夹</string>
+    <string name="host_directory_limit">仅列出前 %1$d 项</string>
     <string name="image_content_description">图像预览</string>
     <string name="image_editor_brightness">亮度</string>
     <string name="image_editor_brush">画笔</string>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">Retour</string>
+    <string name="action_browse_directory">Afficher comme album</string>
     <string name="action_convert_image">Convertir l\'image</string>
     <string name="action_dismiss_hint">Ignorer</string>
     <string name="action_edit_image">Modifier l\'image</string>
@@ -76,6 +77,9 @@
     <string name="gallery_sort_descending">Décroissant</string>
     <string name="gallery_sort_name">Nom</string>
     <string name="gallery_sort_size">Taille</string>
+    <string name="host_directory_empty">Aucune image dans ce dossier</string>
+    <string name="host_directory_folder">Dossier</string>
+    <string name="host_directory_limit">Seules les %1$d premières entrées sont affichées</string>
     <string name="image_content_description">Aperçu de l\'image</string>
     <string name="image_editor_brightness">Luminosité</string>
     <string name="image_editor_brush">Pinceau</string>

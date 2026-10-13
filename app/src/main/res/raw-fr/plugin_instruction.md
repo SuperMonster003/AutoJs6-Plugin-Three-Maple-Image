@@ -25,6 +25,8 @@ Les photos sont automatiquement pivotées ou mises en miroir selon leur orientat
 
 `Imprimer / enregistrer en PDF`, dans le menu en haut à droite, envoie l'image actuelle complète vers la feuille d'impression système d'Android en conservant la correction EXIF et la rotation manuelle de la vue. Pour un GIF animé, l'image visible au toucher est utilisée. Le zoom et le déplacement ne recadrent pas la sortie, et le plugin ne crée aucun fichier image ou PDF temporaire.
 
+Dans le gestionnaire de fichiers, `Afficher comme album` dans le menu d'un dossier ouvre ce dossier comme album via la session de l'hôte. Les sous-dossiers jusqu'à 8 niveaux apparaissent comme cellules de dossier, les images s'ouvrent dans la visionneuse avec pagination dans ce dossier et seules les 4096 premières entrées de chaque dossier sont listées. Ce mode ne requiert aucune permission de stockage et ne divulgue aucun chemin de fichier; les actions de gestion n'y sont pas disponibles.
+
 La version 5276 ou ultérieure de l'hôte est requise.
 
 Limites de sécurité et de confidentialité:

@@ -98,8 +98,8 @@ internal object HostSessionImageRegistry {
         val routes = request.pages.mapIndexedNotNull { index, viewerPage ->
             val relativePath = viewerPage.hostRelativePath?.takeIf { it.isNotEmpty() }
                 ?: return@mapIndexedNotNull null
-            require(relativePath == viewerPage.image.displayName)
-            require(ImageRequestPolicy.validateDisplayName(relativePath) != null)
+            require(ImageViewerContract.isSafeRelativePath(relativePath))
+            require(relativePath.substringAfterLast('/') == viewerPage.image.displayName)
             index to Route(
                 relativePath = relativePath,
                 page = HostSessionImagePage(
@@ -114,6 +114,26 @@ internal object HostSessionImageRegistry {
         while (true) {
             val token = UUID.randomUUID().toString()
             if (sessions.putIfAbsent(token, Session(hostSession, targetId, routes)) == null) {
+                return token
+            }
+        }
+    }
+
+    /** Routes for a directory listing (ROADMAP 6.4): index = position in the listing, path nested below the target. */
+    fun registerRoutes(
+        hostSession: IExplorerActionHostSession,
+        targetId: String,
+        routes: List<Pair<String, HostSessionImagePage>>,
+    ): String {
+        require(routes.isNotEmpty())
+        val mapped = routes.mapIndexed { index, (relativePath, page) ->
+            require(ImageViewerContract.isSafeRelativePath(relativePath))
+            require(relativePath.substringAfterLast('/') == page.displayName)
+            index to Route(relativePath, page)
+        }.toMap()
+        while (true) {
+            val token = UUID.randomUUID().toString()
+            if (sessions.putIfAbsent(token, Session(hostSession, targetId, mapped)) == null) {
                 return token
             }
         }

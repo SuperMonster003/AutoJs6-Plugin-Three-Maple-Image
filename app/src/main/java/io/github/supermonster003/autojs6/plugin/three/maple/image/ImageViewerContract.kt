@@ -25,6 +25,11 @@ internal data class ImageViewerLaunchRequest(
     val editable: Boolean = false,
     /** Gallery album the viewer enumerates itself; [pages] then holds only the start page (ROADMAP 6.3). */
     val source: ViewerSourceSpec? = null,
+    /**
+     * False when another Activity (the directory browser, ROADMAP 6.4) keeps the host session alive: the viewer
+     * then uses the session but never closes it.
+     */
+    val ownsHostSession: Boolean = true,
 ) {
     init {
         require(pages.size in 1..ImageSiblingDiscoveryPolicy.MAX_PAGES)
@@ -37,10 +42,15 @@ internal data class ImageViewerLaunchRequest(
         if (hostSession == null) {
             require(pages.all { it.hostRelativePath == null })
         } else {
-            require(pages.size > 1)
             require(pages.all { it.hostRelativePath != null })
-            require(pages.count { it.hostRelativePath == "" } == 1)
-            require(pages[startIndex].hostRelativePath == "")
+            // The host single-image entry carries the selected image as a direct URI page; the directory browser
+            // (nested relative paths) has no such page.
+            val selectedPages = pages.count { it.hostRelativePath == "" }
+            require(selectedPages <= 1)
+            if (selectedPages == 1) {
+                require(pages.size > 1)
+                require(pages[startIndex].hostRelativePath == "")
+            }
         }
     }
 
@@ -97,6 +107,8 @@ internal object ImageViewerContract {
     private const val SOURCE_START_ITEM_ID = "startItemId"
     private const val HOST_TARGET_ID = "targetId"
     private const val HOST_RELATIVE_PATHS = "relativePaths"
+    private const val HOST_OWNS_SESSION = "ownsSession"
+    private const val MAX_RELATIVE_PATH_DEPTH = 64
 
     fun viewerIntent(context: Context, request: ImageViewerLaunchRequest): Intent =
         Intent(context, ImageViewerActivity::class.java).apply {
@@ -135,7 +147,6 @@ internal object ImageViewerContract {
             hostTargetId = null
             hostRelativePaths = List(count) { null }
         } else {
-            if (count <= 1) return null
             val binder = hostBundle.getBinder(ExplorerActionHostSessionKeys.BINDER) ?: return null
             if (runCatching { binder.interfaceDescriptor }.getOrNull() != IExplorerActionHostSession.DESCRIPTOR) {
                 return null
@@ -162,11 +173,11 @@ internal object ImageViewerContract {
             when {
                 hostSession == null -> if (!isPlainContentUri(uri) || relativePath != null) return null
                 relativePath == "" -> if (!isPlainContentUri(uri) || index != startIndex) return null
-                relativePath?.let(::isSafeDirectName) != true -> return null
+                relativePath?.let(::isSafeRelativePath) != true -> return null
                 !isHostImageUri(uri, index) -> return null
             }
             val displayName = ImageRequestPolicy.validateDisplayName(displayNames[index]) ?: return null
-            if (!relativePath.isNullOrEmpty() && relativePath != displayName) return null
+            if (!relativePath.isNullOrEmpty() && relativePath.substringAfterLast('/') != displayName) return null
             val mimeType = ImageRequestPolicy.normalizeImageMimeType(mimeTypes[index]) ?: return null
             val declaredSize = declaredSizes[index]
                 .takeIf(ImageRequestPolicy::isDeclaredSizeAccepted)
@@ -177,7 +188,7 @@ internal object ImageViewerContract {
             )
         }
         if (pages.map { it.image.targetUri }.toSet().size != pages.size) return null
-        if (hostSession != null && pages.count { it.hostRelativePath == "" } != 1) return null
+        if (hostSession != null && pages.count { it.hostRelativePath == "" } > 1) return null
         val startPage = pages[startIndex]
         if (intent.data != startPage.image.targetUri) return null
         if (ImageRequestPolicy.normalizeImageMimeType(intent.type) != startPage.image.mimeType) return null
@@ -189,8 +200,22 @@ internal object ImageViewerContract {
             hostTargetId = hostTargetId,
             editable = hostSession == null && intent.getBooleanExtra(EXTRA_EDITABLE, false),
             source = source,
+            ownsHostSession = hostBundle?.getBoolean(HOST_OWNS_SESSION, true) ?: true,
         )
     }.getOrNull()
+
+    /**
+     * A host session relative path as the viewer and the image provider accept it: one or more safe name segments
+     * joined by `/`, never `.` or `..`, bounded in depth and length (the host validates the same shape).
+     */
+    fun isSafeRelativePath(value: String): Boolean {
+        if (value.isEmpty() || value.length > ExplorerActionProtocol.MAX_SESSION_RELATIVE_PATH_LENGTH) return false
+        val segments = value.split('/')
+        if (segments.size > MAX_RELATIVE_PATH_DEPTH) return false
+        return segments.all { segment ->
+            segment != "." && segment != ".." && ImageRequestPolicy.validateDisplayName(segment) != null
+        }
+    }
 
     private fun readSourceSpec(bundle: Bundle, hasHost: Boolean, pageCount: Int): ViewerSourceSpec? {
         if (hasHost || pageCount != 1) return null
@@ -216,10 +241,10 @@ internal object ImageViewerContract {
     }
 
     fun closeAttachedHostSession(intent: Intent?) {
-        val binder = runCatching {
-            intent?.parcelableBundleExtra(EXTRA_HOST_REQUEST)
-                ?.getBinder(ExplorerActionHostSessionKeys.BINDER)
-        }.getOrNull() ?: return
+        val hostBundle = runCatching { intent?.parcelableBundleExtra(EXTRA_HOST_REQUEST) }.getOrNull() ?: return
+        // A borrowed session belongs to the Activity that launched the viewer and stays open for it.
+        if (!hostBundle.getBoolean(HOST_OWNS_SESSION, true)) return
+        val binder = runCatching { hostBundle.getBinder(ExplorerActionHostSessionKeys.BINDER) }.getOrNull() ?: return
         if (runCatching { binder.interfaceDescriptor }.getOrNull() != IExplorerActionHostSession.DESCRIPTOR) {
             return
         }
@@ -277,6 +302,7 @@ internal object ImageViewerContract {
                 Bundle().apply {
                     putBinder(ExplorerActionHostSessionKeys.BINDER, session.asBinder())
                     putString(HOST_TARGET_ID, requireNotNull(request.hostTargetId))
+                    putBoolean(HOST_OWNS_SESSION, request.ownsHostSession)
                     putStringArrayList(
                         HOST_RELATIVE_PATHS,
                         ArrayList(request.pages.map { requireNotNull(it.hostRelativePath) }),

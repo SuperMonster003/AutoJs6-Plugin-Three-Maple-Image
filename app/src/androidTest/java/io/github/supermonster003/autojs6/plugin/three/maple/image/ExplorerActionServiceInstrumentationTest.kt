@@ -37,7 +37,23 @@ class ExplorerActionServiceInstrumentationTest {
         val actions = requireNotNull(
             catalog.getParcelableArrayList<android.os.Bundle>(ExplorerActionCatalogKeys.ACTIONS),
         )
-        assertEquals(2, actions.size)
+        assertEquals(3, actions.size)
+        val directoryAction = requireNotNull(
+            actions.singleOrNull { action ->
+                action.getString(ExplorerActionCatalogKeys.ID) == ThreeMapleImagePlugin.BROWSE_DIRECTORY_ACTION_ID
+            },
+        )
+        // ROADMAP 6.4: a read-only, single-directory overflow action without matchers.
+        assertEquals(ExplorerActionValues.TARGET_DIRECTORY, directoryAction.getInt(ExplorerActionCatalogKeys.TARGET_KIND))
+        assertEquals(ExplorerActionValues.CARDINALITY_SINGLE, directoryAction.getInt(ExplorerActionCatalogKeys.CARDINALITY))
+        assertEquals(ExplorerActionValues.ACCESS_READ_ONLY, directoryAction.getInt(ExplorerActionCatalogKeys.ACCESS_MODE))
+        assertEquals(ExplorerActionValues.PLACEMENT_OVERFLOW, directoryAction.getInt(ExplorerActionCatalogKeys.PLACEMENT))
+        assertEquals(
+            ThreeMapleImagePlugin.BROWSE_DIRECTORY_ACTIVITY_CLASS_NAME,
+            directoryAction.getString(ExplorerActionCatalogKeys.ACTIVITY_CLASS_NAME),
+        )
+        assertEquals(emptyList<String>(), directoryAction.getStringArrayList(ExplorerActionCatalogKeys.MIME_TYPES))
+        assertEquals(emptyList<String>(), directoryAction.getStringArrayList(ExplorerActionCatalogKeys.EXTENSIONS))
         val singleAction = requireNotNull(
             actions.singleOrNull { action ->
                 action.getString(ExplorerActionCatalogKeys.ID) == ThreeMapleImagePlugin.ACTION_ID

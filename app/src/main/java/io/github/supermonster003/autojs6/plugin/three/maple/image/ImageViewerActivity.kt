@@ -943,6 +943,7 @@ class ImageViewerActivity : ConfiguredActivity() {
     private fun closeHostSession() {
         if (hostSessionClosed || !::launchRequest.isInitialized) return
         hostSessionClosed = true
+        if (!launchRequest.ownsHostSession) return
         launchRequest.hostSession?.let { session -> runCatching { session.close() } }
     }
 

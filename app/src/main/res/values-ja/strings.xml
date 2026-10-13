@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">戻る</string>
+    <string name="action_browse_directory">アルバムとして表示</string>
     <string name="action_convert_image">画像を変換</string>
     <string name="action_dismiss_hint">閉じる</string>
     <string name="action_edit_image">画像を編集</string>
@@ -76,6 +77,9 @@
     <string name="gallery_sort_descending">降順</string>
     <string name="gallery_sort_name">名前</string>
     <string name="gallery_sort_size">サイズ</string>
+    <string name="host_directory_empty">このフォルダーに画像はありません</string>
+    <string name="host_directory_folder">フォルダー</string>
+    <string name="host_directory_limit">先頭の %1$d 項目のみ表示しています</string>
     <string name="image_content_description">画像プレビュー</string>
     <string name="image_editor_brightness">明るさ</string>
     <string name="image_editor_brush">ブラシ</string>

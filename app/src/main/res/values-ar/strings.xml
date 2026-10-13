@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">رجوع</string>
+    <string name="action_browse_directory">عرض كألبوم</string>
     <string name="action_convert_image">تحويل الصورة</string>
     <string name="action_dismiss_hint">تجاهل</string>
     <string name="action_edit_image">تحرير الصورة</string>
@@ -76,6 +77,9 @@
     <string name="gallery_sort_descending">تنازلي</string>
     <string name="gallery_sort_name">الاسم</string>
     <string name="gallery_sort_size">الحجم</string>
+    <string name="host_directory_empty">لا توجد صور في هذا المجلد</string>
+    <string name="host_directory_folder">مجلد</string>
+    <string name="host_directory_limit">يُعرض أول %1$d عنصرًا فقط</string>
     <string name="image_content_description">معاينة الصورة</string>
     <string name="image_editor_brightness">السطوع</string>
     <string name="image_editor_brush">فرشاة</string>

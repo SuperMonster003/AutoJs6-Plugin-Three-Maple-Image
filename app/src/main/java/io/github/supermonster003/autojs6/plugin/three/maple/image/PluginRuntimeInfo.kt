@@ -23,6 +23,14 @@ internal object ThreeMapleImagePlugin {
         "io.github.supermonster003.autojs6.plugin.three.maple.image.ExplorerActionActivity"
     const val ACTION_PRIORITY = 100
 
+    /** ROADMAP 6.4: overflow action of a single directory that opens it as an album through the host session. */
+    const val BROWSE_DIRECTORY_ACTION_ID = "browse-directory"
+    const val BROWSE_DIRECTORY_LABEL_RESOURCE_NAME = "action_browse_directory"
+    const val BROWSE_DIRECTORY_LABEL_FALLBACK = "View as album"
+    const val BROWSE_DIRECTORY_ACTIVITY_CLASS_NAME =
+        "io.github.supermonster003.autojs6.plugin.three.maple.image.ExplorerDirectoryActivity"
+    const val BROWSE_DIRECTORY_PRIORITY = 90
+
     val MIME_TYPES = emptyArray<String>()
     val EXTENSIONS = ImageFormatSupport.explorerExtensions.toTypedArray()
 }
@@ -71,9 +79,24 @@ internal fun imageViewerActionCatalog(): Bundle {
         putInt(ExplorerActionCatalogKeys.PROTOCOL_VERSION, ThreeMapleImagePlugin.PROTOCOL_VERSION)
         putParcelableArrayList(
             ExplorerActionCatalogKeys.ACTIONS,
-            arrayListOf(singleAction, multipleAction),
+            arrayListOf(singleAction, multipleAction, browseDirectoryAction()),
         )
     }
+}
+
+/** Read-only, single-directory overflow action without matchers: every directory offers "View as album". */
+private fun browseDirectoryAction(): Bundle = Bundle().apply {
+    putString(ExplorerActionCatalogKeys.ID, ThreeMapleImagePlugin.BROWSE_DIRECTORY_ACTION_ID)
+    putString(ExplorerActionCatalogKeys.LABEL_RESOURCE_NAME, ThreeMapleImagePlugin.BROWSE_DIRECTORY_LABEL_RESOURCE_NAME)
+    putString(ExplorerActionCatalogKeys.LABEL_FALLBACK, ThreeMapleImagePlugin.BROWSE_DIRECTORY_LABEL_FALLBACK)
+    putString(ExplorerActionCatalogKeys.ACTIVITY_CLASS_NAME, ThreeMapleImagePlugin.BROWSE_DIRECTORY_ACTIVITY_CLASS_NAME)
+    putInt(ExplorerActionCatalogKeys.PRIORITY, ThreeMapleImagePlugin.BROWSE_DIRECTORY_PRIORITY)
+    putInt(ExplorerActionCatalogKeys.TARGET_KIND, ExplorerActionValues.TARGET_DIRECTORY)
+    putInt(ExplorerActionCatalogKeys.CARDINALITY, ExplorerActionValues.CARDINALITY_SINGLE)
+    putInt(ExplorerActionCatalogKeys.ACCESS_MODE, ExplorerActionValues.ACCESS_READ_ONLY)
+    putInt(ExplorerActionCatalogKeys.PLACEMENT, ExplorerActionValues.PLACEMENT_OVERFLOW)
+    putStringArrayList(ExplorerActionCatalogKeys.MIME_TYPES, arrayListOf())
+    putStringArrayList(ExplorerActionCatalogKeys.EXTENSIONS, arrayListOf())
 }
 
 private fun imageViewerAction(

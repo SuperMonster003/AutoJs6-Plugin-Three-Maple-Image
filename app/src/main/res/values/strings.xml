@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">Back</string>
+    <string name="action_browse_directory">View as album</string>
     <string name="action_convert_image">Convert image</string>
     <string name="action_dismiss_hint">Dismiss</string>
     <string name="action_edit_image">Edit image</string>
@@ -76,6 +77,9 @@
     <string name="gallery_sort_descending">Descending</string>
     <string name="gallery_sort_name">Name</string>
     <string name="gallery_sort_size">Size</string>
+    <string name="host_directory_empty">No images in this folder</string>
+    <string name="host_directory_folder">Folder</string>
+    <string name="host_directory_limit">Only the first %1$d entries are listed</string>
     <string name="image_content_description">Image preview</string>
     <string name="image_editor_brightness">Brightness</string>
     <string name="image_editor_brush">Brush</string>

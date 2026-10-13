@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="action_back">Atrás</string>
+    <string name="action_browse_directory">Ver como álbum</string>
     <string name="action_convert_image">Convertir imagen</string>
     <string name="action_dismiss_hint">Descartar</string>
     <string name="action_edit_image">Editar imagen</string>
@@ -76,6 +77,9 @@
     <string name="gallery_sort_descending">Descendente</string>
     <string name="gallery_sort_name">Nombre</string>
     <string name="gallery_sort_size">Tamaño</string>
+    <string name="host_directory_empty">No hay imágenes en esta carpeta</string>
+    <string name="host_directory_folder">Carpeta</string>
+    <string name="host_directory_limit">Solo se muestran las primeras %1$d entradas</string>
     <string name="image_content_description">Vista previa de imagen</string>
     <string name="image_editor_brightness">Brillo</string>
     <string name="image_editor_brush">Pincel</string>

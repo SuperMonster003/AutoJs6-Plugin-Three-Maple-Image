@@ -25,6 +25,8 @@ Photos are automatically rotated or mirrored to their EXIF orientation. `Rotate`
 
 `Print / Save PDF` in the top-right menu sends the full current image to Android's system print sheet, preserving EXIF correction and manual view rotation. Animated GIFs use the frame visible when tapped. Zoom and panning do not crop the result, and the plugin creates no temporary image or PDF file.
 
+In the file manager, `View as album` in a directory's menu opens that directory as an album through the host session: subfolders up to 8 levels deep appear as folder cells, images open in the viewer with left/right paging inside that folder, and only the first 4096 entries of a folder are listed. This mode needs no storage permission and never discloses file paths; management actions are not available in it.
+
 Host build 5276 or later is required.
 
 Safety and privacy limits:

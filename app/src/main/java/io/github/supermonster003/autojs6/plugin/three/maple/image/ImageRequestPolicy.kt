@@ -38,6 +38,16 @@ internal data class ExplorerImageRequest(
     val hostSession: IExplorerActionHostSession?,
 )
 
+/** A validated "browse directory" request (ROADMAP 6.4): one directory target plus the host session that lists it. */
+internal data class ExplorerDirectoryRequest(
+    val requestId: String,
+    val parentUri: Uri,
+    val parentDisplayPath: String,
+    val targetId: String,
+    val displayName: String,
+    val hostSession: IExplorerActionHostSession,
+)
+
 internal enum class ExplorerImageRequestMode {
     SINGLE_WITH_SIBLINGS,
     EXPLICIT_SELECTION,
@@ -197,6 +207,95 @@ internal object ImageRequestPolicy {
         )
     }
 
+    fun resolveExplorerDirectory(intent: Intent?): ExplorerDirectoryRequest? = try {
+        resolveExplorerDirectoryUnchecked(intent)
+    } catch (_: RuntimeException) {
+        null
+    }
+
+    /** Closes the host session attached to an explorer request that was rejected before any Activity took it over. */
+    fun closeExplorerSession(intent: Intent?) {
+        val binder = runCatching {
+            intent?.parcelableBundleExtra(ExplorerActionIntentExtras.HOST_SESSION)
+                ?.getBinder(ExplorerActionHostSessionKeys.BINDER)
+        }.getOrNull() ?: return
+        if (runCatching { binder.interfaceDescriptor }.getOrNull() != IExplorerActionHostSession.DESCRIPTOR) return
+        runCatching { IExplorerActionHostSession.Stub.asInterface(binder)?.close() }
+    }
+
+    private fun resolveExplorerDirectoryUnchecked(intent: Intent?): ExplorerDirectoryRequest? {
+        intent ?: return null
+        if (intent.action != ExplorerActionPluginActions.EXECUTE) return null
+        if (intent.getStringExtra(ExplorerActionIntentExtras.ACTION_ID) != ThreeMapleImagePlugin.BROWSE_DIRECTORY_ACTION_ID) {
+            return null
+        }
+        if (
+            intent.getIntExtra(ExplorerActionIntentExtras.PROTOCOL_VERSION, Int.MIN_VALUE) !=
+            ThreeMapleImagePlugin.PROTOCOL_VERSION
+        ) {
+            return null
+        }
+        if (
+            intent.getStringExtra(ExplorerActionIntentExtras.SOURCE_SURFACE) !=
+            ExplorerActionIntentValues.SOURCE_SURFACE_MAIN
+        ) {
+            return null
+        }
+        if (!hasExactReadOnlyExplorerFlags(intent.flags)) return null
+        val requestId = canonicalRequestId(intent.getStringExtra(ExplorerActionIntentExtras.REQUEST_ID)) ?: return null
+        val parentUri = intent.parcelableUriExtra(ExplorerActionIntentExtras.PARENT_URI)
+            ?.takeIf(::isPlainContentUri)
+            ?: return null
+        val parentDisplayPath = validateParentDisplayPath(
+            intent.getStringExtra(ExplorerActionIntentExtras.PARENT_DISPLAY_PATH),
+        ) ?: return null
+        val bundle = intent.parcelableBundleArrayListExtra(ExplorerActionIntentExtras.TARGETS)
+            ?.singleOrNull()
+            ?: return null
+        val clipData = intent.clipData ?: return null
+        if (clipData.itemCount != 1) return null
+        val targetId = validateOpaqueId(bundle.getString(ExplorerActionTargetKeys.ID)) ?: return null
+        val targetUri = bundle.parcelableUri(ExplorerActionTargetKeys.URI)
+            ?.takeIf(::isPlainContentUri)
+            ?: return null
+        if (!isDirectChild(parentUri, targetUri)) return null
+        if (!clipData.getItemAt(0).isExactUri(targetUri)) return null
+        val displayName = validateDisplayName(bundle.getString(ExplorerActionTargetKeys.DISPLAY_NAME)) ?: return null
+        if (targetUri.pathSegments.lastOrNull() != displayName) return null
+        if (bundle.getInt(ExplorerActionTargetKeys.KIND, Int.MIN_VALUE) != ExplorerActionValues.TARGET_DIRECTORY) return null
+        val mimeType = bundle.getString(ExplorerActionTargetKeys.MIME_TYPE) ?: return null
+        if (!bundle.containsKey(ExplorerActionTargetKeys.SIZE)) return null
+        if (!bundle.containsKey(ExplorerActionTargetKeys.LAST_MODIFIED)) return null
+        if (intent.data != targetUri || intent.type != mimeType) return null
+        if (intent.getStringExtra(ExplorerActionIntentExtras.DISPLAY_NAME) != displayName) return null
+        if (!intent.hasExtra(ExplorerActionIntentExtras.SIZE)) return null
+        if (
+            intent.getLongExtra(ExplorerActionIntentExtras.SIZE, Long.MIN_VALUE) !=
+            bundle.getLong(ExplorerActionTargetKeys.SIZE, Long.MIN_VALUE)
+        ) {
+            return null
+        }
+        if (
+            intent.getLongExtra(ExplorerActionIntentExtras.HOST_VERSION_CODE, Long.MIN_VALUE) <
+            ThreeMapleImagePlugin.REQUIRED_HOST_VERSION
+        ) {
+            return null
+        }
+        val binder = intent.parcelableBundleExtra(ExplorerActionIntentExtras.HOST_SESSION)
+            ?.getBinder(ExplorerActionHostSessionKeys.BINDER)
+            ?: return null
+        if (runCatching { binder.interfaceDescriptor }.getOrNull() != IExplorerActionHostSession.DESCRIPTOR) return null
+        val hostSession = IExplorerActionHostSession.Stub.asInterface(binder) ?: return null
+        return ExplorerDirectoryRequest(
+            requestId = requestId,
+            parentUri = parentUri,
+            parentDisplayPath = parentDisplayPath,
+            targetId = targetId,
+            displayName = displayName,
+            hostSession = hostSession,
+        )
+    }
+
     private fun parseExplorerTarget(parentUri: Uri, bundle: Bundle): ParsedExplorerTarget? {
         val targetId = validateOpaqueId(bundle.getString(ExplorerActionTargetKeys.ID)) ?: return null
         val targetUri = bundle.parcelableUri(ExplorerActionTargetKeys.URI)
@@ -309,10 +408,14 @@ internal object ImageRequestPolicy {
 
     private const val REQUIRED_EXPLORER_FLAGS =
         Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
+    // Task-stack flags carry no grant semantics, so a launcher may add them; every grant flag beyond the two
+    // required read flags (write, persistable) stays outside this set and rejects the request.
     private const val ALLOWED_EXPLORER_FLAGS =
         REQUIRED_EXPLORER_FLAGS or
             Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS or
-            Intent.FLAG_ACTIVITY_NEW_TASK
+            Intent.FLAG_ACTIVITY_NEW_TASK or
+            Intent.FLAG_ACTIVITY_CLEAR_TOP or
+            Intent.FLAG_ACTIVITY_CLEAR_TASK
     private const val FORBIDDEN_EXTERNAL_GRANTS =
         Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
             Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
