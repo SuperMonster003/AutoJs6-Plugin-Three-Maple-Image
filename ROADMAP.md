@@ -85,7 +85,7 @@
 | --- | --- | --- | --- |
 | M1 | v2.1.0 | Compose 焕新: 四类页面迁移, 视觉系统, 功能集不变 | 已发布 v2.1.0 (2026-10-13, 基线 `dcd0e91`) |
 | M2 | v3.0.0 | 相册: 权限策略, MediaStore 数据层, 相册/媒体网格, 查看器分页与缩略图条, 无权限模式, 宿主 "以相册浏览" | 已发布 v3.0.0 (2026-10-13) |
-| M3 | v3.1.0 + v3.1.1 | 管理操作: 3.1.0 = 多选, 删除与回收站, 重命名/移动/复制, 收藏; 3.1.1 = 排除/置顶/隐藏, 搜索, 排序与分组, 批量输出, 宿主 v24 入口删除 | 进行中 (2026-10-13 起) |
+| M3 | v3.1.0 + v3.1.1 | 管理操作: 3.1.0 = 多选, 删除与回收站, 重命名/移动/复制, 收藏; 3.1.1 = 排除/置顶/隐藏, 搜索, 排序与分组, 批量输出, 宿主 v24 入口删除 | 进行中 (2026-10-13 起); 3.1.0 功能完成, 待发布 (2026-10-14) |
 | M4 | v3.2.0 | 编辑与输出: 编辑器重做与五项扩展, 覆盖保存与撤销, 手势旋转保存, 转换器重做, 协议升级 | 未开始 |
 | M5 | v3.3.0 | 查看器与设置全集: 幻灯片, 壁纸/分享副本, GPS 与地图, 手势与显示选项, 扩展详情, 平板/横屏, 无障碍与性能 | 未开始 |
 | M6 | v3.4.0 | 脚本 API `gallery`: 宿主契约, 插件服务, augment, 四仓库文档 | 未开始 |
@@ -213,27 +213,30 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 - 查看器 (相册来源): 顶栏右侧新增心形 "收藏"; 底栏改为 详情 / 旋转 / 编辑 / 分享 / 删除, "其他应用" 移入右上角菜单, 重命名 / 移动 / 复制也在该菜单.
 - 已授权文件夹 (SAF) 中的图片支持删除 (经 `DocumentsContract` 直接删除, 不进回收站, 二次确认) 与重命名; 移动 / 复制 / 收藏仅用于媒体库相册.
 - 权限申请记录保留 SharedPreferences (偏离 T8): 首页冷启动时同步读取, 放进 Room 会在主线程打开数据库; Room 只承载收藏, 排除 / 置顶目录与自建回收站索引.
+- 实现中的取舍 (2026-10-14, 详见设计稿 8.2 / 8.5 / 8.6): 多选底栏受 `MapleBottomActionBar` 5 项上限约束, 为 分享 / 收藏 / 移动 / 删除 / 更多, "复制" 与 重命名 / 详情 同在 "更多"; 冲突策略 "替换" 把目标中原有的同名图片先送进回收站而非直接覆盖; 查看器内撤销后停在当前图片 (不跳回被恢复的图片).
 
 ### 7.1 多选与通用操作
 
-- [ ] (插件) 多选模式: 长按进入, 点按切换, 拖动范围选择, 全选 / 反选, 顶栏计数, 底部操作栏 (删除 / 分享 / 移动 / 复制 / 收藏 / 更多: 重命名 (单选) / 详情 / 批量转换); 相册网格也可多选 (排除 / 置顶 / 隐藏). 验收: 1000 项全选性能; 旋转屏幕保留选择.
-- [ ] (插件) `MediaWriteCoordinator`: 封装 Android 11+ `createWriteRequest` / `createDeleteRequest` / `createTrashRequest` 的 `IntentSender` 往返 (批量一次确认), Android 9-10 的直接写, `ALL_FILES` 下的直接文件操作; 失败逐项报告, 成功后触发 MediaStore 扫描与网格刷新. 验收: 三种路径各有 instrumentation (API 28 / 29 AVD / 33).
+- [x] (插件) 媒体网格多选 (3.1.0): 长按进入, 点按切换, 长按后拖动范围选择 (边缘自动滚动), 全选 / 反选 (覆盖未加载的分页), 顶栏计数, 底部操作栏 (分享 / 收藏 / 移动 / 删除 / 更多: 复制 / 重命名 (单选) / 详情). 验收: `MediaGridSelectionTest` (长按, 点按, 拖动范围, 返回退出) 与 `MediaSelectionTest` JVM; `GallerySelectionInstrumentationTest` 重建 Activity 后选择保留 (API 35 OnePlus 通过); 1000 项全选用例以 `-e selectionLoad true` 运行 (预算 2 s). 提交 8d07aa0.
+- [ ] (插件) 批量转换入口与相册网格多选 (排除 / 置顶 / 隐藏): 随 3.1.1 (7.4 后两条, 7.6).
+- [x] (插件) `MediaWriteCoordinator` (3.1.0): Android 11+ `createTrashRequest` / `createDeleteRequest` / `createWriteRequest` / `createFavoriteRequest` 的 `IntentSender` 往返 (整批一次确认, 授予媒体管理时系统静默批准), 本应用创建的图片与所有文件访问下直接写 (被拒的行回落到一次请求); Android 7-10 走 `java.io.File` 并等待媒体扫描, 首次写入申请存储写入权限 ("不再询问" 时提示并跳设置). 移动 / 复制带进度与取消. 验收: `MediaWriteCoordinatorInstrumentationTest` 9 例在 API 28 (G8441), API 29 AVD, API 30 AVD, API 33 (Redmi 22120RN86C), API 35 (OnePlus OPD2413) 全部通过. 提交 4ca1156, 290eb05.
 
 ### 7.2 删除与回收站
 
-- [ ] (插件) 删除 (T10): 单张 / 多选删除进入回收站 (Android 11+ 系统; 9-10 自建), 设置 "启用回收站" 关闭时直接删除并二次确认; 删除后 Snackbar "撤销" (系统回收站: 恢复; 自建: 还原文件). 验收: `RecycleBinPolicyTest` (过期, 容量, 命名冲突) JVM; API 28 与 33 instrumentation 验证删除 -> 回收站可见 -> 恢复 -> 原位置一致.
-- [ ] (插件) 回收站视图: 虚拟相册 (更多菜单入口), 剩余天数角标, 恢复 / 永久删除 / 清空, 空状态. 验收: 系统回收站项目经 `QUERY_ARG_MATCH_TRASHED` 列出 (API 30+); 自建回收站 30 天过期用例.
+- [x] (插件) 删除 (T10, 3.1.0): 网格多选与查看器删除进入回收站 (Android 11+ 系统回收站; 7-10 私有回收站), 设置 "回收站" 关闭时二次确认后永久删除, 私有回收站放不下时同样确认; 底部提示 "撤销" (系统回收站: 移出; 私有: 还原文件并扫描). 验收: `MediaManagementPolicyTest` (过期, 容量, 存储名唯一) JVM; `trashIsUndoableAndDeleteIsFinal` 在 API 28 / 29 / 30 / 33 / 35 验证 删除 -> 回收站列表可见 -> 撤销 -> 原文件夹同名恢复; AVD API 30 手工走通 删除 -> 撤销 -> 回收站恢复 -> 永久删除. 提交 e3827bd.
+- [x] (插件) 回收站视图 (3.1.0): 首页更多菜单入口, 剩余天数角标, 恢复 / 永久删除 / 清空 (二次确认), 空状态. 验收: Android 11+ 经 `QUERY_ARG_MATCH_TRASHED` 列出系统回收站 (缩略图可读, `.trashed-<到期>-` 前缀还原为原名); 私有回收站 30 天过期由 `RecycleBinPolicy` JVM 用例覆盖, 打开回收站时先清理过期项.
 - [ ] (宿主) 协议 v24 (T13): `ExplorerActionCatalogKeys.TARGET_TRASH`, 放宽 `moveTargetsToTrash` 的空输出语义 (仅对声明 `targetTrash` 的只读动作, 允许目标子集), 目录策略 (只读 Activity 动作, 单或多目标), 身份复核, v21 批次记录与 `undoTargetTrashBatch` 复用, Explorer 刷新; `docs/dev/explorer-action-protocol-v24.md`; 宿主 `.changelog` 10 种语言. 验收: 宿主 `ExplorerActionCatalogPolicyTest` 与会话单元测试覆盖接受形状, 拒绝写动作 / 非会话目标 / 重复 ID; 宿主 versionCode 记入 T18.
 - [ ] (插件) 宿主入口删除: `view-image` / `view-images` / `browse-directory` 声明 `targetTrash`, 查看器删除按钮在宿主来源下调用 v24 并以 Snackbar 撤销 (v21 批次); 删除后翻到下一页或关闭. 验收: `ExplorerActionV12InstrumentationTest` 升级为 v24 用例; QV770340J7 宿主实机验证删除进入宿主回收站并可撤销.
 
 ### 7.3 重命名 / 移动 / 复制
 
-- [ ] (插件) 重命名: 单张, 校验非法字符 / 重名 / 扩展名变更提示, MediaStore `DISPLAY_NAME` 更新 (需要写请求). 验收: JVM 文件名策略用例; instrumentation.
-- [ ] (插件) 移动与复制: 目标相册选择器 (最近使用置顶, 新建相册), 冲突策略 (自动后缀 / 跳过 / 替换, 默认询问一次后应用到全部), 进度与取消; Android 10+ 移动 = `RELATIVE_PATH` 更新, 9 = 复制后删除; 复制 = `insert` + 流复制 + 元数据保留 (修改时间, 可选 EXIF 原样). 验收: 跨卷 (内置 / SD) 用例; 失败中途可恢复 (已完成项不重复).
+- [x] (插件) 重命名 (3.1.0): 单张, 输入时校验非法字符 / 保留名 / 以点开头 / 255 字节, 扩展名变更提示, 重名在提交后提示; 媒体库更新 `DISPLAY_NAME` (Android 11+ 一次写请求), 已授权文件夹经 `DocumentsContract.renameDocument`; 带撤销. 验收: `MediaManagementPolicyTest` 文件名用例; `renameMoveAndTheirUndoKeepTheRows` 五个 API 级别通过. 提交 0a6d4cd.
+- [x] (插件) 移动与复制 (3.1.0): 目标相册选择器 (新建相册, 最近使用 5 个, 全部相册; Android 10+ 仅 DCIM / Pictures), 冲突询问一次应用到全部 (保留两者 / 跳过 / 替换 = 原同名图片进回收站), 多张时进度与取消; Android 10+ 移动 = `RELATIVE_PATH` 更新, 7-9 = 文件重命名 (跨分区时复制后删除) 并更新行; 复制 = `insert` + `IS_PENDING` 流复制 (7-9 保留修改时间). 验收: 冲突 / 替换 / 中途取消保留已完成项的 instrumentation 五个 API 级别通过. 提交 0a6d4cd.
+- [ ] (验证) 跨卷 (内置 / SD 卡) 移动与复制: 当前设备矩阵没有插 SD 卡的设备; 实现上移动保持在原卷 (只改 `RELATIVE_PATH`), 复制写入主存储. 有卡设备时补测.
 
 ### 7.4 收藏, 排除, 置顶, 隐藏
 
-- [ ] (插件) 收藏 (T9): 查看器与多选的收藏切换, "收藏" 虚拟相册, 本地 Room 表; 可选 "同步系统收藏" 开关 (Android 11+). 验收: 文件被移动/重命名后收藏按内容指纹保留的用例.
+- [x] (插件) 收藏 (T9, 3.1.0): 查看器顶栏心形与多选的收藏切换, "收藏" 虚拟相册 (有内容时排在相册网格首位, 查看器可在收藏内翻页), 本地 Room 表; 可选 "同步系统收藏" 开关 (Android 11+, 开启时导入系统已有收藏, 之后收藏同时写 `IS_FAVORITE`). 验收: `FavoritePolicyTest` (指纹重绑, 同名优先, 歧义不绑, 已认领不复用) JVM; `aFavoriteSurvivesAMoveAndARename` 五个 API 级别通过. 提交 c26a19e, 查看器 b58b195.
 - [ ] (插件) 排除目录 (本地名单) 与 "管理排除目录" 页; 置顶目录 (相册网格置顶区); 排除项在 "显示所有文件夹内容" 中也不出现. 验收: Room 迁移测试; 排除后计数与封面重算.
 - [ ] (插件) 隐藏目录 (.nomedia) 与 "显示隐藏目录" 开关: 仅 `ALL_FILES` 状态可用, 否则按钮显示原因与开启入口; 隐藏目录内容经文件系统枚举. 验收: API 33 开启所有文件访问后隐藏 / 取消隐藏往返; 未开启时无写入.
 
