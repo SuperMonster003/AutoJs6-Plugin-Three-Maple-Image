@@ -66,13 +66,11 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
 
     fun consumeWritePermissionRefused(): Boolean = writePermissionRefused.also { writePermissionRefused = false }
 
-    private val sdk: Int get() = Build.VERSION.SDK_INT
-
     private fun facts(owned: Boolean = false) = MediaWriteFacts(
-        sdk = sdk,
-        allFilesAccess = sdk >= Build.VERSION_CODES.R && Environment.isExternalStorageManager(),
+        sdk = Build.VERSION.SDK_INT,
+        allFilesAccess = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager(),
         manageMedia = canManageMedia(context),
-        legacyWriteGranted = sdk >= Build.VERSION_CODES.R ||
+        legacyWriteGranted = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED,
         ownedByApp = owned,
     )
@@ -226,7 +224,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         routeForIds(operation, items.map { it.id })
 
     private suspend fun routeForIds(operation: MediaWriteOperation, ids: List<Long>): MediaWriteRoute? {
-        val owned = sdk >= Build.VERSION_CODES.R && withContext(Dispatchers.IO) { ownedByApp(ids) }
+        val owned = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && withContext(Dispatchers.IO) { ownedByApp(ids) }
         var route = MediaWritePolicy.route(operation, facts(owned))
         if (route == MediaWriteRoute.NEEDS_LEGACY_PERMISSION) {
             if (!requestLegacyWrite()) {
@@ -267,7 +265,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
     // ---- trash / delete ----
 
     private suspend fun setTrashed(uris: List<Uri>, trashed: Boolean, route: MediaWriteRoute): WriteOutcome {
-        if (sdk < Build.VERSION_CODES.R) return WriteOutcome(failed = uris.size)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return WriteOutcome(failed = uris.size)
         if (route == MediaWriteRoute.DIRECT) {
             val refused = ArrayList<Uri>()
             var done = 0
@@ -287,7 +285,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
 
     private suspend fun deleteUris(uris: List<Uri>, route: MediaWriteRoute): WriteOutcome {
         if (route == MediaWriteRoute.SYSTEM_REQUEST) {
-            return if (sdk >= Build.VERSION_CODES.R && systemRequest(MediaStore.createDeleteRequest(resolver, uris))) {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && systemRequest(MediaStore.createDeleteRequest(resolver, uris))) {
                 WriteOutcome(succeeded = uris.size)
             } else WriteOutcome(cancelled = true)
         }
@@ -311,7 +309,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
             }
         }
         scan(removedPaths)
-        if (refused.isEmpty() || sdk < Build.VERSION_CODES.R) return WriteOutcome(succeeded = done, failed = refused.size)
+        if (refused.isEmpty() || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return WriteOutcome(succeeded = done, failed = refused.size)
         val rest = deleteUris(refused, MediaWriteRoute.SYSTEM_REQUEST)
         return rest.copy(succeeded = rest.succeeded + done, failed = rest.failed)
     }
@@ -353,7 +351,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
     /** Runs [plan] on [route]; returns the outcome and the entries that were actually relocated. */
     private suspend fun relocate(plan: List<Relocation>, route: MediaWriteRoute, control: WriteControl): Pair<WriteOutcome, List<Relocation>> {
         if (route == MediaWriteRoute.SYSTEM_REQUEST) {
-            if (sdk < Build.VERSION_CODES.R || !systemRequest(MediaStore.createWriteRequest(resolver, plan.map { uriOf(it.item) }))) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || !systemRequest(MediaStore.createWriteRequest(resolver, plan.map { uriOf(it.item) }))) {
                 return WriteOutcome(cancelled = true) to emptyList()
             }
         }
@@ -370,7 +368,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         }
         scan(scanned)
         // All files access may still be refused for some rows: one system request covers the rest.
-        if (route != MediaWriteRoute.DIRECT || refused.isEmpty() || sdk < Build.VERSION_CODES.R || control.cancelRequested) {
+        if (route != MediaWriteRoute.DIRECT || refused.isEmpty() || Build.VERSION.SDK_INT < Build.VERSION_CODES.R || control.cancelRequested) {
             return WriteOutcome(succeeded = done.size, failed = refused.size) to done
         }
         val (rest, restDone) = relocate(refused, MediaWriteRoute.SYSTEM_REQUEST, control)
@@ -379,7 +377,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
 
     /** Android 10+: MediaStore moves / renames the file itself when `RELATIVE_PATH` / `DISPLAY_NAME` change. */
     private fun relocateRow(entry: Relocation): Boolean {
-        if (sdk < Build.VERSION_CODES.Q) return false
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return false
         val values = ContentValues().apply {
             if (entry.targetRelativePath != entry.item.relativePath) put(MediaStore.MediaColumns.RELATIVE_PATH, entry.targetRelativePath)
             if (entry.targetName != entry.item.displayName) put(MediaStore.MediaColumns.DISPLAY_NAME, entry.targetName)
@@ -411,7 +409,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
 
     private fun copyOne(entry: Relocation, scanned: MutableList<String>): Boolean {
         val source = uriOf(entry.item)
-        if (sdk >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val values = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, entry.targetName)
                 put(MediaStore.MediaColumns.MIME_TYPE, entry.item.mimeType)
@@ -447,7 +445,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
 
     /** Whether every row was created by this app; trashed rows count too (restoring them from the recycle bin). */
     private fun ownedByApp(ids: List<Long>): Boolean {
-        if (ids.isEmpty() || sdk < Build.VERSION_CODES.R) return false
+        if (ids.isEmpty() || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return false
         val args = Bundle().apply {
             putString(ContentResolver.QUERY_ARG_SQL_SELECTION, "${MediaStore.MediaColumns._ID} IN (${ids.joinToString(",")})")
             putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE)
@@ -468,7 +466,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
     /** Display names already in [relativePath] (case-insensitive comparisons are done by the callers). */
     private fun namesIn(relativePath: String, excludeId: Long?): List<String> {
         val names = ArrayList<String>()
-        if (sdk >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             runCatching {
                 resolver.query(
                     media.collection,
