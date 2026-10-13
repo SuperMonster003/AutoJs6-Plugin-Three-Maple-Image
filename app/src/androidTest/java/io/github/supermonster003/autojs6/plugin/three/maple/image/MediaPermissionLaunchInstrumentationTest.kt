@@ -2,10 +2,13 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import androidx.core.content.FileProvider
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
+import androidx.test.runner.lifecycle.Stage
 import androidx.test.uiautomator.UiDevice
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -19,8 +22,8 @@ import java.util.UUID
 
 /**
  * ROADMAP 6.1 / D1 / R2: the standalone home asks for photo access once on its first launch and never again by
- * itself; the external `ACTION_VIEW` entry never asks. The system dialog is detected through UiAutomator as a
- * foreign package on top of the app.
+ * itself; the external `ACTION_VIEW` entry and the host entries ("View image", "View as album") never ask. The
+ * system dialog is detected through UiAutomator as a foreign package on top of the app.
  */
 @RunWith(AndroidJUnit4::class)
 class MediaPermissionLaunchInstrumentationTest {
@@ -104,5 +107,51 @@ class MediaPermissionLaunchInstrumentationTest {
         } finally {
             fixture.delete()
         }
+    }
+
+    @Test fun hostDirectoryEntryNeverAsks() {
+        val root = File(context.cacheDir, "permission-hostdir-${UUID.randomUUID()}").apply { mkdirs() }
+        File(root, "a.png").writeBytes(MediaStoreTestImages.solidPng(Color.RED))
+        try {
+            // Launched like the host does (ActivityScenario would add FLAG_ACTIVITY_CLEAR_TASK).
+            val activity = instrumentation.startActivitySync(
+                HostRequestFixtures.directoryIntent(context, TreeHostSession(root)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+            assertTrue("the host directory entry opens", activity is ExplorerDirectoryActivity)
+            assertFalse("the host directory entry must not show a permission dialog", foreignPackageOnTop(2_500))
+            assertFalse("the host directory entry leaves the record untouched", record.requestedBefore)
+            instrumentation.runOnMainSync { activity.finish() }
+        } finally {
+            root.deleteRecursively()
+        }
+    }
+
+    @Test fun hostViewImageEntryNeverAsks() {
+        val directory = File(context.cacheDir, "standalone-images/permission-host-${UUID.randomUUID()}").apply { mkdirs() }
+        val image = File(directory, "a.png").apply { writeBytes(MediaStoreTestImages.solidPng(Color.RED)) }
+        File(directory, "b.png").writeBytes(MediaStoreTestImages.solidPng(Color.GREEN))
+        try {
+            val intent = HostRequestFixtures.imageIntent(context, image, TreeHostSession(directory)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            instrumentation.runOnMainSync { context.startActivity(intent) }
+            val viewer = awaitResumed<ImageViewerActivity>()
+            assertFalse("the host view entry must not show a permission dialog", foreignPackageOnTop(2_500))
+            assertFalse("the host view entry leaves the record untouched", record.requestedBefore)
+            instrumentation.runOnMainSync { viewer.finish() }
+        } finally {
+            directory.deleteRecursively()
+        }
+    }
+
+    private inline fun <reified T> awaitResumed(timeoutMillis: Long = 10_000L): T {
+        val deadline = System.currentTimeMillis() + timeoutMillis
+        while (System.currentTimeMillis() < deadline) {
+            var found: T? = null
+            instrumentation.runOnMainSync {
+                found = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED).filterIsInstance<T>().firstOrNull()
+            }
+            found?.let { return it }
+            Thread.sleep(100)
+        }
+        throw AssertionError("${T::class.java.simpleName} did not resume")
     }
 }
