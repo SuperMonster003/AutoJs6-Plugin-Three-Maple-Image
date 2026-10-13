@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -142,8 +143,10 @@ internal fun MapleMediaCell(
     onClick: () -> Unit,
 ) {
     val canvas = MapleTheme.canvas
-    // Outside selection mode the cell stays free of animation state, which keeps flinging a large album cheap.
-    val inset = if (selectionMode) animateDpAsState(if (selected) SELECTED_INSET else 0.dp, label = "selectionInset").value else 0.dp
+    // Outside selection mode the cell stays free of animation state, which keeps flinging a large album cheap. The
+    // inset is read only while drawing (a layer scale), so animating it never recomposes or re-lays out the cells:
+    // selecting all of a full screen stays one recomposition.
+    val inset = if (selectionMode) animateDpAsState(if (selected) SELECTED_INSET else 0.dp, label = "selectionInset") else null
     Box(
         modifier = modifier
             .aspectRatio(1f)
@@ -159,7 +162,17 @@ internal fun MapleMediaCell(
             model = model,
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize().padding(inset).then(if (selected) Modifier.clip(RoundedCornerShape(SELECTED_CORNER)) else Modifier),
+            modifier = Modifier.fillMaxSize().then(
+                if (inset == null) Modifier else Modifier.graphicsLayer {
+                    val scale = if (size.width > 0f) 1f - 2f * inset.value.toPx() / size.width else 1f
+                    scaleX = scale
+                    scaleY = scale
+                    if (selected) {
+                        shape = RoundedCornerShape(SELECTED_CORNER)
+                        clip = true
+                    }
+                },
+            ),
         )
         if (selectionMode) {
             Icon(

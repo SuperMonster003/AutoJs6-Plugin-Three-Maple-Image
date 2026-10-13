@@ -217,7 +217,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 7.1 多选与通用操作
 
-- [x] (插件) 媒体网格多选 (3.1.0): 长按进入, 点按切换, 长按后拖动范围选择 (边缘自动滚动), 全选 / 反选 (覆盖未加载的分页), 顶栏计数, 底部操作栏 (分享 / 收藏 / 移动 / 删除 / 更多: 复制 / 重命名 (单选) / 详情). 验收: `MediaGridSelectionTest` (长按, 点按, 拖动范围, 返回退出) 与 `MediaSelectionTest` JVM; `GallerySelectionInstrumentationTest` 重建 Activity 后选择保留 (API 35 OnePlus 通过); 1000 项全选用例以 `-e selectionLoad true` 运行 (预算 2 s). 提交 8d07aa0.
+- [x] (插件) 媒体网格多选 (3.1.0): 长按进入, 点按切换, 长按后拖动范围选择 (边缘自动滚动), 全选 / 反选 (覆盖未加载的分页), 顶栏计数, 底部操作栏 (分享 / 收藏 / 移动 / 删除 / 更多: 复制 / 重命名 (单选) / 详情). 验收: `MediaGridSelectionTest` (长按, 点按, 拖动范围, 返回退出) 与 `MediaSelectionTest` JVM; `GallerySelectionInstrumentationTest` 重建 Activity 后选择保留 (API 35 OnePlus 通过); 1000 项全选 (`-e selectionLoad true`, 预算 2 s, 从点按到界面空闲) 在 AVD API 33 首测 2.0-4.1 s 不达标: 选择状态 35-61 ms 即就绪, 时间耗在选中缩进动画每帧重组全部可见格子; 缩进改为绘制阶段的图层缩放后 237-365 ms (装包后首轮 1437 ms). 提交 8d07aa0, 性能修正见下一提交.
 - [ ] (插件) 批量转换入口与相册网格多选 (排除 / 置顶 / 隐藏): 随 3.1.1 (7.4 后两条, 7.6).
 - [x] (插件) `MediaWriteCoordinator` (3.1.0): Android 11+ `createTrashRequest` / `createDeleteRequest` / `createWriteRequest` / `createFavoriteRequest` 的 `IntentSender` 往返 (整批一次确认, 授予媒体管理时系统静默批准), 本应用创建的图片与所有文件访问下直接写 (被拒的行回落到一次请求); Android 7-10 走 `java.io.File` 并等待媒体扫描, 首次写入申请存储写入权限 ("不再询问" 时提示并跳设置). 移动 / 复制带进度与取消. 验收: `MediaWriteCoordinatorInstrumentationTest` 9 例在 API 28 (G8441), API 29 AVD, API 30 AVD, API 33 (Redmi 22120RN86C), API 35 (OnePlus OPD2413) 全部通过. 提交 4ca1156, 290eb05.
 
