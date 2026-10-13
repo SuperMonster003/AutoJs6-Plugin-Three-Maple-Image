@@ -165,6 +165,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.test.ext.junit)
     androidTestImplementation(libs.test.runner)
+    androidTestImplementation(libs.test.uiautomator)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
 }

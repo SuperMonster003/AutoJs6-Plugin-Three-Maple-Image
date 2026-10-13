@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.HomeScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
@@ -12,11 +13,26 @@ import kotlinx.coroutines.launch
 
 class HomeActivity : ConfiguredActivity() {
     private lateinit var actions: HomeActions
+    private lateinit var permissionGate: MediaPermissionGate
+    private val requestPhotoAccess = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
+        permissionGate.recordResult(grants)
+        photoAccess = permissionGate.resolve()
+    }
+
+    /** Current photo access as the gallery sees it; refreshed on resume and after the system dialog. */
+    internal var photoAccess: MediaPermissionResolution? = null
+        private set
+
+    /** How many times this instance launched the system permission dialog (test hook). */
+    internal var permissionRequestsForTesting: Int = 0
+        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         actions = HomeActions(this)
         actions.restore(savedInstanceState)
+        permissionGate = MediaPermissionGate(this)
+        if (savedInstanceState == null) requestPhotoAccessOnce()
         setContent {
             MapleTheme(palette = appPalette) {
                 HomeScreen(
@@ -32,6 +48,39 @@ class HomeActivity : ConfiguredActivity() {
             }
         }
         actions.refresh()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        photoAccess = permissionGate.resolve()
+    }
+
+    /**
+     * The standalone home asks for photo access exactly once, on its first launch (ROADMAP D1 / T5); afterwards only
+     * the explicit buttons of the gallery empty state and the storage permission settings ask again.
+     */
+    private fun requestPhotoAccessOnce() {
+        val resolution = permissionGate.resolve()
+        photoAccess = resolution
+        if (!resolution.autoRequestOnLaunch) return
+        permissionGate.markRequested()
+        permissionRequestsForTesting += 1
+        requestPhotoAccess.launch(resolution.permissionsToRequest.toTypedArray())
+    }
+
+    /** Explicit request from the gallery empty state or the settings page; never automatic. */
+    internal fun requestPhotoAccess() {
+        val resolution = permissionGate.resolve()
+        when (resolution.nextAction) {
+            MediaPermissionAction.REQUEST, MediaPermissionAction.MANAGE_SELECTED -> {
+                permissionGate.markRequested()
+                permissionRequestsForTesting += 1
+                requestPhotoAccess.launch(resolution.permissionsToRequest.toTypedArray())
+            }
+            MediaPermissionAction.OPEN_APP_SETTINGS -> runCatching { startActivity(permissionGate.appSettingsIntent()) }
+                .onFailure { showMessage(R.string.standalone_home_open_failed) }
+            MediaPermissionAction.NONE -> Unit
+        }
     }
 
     private fun openHost() {

@@ -2,8 +2,6 @@
 <!-- Debug-only additions for the ROADMAP 5.1 image-loading spike. Release builds never merge this file,
      so the release manifest keeps declaring no storage permission (ROADMAP R2). -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <application>
         <activity android:name=".debug.ComposeSpikeActivity" android:exported="true" android:theme="@style/Theme.Standalone" tools:ignore="ExportedActivity" />
         <activity android:name=".debug.ComposeShowcaseActivity" android:exported="true" android:theme="@style/Theme.Standalone" tools:ignore="ExportedActivity" />
