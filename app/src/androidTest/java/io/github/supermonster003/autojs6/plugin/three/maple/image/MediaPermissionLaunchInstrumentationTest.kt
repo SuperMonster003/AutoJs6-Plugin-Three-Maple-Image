@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
+import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -35,32 +36,44 @@ class MediaPermissionLaunchInstrumentationTest {
     private var originalRequested = false
 
     @Before fun remember() {
+        dismissSystemErrorDialogs()
         originalRequested = record.requestedBefore
         record.reset()
     }
 
     @After fun restore() {
-        dismissForeignWindow()
+        dismissPermissionDialog()
         if (originalRequested) record.markRequested() else record.reset()
     }
 
-    private fun foreignPackageOnTop(timeoutMillis: Long): Boolean {
+    /**
+     * True once the system permission dialog (the permission controller or an OEM replacement) is on top. Other
+     * foreign windows do not count: CI emulators often show "System UI isn't responding" dialogs, waited out here.
+     */
+    private fun permissionDialogOnTop(timeoutMillis: Long): Boolean {
         val deadline = System.currentTimeMillis() + timeoutMillis
         while (System.currentTimeMillis() < deadline) {
-            val top = device.currentPackageName
-            if (top != null && top != context.packageName) return true
+            dismissSystemErrorDialogs()
+            if (isPermissionDialog(device.currentPackageName)) return true
             Thread.sleep(200)
         }
         return false
     }
 
-    private fun dismissForeignWindow() {
+    private fun dismissPermissionDialog() {
         repeat(2) {
-            if (device.currentPackageName != context.packageName) {
+            if (isPermissionDialog(device.currentPackageName)) {
                 device.pressBack()
                 Thread.sleep(500)
             }
         }
+    }
+
+    private fun isPermissionDialog(packageName: String?): Boolean =
+        packageName != null && PERMISSION_DIALOG_PACKAGES.any { packageName.contains(it) }
+
+    private fun dismissSystemErrorDialogs() {
+        device.findObject(By.res("android", "aerr_wait"))?.click()
     }
 
     @Test fun standaloneHomeAsksOnceOnFirstLaunchAndNotOnTheSecond() {
@@ -73,8 +86,8 @@ class MediaPermissionLaunchInstrumentationTest {
             }
             if (state == MediaAccessState.DENIED) {
                 assertEquals("first launch asks once", 1, requests)
-                assertTrue("system permission dialog expected on top", foreignPackageOnTop(5_000))
-                dismissForeignWindow()
+                assertTrue("system permission dialog expected on top", permissionDialogOnTop(5_000))
+                dismissPermissionDialog()
                 scenario.onActivity { activity -> assertEquals("dismissing the dialog does not close the door", MediaAccessState.DENIED, activity.photoAccess?.state) }
             } else {
                 assertEquals("already granted or restricted: no request", 0, requests)
@@ -84,7 +97,7 @@ class MediaPermissionLaunchInstrumentationTest {
         if (state != MediaAccessState.DENIED) record.markRequested()
         ActivityScenario.launch(HomeActivity::class.java).use { scenario ->
             scenario.onActivity { activity -> assertEquals("second launch stays silent", 0, activity.permissionRequestsForTesting) }
-            assertFalse("no system dialog on the second launch", foreignPackageOnTop(2_000))
+            assertFalse("no system dialog on the second launch", permissionDialogOnTop(2_000))
         }
     }
 
@@ -101,7 +114,7 @@ class MediaPermissionLaunchInstrumentationTest {
                 .setDataAndType(uri, "image/png")
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             ActivityScenario.launch<ExternalViewActivity>(intent).use {
-                assertFalse("the external view entry must not show a permission dialog", foreignPackageOnTop(2_500))
+                assertFalse("the external view entry must not show a permission dialog", permissionDialogOnTop(2_500))
                 assertFalse("the external view entry leaves the record untouched", record.requestedBefore)
             }
         } finally {
@@ -118,7 +131,7 @@ class MediaPermissionLaunchInstrumentationTest {
                 HostRequestFixtures.directoryIntent(context, TreeHostSession(root)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             )
             assertTrue("the host directory entry opens", activity is ExplorerDirectoryActivity)
-            assertFalse("the host directory entry must not show a permission dialog", foreignPackageOnTop(2_500))
+            assertFalse("the host directory entry must not show a permission dialog", permissionDialogOnTop(2_500))
             assertFalse("the host directory entry leaves the record untouched", record.requestedBefore)
             instrumentation.runOnMainSync { activity.finish() }
         } finally {
@@ -134,7 +147,7 @@ class MediaPermissionLaunchInstrumentationTest {
             val intent = HostRequestFixtures.imageIntent(context, image, TreeHostSession(directory)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             instrumentation.runOnMainSync { context.startActivity(intent) }
             val viewer = awaitResumed<ImageViewerActivity>()
-            assertFalse("the host view entry must not show a permission dialog", foreignPackageOnTop(2_500))
+            assertFalse("the host view entry must not show a permission dialog", permissionDialogOnTop(2_500))
             assertFalse("the host view entry leaves the record untouched", record.requestedBefore)
             instrumentation.runOnMainSync { viewer.finish() }
         } finally {
@@ -153,5 +166,9 @@ class MediaPermissionLaunchInstrumentationTest {
             Thread.sleep(100)
         }
         throw AssertionError("${T::class.java.simpleName} did not resume")
+    }
+
+    private companion object {
+        val PERMISSION_DIALOG_PACKAGES = listOf("permissioncontroller", "packageinstaller", "lbe.security")
     }
 }

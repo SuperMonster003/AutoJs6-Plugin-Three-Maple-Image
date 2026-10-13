@@ -426,7 +426,8 @@ class TiledImageDrawableInstrumentationTest {
     private companion object {
         const val SELECTED_NAME = "selected-large.png"
         const val SIBLING_NAME = "sibling-large.png"
-        const val LOAD_TIMEOUT_MILLIS = 30_000L
+        // Generous for slow CI emulators: decoding the 20 MP fixture through the host session can take long there.
+        const val LOAD_TIMEOUT_MILLIS = 60_000L
         const val POLL_INTERVAL_MILLIS = 50L
         const val TILE_CACHE_BYTES = 16L * 1_048_576L
         const val MAX_FIXTURE_BYTES = 2L * 1_048_576L
