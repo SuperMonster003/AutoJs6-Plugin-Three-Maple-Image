@@ -121,27 +121,44 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         val siblings = withContext(Dispatchers.IO) { namesIn(item.relativePath, excludeId = item.id) }
         if (siblings.any { it.equals(newName, ignoreCase = true) }) return WriteOutcome(nameTaken = true)
         val route = routeFor(MediaWriteOperation.RENAME, listOf(item)) ?: return WriteOutcome(cancelled = true)
-        val outcome = relocate(listOf(Relocation(item, item.relativePath, newName)), route)
+        val (outcome, _) = relocate(listOf(Relocation(item, item.relativePath, newName)), route, WriteControl())
         return if (outcome.succeeded == 1) {
             outcome.copy(undo = { rename(item.copy(displayName = newName), item.displayName) })
         } else outcome
     }
 
-    /** Moves [items] into [targetRelativePath] (`Pictures/Trips/`); names already there follow [conflict]. */
-    suspend fun move(items: List<MediaItem>, targetRelativePath: String, conflict: NameConflictChoice): WriteOutcome {
-        val plan = withContext(Dispatchers.IO) { planTargets(items.filter { it.relativePath != targetRelativePath }, targetRelativePath, conflict) }
+    /** How many of [items] would meet an existing name in [targetRelativePath] (ignoring case). */
+    suspend fun conflicts(items: List<MediaItem>, targetRelativePath: String): Int = withContext(Dispatchers.IO) {
+        val taken = namesIn(targetRelativePath, excludeId = null).mapTo(HashSet()) { it.lowercase() }
+        items.count { it.relativePath != targetRelativePath && it.displayName.lowercase() in taken }
+    }
+
+    /**
+     * Moves [items] into [targetRelativePath] (`Pictures/Trips/`); names already there follow [conflict] (replaced
+     * images go to the recycle bin first). [control] reports progress and stops between two images when
+     * cancelled; the undo only reverses the images that were moved.
+     */
+    suspend fun move(items: List<MediaItem>, targetRelativePath: String, conflict: NameConflictChoice, control: WriteControl = WriteControl()): WriteOutcome {
+        val candidates = items.filter { it.relativePath != targetRelativePath }
+        if (candidates.isEmpty()) return WriteOutcome()
+        if (conflict == NameConflictChoice.REPLACE && !replaceTargets(candidates, targetRelativePath)) return WriteOutcome(cancelled = true)
+        val plan = withContext(Dispatchers.IO) { planTargets(candidates, targetRelativePath, conflict) }
         if (plan.isEmpty()) return WriteOutcome()
         val route = routeFor(MediaWriteOperation.MOVE, plan.map { it.item }) ?: return WriteOutcome(cancelled = true)
-        val outcome = relocate(plan, route)
-        if (outcome.succeeded == 0) return outcome
+        val (outcome, moved) = relocate(plan, route, control)
+        if (moved.isEmpty()) return outcome
         return outcome.copy(undo = {
-            val back = plan.map { Relocation(it.item.copy(relativePath = it.targetRelativePath, displayName = it.targetName), it.item.relativePath, it.item.displayName) }
-            relocate(back, routeFor(MediaWriteOperation.MOVE, back.map { it.item }) ?: MediaWriteRoute.SYSTEM_REQUEST)
+            val back = moved.map { Relocation(it.item.copy(relativePath = it.targetRelativePath, displayName = it.targetName), it.item.relativePath, it.item.displayName) }
+            relocate(back, routeFor(MediaWriteOperation.MOVE, back.map { it.item }) ?: MediaWriteRoute.SYSTEM_REQUEST, WriteControl()).first
         })
     }
 
     /** Copies [items] into [targetRelativePath]; never asks for confirmation (new files belong to the app). */
-    suspend fun copy(items: List<MediaItem>, targetRelativePath: String, conflict: NameConflictChoice): WriteOutcome {
+    suspend fun copy(items: List<MediaItem>, targetRelativePath: String, conflict: NameConflictChoice, control: WriteControl = WriteControl()): WriteOutcome {
+        if (items.isEmpty()) return WriteOutcome()
+        if (conflict == NameConflictChoice.REPLACE && !replaceTargets(items.filter { it.relativePath != targetRelativePath }, targetRelativePath)) {
+            return WriteOutcome(cancelled = true)
+        }
         val plan = withContext(Dispatchers.IO) { planTargets(items, targetRelativePath, conflict) }
         if (plan.isEmpty()) return WriteOutcome()
         if (routeFor(MediaWriteOperation.COPY, items) == null) return WriteOutcome(cancelled = true)
@@ -149,10 +166,27 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         var failed = 0
         val scanned = ArrayList<String>()
         withContext(Dispatchers.IO) {
-            for (entry in plan) if (copyOne(entry, scanned)) done++ else failed++
+            for ((index, entry) in plan.withIndex()) {
+                if (control.cancelRequested) break
+                if (copyOne(entry, scanned)) done++ else failed++
+                control.report(index + 1, plan.size)
+            }
         }
         scan(scanned)
         return WriteOutcome(succeeded = done, failed = failed)
+    }
+
+    /**
+     * "Replace": the images in [targetRelativePath] whose names the batch needs go to the recycle bin first (an
+     * item of the batch itself is never replaced). False when the user refused that step.
+     */
+    private suspend fun replaceTargets(items: List<MediaItem>, targetRelativePath: String): Boolean {
+        val names = items.mapTo(HashSet()) { it.displayName.lowercase() }
+        val ids = items.mapTo(HashSet()) { it.id }
+        val existing = media.loadFolder(targetRelativePath).filter { it.displayName.lowercase() in names && it.id !in ids }
+        if (existing.isEmpty()) return true
+        val outcome = trash(existing)
+        return !outcome.cancelled && !outcome.tooLargeForRecycleBin
     }
 
     // ---- routes ----
@@ -280,26 +314,31 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         return plan
     }
 
-    private suspend fun relocate(plan: List<Relocation>, route: MediaWriteRoute): WriteOutcome {
+    /** Runs [plan] on [route]; returns the outcome and the entries that were actually relocated. */
+    private suspend fun relocate(plan: List<Relocation>, route: MediaWriteRoute, control: WriteControl): Pair<WriteOutcome, List<Relocation>> {
         if (route == MediaWriteRoute.SYSTEM_REQUEST) {
             if (sdk < Build.VERSION_CODES.R || !systemRequest(MediaStore.createWriteRequest(resolver, plan.map { uriOf(it.item) }))) {
-                return WriteOutcome(cancelled = true)
+                return WriteOutcome(cancelled = true) to emptyList()
             }
         }
-        var done = 0
+        val done = ArrayList<Relocation>()
         val refused = ArrayList<Relocation>()
         val scanned = ArrayList<String>()
         withContext(Dispatchers.IO) {
-            for (entry in plan) {
+            for ((index, entry) in plan.withIndex()) {
+                if (control.cancelRequested) break
                 val ok = if (route == MediaWriteRoute.LEGACY_FILE) relocateFile(entry, scanned) else relocateRow(entry)
-                if (ok) done++ else refused += entry
+                if (ok) done += entry else refused += entry
+                control.report(index + 1, plan.size)
             }
         }
         scan(scanned)
         // All files access may still be refused for some rows: one system request covers the rest.
-        if (route != MediaWriteRoute.DIRECT || refused.isEmpty() || sdk < Build.VERSION_CODES.R) return WriteOutcome(succeeded = done, failed = refused.size)
-        val rest = relocate(refused, MediaWriteRoute.SYSTEM_REQUEST)
-        return rest.copy(succeeded = rest.succeeded + done)
+        if (route != MediaWriteRoute.DIRECT || refused.isEmpty() || sdk < Build.VERSION_CODES.R || control.cancelRequested) {
+            return WriteOutcome(succeeded = done.size, failed = refused.size) to done
+        }
+        val (rest, restDone) = relocate(refused, MediaWriteRoute.SYSTEM_REQUEST, control)
+        return rest.copy(succeeded = rest.succeeded + done.size) to (done + restDone)
     }
 
     /** Android 10+: MediaStore moves / renames the file itself when `RELATIVE_PATH` / `DISPLAY_NAME` change. */
@@ -445,6 +484,22 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         fun isWritableAlbumPath(relativePath: String, sdk: Int = Build.VERSION.SDK_INT): Boolean =
             sdk < Build.VERSION_CODES.Q || relativePath.startsWith("${Environment.DIRECTORY_DCIM}/") || relativePath.startsWith("${Environment.DIRECTORY_PICTURES}/")
     }
+}
+
+/**
+ * Progress and cancellation of a move or copy batch (ROADMAP 7.3): [report] is called from a background thread
+ * after each image, and [cancel] stops the batch before the next one (finished images stay where they are).
+ */
+internal class WriteControl(private val onProgress: (done: Int, total: Int) -> Unit = { _, _ -> }) {
+    @Volatile
+    var cancelRequested: Boolean = false
+        private set
+
+    fun cancel() {
+        cancelRequested = true
+    }
+
+    fun report(done: Int, total: Int) = onProgress(done, total)
 }
 
 /**

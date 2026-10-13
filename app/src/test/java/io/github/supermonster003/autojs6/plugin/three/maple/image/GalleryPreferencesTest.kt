@@ -58,4 +58,12 @@ class GalleryPreferencesTest {
         assertNull(GalleryPreferences.decodeSort("COLOR:asc"))
         assertNull(GalleryPreferences.decodeSort("NAME:sideways"))
     }
+
+    @Test
+    fun recentTargetsKeepTheNewestFiveWithoutDuplicates() {
+        assertEquals(emptyList<String>(), preferences.recentTargets)
+        for (index in 1..6) preferences.rememberTarget("Pictures/A$index/")
+        preferences.rememberTarget("Pictures/A3/")
+        assertEquals(listOf("Pictures/A3/", "Pictures/A6/", "Pictures/A5/", "Pictures/A4/", "Pictures/A2/"), preferences.recentTargets)
+    }
 }

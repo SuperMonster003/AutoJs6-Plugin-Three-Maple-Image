@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="conflict_title">
+        <item quantity="zero">توجد %1$d صورة بالأسماء نفسها</item>
+        <item quantity="one">توجد صورة واحدة (%1$d) بالاسم نفسه</item>
+        <item quantity="two">توجد صورتان (%1$d) بالأسماء نفسها</item>
+        <item quantity="few">توجد %1$d صور بالأسماء نفسها</item>
+        <item quantity="many">توجد %1$d صورة بالأسماء نفسها</item>
+        <item quantity="other">توجد %1$d صورة بالأسماء نفسها</item>
+    </plurals>
+    <plurals name="gallery_copied_count">
+        <item quantity="zero">تم نسخ %1$d صورة إلى %2$s</item>
+        <item quantity="one">تم نسخ صورة واحدة (%1$d) إلى %2$s</item>
+        <item quantity="two">تم نسخ صورتين (%1$d) إلى %2$s</item>
+        <item quantity="few">تم نسخ %1$d صور إلى %2$s</item>
+        <item quantity="many">تم نسخ %1$d صورة إلى %2$s</item>
+        <item quantity="other">تم نسخ %1$d صورة إلى %2$s</item>
+    </plurals>
     <plurals name="gallery_delete_confirm_message">
         <item quantity="zero">سيتم حذف %1$d صورة نهائيا. لا يمكن التراجع عن ذلك.</item>
         <item quantity="one">سيتم حذف صورة واحدة (%1$d) نهائيا. لا يمكن التراجع عن ذلك.</item>
@@ -31,6 +47,14 @@
         <item quantity="few">%1$d صور</item>
         <item quantity="many">%1$d صورة</item>
         <item quantity="other">%1$d صورة</item>
+    </plurals>
+    <plurals name="gallery_moved_count">
+        <item quantity="zero">تم نقل %1$d صورة إلى %2$s</item>
+        <item quantity="one">تم نقل صورة واحدة (%1$d) إلى %2$s</item>
+        <item quantity="two">تم نقل صورتين (%1$d) إلى %2$s</item>
+        <item quantity="few">تم نقل %1$d صور إلى %2$s</item>
+        <item quantity="many">تم نقل %1$d صورة إلى %2$s</item>
+        <item quantity="other">تم نقل %1$d صورة إلى %2$s</item>
     </plurals>
     <plurals name="gallery_selected_count">
         <item quantity="zero">تم تحديد %1$d</item>

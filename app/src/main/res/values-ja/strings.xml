@@ -25,6 +25,12 @@
     <string name="action_undo">元に戻す</string>
     <string name="action_view_image">画像を表示</string>
     <string name="apk_info_format">形式</string>
+    <string name="conflict_auto_rename">両方を残す</string>
+    <string name="conflict_auto_rename_summary">新しいファイル名に番号を付けます</string>
+    <string name="conflict_replace">置き換え</string>
+    <string name="conflict_replace_summary">既存の画像はゴミ箱に移動します</string>
+    <string name="conflict_skip">スキップ</string>
+    <string name="conflict_skip_summary">同じ名前の画像は処理しません</string>
     <string name="details_count">画像数</string>
     <string name="details_date_modified">更新日時</string>
     <string name="details_date_taken">撮影日時</string>
@@ -85,6 +91,7 @@
     <string name="gallery_folder_limit_depth">%1$d 階層より深いサブフォルダーは表示されません</string>
     <string name="gallery_folder_limit_items">最初の %1$d 枚のみ表示しています</string>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">フォルダーを読み込んでいます...</string>
+    <string name="gallery_renamed">%1$s に名前を変更しました</string>
     <string name="gallery_retry">再試行</string>
     <string name="gallery_section_albums">アルバム</string>
     <string name="gallery_section_tools">ツール</string>
@@ -159,6 +166,9 @@
     <string name="metadata_unavailable">画像情報を利用できません</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">画像の表示, 編集, 形式変換</string>
+    <string name="progress_copying">画像をコピーしています</string>
+    <string name="progress_count">%1$d / %2$d</string>
+    <string name="progress_moving">画像を移動しています</string>
     <string name="recycle_bin_empty_action">ゴミ箱を空にする</string>
     <string name="recycle_bin_empty_body">削除した画像はここに 30 日間保管され, その後完全に削除されます</string>
     <string name="recycle_bin_empty_confirm">ゴミ箱内のすべての画像を完全に削除しますか? この操作は元に戻せません.</string>
@@ -166,6 +176,16 @@
     <string name="recycle_bin_title">ゴミ箱</string>
     <string name="release_history">リリース履歴</string>
     <string name="release_history_unavailable">リリース履歴を表示できません</string>
+    <string name="rename_error_blank">名前を入力してください</string>
+    <string name="rename_error_failed">ファイル名を変更できませんでした</string>
+    <string name="rename_error_illegal">使用できない文字が含まれています</string>
+    <string name="rename_error_leading_dot">名前をドットで始めることはできません</string>
+    <string name="rename_error_reserved">この名前は使用できません</string>
+    <string name="rename_error_taken">同じ名前のファイルが既にあります</string>
+    <string name="rename_error_too_long">名前が長すぎます</string>
+    <string name="rename_extension_warning">拡張子が変わるため, 一部のアプリでファイルを開けなくなる可能性があります</string>
+    <string name="rename_label">ファイル名</string>
+    <string name="rename_title">名前を変更</string>
     <string name="selection_exit">選択を終了</string>
     <string name="selection_invert">選択を反転</string>
     <string name="selection_select_all">すべて選択</string>
@@ -243,6 +263,13 @@
     <string name="storage_state_full">すべて</string>
     <string name="storage_state_never_ask">未許可. システムのアプリ設定で変更してください</string>
     <string name="storage_state_partial">選択した写真のみ</string>
+    <string name="target_all">すべてのアルバム</string>
+    <string name="target_copy_title">アルバムにコピー</string>
+    <string name="target_move_title">アルバムに移動</string>
+    <string name="target_new_album">新しいアルバム</string>
+    <string name="target_new_album_label">アルバム名</string>
+    <string name="target_new_album_summary">Pictures フォルダーに作成します</string>
+    <string name="target_recent">最近使用</string>
     <string name="text_cannot_read_file">ファイルを読めません</string>
     <string name="text_color_palette">カラーパレット</string>
     <string name="text_done">完了</string>

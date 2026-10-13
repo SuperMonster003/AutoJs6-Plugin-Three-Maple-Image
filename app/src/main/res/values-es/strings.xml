@@ -25,6 +25,12 @@
     <string name="action_undo">Deshacer</string>
     <string name="action_view_image">Ver imagen</string>
     <string name="apk_info_format">Formato</string>
+    <string name="conflict_auto_rename">Conservar ambos</string>
+    <string name="conflict_auto_rename_summary">Se añade un número al nombre del archivo nuevo</string>
+    <string name="conflict_replace">Reemplazar</string>
+    <string name="conflict_replace_summary">Las imágenes existentes van a la papelera</string>
+    <string name="conflict_skip">Omitir</string>
+    <string name="conflict_skip_summary">Las imágenes con estos nombres no se procesan</string>
     <string name="details_count">Imágenes</string>
     <string name="details_date_modified">Modificada</string>
     <string name="details_date_taken">Tomada</string>
@@ -85,6 +91,7 @@
     <string name="gallery_folder_limit_depth">No se listan las subcarpetas con más de %1$d niveles de profundidad</string>
     <string name="gallery_folder_limit_items">Solo se listan las primeras %1$d imágenes</string>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">Leyendo la carpeta...</string>
+    <string name="gallery_renamed">Nombre cambiado a %1$s</string>
     <string name="gallery_retry">Reintentar</string>
     <string name="gallery_section_albums">Álbumes</string>
     <string name="gallery_section_tools">Herramientas</string>
@@ -159,6 +166,9 @@
     <string name="metadata_unavailable">La información de la imagen no está disponible</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Visualización, edición y conversión de imágenes</string>
+    <string name="progress_copying">Copiando imágenes</string>
+    <string name="progress_count">%1$d / %2$d</string>
+    <string name="progress_moving">Moviendo imágenes</string>
     <string name="recycle_bin_empty_action">Vaciar papelera</string>
     <string name="recycle_bin_empty_body">Las imágenes eliminadas se guardan aquí 30 días y luego se eliminan definitivamente</string>
     <string name="recycle_bin_empty_confirm">¿Eliminar definitivamente todo el contenido de la papelera? Esta acción no se puede deshacer.</string>
@@ -166,6 +176,16 @@
     <string name="recycle_bin_title">Papelera</string>
     <string name="release_history">Historial de versiones</string>
     <string name="release_history_unavailable">El historial de versiones no está disponible</string>
+    <string name="rename_error_blank">Escribe un nombre</string>
+    <string name="rename_error_failed">No se pudo cambiar el nombre del archivo</string>
+    <string name="rename_error_illegal">El nombre contiene un carácter no permitido</string>
+    <string name="rename_error_leading_dot">El nombre no puede empezar por un punto</string>
+    <string name="rename_error_reserved">Este nombre no se puede usar</string>
+    <string name="rename_error_taken">Ya existe un archivo con este nombre</string>
+    <string name="rename_error_too_long">El nombre es demasiado largo</string>
+    <string name="rename_extension_warning">La extensión cambia, por lo que algunas aplicaciones podrían no abrir el archivo</string>
+    <string name="rename_label">Nombre del archivo</string>
+    <string name="rename_title">Cambiar nombre</string>
     <string name="selection_exit">Salir de la selección</string>
     <string name="selection_invert">Invertir selección</string>
     <string name="selection_select_all">Seleccionar todo</string>
@@ -243,6 +263,13 @@
     <string name="storage_state_full">Completo</string>
     <string name="storage_state_never_ask">No concedido; cámbielo en los ajustes de la aplicación del sistema</string>
     <string name="storage_state_partial">Solo fotos seleccionadas</string>
+    <string name="target_all">Todos los álbumes</string>
+    <string name="target_copy_title">Copiar al álbum</string>
+    <string name="target_move_title">Mover al álbum</string>
+    <string name="target_new_album">Álbum nuevo</string>
+    <string name="target_new_album_label">Nombre del álbum</string>
+    <string name="target_new_album_summary">Se crea en la carpeta Pictures</string>
+    <string name="target_recent">Usados recientemente</string>
     <string name="text_cannot_read_file">No se puede leer el archivo</string>
     <string name="text_color_palette">Paleta de colores</string>
     <string name="text_done">Hecho</string>

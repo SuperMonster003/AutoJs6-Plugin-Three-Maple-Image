@@ -25,6 +25,12 @@
     <string name="action_undo">Annuler</string>
     <string name="action_view_image">Afficher l\'image</string>
     <string name="apk_info_format">Format</string>
+    <string name="conflict_auto_rename">Conserver les deux</string>
+    <string name="conflict_auto_rename_summary">Un numéro est ajouté au nom du nouveau fichier</string>
+    <string name="conflict_replace">Remplacer</string>
+    <string name="conflict_replace_summary">Les images existantes vont dans la corbeille</string>
+    <string name="conflict_skip">Ignorer</string>
+    <string name="conflict_skip_summary">Les images portant ces noms ne sont pas traitées</string>
     <string name="details_count">Images</string>
     <string name="details_date_modified">Modifiée</string>
     <string name="details_date_taken">Prise</string>
@@ -85,6 +91,7 @@
     <string name="gallery_folder_limit_depth">Les sous-dossiers au-delà de %1$d niveaux ne sont pas listés</string>
     <string name="gallery_folder_limit_items">Seules les %1$d premières images sont listées</string>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">Lecture du dossier...</string>
+    <string name="gallery_renamed">Renommée en %1$s</string>
     <string name="gallery_retry">Réessayer</string>
     <string name="gallery_section_albums">Albums</string>
     <string name="gallery_section_tools">Outils</string>
@@ -159,6 +166,9 @@
     <string name="metadata_unavailable">Les informations de l\'image ne sont pas disponibles</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Affichage, retouche et conversion d\'images</string>
+    <string name="progress_copying">Copie des images</string>
+    <string name="progress_count">%1$d / %2$d</string>
+    <string name="progress_moving">Déplacement des images</string>
     <string name="recycle_bin_empty_action">Vider la corbeille</string>
     <string name="recycle_bin_empty_body">Les images supprimées restent ici 30 jours, puis sont supprimées définitivement</string>
     <string name="recycle_bin_empty_confirm">Supprimer définitivement tout le contenu de la corbeille? Cette action est irréversible.</string>
@@ -166,6 +176,16 @@
     <string name="recycle_bin_title">Corbeille</string>
     <string name="release_history">Historique des versions</string>
     <string name="release_history_unavailable">L\'historique des versions est indisponible</string>
+    <string name="rename_error_blank">Saisissez un nom</string>
+    <string name="rename_error_failed">Impossible de renommer le fichier</string>
+    <string name="rename_error_illegal">Le nom contient un caractère non autorisé</string>
+    <string name="rename_error_leading_dot">Le nom ne peut pas commencer par un point</string>
+    <string name="rename_error_reserved">Ce nom ne peut pas être utilisé</string>
+    <string name="rename_error_taken">Un fichier portant ce nom existe déjà</string>
+    <string name="rename_error_too_long">Le nom est trop long</string>
+    <string name="rename_extension_warning">L\'extension change, certaines applications risquent de ne plus ouvrir le fichier</string>
+    <string name="rename_label">Nom du fichier</string>
+    <string name="rename_title">Renommer</string>
     <string name="selection_exit">Quitter la sélection</string>
     <string name="selection_invert">Inverser la sélection</string>
     <string name="selection_select_all">Tout sélectionner</string>
@@ -243,6 +263,13 @@
     <string name="storage_state_full">Complet</string>
     <string name="storage_state_never_ask">Non accordé; modifiez-le dans les paramètres système de l\'application</string>
     <string name="storage_state_partial">Photos sélectionnées uniquement</string>
+    <string name="target_all">Tous les albums</string>
+    <string name="target_copy_title">Copier vers un album</string>
+    <string name="target_move_title">Déplacer vers un album</string>
+    <string name="target_new_album">Nouvel album</string>
+    <string name="target_new_album_label">Nom de l\'album</string>
+    <string name="target_new_album_summary">Créé dans le dossier Pictures</string>
+    <string name="target_recent">Utilisés récemment</string>
     <string name="text_cannot_read_file">Impossible de lire le fichier</string>
     <string name="text_color_palette">Palette de couleurs</string>
     <string name="text_done">Terminé</string>

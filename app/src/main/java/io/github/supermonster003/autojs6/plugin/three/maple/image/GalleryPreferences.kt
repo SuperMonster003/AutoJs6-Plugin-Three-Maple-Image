@@ -30,6 +30,14 @@ internal class GalleryPreferences(private val preferences: SharedPreferences) {
             .apply()
     }
 
+    /** Move / copy targets (`Pictures/Trips/`) used lately, newest first (ROADMAP 7.3 album picker). */
+    val recentTargets: List<String>
+        get() = preferences.getString(KEY_RECENT_TARGETS, null).orEmpty().split('\n').filter { it.isNotBlank() }
+
+    fun rememberTarget(relativePath: String) {
+        preferences.edit().putString(KEY_RECENT_TARGETS, pushRecent(recentTargets, relativePath).joinToString("\n")).apply()
+    }
+
     companion object {
         const val MIN_COLUMNS = 3
         const val MAX_COLUMNS = 6
@@ -37,6 +45,11 @@ internal class GalleryPreferences(private val preferences: SharedPreferences) {
         private const val FILE_NAME = "gallery"
         private const val KEY_COLUMNS = "media_columns"
         private const val KEY_DEFAULT_SORT = "default_sort"
+        private const val KEY_RECENT_TARGETS = "recent_targets"
+        const val MAX_RECENT_TARGETS = 5
+
+        /** [path] first, without duplicates, at most [MAX_RECENT_TARGETS]. */
+        fun pushRecent(recent: List<String>, path: String): List<String> = (listOf(path) + recent.filter { it != path }).take(MAX_RECENT_TARGETS)
 
         fun clampColumns(value: Int): Int = value.coerceIn(MIN_COLUMNS, MAX_COLUMNS)
 

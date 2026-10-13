@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="conflict_title">
+        <item quantity="one">Ya existe %1$d imagen con el mismo nombre</item>
+        <item quantity="many">Ya existen %1$d imágenes con los mismos nombres</item>
+        <item quantity="other">Ya existen %1$d imágenes con los mismos nombres</item>
+    </plurals>
+    <plurals name="gallery_copied_count">
+        <item quantity="one">%1$d imagen copiada a %2$s</item>
+        <item quantity="many">%1$d imágenes copiadas a %2$s</item>
+        <item quantity="other">%1$d imágenes copiadas a %2$s</item>
+    </plurals>
     <plurals name="gallery_delete_confirm_message">
         <item quantity="one">%1$d imagen se eliminará definitivamente. Esta acción no se puede deshacer.</item>
         <item quantity="many">%1$d imágenes se eliminarán definitivamente. Esta acción no se puede deshacer.</item>
@@ -19,6 +29,11 @@
         <item quantity="one">%1$d imagen</item>
         <item quantity="many">%1$d imágenes</item>
         <item quantity="other">%1$d imágenes</item>
+    </plurals>
+    <plurals name="gallery_moved_count">
+        <item quantity="one">%1$d imagen movida a %2$s</item>
+        <item quantity="many">%1$d imágenes movidas a %2$s</item>
+        <item quantity="other">%1$d imágenes movidas a %2$s</item>
     </plurals>
     <plurals name="gallery_selected_count">
         <item quantity="one">%1$d seleccionada</item>

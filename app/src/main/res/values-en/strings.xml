@@ -25,6 +25,12 @@
     <string name="action_undo">Undo</string>
     <string name="action_view_image">View image</string>
     <string name="apk_info_format">Format</string>
+    <string name="conflict_auto_rename">Keep both</string>
+    <string name="conflict_auto_rename_summary">A number is added to the new file name</string>
+    <string name="conflict_replace">Replace</string>
+    <string name="conflict_replace_summary">The existing images go to the recycle bin</string>
+    <string name="conflict_skip">Skip</string>
+    <string name="conflict_skip_summary">Images with these names are left out</string>
     <string name="details_count">Images</string>
     <string name="details_date_modified">Modified</string>
     <string name="details_date_taken">Taken</string>
@@ -85,6 +91,7 @@
     <string name="gallery_folder_limit_depth">Subfolders deeper than %1$d levels are not listed</string>
     <string name="gallery_folder_limit_items">Only the first %1$d images are listed</string>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">Reading folder...</string>
+    <string name="gallery_renamed">Renamed to %1$s</string>
     <string name="gallery_retry">Retry</string>
     <string name="gallery_section_albums">Albums</string>
     <string name="gallery_section_tools">Tools</string>
@@ -159,6 +166,9 @@
     <string name="metadata_unavailable">Image information is unavailable</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Image viewing, editing and format conversion</string>
+    <string name="progress_copying">Copying images</string>
+    <string name="progress_count">%1$d / %2$d</string>
+    <string name="progress_moving">Moving images</string>
     <string name="recycle_bin_empty_action">Empty recycle bin</string>
     <string name="recycle_bin_empty_body">Deleted images stay here for 30 days, then they are removed for good</string>
     <string name="recycle_bin_empty_confirm">Delete everything in the recycle bin permanently? This cannot be undone.</string>
@@ -166,6 +176,16 @@
     <string name="recycle_bin_title">Recycle bin</string>
     <string name="release_history">Release history</string>
     <string name="release_history_unavailable">Release history is unavailable</string>
+    <string name="rename_error_blank">Enter a name</string>
+    <string name="rename_error_failed">The file could not be renamed</string>
+    <string name="rename_error_illegal">The name contains a character that is not allowed</string>
+    <string name="rename_error_leading_dot">The name cannot start with a dot</string>
+    <string name="rename_error_reserved">This name cannot be used</string>
+    <string name="rename_error_taken">A file with this name already exists</string>
+    <string name="rename_error_too_long">The name is too long</string>
+    <string name="rename_extension_warning">The extension changes, so some apps may no longer open the file</string>
+    <string name="rename_label">File name</string>
+    <string name="rename_title">Rename</string>
     <string name="selection_exit">Exit selection</string>
     <string name="selection_invert">Invert selection</string>
     <string name="selection_select_all">Select all</string>
@@ -243,6 +263,13 @@
     <string name="storage_state_full">Full</string>
     <string name="storage_state_never_ask">Not granted; change it in the system app settings</string>
     <string name="storage_state_partial">Selected photos only</string>
+    <string name="target_all">All albums</string>
+    <string name="target_copy_title">Copy to album</string>
+    <string name="target_move_title">Move to album</string>
+    <string name="target_new_album">New album</string>
+    <string name="target_new_album_label">Album name</string>
+    <string name="target_new_album_summary">Created in the Pictures folder</string>
+    <string name="target_recent">Recently used</string>
     <string name="text_cannot_read_file">Cannot read image</string>
     <string name="text_color_palette">Color palette</string>
     <string name="text_done">Done</string>

@@ -147,6 +147,19 @@ internal class MediaStoreRepository(
     fun changes(quietMillis: Long = DEFAULT_QUIET_MILLIS, maxWaitMillis: Long = DEFAULT_MAX_WAIT_MILLIS): Flow<Unit> =
         rawChanges().settle(quietMillis, maxWaitMillis).onEach { invalidate() }
 
+    /** Every row of one folder (`Pictures/Trips/`), unfiltered: the name conflicts of a move or copy (ROADMAP 7.3). */
+    suspend fun loadFolder(relativePath: String): List<MediaItem> = withContext(Dispatchers.IO) {
+        runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                query("${MediaStore.Images.Media.RELATIVE_PATH} = ?", arrayOf(relativePath), MediaSort.DEFAULT, limit = null, offset = 0)
+            } else {
+                @Suppress("DEPRECATION")
+                query("${MediaStore.Images.Media.DATA} LIKE ?", arrayOf("%/$relativePath%"), MediaSort.DEFAULT, limit = null, offset = 0)
+                    .filter { it.relativePath == relativePath }
+            }
+        }.getOrDefault(emptyList())
+    }
+
     private fun rawChanges(): Flow<Unit> = callbackFlow {
         val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
             override fun onChange(selfChange: Boolean) {

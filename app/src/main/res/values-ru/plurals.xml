@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="conflict_title">
+        <item quantity="one">Там уже есть %1$d изображение с таким же именем</item>
+        <item quantity="few">Там уже есть %1$d изображения с такими же именами</item>
+        <item quantity="many">Там уже есть %1$d изображений с такими же именами</item>
+        <item quantity="other">Там уже есть %1$d изображения с такими же именами</item>
+    </plurals>
+    <plurals name="gallery_copied_count">
+        <item quantity="one">%1$d изображение скопировано в %2$s</item>
+        <item quantity="few">%1$d изображения скопированы в %2$s</item>
+        <item quantity="many">%1$d изображений скопировано в %2$s</item>
+        <item quantity="other">%1$d изображения скопированы в %2$s</item>
+    </plurals>
     <plurals name="gallery_delete_confirm_message">
         <item quantity="one">%1$d изображение будет удалено навсегда. Это действие нельзя отменить.</item>
         <item quantity="few">%1$d изображения будут удалены навсегда. Это действие нельзя отменить.</item>
@@ -23,6 +35,12 @@
         <item quantity="few">%1$d изображения</item>
         <item quantity="many">%1$d изображений</item>
         <item quantity="other">%1$d изображения</item>
+    </plurals>
+    <plurals name="gallery_moved_count">
+        <item quantity="one">%1$d изображение перемещено в %2$s</item>
+        <item quantity="few">%1$d изображения перемещены в %2$s</item>
+        <item quantity="many">%1$d изображений перемещено в %2$s</item>
+        <item quantity="other">%1$d изображения перемещены в %2$s</item>
     </plurals>
     <plurals name="gallery_selected_count">
         <item quantity="one">Выбран %1$d</item>

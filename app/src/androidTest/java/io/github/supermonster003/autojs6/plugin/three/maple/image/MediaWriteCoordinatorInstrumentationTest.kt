@@ -88,6 +88,34 @@ class MediaWriteCoordinatorInstrumentationTest {
     }
 
     @Test
+    fun conflictsAreCountedAndReplacedTargetsGoToTheRecycleBin() = runBlocking {
+        insert("a.png", Color.RED)
+        insert("b.png", Color.GREEN)
+        MediaStoreTestImages.insert(context, target, "A.PNG", Color.BLUE)
+        val (a, b) = items(folder).sortedBy { it.displayName }
+        val old = items(target).single()
+        assertEquals(1, main { coordinator.conflicts(listOf(a, b), relativePath(target)) })
+
+        val moved = main { coordinator.move(listOf(a, b), relativePath(target), NameConflictChoice.REPLACE) }
+        assertEquals(2, moved.succeeded)
+        assertEquals(listOf("a.png", "b.png"), names(target).map { it.lowercase() }.sorted())
+        assertTrue("the moved image replaced the old one", items(target).none { it.id == old.id })
+        assertTrue("the replaced image waits in the recycle bin", RecycleBinRepository(context).load().any { it.displayName.equals("A.PNG", ignoreCase = true) })
+    }
+
+    @Test
+    fun aCancelledCopyKeepsTheFinishedImages() = runBlocking {
+        insert("a.png", Color.RED)
+        insert("b.png", Color.GREEN)
+        insert("c.png", Color.BLUE)
+        lateinit var control: WriteControl
+        control = WriteControl { done, _ -> if (done == 1) control.cancel() }
+        val copied = main { coordinator.copy(items(folder), relativePath(target), NameConflictChoice.AUTO_RENAME, control) }
+        assertEquals(1, copied.succeeded)
+        assertEquals(1, names(target).size)
+    }
+
+    @Test
     fun trashIsUndoableAndDeleteIsFinal() = runBlocking {
         insert("a.png", Color.RED)
         insert("b.png", Color.BLUE)

@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.DocumentsContract
 import android.text.format.Formatter
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,9 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,9 +28,15 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ConflictDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleSettingsDefaults
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaSelectionActions
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.NewAlbumDialog
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.RenameDialog
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.TargetAlbum
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.TargetAlbumDialog
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.TransferProgressDialog
 import java.text.DateFormat
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +53,17 @@ internal sealed interface GalleryDialog {
 
     /** Permanent delete from the recycle bin page; [all] empties it. */
     data class ConfirmBinDelete(val entries: List<RecycleBinEntry>, val all: Boolean) : GalleryDialog
+
+    /** Rename one image; [document] renames an authorized folder document instead of a library row. */
+    data class Rename(val item: MediaItem, val document: Boolean) : GalleryDialog
+
+    data class PickTarget(val items: List<MediaItem>, val copy: Boolean) : GalleryDialog
+
+    data class NewAlbum(val items: List<MediaItem>, val copy: Boolean) : GalleryDialog
+
+    data class Conflict(val items: List<MediaItem>, val copy: Boolean, val target: TargetAlbum, val count: Int) : GalleryDialog
+
+    data class Progress(val copy: Boolean, val control: WriteControl) : GalleryDialog
 }
 
 internal enum class DeleteReason {
@@ -71,13 +91,22 @@ internal class GalleryOperations(
     private var dialog by mutableStateOf<GalleryDialog?>(null)
     private var job: Job? = null
     private var snackbarJob: Job? = null
+    private val preferences = GalleryPreferences(activity)
+    private var renameError by mutableStateOf<String?>(null)
+    private var renameBusy by mutableStateOf(false)
+    private var progressDone by mutableIntStateOf(0)
+    private var progressTotal by mutableIntStateOf(0)
 
     /** What the bar offers for [state]'s album: authorized folders only share, delete, rename and show details. */
     fun actionsFor(state: MediaGridUiState): MediaSelectionActions {
-        if (state.album == null) return MediaSelectionActions()
+        val album = state.album ?: return MediaSelectionActions()
+        val library = album.kind != AlbumKind.FOLDER
         return MediaSelectionActions(
             onShare = ::share,
+            onMove = if (library) ::move else null,
             onDelete = ::delete,
+            onCopy = if (library) ::copy else null,
+            onRename = ::rename,
             onDetails = ::details,
         )
     }
@@ -200,6 +229,107 @@ internal class GalleryOperations(
         recycleBin.load()
     }
 
+    // ---- rename / move / copy (ROADMAP 7.3) ----
+
+    fun rename() = launch {
+        val item = gallery.selectedItems().singleOrNull() ?: return@launch
+        renameError = null
+        show(GalleryDialog.Rename(item, document = gallery.grid.value.album?.kind == AlbumKind.FOLDER))
+    }
+
+    private fun runRename(item: MediaItem, document: Boolean, name: String) = launch {
+        renameBusy = true
+        val outcome = try {
+            if (document) renameDocument(item, name) else coordinator.rename(item, name)
+        } finally {
+            renameBusy = false
+        }
+        when {
+            outcome.nameTaken -> renameError = activity.getString(R.string.rename_error_taken)
+            outcome.cancelled -> show(null)
+            outcome.succeeded == 0 -> renameError = activity.getString(R.string.rename_error_failed)
+            else -> {
+                show(null)
+                afterGridWrite(listOf(item))
+                notify(activity.getString(R.string.gallery_renamed, name), outcome.undo, afterUndo = ::refreshAll)
+            }
+        }
+    }
+
+    /** Authorized folders rename through their documents provider; the undo renames the new document back. */
+    private suspend fun renameDocument(item: MediaItem, name: String): WriteOutcome = withContext(Dispatchers.IO) {
+        val resolver = activity.contentResolver
+        val renamed = runCatching { DocumentsContract.renameDocument(resolver, Uri.parse(item.contentUri), name) }.getOrNull()
+            ?: return@withContext WriteOutcome(failed = 1)
+        WriteOutcome(succeeded = 1, undo = {
+            withContext(Dispatchers.IO) {
+                val back = runCatching { DocumentsContract.renameDocument(resolver, renamed, item.displayName) }.getOrNull()
+                if (back != null) WriteOutcome(succeeded = 1) else WriteOutcome(failed = 1)
+            }
+        })
+    }
+
+    fun move() = pickTarget(copy = false)
+
+    fun copy() = pickTarget(copy = true)
+
+    private fun pickTarget(copy: Boolean) = launch {
+        val items = gallery.selectedItems()
+        if (items.isNotEmpty()) show(GalleryDialog.PickTarget(items, copy))
+    }
+
+    /** Writable albums of the media library (Android 10+ only accepts DCIM/ and Pictures/), moves skip the open one. */
+    private fun targetAlbums(copy: Boolean): Pair<List<TargetAlbum>, List<TargetAlbum>> {
+        val open = gallery.grid.value.album
+        val albums = gallery.albums.value.albums
+            .filter { it.kind == AlbumKind.MEDIA && it.subtitle.isNotEmpty() && MediaWriteCoordinator.isWritableAlbumPath(it.subtitle) }
+            .filter { copy || open?.kind != AlbumKind.MEDIA || it.id != open.id }
+            .map { TargetAlbum(it.name, it.subtitle) }
+            .distinctBy { it.relativePath }
+        val byPath = albums.associateBy { it.relativePath }
+        val recent = preferences.recentTargets
+            .filter { MediaWriteCoordinator.isWritableAlbumPath(it) && (copy || open?.kind != AlbumKind.MEDIA || it != open.subtitle) }
+            .map { path -> byPath[path] ?: TargetAlbum(path.trimEnd('/').substringAfterLast('/'), path) }
+        return recent to albums
+    }
+
+    private fun chooseTarget(items: List<MediaItem>, copy: Boolean, target: TargetAlbum) = launch {
+        show(null)
+        val count = coordinator.conflicts(items, target.relativePath)
+        if (count > 0) show(GalleryDialog.Conflict(items, copy, target, count)) else transfer(items, copy, target, NameConflictChoice.AUTO_RENAME)
+    }
+
+    private fun transferLater(items: List<MediaItem>, copy: Boolean, target: TargetAlbum, conflict: NameConflictChoice) = launch {
+        transfer(items, copy, target, conflict)
+    }
+
+    private suspend fun transfer(items: List<MediaItem>, copy: Boolean, target: TargetAlbum, conflict: NameConflictChoice) {
+        val control = WriteControl { done, total ->
+            progressDone = done
+            progressTotal = total
+        }
+        progressDone = 0
+        progressTotal = items.size
+        if (items.size > 1) show(GalleryDialog.Progress(copy, control))
+        val outcome = try {
+            if (copy) coordinator.copy(items, target.relativePath, conflict, control) else coordinator.move(items, target.relativePath, conflict, control)
+        } finally {
+            if (dialog is GalleryDialog.Progress) show(null)
+        }
+        if (outcome.cancelled) return
+        if (outcome.succeeded > 0) preferences.rememberTarget(target.relativePath)
+        afterGridWrite(items)
+        val resource = if (copy) R.plurals.gallery_copied_count else R.plurals.gallery_moved_count
+        val message = buildString {
+            if (outcome.succeeded > 0) append(activity.resources.getQuantityString(resource, outcome.succeeded, outcome.succeeded, target.name))
+            if (outcome.failed > 0) {
+                if (isNotEmpty()) append(". ")
+                append(failedMessage(outcome.failed))
+            }
+        }
+        if (message.isNotEmpty()) notify(message, if (copy) null else outcome.undo, afterUndo = ::refreshAll)
+    }
+
     // ---- recycle bin page (ROADMAP 7.2) ----
 
     fun restoreFromBin() = launch {
@@ -270,6 +400,47 @@ internal class GalleryOperations(
                     show(null)
                     deleteBinEntries(current.entries)
                 },
+            )
+            is GalleryDialog.Rename -> RenameDialog(
+                name = current.item.displayName,
+                externalError = renameError,
+                busy = renameBusy,
+                onDismiss = { show(null) },
+                onConfirm = { name -> runRename(current.item, current.document, name) },
+            )
+            is GalleryDialog.PickTarget -> {
+                val (recent, albums) = remember(current) { targetAlbums(current.copy) }
+                TargetAlbumDialog(
+                    copy = current.copy,
+                    recent = recent,
+                    albums = albums,
+                    onNewAlbum = { show(GalleryDialog.NewAlbum(current.items, current.copy)) },
+                    onPick = { target -> chooseTarget(current.items, current.copy, target) },
+                    onDismiss = { show(null) },
+                )
+            }
+            is GalleryDialog.NewAlbum -> NewAlbumDialog(
+                onDismiss = { show(null) },
+                onConfirm = { name -> chooseTarget(current.items, current.copy, TargetAlbum(name, "${Environment.DIRECTORY_PICTURES}/$name/")) },
+            )
+            is GalleryDialog.Conflict -> ConflictDialog(
+                count = current.count,
+                onDismiss = { show(null) },
+                onConfirm = { index ->
+                    show(null)
+                    val choice = when (index) {
+                        1 -> NameConflictChoice.SKIP
+                        2 -> NameConflictChoice.REPLACE
+                        else -> NameConflictChoice.AUTO_RENAME
+                    }
+                    transferLater(current.items, current.copy, current.target, choice)
+                },
+            )
+            is GalleryDialog.Progress -> TransferProgressDialog(
+                copy = current.copy,
+                done = progressDone,
+                total = progressTotal,
+                onCancel = current.control::cancel,
             )
             null -> Unit
         }

@@ -25,6 +25,12 @@
     <string name="action_undo">Отменить</string>
     <string name="action_view_image">Просмотреть изображение</string>
     <string name="apk_info_format">Формат</string>
+    <string name="conflict_auto_rename">Оставить оба</string>
+    <string name="conflict_auto_rename_summary">К имени нового файла добавляется номер</string>
+    <string name="conflict_replace">Заменить</string>
+    <string name="conflict_replace_summary">Существующие изображения попадут в корзину</string>
+    <string name="conflict_skip">Пропустить</string>
+    <string name="conflict_skip_summary">Изображения с такими именами не обрабатываются</string>
     <string name="details_count">Изображения</string>
     <string name="details_date_modified">Изменено</string>
     <string name="details_date_taken">Снято</string>
@@ -85,6 +91,7 @@
     <string name="gallery_folder_limit_depth">Подпапки глубже %1$d уровней не показаны</string>
     <string name="gallery_folder_limit_items">Показаны только первые %1$d изображений</string>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">Чтение папки...</string>
+    <string name="gallery_renamed">Переименовано в %1$s</string>
     <string name="gallery_retry">Повторить</string>
     <string name="gallery_section_albums">Альбомы</string>
     <string name="gallery_section_tools">Инструменты</string>
@@ -159,6 +166,9 @@
     <string name="metadata_unavailable">Сведения об изображении недоступны</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Просмотр, редактирование и преобразование изображений</string>
+    <string name="progress_copying">Копирование изображений</string>
+    <string name="progress_count">%1$d / %2$d</string>
+    <string name="progress_moving">Перемещение изображений</string>
     <string name="recycle_bin_empty_action">Очистить корзину</string>
     <string name="recycle_bin_empty_body">Удалённые изображения хранятся здесь 30 дней, затем удаляются навсегда</string>
     <string name="recycle_bin_empty_confirm">Удалить всё содержимое корзины навсегда? Это действие нельзя отменить.</string>
@@ -166,6 +176,16 @@
     <string name="recycle_bin_title">Корзина</string>
     <string name="release_history">История выпусков</string>
     <string name="release_history_unavailable">История выпусков недоступна</string>
+    <string name="rename_error_blank">Введите имя</string>
+    <string name="rename_error_failed">Не удалось переименовать файл</string>
+    <string name="rename_error_illegal">Имя содержит недопустимый символ</string>
+    <string name="rename_error_leading_dot">Имя не может начинаться с точки</string>
+    <string name="rename_error_reserved">Это имя нельзя использовать</string>
+    <string name="rename_error_taken">Файл с таким именем уже существует</string>
+    <string name="rename_error_too_long">Имя слишком длинное</string>
+    <string name="rename_extension_warning">Расширение изменится, и некоторые приложения могут перестать открывать файл</string>
+    <string name="rename_label">Имя файла</string>
+    <string name="rename_title">Переименовать</string>
     <string name="selection_exit">Выйти из выбора</string>
     <string name="selection_invert">Инвертировать выбор</string>
     <string name="selection_select_all">Выбрать все</string>
@@ -243,6 +263,13 @@
     <string name="storage_state_full">Полный</string>
     <string name="storage_state_never_ask">Не предоставлен; измените его в системных настройках приложения</string>
     <string name="storage_state_partial">Только выбранные фото</string>
+    <string name="target_all">Все альбомы</string>
+    <string name="target_copy_title">Копировать в альбом</string>
+    <string name="target_move_title">Переместить в альбом</string>
+    <string name="target_new_album">Новый альбом</string>
+    <string name="target_new_album_label">Название альбома</string>
+    <string name="target_new_album_summary">Создаётся в папке Pictures</string>
+    <string name="target_recent">Недавние</string>
     <string name="text_cannot_read_file">Невозможно прочитать файл</string>
     <string name="text_color_palette">Цветовая палитра</string>
     <string name="text_done">Готово</string>
