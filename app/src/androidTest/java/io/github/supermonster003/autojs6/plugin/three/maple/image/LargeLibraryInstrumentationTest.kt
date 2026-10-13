@@ -58,7 +58,14 @@ class LargeLibraryInstrumentationTest {
     @Test
     fun dataLayerTimings() = runBlocking {
         val repository = MediaStoreRepository(context)
-        val all = measure("full scan") { repository.loadAll() }
+        var all = measure("full scan") { repository.loadAll() }
+        if (all.isEmpty()) {
+            // Right after the runtime grant MediaStore may still answer with the old permission state (see
+            // GalleryViewModel.reload); give it a moment, like the gallery does.
+            delay(1_000)
+            repository.invalidate()
+            all = measure("full scan after the grant settled") { repository.loadAll() }
+        }
         val buckets = measure("album aggregation over the cached scan") { repository.loadBuckets() }
         report("library images=${all.size} albums=${buckets.size} pssKb=${Debug.getPss()}")
         repository.invalidate()
