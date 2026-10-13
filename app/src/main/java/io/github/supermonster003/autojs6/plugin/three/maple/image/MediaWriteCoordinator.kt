@@ -61,6 +61,11 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
 
     private var requestCount = 0
 
+    /** Set when Android 7-10 refused the storage write permission for the last batch; read once by the caller. */
+    private var writePermissionRefused = false
+
+    fun consumeWritePermissionRefused(): Boolean = writePermissionRefused.also { writePermissionRefused = false }
+
     private val sdk: Int get() = Build.VERSION.SDK_INT
 
     private fun facts(owned: Boolean = false) = MediaWriteFacts(
@@ -224,9 +229,15 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         val owned = sdk >= Build.VERSION_CODES.R && withContext(Dispatchers.IO) { ownedByApp(ids) }
         var route = MediaWritePolicy.route(operation, facts(owned))
         if (route == MediaWriteRoute.NEEDS_LEGACY_PERMISSION) {
-            if (!requestLegacyWrite()) return null
+            if (!requestLegacyWrite()) {
+                writePermissionRefused = true
+                return null
+            }
             route = MediaWritePolicy.route(operation, facts(owned))
-            if (route == MediaWriteRoute.NEEDS_LEGACY_PERMISSION) return null
+            if (route == MediaWriteRoute.NEEDS_LEGACY_PERMISSION) {
+                writePermissionRefused = true
+                return null
+            }
         }
         return route
     }

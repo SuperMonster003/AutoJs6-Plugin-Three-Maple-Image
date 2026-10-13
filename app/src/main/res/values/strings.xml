@@ -267,6 +267,7 @@
     <string name="storage_state_full">Full</string>
     <string name="storage_state_never_ask">Not granted; change it in the system app settings</string>
     <string name="storage_state_partial">Selected photos only</string>
+    <string name="storage_write_refused">Storage access was refused. Allow it in the app settings to change images</string>
     <string name="target_all">All albums</string>
     <string name="target_copy_title">Copy to album</string>
     <string name="target_move_title">Move to album</string>

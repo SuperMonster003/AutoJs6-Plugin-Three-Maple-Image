@@ -267,6 +267,7 @@
     <string name="storage_state_full">Completo</string>
     <string name="storage_state_never_ask">No concedido; cámbielo en los ajustes de la aplicación del sistema</string>
     <string name="storage_state_partial">Solo fotos seleccionadas</string>
+    <string name="storage_write_refused">Se denegó el acceso al almacenamiento. Permítelo en los ajustes de la aplicación para modificar imágenes</string>
     <string name="target_all">Todos los álbumes</string>
     <string name="target_copy_title">Copiar al álbum</string>
     <string name="target_move_title">Mover al álbum</string>

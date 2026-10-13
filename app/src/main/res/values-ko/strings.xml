@@ -267,6 +267,7 @@
     <string name="storage_state_full">전체</string>
     <string name="storage_state_never_ask">허용되지 않음. 시스템 앱 설정에서 변경하세요</string>
     <string name="storage_state_partial">선택한 사진만</string>
+    <string name="storage_write_refused">저장소 접근이 거부되었습니다. 이미지를 변경하려면 앱 설정에서 허용하세요</string>
     <string name="target_all">모든 앨범</string>
     <string name="target_copy_title">앨범으로 복사</string>
     <string name="target_move_title">앨범으로 이동</string>

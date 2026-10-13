@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
+import android.provider.Settings
 import android.text.format.Formatter
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -165,6 +166,27 @@ internal class GalleryOperations(
         }
     }
 
+    /**
+     * Android 7-10 with the storage write permission refused ("don't ask again"): say so and offer the app's
+     * system settings, instead of a batch that silently did nothing. True when that was the reason.
+     */
+    private fun explainRefusedPermission(): Boolean {
+        if (!coordinator.consumeWritePermissionRefused()) return false
+        snackbarJob?.cancel()
+        snackbarJob = activity.lifecycleScope.launch {
+            val result = snackbar.showSnackbar(
+                message = activity.getString(R.string.storage_write_refused),
+                actionLabel = activity.getString(R.string.standalone_settings_title),
+                duration = SnackbarDuration.Long,
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", activity.packageName, null))
+                runCatching { activity.startActivity(intent) }
+            }
+        }
+        return true
+    }
+
     private fun quantity(resource: Int, count: Int): String = activity.resources.getQuantityString(resource, count, count)
 
     private fun failedMessage(count: Int): String = quantity(R.plurals.gallery_failed_count, count)
@@ -235,7 +257,7 @@ internal class GalleryOperations(
     private suspend fun trash(items: List<MediaItem>) {
         val outcome = coordinator.trash(items)
         when {
-            outcome.cancelled -> Unit
+            outcome.cancelled -> explainRefusedPermission()
             outcome.tooLargeForRecycleBin -> show(GalleryDialog.ConfirmDelete(items, DeleteReason.TOO_LARGE))
             else -> {
                 finishWrite()
@@ -246,7 +268,10 @@ internal class GalleryOperations(
 
     private fun deleteForGood(items: List<MediaItem>, reason: DeleteReason) = launch {
         val outcome = if (reason == DeleteReason.AUTHORIZED_FOLDER) deleteDocuments(items) else coordinator.delete(items)
-        if (outcome.cancelled) return@launch
+        if (outcome.cancelled) {
+            explainRefusedPermission()
+            return@launch
+        }
         if (reason != DeleteReason.AUTHORIZED_FOLDER) favorites.remove(items.map { it.id })
         finishWrite()
         notify(summary(R.plurals.gallery_deleted_count, outcome))
@@ -288,7 +313,10 @@ internal class GalleryOperations(
         }
         when {
             outcome.nameTaken -> renameError = activity.getString(R.string.rename_error_taken)
-            outcome.cancelled -> show(null)
+            outcome.cancelled -> {
+                show(null)
+                explainRefusedPermission()
+            }
             outcome.succeeded == 0 -> renameError = activity.getString(R.string.rename_error_failed)
             else -> {
                 show(null)
@@ -360,7 +388,10 @@ internal class GalleryOperations(
         } finally {
             if (dialog is GalleryDialog.Progress) show(null)
         }
-        if (outcome.cancelled) return
+        if (outcome.cancelled) {
+            explainRefusedPermission()
+            return
+        }
         if (outcome.succeeded > 0) preferences.rememberTarget(target.relativePath)
         finishWrite()
         val resource = if (copy) R.plurals.gallery_copied_count else R.plurals.gallery_moved_count
@@ -385,7 +416,10 @@ internal class GalleryOperations(
         } else {
             coordinator.restoreFromPrivateBin(entries.map { it.id })
         }
-        if (outcome.cancelled) return@launch
+        if (outcome.cancelled) {
+            explainRefusedPermission()
+            return@launch
+        }
         recycleBin.clearSelection()
         refreshAll()
         notify(summary(R.plurals.recycle_bin_restored_count, outcome))
@@ -407,7 +441,10 @@ internal class GalleryOperations(
         } else {
             coordinator.deleteFromPrivateBin(entries.map { it.id })
         }
-        if (outcome.cancelled) return@launch
+        if (outcome.cancelled) {
+            explainRefusedPermission()
+            return@launch
+        }
         // Android 11+ bin entries carry media ids; Android 7-10 favorites of binned images were rebound or dropped already.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) favorites.remove(entries.map { it.id })
         recycleBin?.clearSelection()

@@ -267,6 +267,7 @@
     <string name="storage_state_full">Полный</string>
     <string name="storage_state_never_ask">Не предоставлен; измените его в системных настройках приложения</string>
     <string name="storage_state_partial">Только выбранные фото</string>
+    <string name="storage_write_refused">Доступ к хранилищу запрещён. Разрешите его в настройках приложения, чтобы изменять изображения</string>
     <string name="target_all">Все альбомы</string>
     <string name="target_copy_title">Копировать в альбом</string>
     <string name="target_move_title">Переместить в альбом</string>

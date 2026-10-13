@@ -267,6 +267,7 @@
     <string name="storage_state_full">すべて</string>
     <string name="storage_state_never_ask">未許可. システムのアプリ設定で変更してください</string>
     <string name="storage_state_partial">選択した写真のみ</string>
+    <string name="storage_write_refused">ストレージへのアクセスが拒否されました. 画像を変更するにはアプリの設定で許可してください</string>
     <string name="target_all">すべてのアルバム</string>
     <string name="target_copy_title">アルバムにコピー</string>
     <string name="target_move_title">アルバムに移動</string>

@@ -267,6 +267,7 @@
     <string name="storage_state_full">完整</string>
     <string name="storage_state_never_ask">未授予, 需在系統的應用程式設定中變更</string>
     <string name="storage_state_partial">僅限所選相片</string>
+    <string name="storage_write_refused">儲存空間存取權已遭拒. 請在應用程式設定中允許後再修改圖片</string>
     <string name="target_all">所有相簿</string>
     <string name="target_copy_title">複製到相簿</string>
     <string name="target_move_title">移動到相簿</string>

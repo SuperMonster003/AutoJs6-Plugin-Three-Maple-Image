@@ -267,6 +267,7 @@
     <string name="storage_state_full">完整</string>
     <string name="storage_state_never_ask">未授予, 需在系统应用设置中更改</string>
     <string name="storage_state_partial">仅所选照片</string>
+    <string name="storage_write_refused">存储访问已被拒绝. 请在应用设置中允许后再修改图片</string>
     <string name="target_all">全部相册</string>
     <string name="target_copy_title">复制到相册</string>
     <string name="target_move_title">移动到相册</string>

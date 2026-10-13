@@ -267,6 +267,7 @@
     <string name="storage_state_full">كامل</string>
     <string name="storage_state_never_ask">غير ممنوح; غيره من اعدادات التطبيق في النظام</string>
     <string name="storage_state_partial">الصور المحددة فقط</string>
+    <string name="storage_write_refused">تم رفض الوصول إلى التخزين. اسمح به في إعدادات التطبيق لتعديل الصور</string>
     <string name="target_all">كل الألبومات</string>
     <string name="target_copy_title">نسخ إلى ألبوم</string>
     <string name="target_move_title">نقل إلى ألبوم</string>

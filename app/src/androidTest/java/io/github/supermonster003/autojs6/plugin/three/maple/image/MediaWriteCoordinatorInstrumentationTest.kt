@@ -1,5 +1,6 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
+import android.Manifest
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -32,7 +33,10 @@ import java.io.File
 class MediaWriteCoordinatorInstrumentationTest {
 
     @get:Rule
-    val permissions: GrantPermissionRule = GrantPermissionRule.grant(*MediaStoreTestImages.permissions())
+    // Android 10 still writes through java.io.File (legacy storage), so it needs the write permission as well.
+    val permissions: GrantPermissionRule = GrantPermissionRule.grant(
+        *(MediaStoreTestImages.permissions().toSet() + if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) setOf(Manifest.permission.WRITE_EXTERNAL_STORAGE) else emptySet()).toTypedArray(),
+    )
 
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
     private val folder = "MapleWrite${System.currentTimeMillis()}"
