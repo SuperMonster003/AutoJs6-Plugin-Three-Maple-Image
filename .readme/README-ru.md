@@ -89,9 +89,33 @@ Image Viewer и Image Tools объединены в 3-Maple Image для про�
 
 ******
 
-Это снимки реально работающего интерфейса AutoJs6 6.8.0 в эмуляторе Android 13. Все показанные изображения, имена файлов и каталоги созданы специально для документации и не содержат персональных данных.
+Это реальные снимки экрана отдельного приложения и AutoJs6 6.8.0 на эмуляторе Android 13. Все показанные изображения, имена файлов и папки созданы специально для документации и не содержат личных данных.
 
 <table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-albums.png?raw=true" alt="Главный экран с альбомами" width="360" />
+      <br />
+      <sub>Главный экран с альбомами</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-media-grid.png?raw=true" alt="Сетка изображений альбома" width="360" />
+      <br />
+      <sub>Сетка изображений альбома</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-thumbnail-strip.png?raw=true" alt="Постраничный просмотр с лентой миниатюр" width="360" />
+      <br />
+      <sub>Постраничный просмотр с лентой миниатюр</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-no-permission.png?raw=true" alt="Главный экран без доступа к фото" width="360" />
+      <br />
+      <sub>Главный экран без доступа к фото</sub>
+    </td>
+  </tr>
   <tr>
     <td align="center">
       <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="Действие просмотра одного файла" width="360" />

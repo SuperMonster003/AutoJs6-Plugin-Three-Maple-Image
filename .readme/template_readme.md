@@ -64,6 +64,30 @@
 <table>
   <tr>
     <td align="center">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/gallery-albums.png?raw=true" alt="{{ screenshot_gallery_albums_caption }}" width="360" />
+      <br />
+      <sub>{{ screenshot_gallery_albums_caption }}</sub>
+    </td>
+    <td align="center">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/gallery-media-grid.png?raw=true" alt="{{ screenshot_gallery_grid_caption }}" width="360" />
+      <br />
+      <sub>{{ screenshot_gallery_grid_caption }}</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/viewer-thumbnail-strip.png?raw=true" alt="{{ screenshot_viewer_strip_caption }}" width="360" />
+      <br />
+      <sub>{{ screenshot_viewer_strip_caption }}</sub>
+    </td>
+    <td align="center">
+      <img src="{{ repo_url }}/blob/master/docs/images/screenshots/gallery-no-permission.png?raw=true" alt="{{ screenshot_no_permission_caption }}" width="360" />
+      <br />
+      <sub>{{ screenshot_no_permission_caption }}</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
       <img src="{{ repo_url }}/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="{{ screenshot_explorer_caption }}" width="360" />
       <br />
       <sub>{{ screenshot_explorer_caption }}</sub>

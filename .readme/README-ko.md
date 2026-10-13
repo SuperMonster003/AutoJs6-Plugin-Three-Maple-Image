@@ -89,9 +89,33 @@ Image Viewer와 Image Tools를 3-Maple Image로 통합하여 이미지 보기, �
 
 ******
 
-다음 화면은 Android 13 에뮬레이터에서 실행한 AutoJs6 6.8.0의 실제 UI 캡처입니다. 표시된 이미지, 파일 이름, 디렉터리는 모두 문서화를 위해 생성한 합성 데이터이며 개인 정보를 포함하지 않습니다.
+아래는 독립 앱과 AutoJs6 6.8.0을 Android 13 에뮬레이터에서 실제로 실행한 화면입니다. 표시된 모든 이미지, 파일 이름, 폴더는 문서용으로 생성한 합성 데이터이며 개인 정보를 포함하지 않습니다.
 
 <table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-albums.png?raw=true" alt="앨범 홈" width="360" />
+      <br />
+      <sub>앨범 홈</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-media-grid.png?raw=true" alt="앨범의 이미지 그리드" width="360" />
+      <br />
+      <sub>앨범의 이미지 그리드</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-thumbnail-strip.png?raw=true" alt="페이지 뷰어와 썸네일 바" width="360" />
+      <br />
+      <sub>페이지 뷰어와 썸네일 바</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-no-permission.png?raw=true" alt="사진 접근 권한이 없을 때의 홈" width="360" />
+      <br />
+      <sub>사진 접근 권한이 없을 때의 홈</sub>
+    </td>
+  </tr>
   <tr>
     <td align="center">
       <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="파일 관리자의 단일 이미지 보기 동작" width="360" />

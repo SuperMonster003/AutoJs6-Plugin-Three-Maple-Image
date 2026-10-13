@@ -33,7 +33,11 @@
     "設定變更會保留畫布, 對話框草稿, 撤銷/重做歷史與執行中的工作; 每個動作仍只使用一個唯讀輸入和一個宿主擁有的一次性同層輸出交易."
   ],
   "h3_screenshots": "介面截圖",
-  "p_screenshots_intro": "以下介面來自 AutoJs6 6.8.0 和 Android 13 模擬器的實際執行截圖. 所有顯示的圖片, 檔案名稱與目錄均為說明文件專門產生的合成資料, 不含個人資訊.",
+  "p_screenshots_intro": "以下介面來自獨立應用程式及 AutoJs6 6.8.0 在 Android 13 模擬器上的真實執行截圖. 所有顯示的圖片, 檔案名稱與目錄均為文件專門產生的合成資料, 不含個人資訊.",
+  "screenshot_gallery_albums_caption": "相簿首頁",
+  "screenshot_gallery_grid_caption": "相簿內的圖片網格",
+  "screenshot_viewer_strip_caption": "分頁檢視器與縮圖列",
+  "screenshot_no_permission_caption": "未授予相片權限時的首頁",
   "screenshot_explorer_caption": "檔案管理器中的單檔檢視入口",
   "screenshot_selection_caption": "兩張已選圖片的精確多選群組",
   "screenshot_viewer_caption": "檢視器主介面與即時中繼資料",

@@ -89,9 +89,33 @@ La visualización usa entradas de solo lectura. La edición y conversión crean 
 
 ******
 
-Estas capturas muestran la interfaz real de AutoJs6 6.8.0 en un emulador de Android 13. Todas las imágenes, los nombres de archivo y los directorios visibles se generaron específicamente para la documentación y no contienen datos personales.
+Estas son capturas reales de la aplicación independiente y de AutoJs6 6.8.0 en un emulador de Android 13. Todas las imágenes, nombres de archivo y carpetas mostrados se generaron expresamente para la documentación y no contienen datos personales.
 
 <table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-albums.png?raw=true" alt="Inicio con álbumes" width="360" />
+      <br />
+      <sub>Inicio con álbumes</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-media-grid.png?raw=true" alt="Cuadrícula de imágenes de un álbum" width="360" />
+      <br />
+      <sub>Cuadrícula de imágenes de un álbum</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-thumbnail-strip.png?raw=true" alt="Visor paginado con la tira de miniaturas" width="360" />
+      <br />
+      <sub>Visor paginado con la tira de miniaturas</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-no-permission.png?raw=true" alt="Inicio sin acceso a fotos" width="360" />
+      <br />
+      <sub>Inicio sin acceso a fotos</sub>
+    </td>
+  </tr>
   <tr>
     <td align="center">
       <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="Acción para ver un solo archivo" width="360" />

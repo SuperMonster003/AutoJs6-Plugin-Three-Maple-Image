@@ -33,7 +33,11 @@
     "構成変更でもキャンバス, ダイアログの下書き, 元に戻す/やり直し履歴, 実行中タスクを保持します. 各アクションは引き続き 1 つの読み取り専用入力とホスト所有の 1 回限りの隣接出力トランザクションだけを使います."
   ],
   "h3_screenshots": "スクリーンショット",
-  "p_screenshots_intro": "以下は Android 13 エミュレーター上の AutoJs6 6.8.0 から取得した実際の UI です. 表示される画像, ファイル名, ディレクトリはすべて文書用に生成した合成データで, 個人情報を含みません.",
+  "p_screenshots_intro": "以下は単独アプリと AutoJs6 6.8.0 を Android 13 エミュレーターで実際に動かした画面です. 表示されている画像, ファイル名, フォルダーはすべてドキュメント用に生成した合成データで, 個人情報は含まれていません.",
+  "screenshot_gallery_albums_caption": "アルバムのホーム",
+  "screenshot_gallery_grid_caption": "アルバム内の画像グリッド",
+  "screenshot_viewer_strip_caption": "ページ送りビューアーとサムネイルバー",
+  "screenshot_no_permission_caption": "写真へのアクセスがないときのホーム",
   "screenshot_explorer_caption": "ファイルマネージャーの単一画像表示アクション",
   "screenshot_selection_caption": "選択した 2 枚だけの画像グループ",
   "screenshot_viewer_caption": "ビューアーのメイン画面とリアルタイムメタデータ",

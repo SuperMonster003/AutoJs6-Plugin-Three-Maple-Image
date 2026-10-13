@@ -33,7 +33,11 @@
     "구성 변경에도 캔버스, 대화상자 초안, 실행 취소/다시 실행 기록과 진행 중인 작업을 보존합니다. 각 작업은 읽기 전용 입력 하나와 호스트가 소유한 일회성 같은 위치 출력 트랜잭션 하나만 사용합니다."
   ],
   "h3_screenshots": "스크린샷",
-  "p_screenshots_intro": "다음 화면은 Android 13 에뮬레이터에서 실행한 AutoJs6 6.8.0의 실제 UI 캡처입니다. 표시된 이미지, 파일 이름, 디렉터리는 모두 문서화를 위해 생성한 합성 데이터이며 개인 정보를 포함하지 않습니다.",
+  "p_screenshots_intro": "아래는 독립 앱과 AutoJs6 6.8.0을 Android 13 에뮬레이터에서 실제로 실행한 화면입니다. 표시된 모든 이미지, 파일 이름, 폴더는 문서용으로 생성한 합성 데이터이며 개인 정보를 포함하지 않습니다.",
+  "screenshot_gallery_albums_caption": "앨범 홈",
+  "screenshot_gallery_grid_caption": "앨범의 이미지 그리드",
+  "screenshot_viewer_strip_caption": "페이지 뷰어와 썸네일 바",
+  "screenshot_no_permission_caption": "사진 접근 권한이 없을 때의 홈",
   "screenshot_explorer_caption": "파일 관리자의 단일 이미지 보기 동작",
   "screenshot_selection_caption": "선택한 이미지 2개로 구성된 정확한 그룹",
   "screenshot_viewer_caption": "뷰어 기본 화면과 실시간 메타데이터",

@@ -33,7 +33,11 @@
     "Configuration changes preserve the canvas, dialog drafts, undo/redo history, and running tasks; each action still uses one read-only input and one host-owned single-use sibling-output transaction."
   ],
   "h3_screenshots": "Screenshots",
-  "p_screenshots_intro": "These are real UI captures from AutoJs6 6.8.0 on an Android 13 emulator. Every image, file name, and directory shown was generated specifically for the documentation and contains no personal data.",
+  "p_screenshots_intro": "These are real UI captures of the standalone app and of AutoJs6 6.8.0 on an Android 13 emulator. Every image, file name, and directory shown was generated specifically for the documentation and contains no personal data.",
+  "screenshot_gallery_albums_caption": "Album home",
+  "screenshot_gallery_grid_caption": "Image grid of an album",
+  "screenshot_viewer_strip_caption": "Paged viewer with the thumbnail strip",
+  "screenshot_no_permission_caption": "Home without photo access",
   "screenshot_explorer_caption": "Single-file viewer action in the file manager",
   "screenshot_selection_caption": "Exact group of two selected images",
   "screenshot_viewer_caption": "Main viewer and live metadata",

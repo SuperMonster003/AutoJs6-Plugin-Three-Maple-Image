@@ -89,9 +89,33 @@ La lecture utilise des entrées en lecture seule. La retouche et la conversion c
 
 ******
 
-Ces captures montrent l'interface réellement exécutée avec AutoJs6 6.8.0 sur un émulateur Android 13. Toutes les images, tous les noms de fichiers et tous les dossiers affichés ont été générés spécialement pour la documentation et ne contiennent aucune donnée personnelle.
+Ce sont de véritables captures de l'application autonome et d'AutoJs6 6.8.0 sur un émulateur Android 13. Toutes les images, noms de fichiers et dossiers affichés ont été générés spécialement pour la documentation et ne contiennent aucune donnée personnelle.
 
 <table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-albums.png?raw=true" alt="Accueil en albums" width="360" />
+      <br />
+      <sub>Accueil en albums</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-media-grid.png?raw=true" alt="Grille d'images d'un album" width="360" />
+      <br />
+      <sub>Grille d'images d'un album</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-thumbnail-strip.png?raw=true" alt="Visionneuse paginée avec la bande de miniatures" width="360" />
+      <br />
+      <sub>Visionneuse paginée avec la bande de miniatures</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-no-permission.png?raw=true" alt="Accueil sans accès aux photos" width="360" />
+      <br />
+      <sub>Accueil sans accès aux photos</sub>
+    </td>
+  </tr>
   <tr>
     <td align="center">
       <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="Action d'affichage d'un seul fichier" width="360" />

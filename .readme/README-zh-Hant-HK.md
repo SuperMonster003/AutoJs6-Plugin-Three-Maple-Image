@@ -89,9 +89,33 @@ Image Viewer 與 Image Tools 合併為 3-Maple Image, 在同一應用程式提�
 
 ******
 
-以下界面來自 AutoJs6 6.8.0 和 Android 13 模擬器的真實運行截圖. 所有顯示的圖像, 檔案名稱與目錄均為文檔專門生成的合成資料, 不含個人資料.
+以下介面來自獨立應用程式及 AutoJs6 6.8.0 在 Android 13 模擬器上的真實運行截圖. 所有顯示的圖像, 檔案名稱與目錄均為文件專門產生的合成資料, 不含個人資訊.
 
 <table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-albums.png?raw=true" alt="相簿首頁" width="360" />
+      <br />
+      <sub>相簿首頁</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-media-grid.png?raw=true" alt="相簿內的圖片網格" width="360" />
+      <br />
+      <sub>相簿內的圖片網格</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-thumbnail-strip.png?raw=true" alt="分頁檢視器與縮圖列" width="360" />
+      <br />
+      <sub>分頁檢視器與縮圖列</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-no-permission.png?raw=true" alt="未授予相片權限時的首頁" width="360" />
+      <br />
+      <sub>未授予相片權限時的首頁</sub>
+    </td>
+  </tr>
   <tr>
     <td align="center">
       <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="檔案管理器中的單檔查看入口" width="360" />

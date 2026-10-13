@@ -33,7 +33,11 @@
     "Les changements de configuration conservent le canevas, les brouillons, l'historique annuler/rétablir et les tâches en cours; chaque action utilise toujours une entrée en lecture seule et une transaction de sortie voisine, à usage unique et appartenant à l'hôte."
   ],
   "h3_screenshots": "Captures d'écran",
-  "p_screenshots_intro": "Ces captures montrent l'interface réellement exécutée avec AutoJs6 6.8.0 sur un émulateur Android 13. Toutes les images, tous les noms de fichiers et tous les dossiers affichés ont été générés spécialement pour la documentation et ne contiennent aucune donnée personnelle.",
+  "p_screenshots_intro": "Ce sont de véritables captures de l'application autonome et d'AutoJs6 6.8.0 sur un émulateur Android 13. Toutes les images, noms de fichiers et dossiers affichés ont été générés spécialement pour la documentation et ne contiennent aucune donnée personnelle.",
+  "screenshot_gallery_albums_caption": "Accueil en albums",
+  "screenshot_gallery_grid_caption": "Grille d'images d'un album",
+  "screenshot_viewer_strip_caption": "Visionneuse paginée avec la bande de miniatures",
+  "screenshot_no_permission_caption": "Accueil sans accès aux photos",
   "screenshot_explorer_caption": "Action d'affichage d'un seul fichier",
   "screenshot_selection_caption": "Groupe exact de deux images sélectionnées",
   "screenshot_viewer_caption": "Vue principale et métadonnées en direct",

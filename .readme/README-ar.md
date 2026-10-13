@@ -89,9 +89,33 @@
 
 ******
 
-هذه لقطات فعلية للواجهة من AutoJs6 6.8.0 على محاكي Android 13. كل صورة واسم ملف ومجلد ظاهر تم إنشاؤه خصيصا للتوثيق ولا يحتوي على بيانات شخصية.
+هذه لقطات حقيقية للتطبيق المستقل ولـ AutoJs6 6.8.0 على محاكي Android 13. كل الصور وأسماء الملفات والمجلدات المعروضة أنشئت خصيصا للتوثيق ولا تحتوي على بيانات شخصية.
 
 <table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-albums.png?raw=true" alt="صفحة الألبومات" width="360" />
+      <br />
+      <sub>صفحة الألبومات</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-media-grid.png?raw=true" alt="شبكة صور الألبوم" width="360" />
+      <br />
+      <sub>شبكة صور الألبوم</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/viewer-thumbnail-strip.png?raw=true" alt="العارض بالصفحات مع شريط المصغرات" width="360" />
+      <br />
+      <sub>العارض بالصفحات مع شريط المصغرات</sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/gallery-no-permission.png?raw=true" alt="الصفحة الرئيسية دون الوصول الى الصور" width="360" />
+      <br />
+      <sub>الصفحة الرئيسية دون الوصول الى الصور</sub>
+    </td>
+  </tr>
   <tr>
     <td align="center">
       <img src="https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/blob/master/docs/images/screenshots/explorer-action.png?raw=true" alt="إجراء عرض ملف واحد في مدير الملفات" width="360" />

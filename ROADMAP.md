@@ -190,7 +190,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 6.6 发布
 
-- [ ] (发布) 按 P1-P6 发布 v3.0.0; changelog `hint` 说明独立启动会申请一次媒体权限及拒绝后的可用范围, `feature` 覆盖相册网格, 分页与缩略图条, 旋转手势, 已授权文件夹, 存储权限设置页, 宿主 "以相册浏览"; README 新增相册与权限 FAQ; 截图重采 (首页网格, 媒体网格, 查看器缩略图条, 无权限状态).
+- [ ] (发布) 按 P1-P6 发布 v3.0.0; changelog `hint` 说明独立启动会申请一次媒体权限及拒绝后的可用范围, `feature` 覆盖相册网格, 分页与缩略图条, 旋转手势, 已授权文件夹, 存储权限设置页, 宿主 "以相册浏览"; README 新增相册与权限 FAQ; 截图重采 (首页网格, 媒体网格, 查看器缩略图条, 无权限状态). 进度 (2026-10-13, 维护者决定先准备, 大库真机达标后再改 `VERSION_NAME`): P2 README 10 种语言新增相册首页, 分页查看器与缩略图条, 按需权限, 以相册浏览四条亮点与三条相册 / 权限 FAQ, 修正两条答非所问的 FAQ 与使用步骤中的旧名, 补两条安全要点 (提交 `bb08354`); 截图重采 4 张 (`gallery-albums.png`, `gallery-media-grid.png`, `viewer-thumbnail-strip.png`, `gallery-no-permission.png`, Android 13 模拟器 1080 x 2340, 合成素材, 采集说明与 SHA-256 在 `docs/images/screenshots/README.md`); P1 changelog 10 种语言草稿 (hint / feature / dependency) 在 `docs/release/v3.0.0.md`, 改版本号时并入 `.changelog`. 待办: P1 版本号与 changelog 并入, P3 冒烟, P4 / P5 (维护者), P6 宿主两处改动提交.
 
 验收条件: 独立首页为相册网格且在完整 / 部分 / 无权限三种状态下都可用; 宿主入口与外部入口不触发权限申请; 查看器五种来源分页与缩略图条一致; 5 万张库滚动流畅; 协议仍为 v12.
 

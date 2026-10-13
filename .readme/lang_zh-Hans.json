@@ -33,7 +33,11 @@
     "配置变更会保留画布, 对话框草稿, 撤销/重做历史与执行中的任务; 每个动作仍只使用一个只读输入和一个宿主拥有的一次性同级输出事务."
   ],
   "h3_screenshots": "界面截图",
-  "p_screenshots_intro": "以下界面来自 AutoJs6 6.8.0 和 Android 13 模拟器的真实运行截图. 所有显示的图像, 文件名与目录均为文档专门生成的合成数据, 不含个人信息.",
+  "p_screenshots_intro": "以下界面来自独立应用及 AutoJs6 6.8.0 在 Android 13 模拟器上的真实运行截图. 所有显示的图像, 文件名与目录均为文档专门生成的合成数据, 不含个人信息.",
+  "screenshot_gallery_albums_caption": "相册首页",
+  "screenshot_gallery_grid_caption": "相册内的图片网格",
+  "screenshot_viewer_strip_caption": "分页查看器与缩略图条",
+  "screenshot_no_permission_caption": "未授予照片权限时的首页",
   "screenshot_explorer_caption": "文件管理器中的单文件查看入口",
   "screenshot_selection_caption": "两张已选图像的精确多选组",
   "screenshot_viewer_caption": "查看器主界面与实时元数据",
