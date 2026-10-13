@@ -3,8 +3,13 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
@@ -47,5 +52,32 @@ class MediaStoreRepositoryInstrumentationTest {
         assertTrue(newest.zipWithNext().all { (a, b) -> a.dateModifiedSeconds >= b.dateModifiedSeconds })
         repository.invalidate()
         assertEquals(all.map { it.id }, repository.loadAll().map { it.id })
+    }
+
+    @Test fun viewerReusesTheObservedScanInProviderOrder() = runBlocking {
+        val gallery = MediaStoreRepository(context)
+        val direct = MediaStoreRepository(context).loadBucketAll(MediaCatalog.ALL_BUCKETS, MediaSort.DEFAULT)
+        assumeTrue("the device library has at least one supported image", direct.isNotEmpty())
+        // The gallery's change observer publishes its scan for the viewer of the same process.
+        val observing = launch(Dispatchers.Default) { gallery.changes().collect {} }
+        try {
+            delay(OBSERVER_REGISTRATION_MILLIS)
+            val scan = gallery.loadAll()
+            val viewer = MediaStoreRepository(context)
+            assertSame("the viewer reuses the gallery scan", scan, viewer.loadBucketAll(MediaCatalog.ALL_BUCKETS, MediaSort.DEFAULT))
+            assertEquals("same order as the provider query", direct.map { it.id }, scan.map { it.id })
+            val album = scan.first().bucketId
+            val fromScan = viewer.loadBucketAll(album, MediaSort.DEFAULT).map { it.id }
+            observing.cancelAndJoin()
+            // Without an observer the shared scan is dropped and the album comes from the provider again.
+            val fromProvider = MediaStoreRepository(context).loadBucketAll(album, MediaSort.DEFAULT).map { it.id }
+            assertEquals(fromProvider, fromScan)
+        } finally {
+            observing.cancel()
+        }
+    }
+
+    private companion object {
+        const val OBSERVER_REGISTRATION_MILLIS = 300L
     }
 }

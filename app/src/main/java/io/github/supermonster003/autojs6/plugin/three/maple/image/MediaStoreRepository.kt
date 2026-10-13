@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Reads the device image library straight from MediaStore (ROADMAP T6): a lightweight full scan for the album list,
@@ -51,13 +52,22 @@ internal class MediaStoreRepository(
         MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     }
 
-    /** Every cataloged image on the device, newest change first; cached until [invalidate] or a change event. */
+    /**
+     * Every cataloged image on the device, newest change first; cached until [invalidate] or a change event. While
+     * a gallery change observer is registered the scan is also shared with other repositories of the process (the
+     * viewer opened from the grid), so a large library is not queried twice.
+     */
     suspend fun loadAll(): List<MediaItem> {
         cachedAll?.let { return it }
+        sharedAll?.let { shared ->
+            cachedAll = shared
+            return shared
+        }
         val cataloged = withContext(Dispatchers.IO) {
             MediaCatalog.filter(query(selection = null, selectionArgs = null, sort = MediaSort.DEFAULT, limit = null, offset = 0), supports)
         }
         cachedAll = cataloged
+        if (observers.get() > 0) sharedAll = cataloged
         return cataloged
     }
 
@@ -108,6 +118,10 @@ internal class MediaStoreRepository(
     /** Every image of one album in the requested order; the viewer pages through this list (ROADMAP 6.3). */
     suspend fun loadBucketAll(bucketId: Long, sort: MediaSort = MediaSort.DEFAULT): List<MediaItem> {
         if (sort.field == MediaSortField.NAME) return nameOrdered(bucketId, sort)
+        // The shared full scan is already in the default order (the provider query below would return the same rows).
+        if (sort == MediaSort.DEFAULT) sharedAll?.let { all ->
+            return if (bucketId == MediaCatalog.ALL_BUCKETS) all else withContext(Dispatchers.Default) { all.filter { it.bucketId == bucketId } }
+        }
         return withContext(Dispatchers.IO) {
             val rows = query(
                 selection = bucketSelection(bucketId),
@@ -123,6 +137,7 @@ internal class MediaStoreRepository(
     fun invalidate() {
         cachedAll = null
         cachedNameOrder = null
+        sharedAll = null
     }
 
     /**
@@ -148,7 +163,12 @@ internal class MediaStoreRepository(
             }
         }
         resolver.registerContentObserver(collection, true, observer)
-        awaitClose { resolver.unregisterContentObserver(observer) }
+        observers.incrementAndGet()
+        awaitClose {
+            resolver.unregisterContentObserver(observer)
+            // Without an observer nothing would drop a stale shared scan.
+            if (observers.decrementAndGet() == 0) sharedAll = null
+        }
     }.conflate()
 
     private fun query(selection: String?, selectionArgs: Array<String>?, sort: MediaSort, limit: Int?, offset: Int): List<MediaItem> {
@@ -247,5 +267,11 @@ internal class MediaStoreRepository(
 
     companion object {
         const val DEFAULT_THROTTLE_MILLIS = 400L
+
+        /** Change observers registered right now; the shared scan is only published while one keeps it fresh. */
+        private val observers = AtomicInteger()
+
+        @Volatile
+        private var sharedAll: List<MediaItem>? = null
     }
 }
