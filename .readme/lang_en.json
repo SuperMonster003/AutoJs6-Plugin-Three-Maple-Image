@@ -9,6 +9,10 @@
   "p_introduction_secure": "Viewing uses read-only inputs. Editing and conversion produce a separate output; the source image is preserved. Standalone file access uses the Android document picker.",
   "h3_functions": "Highlights",
   "highlights": [
+    "Album home: launched on its own, the app opens an album grid of the images on the device (cover, name, count), with authorized folders as their own group; `Show all folder contents` in the menu opens a flat view. The media grid offers 3-6 columns (menu or pinch), sorting by name, date modified, date taken or size remembered per album, a fast scroller with a date bubble, and pull to refresh.",
+    "Paged viewer with a thumbnail strip: images opened from the grid swipe through the whole album, the strip highlights the current page and jumps on tap, and the grid scrolls back to the last image viewed. Rotate the picture with two fingers; it snaps to the nearest quarter turn on release (display only; turn it off in `Settings` > `Viewer` > `Two-finger rotation`).",
+    "Permissions only when needed: the standalone home asks for photo access once, on its first launch, and never again by itself; without it, `Choose image`, `Choose folder`, `Edit image` and `Convert image` keep working through the system picker. Android 14+ supports access to selected photos only (`Manage selected photos`). `Settings` > `Storage permission` grants access again, manages authorized folders (shown as albums even without photo access) and the optional `All files access`. Opening images from AutoJs6 or other apps never asks for a permission.",
+    "View as album: in the folder menu of the AutoJs6 file manager, choose `View as album` to see the folder's images as a grid and open its subfolders, read-only through the host session, with no permission request and no absolute paths shown.",
     "Open an exact selection: in AutoJs6 selection mode, choose up to 128 supported images from one folder and tap `View image`; the viewer keeps the host selection order and swipes only within that chosen group.",
     "Tap and browse: tapping a supported image file opens the viewer directly; at 1x, swipe left or right to move through supported images in the same folder in natural file-name order.",
     "Natural gestures: focal pinch zoom centered on your fingers (up to {{ max_zoom_factor }}x), one-finger panning, double-tap to toggle a 2.5x zoom around the touch point, 90° clockwise view rotation, and tap to hide or reveal the controls for distraction-free viewing. A compact indicator shows the live multiplier while pinching and briefly after a double-tap.",
@@ -39,10 +43,10 @@
   "p_usage_prerequisites": "Before starting, confirm the following requirements",
   "p_usage_steps_intro": "It takes 4 steps from installation to your first image",
   "usage_steps": [
-    "A standalone home screen opens local images, starts editing or conversion, and saves the result to a chosen destination.",
+    "Launch 3-Maple Image on its own to browse the device's albums (photo access is requested once on the first launch); the menu at the top right still opens a chosen image for viewing, editing or conversion and saves the result to a destination you pick.",
     "Open AutoJs6, enter the `Plugin center`, locate `3-Maple Image`, and enable it.",
     "In the AutoJs6 file manager, locate any supported image file (such as `screenshot.png`).",
-    "Tap the file. The image opens in the dedicated viewer."
+    "Tap the file. The image opens in the dedicated viewer. Choose `View as album` in a folder's menu to see the images of that folder as a grid."
   ],
   "p_usage_viewer_tips": "Inside the viewer: at 1x, swipe left or right to move to the previous or next supported image in the same folder. Pinch to zoom around your fingers (1x to {{ max_zoom_factor }}x), drag with one finger to pan, and double-tap to switch between fit-to-screen and a 2.5x zoom centered on the touch point. The current multiplier appears while pinching and briefly after a double-tap. Tap `Rotate` for a view-only quarter turn; an active zoom is preserved, while `Reset zoom` in the top-right menu restores both the original orientation and fitted size. Animated GIFs show a floating `Pause animation` / `Resume animation` button, while static images do not. Tapping the image hides or reveals the overlay bars, and `Details` opens a bottom sheet with the file facts and EXIF fields. `Share` and `Open with` are available on the originally opened image; they are disabled on session-only sibling pages because those pages intentionally have no transferable content URI. Images opened from the standalone home or from another app also offer `Edit`, which opens the editor and lets you save the result; host entries and sibling pages do not.",
   "h3_supported_formats": "Supported Formats",
@@ -51,16 +55,28 @@
   "h3_faq": "FAQ",
   "faq": [
     {
+      "question": "Why does the standalone app ask for photo access, and does it work if I refuse?",
+      "answer": "The album home needs the list of images on the device, so the first standalone launch asks once (photos and videos on Android 13+, storage on older versions) and never again by itself. Without access, `Choose image`, `Choose folder`, `Edit image` and `Convert image` still work through the system picker; you can grant access later from the home button or `Settings` > `Storage permission`, and when the system stops showing the dialog the button becomes `Open app settings`. Opening images from AutoJs6 or other apps never asks for any permission."
+    },
+    {
+      "question": "On Android 14+ I allowed only some photos. Why are other albums missing?",
+      "answer": "Limited access only exposes the photos picked in the system photo picker, so only their albums appear. Tap `Manage selected photos` at the top of the home screen to change the selection, or grant full access again in `Settings` > `Storage permission`."
+    },
+    {
+      "question": "What is `All files access` for? Do I need it?",
+      "answer": "No. It is an optional advanced switch that opens the system settings page; browsing albums only needs photo access. It is reserved for later features such as hidden (.nomedia) folders and bulk actions without confirmation, and it can be turned off at any time in the system settings."
+    },
+    {
       "question": "The file menu does not show `Edit image` and `Convert image`?",
       "answer": "Check the following in order: the AutoJs6 version code is at least {{ required_host_build }}; the plugin is enabled in the `Plugin center`; and the file extension or MIME type is in the supported list. If any of the three fails, the menu actions will not appear."
     },
     {
       "question": "Opening fails with `Unable to read image information` or the screen flashes and closes?",
-      "answer": "Viewing uses read-only inputs. Editing and conversion produce a separate output; the source image is preserved. Standalone file access uses the Android document picker."
+      "answer": "The file cannot be read right now: it may have been moved or deleted, the app that shared it may have withdrawn access, or its content does not match the extension (for example a damaged file). Open it again from its current location, or share it again from the original app."
     },
     {
       "question": "Where is the result saved? Does it overwrite the original?",
-      "answer": "Viewing supports a selected group of images. Editing and conversion handle one image at a time. From the standalone home screen, you choose where to save the result; calls from AutoJs6 create a new sibling file."
+      "answer": "The original is never overwritten. From AutoJs6, the result is saved as a new file next to the source; from the standalone home screen, you choose where to save it after editing or converting."
     },
     {
       "question": "Converting a large image reports insufficient memory or too many pixels?",
@@ -78,7 +94,9 @@
   "h3_security": "Security",
   "p_security_intro": "The plugin is built on a deny-by-default principle. All of the following measures are always on and cannot be disabled",
   "security_points": [
-    "Viewing uses read-only inputs. Editing and conversion produce a separate output; the source image is preserved. Standalone file access uses the Android document picker."
+    "Viewing uses read-only inputs. Editing and conversion produce a separate output; the source image is preserved. Standalone file access uses the Android document picker.",
+    "Opening images from AutoJs6 (`View image`, `View as album`) or from other apps never requests a runtime permission; the standalone home asks for photo access at most once by itself, and `All files access` can only be turned on by you in the system settings.",
+    "The plugin does not declare the network permission (`INTERNET`): albums, thumbnails and image details are read on the device and never leave it."
   ],
   "h3_plugin_interface": "Plugin Interface (for Developers)",
   "p_plugin_interface": "The host discovers and invokes the plugin with the following identities",

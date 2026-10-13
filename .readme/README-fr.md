@@ -60,6 +60,10 @@ La lecture utilise des entrées en lecture seule. La retouche et la conversion c
 
 ******
 
+- Accueil en albums: lancée seule, l'application affiche une grille d'albums des images de l'appareil (couverture, nom, nombre), avec les dossiers autorisés dans leur propre groupe; `Afficher le contenu de tous les dossiers` dans le menu ouvre une vue à plat. La grille propose 3 à 6 colonnes (menu ou pincement), un tri par nom, date de modification, date de prise de vue ou taille mémorisé par album, une barre de défilement rapide avec bulle de date et l'actualisation par glissement.
+- Visionneuse paginée avec bande de miniatures: les images ouvertes depuis la grille se parcourent dans tout l'album, la bande met en évidence la page courante et y saute au toucher, et la grille revient à la dernière image vue. Faites pivoter l'image à deux doigts; au relâchement elle se cale sur le quart de tour le plus proche (affichage seulement; désactivable dans `Paramètres` > `Visionneuse` > `Rotation à deux doigts`).
+- Autorisations seulement si nécessaire: l'accueil autonome demande l'accès aux photos une seule fois, au premier lancement, puis plus jamais de lui-même; sans cet accès, `Choisir une image`, `Choisir un dossier`, `Modifier l'image` et `Convertir l'image` fonctionnent toujours via le sélecteur du système. Android 14+ permet de n'autoriser que certaines photos (`Gérer les photos sélectionnées`). `Paramètres` > `Autorisation de stockage` permet d'accorder à nouveau l'accès, de gérer les dossiers autorisés (affichés comme albums même sans accès aux photos) et l'option `Accès à tous les fichiers`. Ouvrir des images depuis AutoJs6 ou d'autres applications ne demande jamais d'autorisation.
+- Afficher comme album: dans le menu d'un dossier du gestionnaire de fichiers d'AutoJs6, choisissez `Afficher comme album` pour voir ses images en grille et ouvrir ses sous-dossiers, en lecture seule via la session de l'hôte, sans demande d'autorisation ni chemin absolu affiché.
 - Ouvrir une sélection précise: dans le mode de sélection d'AutoJs6, choisissez jusqu'à 128 images prises en charge dans un même dossier puis touchez `Afficher l'image`; la visionneuse conserve l'ordre de sélection de l'hôte et limite le balayage à ce groupe.
 - Toucher et parcourir: toucher un fichier image pris en charge ouvre directement la visionneuse; à l'échelle 1x, glissez à gauche ou à droite pour parcourir les images prises en charge du même dossier selon l'ordre naturel des noms.
 - Gestes naturels: zoom par pincement centré sur les doigts (jusqu'à 5x), déplacement à un doigt, double toucher pour basculer entre l'ajustement et un zoom 2,5x centré sur le point touché, rotation de la vue de 90° à droite et toucher simple pour masquer ou afficher les commandes. Un indicateur compact affiche le facteur actuel pendant le pincement et brièvement après un double toucher.
@@ -138,10 +142,10 @@ plugin package: io.github.supermonster003.autojs6.plugin.three.maple.image
 
 Il faut 4 étapes entre l'installation et la première image affichée:
 
-1. Un écran d'accueil autonome permet de choisir une image, de la retoucher ou convertir et d'enregistrer le résultat à l'emplacement choisi.
-2. Ouvrez AutoJs6, accédez au `Centre des plugins`, repérez `Visionneuse d'images` et activez-la.
+1. Lancez 3-Maple Image seule pour parcourir les albums de l'appareil (l'accès aux photos est demandé une fois au premier lancement); le menu en haut à droite permet toujours d'ouvrir une image choisie pour l'afficher, la retoucher ou la convertir et d'enregistrer le résultat à l'emplacement choisi.
+2. Ouvrez AutoJs6, accédez au `Centre des plugins`, repérez `3-Maple Image` et activez-la.
 3. Dans le gestionnaire de fichiers d'AutoJs6, localisez un fichier image pris en charge (par exemple `screenshot.png`).
-4. Touchez le fichier. L'image s'ouvre dans la visionneuse dédiée.
+4. Touchez le fichier. L'image s'ouvre dans la visionneuse dédiée. Choisissez `Afficher comme album` dans le menu d'un dossier pour voir ses images en grille.
 
 Dans la visionneuse: à l'échelle 1x, glissez à gauche ou à droite pour passer à l'image prise en charge précédente ou suivante du même dossier. Pincez pour zoomer autour de vos doigts (1x à 5x), faites glisser un doigt pour vous déplacer et double-touchez pour basculer entre l'ajustement à l'écran et un zoom 2,5x centré sur le point touché. Le facteur actuel apparaît pendant le pincement et brièvement après un double toucher. Touchez `Pivoter` pour ne faire pivoter que la vue; le zoom actif est conservé, tandis que `Réinitialiser le zoom`, dans le menu en haut à droite, rétablit l'orientation d'origine et l'ajustement. Les GIF animés affichent un bouton flottant `Mettre l'animation en pause` / `Reprendre l'animation`, absent pour les images statiques. Toucher l'image masque ou affiche les barres en surimpression, et `Détails` ouvre un panneau inférieur avec les informations du fichier et les champs EXIF. `Partager` et `Ouvrir avec` restent disponibles sur l'image ouverte initialement; ces actions sont désactivées pour les pages voisines de session, qui ne possèdent volontairement aucun content URI transférable. Les images ouvertes depuis l'accueil autonome ou depuis une autre application proposent aussi `Editer`, qui ouvre l'éditeur et permet d'enregistrer le résultat; les entrées de l'hôte et les pages voisines ne le proposent pas.
 
@@ -165,17 +169,29 @@ JFIF et JPE sont des extensions alias de la famille JPEG. HEIC et HEIF nécessit
 
 ******
 
+**Pourquoi l'application autonome demande-t-elle l'accès aux photos, et fonctionne-t-elle si je refuse?**
+
+L'accueil en albums a besoin de la liste des images de l'appareil: le premier lancement autonome la demande donc une fois (photos et vidéos sur Android 13+, stockage sur les versions antérieures) puis plus jamais de lui-même. Sans accès, `Choisir une image`, `Choisir un dossier`, `Modifier l'image` et `Convertir l'image` fonctionnent toujours via le sélecteur du système; vous pouvez accorder l'accès plus tard depuis le bouton de l'accueil ou dans `Paramètres` > `Autorisation de stockage`, et quand le système n'affiche plus la boîte de dialogue le bouton devient `Ouvrir les paramètres de l'application`. Ouvrir des images depuis AutoJs6 ou d'autres applications ne demande jamais d'autorisation.
+
+**Sur Android 14+ je n'ai autorisé que certaines photos. Pourquoi d'autres albums manquent-ils?**
+
+L'accès limité n'expose que les photos choisies dans le sélecteur de photos du système, donc seuls leurs albums apparaissent. Touchez `Gérer les photos sélectionnées` en haut de l'accueil pour modifier la sélection, ou accordez de nouveau l'accès complet dans `Paramètres` > `Autorisation de stockage`.
+
+**À quoi sert `Accès à tous les fichiers`? En ai-je besoin?**
+
+Non. C'est un interrupteur avancé facultatif qui ouvre la page des paramètres du système; parcourir les albums ne demande que l'accès aux photos. Il est réservé à des fonctions ultérieures comme les dossiers masqués (.nomedia) et les actions groupées sans confirmation, et peut être désactivé à tout moment dans les paramètres du système.
+
 **Le menu du fichier n'affiche pas `Modifier l'image` et `Convertir l'image`?**
 
 Vérifiez dans l'ordre: le code de version d'AutoJs6 est au moins 5276; le plugin est activé dans le `Centre des plugins`; l'extension du fichier ou son type MIME figure dans la liste prise en charge. Si l'une des trois conditions manque, les actions n'apparaissent pas.
 
 **L'ouverture échoue avec `Impossible de lire les informations de l'image` ou l'écran se ferme aussitôt?**
 
-La lecture utilise des entrées en lecture seule. La retouche et la conversion créent un fichier distinct en conservant la source. L'application autonome utilise le sélecteur de documents Android.
+Le fichier ne peut pas être lu pour le moment: il a peut-être été déplacé ou supprimé, l'application qui l'a partagé a peut-être retiré l'accès, ou son contenu ne correspond pas à l'extension (par exemple un fichier endommagé). Rouvrez-le depuis son emplacement actuel ou partagez-le de nouveau depuis l'application d'origine.
 
 **Où le résultat est-il enregistré? Écrase-t-il l'original?**
 
-La lecture accepte une sélection d'images; la retouche et la conversion traitent une image à la fois. Depuis l'accueil autonome vous choisissez la destination; les appels AutoJs6 créent un nouveau fichier à côté de la source.
+L'original n'est jamais écrasé. Depuis AutoJs6, le résultat est enregistré comme un nouveau fichier à côté de la source; depuis l'accueil autonome, vous choisissez où l'enregistrer après la retouche ou la conversion.
 
 **La conversion d'une grande image signale une mémoire insuffisante ou trop de pixels?**
 
@@ -198,6 +214,8 @@ La lecture accepte une sélection d'images; la retouche et la conversion traiten
 Le plugin applique le principe du refus par défaut. Toutes les mesures suivantes sont toujours actives et ne peuvent pas être désactivées:
 
 - La lecture utilise des entrées en lecture seule. La retouche et la conversion créent un fichier distinct en conservant la source. L'application autonome utilise le sélecteur de documents Android.
+- Ouvrir des images depuis AutoJs6 (`Afficher l'image`, `Afficher comme album`) ou d'autres applications ne demande jamais d'autorisation d'exécution; l'accueil autonome demande l'accès aux photos au plus une fois de lui-même, et seul vous pouvez activer `Accès à tous les fichiers` dans les paramètres du système.
+- Le plugin ne déclare pas l'autorisation réseau (`INTERNET`): albums, miniatures et détails des images sont lus sur l'appareil et ne le quittent jamais.
 
 ******
 
