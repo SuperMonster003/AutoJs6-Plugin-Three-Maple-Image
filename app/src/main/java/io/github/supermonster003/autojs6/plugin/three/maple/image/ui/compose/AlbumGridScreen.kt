@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -264,7 +265,7 @@ private fun AlbumGrid(
 
 @Composable
 private fun AlbumCell(album: AlbumSummary, callbacks: AlbumGridCallbacks, modifier: Modifier = Modifier) {
-    val count = if (album.count >= 0) stringResource(R.string.gallery_image_count, album.count) else stringResource(R.string.gallery_loading_folder)
+    val count = if (album.count >= 0) pluralStringResource(R.plurals.gallery_image_count, album.count, album.count) else stringResource(R.string.gallery_loading_folder)
     MapleAlbumCell(
         name = album.name,
         count = if (album.available) count else stringResource(R.string.storage_folder_unavailable),

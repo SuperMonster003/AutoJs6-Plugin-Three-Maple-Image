@@ -64,7 +64,10 @@
     <string name="gallery_empty_no_permission_title">Photo access not granted yet</string>
     <string name="gallery_folder_limit_depth">Subfolders deeper than %1$d levels are not listed</string>
     <string name="gallery_folder_limit_items">Only the first %1$d images are listed</string>
-    <string name="gallery_image_count">%1$d images</string>
+    <plurals name="gallery_image_count">
+        <item quantity="one">%1$d image</item>
+        <item quantity="other">%1$d images</item>
+    </plurals>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">Reading folder...</string>
     <string name="gallery_retry">Retry</string>
     <string name="gallery_section_albums">Albums</string>

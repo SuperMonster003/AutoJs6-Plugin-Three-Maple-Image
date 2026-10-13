@@ -64,7 +64,9 @@
     <string name="gallery_empty_no_permission_title">사진 접근이 아직 허용되지 않았습니다</string>
     <string name="gallery_folder_limit_depth">%1$d단계보다 깊은 하위 폴더는 표시되지 않습니다</string>
     <string name="gallery_folder_limit_items">처음 %1$d개의 이미지만 표시합니다</string>
-    <string name="gallery_image_count">이미지 %1$d개</string>
+    <plurals name="gallery_image_count">
+        <item quantity="other">이미지 %1$d개</item>
+    </plurals>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">폴더를 읽는 중...</string>
     <string name="gallery_retry">다시 시도</string>
     <string name="gallery_section_albums">앨범</string>

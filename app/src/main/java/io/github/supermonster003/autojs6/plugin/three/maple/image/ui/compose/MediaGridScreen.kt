@@ -38,6 +38,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.supermonster003.autojs6.plugin.three.maple.image.DocumentTreeLimit
@@ -71,7 +72,10 @@ internal fun MediaGridScreen(
     var sortOpen by remember { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
     val album = state.album
-    val countText = album?.let { stringResource(R.string.gallery_image_count, if (it.count >= 0) it.count else state.items.size) }
+    val countText = album?.let {
+        val count = if (it.count >= 0) it.count else state.items.size
+        pluralStringResource(R.plurals.gallery_image_count, count, count)
+    }
     MapleScreen(
         title = album?.name.orEmpty(),
         subtitle = countText,

@@ -64,7 +64,9 @@
     <string name="gallery_empty_no_permission_title">尚未授予相片存取權限</string>
     <string name="gallery_folder_limit_depth">超過 %1$d 層的子資料夾未列出</string>
     <string name="gallery_folder_limit_items">僅列出前 %1$d 張圖片</string>
-    <string name="gallery_image_count">%1$d 張圖片</string>
+    <plurals name="gallery_image_count">
+        <item quantity="other">%1$d 張圖片</item>
+    </plurals>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">正在讀取資料夾...</string>
     <string name="gallery_retry">重試</string>
     <string name="gallery_section_albums">相簿</string>
