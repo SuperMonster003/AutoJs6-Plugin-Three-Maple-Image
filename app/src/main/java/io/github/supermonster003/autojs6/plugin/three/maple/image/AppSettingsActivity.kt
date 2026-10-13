@@ -58,6 +58,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     onDarkMode = { open(SettingsDialog.DarkMode) },
                     onThemeColor = { open(SettingsDialog.ThemeColor) },
                     onLauncherIcon = { open(SettingsDialog.LauncherIcon) },
+                    onStoragePermission = { startActivity(StoragePermissionActivity.intent(this)) },
                     onReleaseHistory = { startActivity(Intent(this, ReleaseHistoryActivity::class.java)) },
                     onAbout = { startActivity(Intent(this, AboutActivity::class.java)) },
                 )

@@ -47,6 +47,7 @@ internal fun SettingsScreen(
     onDarkMode: () -> Unit,
     onThemeColor: () -> Unit,
     onLauncherIcon: () -> Unit,
+    onStoragePermission: () -> Unit,
     onReleaseHistory: () -> Unit,
     onAbout: () -> Unit,
 ) {
@@ -80,6 +81,14 @@ internal fun SettingsScreen(
                 iconResource = R.drawable.ic_apps_24,
                 onClick = onLauncherIcon,
                 modifier = Modifier.testTag("maple.settings.launcherIcon"),
+            )
+            MapleSectionHeader(stringResource(R.string.standalone_settings_section_storage))
+            MapleSettingsRow(
+                title = stringResource(R.string.storage_permission_title),
+                summary = stringResource(R.string.storage_permission_summary),
+                iconResource = R.drawable.ic_folder_24,
+                onClick = onStoragePermission,
+                modifier = Modifier.testTag("maple.settings.storage"),
             )
             MapleSectionHeader(stringResource(R.string.standalone_settings_section_information))
             MapleSettingsRow(
