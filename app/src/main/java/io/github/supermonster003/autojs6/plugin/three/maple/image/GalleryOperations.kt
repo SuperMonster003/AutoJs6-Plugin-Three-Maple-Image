@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.text.format.Formatter
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -57,7 +57,7 @@ internal sealed interface GalleryDialog {
     /** Rename one image; [document] renames an authorized folder document instead of a library row. */
     data class Rename(val item: MediaItem, val document: Boolean) : GalleryDialog
 
-    data class PickTarget(val items: List<MediaItem>, val copy: Boolean) : GalleryDialog
+    data class PickTarget(val items: List<MediaItem>, val copy: Boolean, val recent: List<TargetAlbum>, val albums: List<TargetAlbum>) : GalleryDialog
 
     data class NewAlbum(val items: List<MediaItem>, val copy: Boolean) : GalleryDialog
 
@@ -75,15 +75,38 @@ internal enum class DeleteReason {
     AUTHORIZED_FOLDER,
 }
 
+/** What the operations act on: the media grid selection on the home screen, or the viewer's current page. */
+internal interface OperationTarget {
+    /** The images to act on, in album order. */
+    suspend fun items(): List<MediaItem>
+
+    /** Kind of the open album; [AlbumKind.FOLDER] limits the operations to share, delete, rename and details. */
+    val albumKind: AlbumKind?
+
+    /** The open media library album (a move skips it as a target), or null. */
+    val openAlbum: AlbumSummary?
+
+    val favoriteIds: Set<Long>
+
+    /** Media library albums for the move / copy picker. */
+    suspend fun albums(): List<AlbumSummary>
+
+    fun clearSelection()
+
+    /** A write finished or was undone: reload what shows the images. */
+    fun afterWrite()
+}
+
 /**
- * The selection operations of the media grid and the recycle bin page (ROADMAP 7.1-7.4) for [HomeActivity]:
- * resolves the selected images, runs them through [MediaWriteCoordinator], owns the dialogs and the snackbar
- * (with "Undo" for deletes, moves and renames), and refreshes the gallery. Construct it in `onCreate`.
+ * The management operations (ROADMAP 7.1-7.4) of the home screen (media grid selection, recycle bin page) and of
+ * the viewer: resolves the [target] images, runs them through [MediaWriteCoordinator], owns the dialogs and the
+ * snackbar (with "Undo" for deletes, moves and renames). [recycleBin] is the home screen's recycle bin page.
+ * Construct it in `onCreate`.
  */
 internal class GalleryOperations(
-    private val activity: HomeActivity,
-    private val gallery: GalleryViewModel,
-    private val recycleBin: RecycleBinViewModel,
+    private val activity: ConfiguredActivity,
+    private val target: OperationTarget,
+    private val recycleBin: RecycleBinViewModel? = null,
 ) {
 
     val snackbar = SnackbarHostState()
@@ -156,7 +179,7 @@ internal class GalleryOperations(
     }
 
     fun share() = launch {
-        val items = gallery.selectedItems()
+        val items = target.items()
         if (items.isEmpty()) return@launch
         if (items.size > SHARE_LIMIT) {
             notify(activity.getString(R.string.selection_share_limit, SHARE_LIMIT))
@@ -172,11 +195,11 @@ internal class GalleryOperations(
         intent.clipData = ClipData.newRawUri(null, uris.first()).apply { uris.drop(1).forEach { addItem(ClipData.Item(it)) } }
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         runCatching { activity.startActivity(Intent.createChooser(intent, activity.getString(R.string.action_share))) }
-            .onFailure { activity.showMessage(R.string.standalone_home_open_failed) }
+            .onFailure { Toast.makeText(activity, R.string.standalone_home_open_failed, Toast.LENGTH_LONG).show() }
     }
 
     fun details() = launch {
-        val items = gallery.selectedItems()
+        val items = target.items()
         if (items.isNotEmpty()) show(GalleryDialog.Details(items))
     }
 
@@ -184,15 +207,15 @@ internal class GalleryOperations(
 
     /** Adds the selection to the favorites, or removes it when every selected image is one already. */
     fun favorite() = launch {
-        val items = gallery.selectedItems()
+        val items = target.items()
         if (items.isEmpty()) return@launch
-        val known = gallery.grid.value.favoriteIds
+        val known = target.favoriteIds
         val remove = items.all { it.id in known }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && ApplicationSettingsStore(activity).load().syncSystemFavorites) {
             if (coordinator.setSystemFavorite(items, favorite = !remove).cancelled) return@launch
         }
         if (remove) favorites.remove(items.map { it.id }) else favorites.add(items.filter { it.id !in known })
-        gallery.clearSelection()
+        target.clearSelection()
         notify(quantity(if (remove) R.plurals.favorites_removed_count else R.plurals.favorites_added_count, items.size))
     }
 
@@ -200,10 +223,10 @@ internal class GalleryOperations(
 
     /** Media library images go to the recycle bin unless it is switched off; folder documents ask first. */
     fun delete() = launch {
-        val items = gallery.selectedItems()
+        val items = target.items()
         if (items.isEmpty()) return@launch
         when {
-            gallery.grid.value.album?.kind == AlbumKind.FOLDER -> show(GalleryDialog.ConfirmDelete(items, DeleteReason.AUTHORIZED_FOLDER))
+            target.albumKind == AlbumKind.FOLDER -> show(GalleryDialog.ConfirmDelete(items, DeleteReason.AUTHORIZED_FOLDER))
             !ApplicationSettingsStore(activity).load().recycleBinEnabled -> show(GalleryDialog.ConfirmDelete(items, DeleteReason.RECYCLE_BIN_OFF))
             else -> trash(items)
         }
@@ -215,7 +238,7 @@ internal class GalleryOperations(
             outcome.cancelled -> Unit
             outcome.tooLargeForRecycleBin -> show(GalleryDialog.ConfirmDelete(items, DeleteReason.TOO_LARGE))
             else -> {
-                afterGridWrite(items)
+                finishWrite()
                 notify(summary(R.plurals.gallery_trashed_count, outcome), outcome.undo, afterUndo = ::refreshAll)
             }
         }
@@ -225,7 +248,7 @@ internal class GalleryOperations(
         val outcome = if (reason == DeleteReason.AUTHORIZED_FOLDER) deleteDocuments(items) else coordinator.delete(items)
         if (outcome.cancelled) return@launch
         if (reason != DeleteReason.AUTHORIZED_FOLDER) favorites.remove(items.map { it.id })
-        afterGridWrite(items)
+        finishWrite()
         notify(summary(R.plurals.gallery_deleted_count, outcome))
     }
 
@@ -238,23 +261,22 @@ internal class GalleryOperations(
         WriteOutcome(succeeded = done, failed = items.size - done)
     }
 
-    private fun afterGridWrite(items: List<MediaItem>) {
-        gallery.deselect(items.map { it.id })
-        gallery.clearSelection()
+    private fun finishWrite() {
+        target.clearSelection()
         refreshAll()
     }
 
     private fun refreshAll() {
-        gallery.refreshAfterWrite()
-        recycleBin.load()
+        target.afterWrite()
+        recycleBin?.load()
     }
 
     // ---- rename / move / copy (ROADMAP 7.3) ----
 
     fun rename() = launch {
-        val item = gallery.selectedItems().singleOrNull() ?: return@launch
+        val item = target.items().singleOrNull() ?: return@launch
         renameError = null
-        show(GalleryDialog.Rename(item, document = gallery.grid.value.album?.kind == AlbumKind.FOLDER))
+        show(GalleryDialog.Rename(item, document = target.albumKind == AlbumKind.FOLDER))
     }
 
     private fun runRename(item: MediaItem, document: Boolean, name: String) = launch {
@@ -270,7 +292,7 @@ internal class GalleryOperations(
             outcome.succeeded == 0 -> renameError = activity.getString(R.string.rename_error_failed)
             else -> {
                 show(null)
-                afterGridWrite(listOf(item))
+                finishWrite()
                 notify(activity.getString(R.string.gallery_renamed, name), outcome.undo, afterUndo = ::refreshAll)
             }
         }
@@ -294,14 +316,16 @@ internal class GalleryOperations(
     fun copy() = pickTarget(copy = true)
 
     private fun pickTarget(copy: Boolean) = launch {
-        val items = gallery.selectedItems()
-        if (items.isNotEmpty()) show(GalleryDialog.PickTarget(items, copy))
+        val items = target.items()
+        if (items.isEmpty()) return@launch
+        val (recent, albums) = targetAlbums(copy)
+        show(GalleryDialog.PickTarget(items, copy, recent, albums))
     }
 
     /** Writable albums of the media library (Android 10+ only accepts DCIM/ and Pictures/), moves skip the open one. */
-    private fun targetAlbums(copy: Boolean): Pair<List<TargetAlbum>, List<TargetAlbum>> {
-        val open = gallery.grid.value.album
-        val albums = gallery.albums.value.albums
+    private suspend fun targetAlbums(copy: Boolean): Pair<List<TargetAlbum>, List<TargetAlbum>> {
+        val open = target.openAlbum
+        val albums = target.albums()
             .filter { it.kind == AlbumKind.MEDIA && it.subtitle.isNotEmpty() && MediaWriteCoordinator.isWritableAlbumPath(it.subtitle) }
             .filter { copy || open?.kind != AlbumKind.MEDIA || it.id != open.id }
             .map { TargetAlbum(it.name, it.subtitle) }
@@ -338,7 +362,7 @@ internal class GalleryOperations(
         }
         if (outcome.cancelled) return
         if (outcome.succeeded > 0) preferences.rememberTarget(target.relativePath)
-        afterGridWrite(items)
+        finishWrite()
         val resource = if (copy) R.plurals.gallery_copied_count else R.plurals.gallery_moved_count
         val message = buildString {
             if (outcome.succeeded > 0) append(activity.resources.getQuantityString(resource, outcome.succeeded, outcome.succeeded, target.name))
@@ -353,6 +377,7 @@ internal class GalleryOperations(
     // ---- recycle bin page (ROADMAP 7.2) ----
 
     fun restoreFromBin() = launch {
+        val recycleBin = recycleBin ?: return@launch
         val entries = recycleBin.selected()
         if (entries.isEmpty()) return@launch
         val outcome = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -367,12 +392,12 @@ internal class GalleryOperations(
     }
 
     fun deleteFromBin() {
-        val entries = recycleBin.selected()
+        val entries = recycleBin?.selected().orEmpty()
         if (entries.isNotEmpty()) show(GalleryDialog.ConfirmBinDelete(entries, all = false))
     }
 
     fun emptyBin() {
-        val entries = recycleBin.state.value.entries
+        val entries = recycleBin?.state?.value?.entries.orEmpty()
         if (entries.isNotEmpty()) show(GalleryDialog.ConfirmBinDelete(entries, all = true))
     }
 
@@ -385,8 +410,8 @@ internal class GalleryOperations(
         if (outcome.cancelled) return@launch
         // Android 11+ bin entries carry media ids; Android 7-10 favorites of binned images were rebound or dropped already.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) favorites.remove(entries.map { it.id })
-        recycleBin.clearSelection()
-        recycleBin.load()
+        recycleBin?.clearSelection()
+        recycleBin?.load()
         notify(summary(R.plurals.gallery_deleted_count, outcome))
     }
 
@@ -431,11 +456,10 @@ internal class GalleryOperations(
                 onConfirm = { name -> runRename(current.item, current.document, name) },
             )
             is GalleryDialog.PickTarget -> {
-                val (recent, albums) = remember(current) { targetAlbums(current.copy) }
                 TargetAlbumDialog(
                     copy = current.copy,
-                    recent = recent,
-                    albums = albums,
+                    recent = current.recent,
+                    albums = current.albums,
                     onNewAlbum = { show(GalleryDialog.NewAlbum(current.items, current.copy)) },
                     onPick = { target -> chooseTarget(current.items, current.copy, target) },
                     onDismiss = { show(null) },

@@ -126,6 +126,18 @@ internal class ViewerSourceLoader(
         },
     )
 
+    /** The album behind [spec] again, after a write in the viewer (ROADMAP 7.0); empty when it cannot be read. */
+    suspend fun items(spec: ViewerSourceSpec): List<MediaItem> = try {
+        when (spec) {
+            is ViewerSourceSpec.MediaAlbum -> loadAlbum(spec.bucketId, spec.sort)
+            is ViewerSourceSpec.AuthorizedFolder -> loadFolder(spec.treeUri, spec.sort)
+        }
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (_: Exception) {
+        emptyList()
+    }
+
     suspend fun load(request: ImageViewerLaunchRequest): ViewerSource {
         val spec = request.source ?: return ViewerSource.fromRequest(request)
         val items = try {

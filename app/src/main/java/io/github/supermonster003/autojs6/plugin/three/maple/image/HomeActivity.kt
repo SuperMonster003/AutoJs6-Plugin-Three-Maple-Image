@@ -70,7 +70,7 @@ class HomeActivity : ConfiguredActivity() {
         actions = HomeActions(this)
         actions.restore(savedInstanceState)
         permissionGate = MediaPermissionGate(this)
-        operations = GalleryOperations(this, gallery, recycleBin)
+        operations = GalleryOperations(this, galleryTarget, recycleBin)
         if (savedInstanceState == null) requestPhotoAccessOnce()
         val callbacks = AlbumGridCallbacks(
             onOpenAlbum = { album -> navigate?.invoke("album/${album.kind.name}/${album.id}") },
@@ -168,6 +168,17 @@ class HomeActivity : ConfiguredActivity() {
     }
 
     private var navigate: ((String) -> Unit)? = null
+
+    /** The media grid selection as the operations see it. */
+    private val galleryTarget = object : OperationTarget {
+        override suspend fun items(): List<MediaItem> = gallery.selectedItems()
+        override val albumKind: AlbumKind? get() = gallery.grid.value.album?.kind
+        override val openAlbum: AlbumSummary? get() = gallery.grid.value.album
+        override val favoriteIds: Set<Long> get() = gallery.grid.value.favoriteIds
+        override suspend fun albums(): List<AlbumSummary> = gallery.albums.value.albums
+        override fun clearSelection() = gallery.clearSelection()
+        override fun afterWrite() = gallery.refreshAfterWrite()
+    }
 
     override fun onStart() {
         super.onStart()

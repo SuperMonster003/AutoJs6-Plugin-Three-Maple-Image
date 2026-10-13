@@ -31,6 +31,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -38,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -78,7 +81,15 @@ internal data class ViewerUiState(
     val zoomIndicatorText: String? = null,
     /** "Rotated for viewing only" bar above the strip while the current page carries a user rotation. */
     val rotationHint: String? = null,
+    /** Gallery sources only (ROADMAP 7.0): favorite, delete and the file operations; null for host and single sources. */
+    val management: ViewerManagement? = null,
 )
+
+/**
+ * The management controls of a gallery page: [favorite] is the heart state (null hides it, authorized folders
+ * have no favorites) and [canMoveCopy] offers move and copy (media library albums only).
+ */
+internal data class ViewerManagement(val favorite: Boolean?, val canMoveCopy: Boolean)
 
 internal class ViewerCallbacks(
     val onBack: () -> Unit,
@@ -98,6 +109,11 @@ internal class ViewerCallbacks(
     val onSelectPage: (Int) -> Unit,
     val onUndoRotation: () -> Unit,
     val onDismissRotationHint: () -> Unit,
+    val onToggleFavorite: () -> Unit = {},
+    val onDelete: () -> Unit = {},
+    val onRename: () -> Unit = {},
+    val onMove: () -> Unit = {},
+    val onCopy: () -> Unit = {},
 )
 
 /** What one pager page renders: the zoomable View plus its own loading and error state. */
@@ -134,13 +150,15 @@ internal class ViewerPagerUi(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks: ViewerCallbacks) {
+internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks: ViewerCallbacks, snackbarHostState: SnackbarHostState? = null) {
     val canvas = MapleTheme.canvas
     Box(modifier = Modifier.fillMaxSize().background(canvas.viewerCanvas)) {
         if (pager == null) {
             MapleLoading(dark = true)
         } else {
-            ViewerPager(pager, callbacks.onPageChanged)
+            // A reloaded source (after a delete or move) brings a new page list: compose a fresh pager for it
+            // instead of feeding the old pager state the new keys.
+            key(pager) { ViewerPager(pager, callbacks.onPageChanged) }
         }
         AnimatedVisibility(
             visible = state.controlsVisible,
@@ -165,6 +183,9 @@ internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks
                 .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal)),
             horizontalAlignment = Alignment.End,
         ) {
+            if (snackbarHostState != null) {
+                SnackbarHost(snackbarHostState, modifier = Modifier.fillMaxWidth().testTag("maple.viewer.snackbar"))
+            }
             val animationVisible = state.controlsVisible && state.animation != ImageAnimationPlayback.UNAVAILABLE
             if (animationVisible) {
                 val paused = state.animation == ImageAnimationPlayback.PAUSED
@@ -279,14 +300,24 @@ internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks
                                 onClick = callbacks.onShare,
                                 testTag = "maple.viewer.share",
                             ),
-                            MapleAction(
-                                icon = painterResource(R.drawable.ic_open_in_new_24),
-                                label = stringResource(R.string.label_open_with),
-                                contentDescription = stringResource(R.string.action_open_external),
-                                enabled = state.canForward,
-                                onClick = callbacks.onOpenWith,
-                                testTag = "maple.viewer.openWith",
-                            ),
+                            // Gallery pages trade "open with" (now in the menu) for delete (ROADMAP 7.0).
+                            if (state.management != null) {
+                                MapleAction(
+                                    icon = painterResource(R.drawable.ic_delete_24),
+                                    label = stringResource(R.string.action_delete),
+                                    onClick = callbacks.onDelete,
+                                    testTag = "maple.viewer.delete",
+                                )
+                            } else {
+                                MapleAction(
+                                    icon = painterResource(R.drawable.ic_open_in_new_24),
+                                    label = stringResource(R.string.label_open_with),
+                                    contentDescription = stringResource(R.string.action_open_external),
+                                    enabled = state.canForward,
+                                    onClick = callbacks.onOpenWith,
+                                    testTag = "maple.viewer.openWith",
+                                )
+                            },
                         ),
                     )
                 }
@@ -393,10 +424,45 @@ private fun ViewerTopBar(state: ViewerUiState, callbacks: ViewerCallbacks) {
         onNavigationClick = callbacks.onBack,
         overlay = true,
         actions = {
+            val management = state.management
+            val favorite = management?.favorite
+            if (favorite != null) {
+                IconButton(onClick = callbacks.onToggleFavorite, modifier = Modifier.testTag("maple.viewer.favorite")) {
+                    Icon(
+                        painter = painterResource(if (favorite) R.drawable.ic_favorite_24 else R.drawable.ic_favorite_border_24),
+                        contentDescription = stringResource(if (favorite) R.string.action_unfavorite else R.string.action_favorite),
+                    )
+                }
+            }
             IconButton(onClick = { menuOpen = true }, modifier = Modifier.testTag("maple.viewer.more")) {
                 Icon(painter = painterResource(R.drawable.ic_more_vert_24), contentDescription = stringResource(R.string.action_more))
             }
             DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                if (management != null) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.action_open_external)) },
+                        enabled = state.canForward,
+                        onClick = { menuOpen = false; callbacks.onOpenWith() },
+                        modifier = Modifier.testTag("maple.viewer.menu.openWith"),
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.action_rename)) },
+                        onClick = { menuOpen = false; callbacks.onRename() },
+                        modifier = Modifier.testTag("maple.viewer.menu.rename"),
+                    )
+                    if (management.canMoveCopy) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.action_move)) },
+                            onClick = { menuOpen = false; callbacks.onMove() },
+                            modifier = Modifier.testTag("maple.viewer.menu.move"),
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.action_copy)) },
+                            onClick = { menuOpen = false; callbacks.onCopy() },
+                            modifier = Modifier.testTag("maple.viewer.menu.copy"),
+                        )
+                    }
+                }
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.action_reset_zoom)) },
                     onClick = { menuOpen = false; callbacks.onResetZoom() },

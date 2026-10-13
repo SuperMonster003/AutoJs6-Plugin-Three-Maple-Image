@@ -31,6 +31,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerCallbacks
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerManagement
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerPagerState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerPagerUi
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerScreen
@@ -58,7 +59,10 @@ class ImageViewerActivity : ConfiguredActivity() {
     private var source: ViewerSource? = null
     private var pagerState: ViewerPagerState? = null
     private var pagerUi by mutableStateOf<ViewerPagerUi?>(null)
-    private val hosts = HashMap<Int, ViewerPageHost>()
+    /** Page hosts of the installed source; a reload after a write installs a fresh map (see [installSource]). */
+    private var hosts = HashMap<Int, ViewerPageHost>()
+    private lateinit var operations: GalleryOperations
+    private var favoriteIds: Set<Long> = emptySet()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     /** Pager animations need a frame clock, which the plain main dispatcher does not carry. */
@@ -116,6 +120,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         )
         readRestoredState(savedInstanceState)
         rotationGestureEnabled = ApplicationSettingsStore(this).load().viewerRotationGesture
+        operations = GalleryOperations(this, viewerTarget)
         val callbacks = ViewerCallbacks(
             onBack = ::finish,
             onToggleDetails = { setExifDetailsExpanded(!uiState.detailsExpanded) },
@@ -132,6 +137,11 @@ class ImageViewerActivity : ConfiguredActivity() {
             onSelectPage = ::jumpToPage,
             onUndoRotation = { currentHost()?.view?.undoRotation() },
             onDismissRotationHint = ::dismissRotationHint,
+            onToggleFavorite = operations::favorite,
+            onDelete = operations::delete,
+            onRename = operations::rename,
+            onMove = operations::move,
+            onCopy = operations::copy,
         )
         uiState = uiState.copy(
             title = launchRequest.startPage.image.displayName,
@@ -142,7 +152,21 @@ class ImageViewerActivity : ConfiguredActivity() {
         )
         setContent {
             MapleTheme(palette = appPalette) {
-                ViewerScreen(state = uiState, pager = pagerUi, callbacks = callbacks)
+                ViewerScreen(
+                    state = uiState,
+                    pager = pagerUi,
+                    callbacks = callbacks,
+                    snackbarHostState = operations.snackbar.takeIf { launchRequest.source != null },
+                )
+                operations.Dialogs()
+            }
+        }
+        if (launchRequest.source is ViewerSourceSpec.MediaAlbum) {
+            scope.launch {
+                FavoritesRepository(this@ImageViewerActivity).observeIds().collect { ids ->
+                    favoriteIds = ids
+                    uiState = uiState.copy(management = managementState())
+                }
             }
         }
         sourceJob = scope.launch {
@@ -164,6 +188,10 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     private fun installSource(resolved: ViewerSource) {
         source = resolved
+        // The pager's acquire / release close over this map, so the pages of a replaced source release only
+        // their own hosts.
+        val pageHosts = HashMap<Int, ViewerPageHost>()
+        hosts = pageHosts
         val count = resolved.pages.size
         if (restoredIndex !in resolved.pages.indices) restoredIndex = -1
         if (restoredAnimationIndex !in resolved.pages.indices) restoredAnimationIndex = -1
@@ -176,8 +204,8 @@ class ImageViewerActivity : ConfiguredActivity() {
             state = state,
             pageCount = count,
             pageKey = { index -> resolved.pages[index].image.targetUri.toString() },
-            acquire = ::acquirePage,
-            release = ::releasePage,
+            acquire = { index -> pageHosts.getOrPut(index) { createHost(index) } },
+            release = { index -> releasePage(pageHosts, index) },
             thumbnail = ::thumbnailModel,
             thumbnailDescription = { index -> getString(R.string.viewer_thumbnail_description, index + 1, count) },
         )
@@ -303,6 +331,85 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     private fun acquirePage(index: Int): ViewerPageHost = hosts.getOrPut(index) { createHost(index) }
 
+    /** The gallery page as the management operations see it (ROADMAP 7.0 viewer actions). */
+    private val viewerTarget = object : OperationTarget {
+        override suspend fun items(): List<MediaItem> = listOfNotNull(source?.items?.getOrNull(currentIndex))
+
+        override val albumKind: AlbumKind?
+            get() = when (val spec = launchRequest.source) {
+                is ViewerSourceSpec.AuthorizedFolder -> AlbumKind.FOLDER
+                is ViewerSourceSpec.MediaAlbum -> when (spec.bucketId) {
+                    MediaCatalog.ALL_BUCKETS -> AlbumKind.ALL
+                    MediaCatalog.FAVORITES -> AlbumKind.FAVORITES
+                    else -> AlbumKind.MEDIA
+                }
+                null -> null
+            }
+
+        override val openAlbum: AlbumSummary?
+            get() {
+                val spec = launchRequest.source as? ViewerSourceSpec.MediaAlbum ?: return null
+                if (albumKind != AlbumKind.MEDIA) return null
+                val path = source?.items?.getOrNull(currentIndex)?.relativePath.orEmpty()
+                return AlbumSummary(AlbumKind.MEDIA, spec.bucketId, "", -1, null, path)
+            }
+
+        override val favoriteIds: Set<Long> get() = this@ImageViewerActivity.favoriteIds
+
+        override suspend fun albums(): List<AlbumSummary> {
+            val root = getString(R.string.gallery_album_root)
+            return runCatching { MediaStoreRepository(this@ImageViewerActivity).loadBuckets() }.getOrDefault(emptyList()).map { bucket ->
+                val name = bucket.name.ifBlank { bucket.relativePath.trimEnd('/').substringAfterLast('/').ifBlank { root } }
+                AlbumSummary(AlbumKind.MEDIA, bucket.id, name, bucket.count, bucket.cover.contentUri, bucket.relativePath)
+            }
+        }
+
+        override fun clearSelection() = Unit
+
+        override fun afterWrite() = reloadSource()
+    }
+
+    /**
+     * After a delete, move or rename: enumerate the album again and stay on the same image, or on its next (then
+     * previous) neighbour once it left the album; an emptied album closes the viewer.
+     */
+    private fun reloadSource() {
+        val spec = launchRequest.source ?: return
+        val previous = source?.items ?: return
+        val index = currentIndex
+        sourceJob?.cancel()
+        sourceJob = scope.launch {
+            // The write changed the library now; neither the shared scan nor the folder cache may answer.
+            if (spec is ViewerSourceSpec.AuthorizedFolder) AuthorizedFolderRepository(this@ImageViewerActivity).invalidateCache()
+            else MediaStoreRepository(this@ImageViewerActivity).invalidate()
+            val items = ViewerSourceLoader.create(this@ImageViewerActivity).items(spec)
+            if (isFinishing || isDestroyed) return@launch
+            if (items.isEmpty()) {
+                finish()
+                return@launch
+            }
+            val ids = items.mapTo(HashSet()) { it.id }
+            val order = listOf(index) + (index + 1 until previous.size) + (index - 1 downTo 0)
+            val start = order.mapNotNull { previous.getOrNull(it)?.id }.firstOrNull { it in ids } ?: items.first().id
+            val kind = requireNotNull(source).kind
+            currentIndex = -1
+            restoredIndex = -1
+            restoredAnimationIndex = -1
+            restoredRotationIndex = -1
+            restoredExpandedDetailsIndex = -1
+            // The old pages release their hosts from the old map when the new pager replaces them.
+            installSource(ViewerSource.fromItems(kind, items, start, ViewerSource.page(items.first { it.id == start }), launchRequest.editable))
+        }
+    }
+
+    /** Management controls of the current page: gallery sources only (ROADMAP 7.0). */
+    private fun managementState(): ViewerManagement? {
+        val spec = launchRequest.source ?: return null
+        val item = source?.items?.getOrNull(currentIndex) ?: return null
+        val library = spec is ViewerSourceSpec.MediaAlbum
+        return ViewerManagement(favorite = if (library) item.id in favoriteIds else null, canMoveCopy = library)
+    }
+
     private fun createHost(index: Int): ViewerPageHost {
         val source = requireNotNull(source)
         val page = source.pages[index]
@@ -331,9 +438,9 @@ class ImageViewerActivity : ConfiguredActivity() {
         return host
     }
 
-    private fun releasePage(index: Int) {
-        if (index == currentIndex) return // the current page is never released while shown
-        hosts.remove(index)?.release(this)
+    private fun releasePage(map: HashMap<Int, ViewerPageHost>, index: Int) {
+        if (map === hosts && index == currentIndex) return // the current page is never released while shown
+        map.remove(index)?.release(this)
     }
 
     /** The pager crossed into [index]; intermediate pages of a programmatic jump are skipped. */
@@ -456,6 +563,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             canEdit = canForward && source.editable,
             animation = host?.animation?.playback ?: ImageAnimationPlayback.UNAVAILABLE,
             rotationHint = rotationHintText(host),
+            management = managementState(),
         )
     }
 
