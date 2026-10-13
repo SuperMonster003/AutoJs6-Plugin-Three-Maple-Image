@@ -141,6 +141,8 @@
     <string name="plugin_description">图片查看, 编辑与格式转换</string>
     <string name="release_history">发行历史</string>
     <string name="release_history_unavailable">发行历史暂不可用</string>
+    <string name="settings_recycle_bin_summary">删除的照片保留 30 天, 期间可以恢复; 关闭后删除即永久删除</string>
+    <string name="settings_recycle_bin_title">回收站</string>
     <string name="standalone_about_app_summary">版本信息, 开源许可与项目链接</string>
     <string name="standalone_about_title">关于应用与开发者</string>
     <string name="standalone_dark_mode_dark">深色</string>
@@ -193,6 +195,9 @@
     <string name="storage_folder_unavailable">授权已失效, 请移除后重新添加</string>
     <string name="storage_folders_summary">授权的文件夹即使没有照片访问权限也会作为相册显示</string>
     <string name="storage_grant_photo_access">授予照片访问权限</string>
+    <string name="storage_manage_media">媒体管理</string>
+    <string name="storage_manage_media_summary">允许图库删除, 移动和重命名照片时不再逐次确认; 跳转系统设置页</string>
+    <string name="storage_manage_media_unavailable">需要 Android 12 或更高版本</string>
     <string name="storage_manage_selected">管理所选照片</string>
     <string name="storage_no_folders">尚无已授权文件夹</string>
     <string name="storage_open_app_settings">打开应用设置</string>

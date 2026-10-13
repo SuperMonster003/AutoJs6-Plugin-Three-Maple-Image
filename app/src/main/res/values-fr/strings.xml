@@ -141,6 +141,8 @@
     <string name="plugin_description">Affichage, retouche et conversion d\'images</string>
     <string name="release_history">Historique des versions</string>
     <string name="release_history_unavailable">L\'historique des versions est indisponible</string>
+    <string name="settings_recycle_bin_summary">Les photos supprimées sont conservées 30 jours et peuvent être restaurées; désactivée, la suppression est définitive</string>
+    <string name="settings_recycle_bin_title">Corbeille</string>
     <string name="standalone_about_app_summary">Détails de version, licence libre et liens du projet</string>
     <string name="standalone_about_title">À propos de l\'application et du développeur</string>
     <string name="standalone_dark_mode_dark">Sombre</string>
@@ -193,6 +195,9 @@
     <string name="storage_folder_unavailable">Autorisation perdue; retirez-le puis ajoutez-le à nouveau</string>
     <string name="storage_folders_summary">Les dossiers que vous autorisez apparaissent comme des albums même sans accès aux photos</string>
     <string name="storage_grant_photo_access">Accorder l\'accès aux photos</string>
+    <string name="storage_manage_media">Gestion des médias</string>
+    <string name="storage_manage_media_summary">Permet à la galerie de supprimer, déplacer et renommer des photos sans confirmation à chaque fois; ouvre la page système</string>
+    <string name="storage_manage_media_unavailable">Nécessite Android 12 ou une version ultérieure</string>
     <string name="storage_manage_selected">Gérer les photos sélectionnées</string>
     <string name="storage_no_folders">Aucun dossier autorisé pour le moment</string>
     <string name="storage_open_app_settings">Ouvrir les paramètres de l\'application</string>

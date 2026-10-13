@@ -49,6 +49,8 @@ internal fun SettingsScreen(
     onLauncherIcon: () -> Unit,
     viewerRotationGesture: Boolean,
     onViewerRotationGesture: (Boolean) -> Unit,
+    recycleBinEnabled: Boolean,
+    onRecycleBinEnabled: (Boolean) -> Unit,
     onStoragePermission: () -> Unit,
     onReleaseHistory: () -> Unit,
     onAbout: () -> Unit,
@@ -100,6 +102,14 @@ internal fun SettingsScreen(
                 iconResource = R.drawable.ic_folder_24,
                 onClick = onStoragePermission,
                 modifier = Modifier.testTag("maple.settings.storage"),
+            )
+            MapleSwitchRow(
+                title = stringResource(R.string.settings_recycle_bin_title),
+                summary = stringResource(R.string.settings_recycle_bin_summary),
+                iconResource = R.drawable.ic_delete_24,
+                checked = recycleBinEnabled,
+                onToggle = onRecycleBinEnabled,
+                modifier = Modifier.testTag("maple.settings.recycleBin"),
             )
             MapleSectionHeader(stringResource(R.string.standalone_settings_section_information))
             MapleSettingsRow(

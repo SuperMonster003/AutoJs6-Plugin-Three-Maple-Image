@@ -141,6 +141,8 @@
     <string name="plugin_description">Просмотр, редактирование и преобразование изображений</string>
     <string name="release_history">История выпусков</string>
     <string name="release_history_unavailable">История выпусков недоступна</string>
+    <string name="settings_recycle_bin_summary">Удалённые фото хранятся 30 дней, их можно восстановить; если выключено, удаление необратимо</string>
+    <string name="settings_recycle_bin_title">Корзина</string>
     <string name="standalone_about_app_summary">Сведения о версии, лицензия открытого кода и ссылки проекта</string>
     <string name="standalone_about_title">О приложении и разработчике</string>
     <string name="standalone_dark_mode_dark">Темная</string>
@@ -193,6 +195,9 @@
     <string name="storage_folder_unavailable">Разрешение утрачено; удалите папку и добавьте ее снова</string>
     <string name="storage_folders_summary">Разрешенные папки отображаются как альбомы даже без доступа к фото</string>
     <string name="storage_grant_photo_access">Предоставить доступ к фото</string>
+    <string name="storage_manage_media">Управление медиафайлами</string>
+    <string name="storage_manage_media_summary">Позволяет галерее удалять, перемещать и переименовывать фото без подтверждения каждый раз; открывает системную страницу</string>
+    <string name="storage_manage_media_unavailable">Требуется Android 12 или новее</string>
     <string name="storage_manage_selected">Управлять выбранными фото</string>
     <string name="storage_no_folders">Разрешенных папок пока нет</string>
     <string name="storage_open_app_settings">Открыть настройки приложения</string>

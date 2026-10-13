@@ -141,6 +141,8 @@
     <string name="plugin_description">画像の表示, 編集, 形式変換</string>
     <string name="release_history">リリース履歴</string>
     <string name="release_history_unavailable">リリース履歴を表示できません</string>
+    <string name="settings_recycle_bin_summary">削除した写真は 30 日間保管され, 復元できます. オフにすると削除は完全削除になります</string>
+    <string name="settings_recycle_bin_title">ゴミ箱</string>
     <string name="standalone_about_app_summary">バージョン情報, オープンソースライセンス, プロジェクトのリンク</string>
     <string name="standalone_about_title">アプリと開発者について</string>
     <string name="standalone_dark_mode_dark">ダーク</string>
@@ -193,6 +195,9 @@
     <string name="storage_folder_unavailable">承認が失われました. 削除してから追加し直してください</string>
     <string name="storage_folders_summary">承認したフォルダーは写真へのアクセスがなくてもアルバムとして表示されます</string>
     <string name="storage_grant_photo_access">写真へのアクセスを許可</string>
+    <string name="storage_manage_media">メディアの管理</string>
+    <string name="storage_manage_media_summary">写真の削除, 移動, 名前の変更を毎回確認せずに行えるようにします. システムの設定ページを開きます</string>
+    <string name="storage_manage_media_unavailable">Android 12 以降が必要です</string>
     <string name="storage_manage_selected">選択した写真を管理</string>
     <string name="storage_no_folders">承認済みフォルダーはまだありません</string>
     <string name="storage_open_app_settings">アプリ設定を開く</string>

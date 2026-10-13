@@ -37,6 +37,8 @@ internal data class ApplicationSettings(
     val language: AppLanguage = AppLanguage.FOLLOW_AUTOJS6,
     /** Two-finger rotation in the viewer (ROADMAP D8); display-only, so it does not touch the appearance revision. */
     val viewerRotationGesture: Boolean = true,
+    /** Deletes go to the recycle bin first (ROADMAP 7.2, on by default); off deletes for good after a confirmation. */
+    val recycleBinEnabled: Boolean = true,
 )
 
 internal object AppSettingsPolicy {
@@ -161,6 +163,7 @@ internal class ApplicationSettingsStore(context: Context) {
             AppLanguage.FOLLOW_AUTOJS6,
         ),
         viewerRotationGesture = preferences.getBoolean(KEY_VIEWER_ROTATION_GESTURE, true),
+        recycleBinEnabled = preferences.getBoolean(KEY_RECYCLE_BIN_ENABLED, true),
     )
 
     fun save(settings: ApplicationSettings) {
@@ -173,6 +176,7 @@ internal class ApplicationSettingsStore(context: Context) {
             .putString(KEY_DARK_MODE, settings.darkMode.name)
             .putString(KEY_LANGUAGE, settings.language.name)
             .putBoolean(KEY_VIEWER_ROTATION_GESTURE, settings.viewerRotationGesture)
+            .putBoolean(KEY_RECYCLE_BIN_ENABLED, settings.recycleBinEnabled)
             .putLong(KEY_REVISION, revision() + 1L)
             .apply()
     }
@@ -180,6 +184,11 @@ internal class ApplicationSettingsStore(context: Context) {
     /** Viewer gestures do not change appearance, so they skip the revision that recreates open activities. */
     fun saveViewerRotationGesture(enabled: Boolean) {
         preferences.edit().putBoolean(KEY_VIEWER_ROTATION_GESTURE, enabled).apply()
+    }
+
+    /** Like the rotation gesture, the recycle bin switch does not change appearance. */
+    fun saveRecycleBinEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(KEY_RECYCLE_BIN_ENABLED, enabled).apply()
     }
 
     fun revision(): Long = preferences.getLong(KEY_REVISION, 0L)
@@ -191,6 +200,7 @@ internal class ApplicationSettingsStore(context: Context) {
         const val KEY_DARK_MODE = "dark-mode"
         const val KEY_LANGUAGE = "language"
         const val KEY_VIEWER_ROTATION_GESTURE = "viewer-rotation-gesture"
+        const val KEY_RECYCLE_BIN_ENABLED = "recycle-bin-enabled"
         const val KEY_REVISION = "revision"
     }
 }

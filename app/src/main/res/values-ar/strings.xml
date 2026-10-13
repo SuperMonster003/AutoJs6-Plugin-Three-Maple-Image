@@ -141,6 +141,8 @@
     <string name="plugin_description">عرض الصور وتحريرها وتحويل صيغها</string>
     <string name="release_history">سجل الإصدارات</string>
     <string name="release_history_unavailable">سجل الإصدارات غير متاح</string>
+    <string name="settings_recycle_bin_summary">تحفظ الصور المحذوفة 30 يوما ويمكن استعادتها; عند الإيقاف يكون الحذف نهائيا</string>
+    <string name="settings_recycle_bin_title">سلة المحذوفات</string>
     <string name="standalone_about_app_summary">تفاصيل الإصدار وترخيص المصدر المفتوح وروابط المشروع</string>
     <string name="standalone_about_title">حول التطبيق والمطور</string>
     <string name="standalone_dark_mode_dark">داكن</string>
@@ -193,6 +195,9 @@
     <string name="storage_folder_unavailable">فقد التصريح; ازله ثم اضفه مرة اخرى</string>
     <string name="storage_folders_summary">تظهر المجلدات التي تصرح بها كالبومات حتى بدون الوصول الى الصور</string>
     <string name="storage_grant_photo_access">منح الوصول الى الصور</string>
+    <string name="storage_manage_media">إدارة الوسائط</string>
+    <string name="storage_manage_media_summary">يسمح للمعرض بحذف الصور ونقلها وإعادة تسميتها دون طلب تأكيد كل مرة; يفتح صفحة النظام</string>
+    <string name="storage_manage_media_unavailable">يتطلب Android 12 أو أحدث</string>
     <string name="storage_manage_selected">ادارة الصور المحددة</string>
     <string name="storage_no_folders">لا توجد مجلدات مصرح بها بعد</string>
     <string name="storage_open_app_settings">فتح اعدادات التطبيق</string>

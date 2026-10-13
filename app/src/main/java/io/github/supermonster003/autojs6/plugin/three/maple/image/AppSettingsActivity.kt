@@ -38,12 +38,14 @@ internal class AppSettingsActivity : ConfiguredActivity() {
     private var dialog by mutableStateOf<SettingsDialog?>(null)
     private var launcherIconSummary by mutableStateOf("")
     private var viewerRotationGesture by mutableStateOf(true)
+    private var recycleBinEnabled by mutableStateOf(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settingsStore = ApplicationSettingsStore(applicationContext)
         settings = settingsStore.load()
         viewerRotationGesture = settings.viewerRotationGesture
+        recycleBinEnabled = settings.recycleBinEnabled
         hostResult = AutoJs6HostSettingsClient.query(this)
         launcherIconSummary = getString(launcherIconLabels[LauncherIcons.current(this).ordinal])
         setContent {
@@ -62,6 +64,8 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     onLauncherIcon = { open(SettingsDialog.LauncherIcon) },
                     viewerRotationGesture = viewerRotationGesture,
                     onViewerRotationGesture = ::updateViewerRotationGesture,
+                    recycleBinEnabled = recycleBinEnabled,
+                    onRecycleBinEnabled = ::updateRecycleBinEnabled,
                     onStoragePermission = { startActivity(StoragePermissionActivity.intent(this)) },
                     onReleaseHistory = { startActivity(Intent(this, ReleaseHistoryActivity::class.java)) },
                     onAbout = { startActivity(Intent(this, AboutActivity::class.java)) },
@@ -75,6 +79,12 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         viewerRotationGesture = enabled
         settings = settings.copy(viewerRotationGesture = enabled)
         settingsStore.saveViewerRotationGesture(enabled)
+    }
+
+    private fun updateRecycleBinEnabled(enabled: Boolean) {
+        recycleBinEnabled = enabled
+        settings = settings.copy(recycleBinEnabled = enabled)
+        settingsStore.saveRecycleBinEnabled(enabled)
     }
 
     private fun open(target: SettingsDialog) {

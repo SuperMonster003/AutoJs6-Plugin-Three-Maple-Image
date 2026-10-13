@@ -9,6 +9,9 @@
     <!-- Optional "All files access" (ROADMAP D5): only the user turns it on from the storage settings page; without
          this declaration the system page keeps its switch disabled. Special app access, never requested at runtime. -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+    <!-- Optional "Media management" (Android 12+, ROADMAP 7.1): with it the system grants trash / delete / write
+         requests without showing them. Special app access, only switched on by the user from the system page. -->
+    <uses-permission android:name="android.permission.MANAGE_MEDIA" tools:ignore="ProtectedPermissions" />
     <queries>
         <package android:name="org.autojs.autojs6" />
     </queries>

@@ -141,6 +141,8 @@
     <string name="plugin_description">Image viewing, editing and format conversion</string>
     <string name="release_history">Release history</string>
     <string name="release_history_unavailable">Release history is unavailable</string>
+    <string name="settings_recycle_bin_summary">Deleted photos are kept for 30 days and can be restored; when off, deleting removes them for good</string>
+    <string name="settings_recycle_bin_title">Recycle bin</string>
     <string name="standalone_about_app_summary">Version details, open source license, and project links</string>
     <string name="standalone_about_title">About app and developer</string>
     <string name="standalone_dark_mode_dark">Dark</string>
@@ -193,6 +195,9 @@
     <string name="storage_folder_unavailable">Authorization lost; remove it and add it again</string>
     <string name="storage_folders_summary">Folders you authorize appear as albums even without photo access</string>
     <string name="storage_grant_photo_access">Grant photo access</string>
+    <string name="storage_manage_media">Media management</string>
+    <string name="storage_manage_media_summary">Lets the gallery delete, move and rename photos without asking every time; opens the system page</string>
+    <string name="storage_manage_media_unavailable">Requires Android 12 or later</string>
     <string name="storage_manage_selected">Manage selected photos</string>
     <string name="storage_no_folders">No authorized folders yet</string>
     <string name="storage_open_app_settings">Open app settings</string>

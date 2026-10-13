@@ -141,6 +141,8 @@
     <string name="plugin_description">Visualización, edición y conversión de imágenes</string>
     <string name="release_history">Historial de versiones</string>
     <string name="release_history_unavailable">El historial de versiones no está disponible</string>
+    <string name="settings_recycle_bin_summary">Las fotos eliminadas se guardan 30 días y se pueden restaurar; desactivada, eliminar es definitivo</string>
+    <string name="settings_recycle_bin_title">Papelera</string>
     <string name="standalone_about_app_summary">Detalles de versión, licencia de código abierto y enlaces del proyecto</string>
     <string name="standalone_about_title">Acerca de la aplicación y el desarrollador</string>
     <string name="standalone_dark_mode_dark">Oscuro</string>
@@ -193,6 +195,9 @@
     <string name="storage_folder_unavailable">Autorización perdida; quítela y añádala de nuevo</string>
     <string name="storage_folders_summary">Las carpetas que autorice aparecen como álbumes incluso sin acceso a fotos</string>
     <string name="storage_grant_photo_access">Conceder acceso a fotos</string>
+    <string name="storage_manage_media">Gestión de contenido multimedia</string>
+    <string name="storage_manage_media_summary">Permite a la galería eliminar, mover y cambiar el nombre de fotos sin pedir confirmación cada vez; abre la página del sistema</string>
+    <string name="storage_manage_media_unavailable">Requiere Android 12 o posterior</string>
     <string name="storage_manage_selected">Gestionar fotos seleccionadas</string>
     <string name="storage_no_folders">Aún no hay carpetas autorizadas</string>
     <string name="storage_open_app_settings">Abrir ajustes de la aplicación</string>

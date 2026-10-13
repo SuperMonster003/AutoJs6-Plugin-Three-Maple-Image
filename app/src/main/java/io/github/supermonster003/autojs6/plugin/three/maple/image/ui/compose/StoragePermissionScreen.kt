@@ -32,6 +32,9 @@ internal data class StoragePermissionUiModel(
     val nextAction: MediaPermissionAction = MediaPermissionAction.REQUEST,
     val allFilesAvailable: Boolean = false,
     val allFilesOn: Boolean = false,
+    /** Android 12+ media management special access (ROADMAP 7.1): write requests are granted without a dialog. */
+    val manageMediaAvailable: Boolean = false,
+    val manageMediaOn: Boolean = false,
     val folders: List<AuthorizedFolder> = emptyList(),
 )
 
@@ -40,6 +43,7 @@ internal class StoragePermissionCallbacks(
     val onGrant: () -> Unit,
     val onManageSelected: () -> Unit,
     val onAllFiles: () -> Unit,
+    val onManageMedia: () -> Unit,
     val onAddFolder: () -> Unit,
     val onRemoveFolder: (AuthorizedFolder) -> Unit,
 )
@@ -95,6 +99,15 @@ internal fun StoragePermissionScreen(model: StoragePermissionUiModel, callbacks:
                 onToggle = { callbacks.onAllFiles() },
                 enabled = model.allFilesAvailable,
                 modifier = Modifier.testTag("maple.storage.allFiles"),
+            )
+            MapleSwitchRow(
+                title = stringResource(R.string.storage_manage_media),
+                summary = if (model.manageMediaAvailable) stringResource(R.string.storage_manage_media_summary) else stringResource(R.string.storage_manage_media_unavailable),
+                iconResource = R.drawable.ic_perm_media_24,
+                checked = model.manageMediaOn,
+                onToggle = { callbacks.onManageMedia() },
+                enabled = model.manageMediaAvailable,
+                modifier = Modifier.testTag("maple.storage.manageMedia"),
             )
             MapleSectionHeader(stringResource(R.string.storage_section_folders))
             Text(
