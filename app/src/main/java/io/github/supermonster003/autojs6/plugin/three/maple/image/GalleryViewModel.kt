@@ -354,11 +354,6 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         _grid.update { if (it.selection.isEmpty()) it else it.copy(selection = emptySet()) }
     }
 
-    /** Removes ids that no longer exist after a delete or move (the rest stays selected). */
-    fun deselect(ids: Collection<Long>) {
-        _grid.update { state -> state.copy(selection = state.selection.filterTo(LinkedHashSet()) { it !in ids }) }
-    }
-
     /** A long press: selects [id] and anchors a drag range there. */
     fun beginDragSelection(id: Long) {
         val base = _grid.value.selection
