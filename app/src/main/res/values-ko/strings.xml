@@ -5,6 +5,7 @@
     <string name="action_convert_image">이미지 변환</string>
     <string name="action_copy">복사</string>
     <string name="action_delete">삭제</string>
+    <string name="action_delete_forever">영구 삭제</string>
     <string name="action_dismiss_hint">닫기</string>
     <string name="action_edit_image">이미지 편집</string>
     <string name="action_favorite">즐겨찾기</string>
@@ -16,10 +17,12 @@
     <string name="action_print">인쇄 / PDF로 저장</string>
     <string name="action_rename">이름 변경</string>
     <string name="action_reset_zoom">확대 재설정</string>
+    <string name="action_restore">복원</string>
     <string name="action_resume_animation">애니메이션 계속</string>
     <string name="action_rotate_clockwise">시계 방향으로 90° 회전</string>
     <string name="action_share">공유</string>
     <string name="action_show_image_details">세부 정보 보기</string>
+    <string name="action_undo">실행 취소</string>
     <string name="action_view_image">이미지 보기</string>
     <string name="apk_info_format">형식</string>
     <string name="details_count">이미지 수</string>
@@ -71,6 +74,9 @@
     <string name="gallery_choose_image">이미지 선택</string>
     <string name="gallery_columns">열 수</string>
     <string name="gallery_columns_value">%1$d열</string>
+    <string name="gallery_delete_confirm_title">영구적으로 삭제할까요?</string>
+    <string name="gallery_delete_folder_note">권한을 부여한 폴더의 이미지는 휴지통으로 이동하지 않습니다.</string>
+    <string name="gallery_delete_too_large">이 이미지들은 휴지통 용량 (남은 공간의 최대 10분의 1, 최대 2 GiB) 을 초과합니다. 영구적으로 삭제할까요? 이 작업은 되돌릴 수 없습니다.</string>
     <string name="gallery_empty_album_title">이 앨범은 비어 있습니다</string>
     <string name="gallery_empty_no_images_body">기기 미디어 라이브러리와 승인된 폴더의 이미지가 여기에 표시됩니다</string>
     <string name="gallery_empty_no_images_title">이미지를 찾을 수 없습니다</string>
@@ -153,6 +159,11 @@
     <string name="metadata_unavailable">이미지 정보를 사용할 수 없습니다</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">이미지 보기, 편집 및 형식 변환</string>
+    <string name="recycle_bin_empty_action">휴지통 비우기</string>
+    <string name="recycle_bin_empty_body">삭제한 이미지는 이곳에 30일 동안 보관된 후 영구 삭제됩니다</string>
+    <string name="recycle_bin_empty_confirm">휴지통의 모든 이미지를 영구적으로 삭제할까요? 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="recycle_bin_empty_title">휴지통이 비어 있습니다</string>
+    <string name="recycle_bin_title">휴지통</string>
     <string name="release_history">릴리스 기록</string>
     <string name="release_history_unavailable">릴리스 기록을 사용할 수 없습니다</string>
     <string name="selection_exit">선택 종료</string>

@@ -5,6 +5,7 @@
     <string name="action_convert_image">Преобразовать изображение</string>
     <string name="action_copy">Копировать</string>
     <string name="action_delete">Удалить</string>
+    <string name="action_delete_forever">Удалить навсегда</string>
     <string name="action_dismiss_hint">Скрыть</string>
     <string name="action_edit_image">Редактировать изображение</string>
     <string name="action_favorite">В избранное</string>
@@ -16,10 +17,12 @@
     <string name="action_print">Печать / сохранить PDF</string>
     <string name="action_rename">Переименовать</string>
     <string name="action_reset_zoom">Сбросить масштаб</string>
+    <string name="action_restore">Восстановить</string>
     <string name="action_resume_animation">Продолжить анимацию</string>
     <string name="action_rotate_clockwise">Повернуть на 90° по часовой стрелке</string>
     <string name="action_share">Отправить</string>
     <string name="action_show_image_details">Показать сведения</string>
+    <string name="action_undo">Отменить</string>
     <string name="action_view_image">Просмотреть изображение</string>
     <string name="apk_info_format">Формат</string>
     <string name="details_count">Изображения</string>
@@ -71,6 +74,9 @@
     <string name="gallery_choose_image">Выбрать изображение</string>
     <string name="gallery_columns">Столбцы</string>
     <string name="gallery_columns_value">Столбцов: %1$d</string>
+    <string name="gallery_delete_confirm_title">Удалить навсегда?</string>
+    <string name="gallery_delete_folder_note">Изображения из разрешённых папок не попадают в корзину.</string>
+    <string name="gallery_delete_too_large">Эти изображения не помещаются в корзину (она занимает не более десятой части свободного места, до 2 GiB). Удалить их навсегда? Это действие нельзя отменить.</string>
     <string name="gallery_empty_album_title">Этот альбом пуст</string>
     <string name="gallery_empty_no_images_body">Здесь появятся изображения из медиатеки устройства и из разрешенных папок</string>
     <string name="gallery_empty_no_images_title">Изображения не найдены</string>
@@ -153,6 +159,11 @@
     <string name="metadata_unavailable">Сведения об изображении недоступны</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Просмотр, редактирование и преобразование изображений</string>
+    <string name="recycle_bin_empty_action">Очистить корзину</string>
+    <string name="recycle_bin_empty_body">Удалённые изображения хранятся здесь 30 дней, затем удаляются навсегда</string>
+    <string name="recycle_bin_empty_confirm">Удалить всё содержимое корзины навсегда? Это действие нельзя отменить.</string>
+    <string name="recycle_bin_empty_title">Корзина пуста</string>
+    <string name="recycle_bin_title">Корзина</string>
     <string name="release_history">История выпусков</string>
     <string name="release_history_unavailable">История выпусков недоступна</string>
     <string name="selection_exit">Выйти из выбора</string>

@@ -5,6 +5,7 @@
     <string name="action_convert_image">Convertir l\'image</string>
     <string name="action_copy">Copier</string>
     <string name="action_delete">Supprimer</string>
+    <string name="action_delete_forever">Supprimer définitivement</string>
     <string name="action_dismiss_hint">Ignorer</string>
     <string name="action_edit_image">Modifier l\'image</string>
     <string name="action_favorite">Favori</string>
@@ -16,10 +17,12 @@
     <string name="action_print">Imprimer / enregistrer en PDF</string>
     <string name="action_rename">Renommer</string>
     <string name="action_reset_zoom">Réinitialiser le zoom</string>
+    <string name="action_restore">Restaurer</string>
     <string name="action_resume_animation">Reprendre l\'animation</string>
     <string name="action_rotate_clockwise">Pivoter de 90° à droite</string>
     <string name="action_share">Partager</string>
     <string name="action_show_image_details">Afficher les détails</string>
+    <string name="action_undo">Annuler</string>
     <string name="action_view_image">Afficher l\'image</string>
     <string name="apk_info_format">Format</string>
     <string name="details_count">Images</string>
@@ -71,6 +74,9 @@
     <string name="gallery_choose_image">Choisir une image</string>
     <string name="gallery_columns">Colonnes</string>
     <string name="gallery_columns_value">%1$d colonnes</string>
+    <string name="gallery_delete_confirm_title">Supprimer définitivement?</string>
+    <string name="gallery_delete_folder_note">Les images des dossiers autorisés ne vont pas dans la corbeille.</string>
+    <string name="gallery_delete_too_large">Ces images dépassent la capacité de la corbeille (au plus un dixième de l\'espace libre, jusqu\'à 2 GiB). Les supprimer définitivement? Cette action est irréversible.</string>
     <string name="gallery_empty_album_title">Cet album est vide</string>
     <string name="gallery_empty_no_images_body">Les images de la bibliothèque de l\'appareil et des dossiers autorisés apparaissent ici</string>
     <string name="gallery_empty_no_images_title">Aucune image trouvée</string>
@@ -153,6 +159,11 @@
     <string name="metadata_unavailable">Les informations de l\'image ne sont pas disponibles</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Affichage, retouche et conversion d\'images</string>
+    <string name="recycle_bin_empty_action">Vider la corbeille</string>
+    <string name="recycle_bin_empty_body">Les images supprimées restent ici 30 jours, puis sont supprimées définitivement</string>
+    <string name="recycle_bin_empty_confirm">Supprimer définitivement tout le contenu de la corbeille? Cette action est irréversible.</string>
+    <string name="recycle_bin_empty_title">La corbeille est vide</string>
+    <string name="recycle_bin_title">Corbeille</string>
     <string name="release_history">Historique des versions</string>
     <string name="release_history_unavailable">L\'historique des versions est indisponible</string>
     <string name="selection_exit">Quitter la sélection</string>

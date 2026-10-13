@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="gallery_delete_confirm_message">
+        <item quantity="one">%1$d imagen se eliminará definitivamente. Esta acción no se puede deshacer.</item>
+        <item quantity="many">%1$d imágenes se eliminarán definitivamente. Esta acción no se puede deshacer.</item>
+        <item quantity="other">%1$d imágenes se eliminarán definitivamente. Esta acción no se puede deshacer.</item>
+    </plurals>
+    <plurals name="gallery_deleted_count">
+        <item quantity="one">%1$d imagen eliminada</item>
+        <item quantity="many">%1$d imágenes eliminadas</item>
+        <item quantity="other">%1$d imágenes eliminadas</item>
+    </plurals>
+    <plurals name="gallery_failed_count">
+        <item quantity="one">No se pudo cambiar %1$d imagen</item>
+        <item quantity="many">No se pudieron cambiar %1$d imágenes</item>
+        <item quantity="other">No se pudieron cambiar %1$d imágenes</item>
+    </plurals>
     <plurals name="gallery_image_count">
         <item quantity="one">%1$d imagen</item>
         <item quantity="many">%1$d imágenes</item>
@@ -9,5 +24,20 @@
         <item quantity="one">%1$d seleccionada</item>
         <item quantity="many">%1$d seleccionadas</item>
         <item quantity="other">%1$d seleccionadas</item>
+    </plurals>
+    <plurals name="gallery_trashed_count">
+        <item quantity="one">%1$d imagen movida a la papelera</item>
+        <item quantity="many">%1$d imágenes movidas a la papelera</item>
+        <item quantity="other">%1$d imágenes movidas a la papelera</item>
+    </plurals>
+    <plurals name="recycle_bin_days_left">
+        <item quantity="one">%1$d día</item>
+        <item quantity="many">%1$d días</item>
+        <item quantity="other">%1$d días</item>
+    </plurals>
+    <plurals name="recycle_bin_restored_count">
+        <item quantity="one">%1$d imagen restaurada</item>
+        <item quantity="many">%1$d imágenes restauradas</item>
+        <item quantity="other">%1$d imágenes restauradas</item>
     </plurals>
 </resources>

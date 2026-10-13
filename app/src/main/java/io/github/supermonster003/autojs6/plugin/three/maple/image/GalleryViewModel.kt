@@ -180,6 +180,12 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                 )
             }
             _albums.update { it.copy(loading = false, refreshing = false, albums = sortAlbums(albums, it.albumSort), folders = folders) }
+            // The open album's title and count follow the reloaded list (after a delete or move, for example).
+            _grid.update { grid ->
+                val open = grid.album ?: return@update grid
+                val fresh = findAlbum(open.kind, open.id) ?: return@update grid
+                if (fresh == open) grid else grid.copy(album = fresh)
+            }
             folders.filter { it.available && it.count < 0 }.forEach { summary -> enumerateFolder(summary) }
         }
     }

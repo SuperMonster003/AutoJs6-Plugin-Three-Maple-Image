@@ -102,8 +102,12 @@ class MediaWriteCoordinatorInstrumentationTest {
             val entry = coordinator.privateRecycleBin.entries().single { it.displayName == "a.png" }
             assertTrue(coordinator.privateRecycleBin.storedFile(entry).isFile)
         }
+        val listed = RecycleBinRepository(context).load().filter { it.displayName == "a.png" }
+        assertEquals("the recycle bin view lists it with the original name", 1, listed.size)
+        assertTrue(listed.single().remainingDays in 1..RecycleBinPolicy.RETENTION_DAYS)
         main { requireNotNull(trashed.undo).invoke() }
         assertEquals(listOf("a.png", "b.png"), names(folder))
+        assertTrue(RecycleBinRepository(context).load().none { it.displayName == "a.png" && it.id == listed.single().id })
 
         val deleted = main { coordinator.delete(listOf(b)) }
         assertEquals(1, deleted.succeeded)

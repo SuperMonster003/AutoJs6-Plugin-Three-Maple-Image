@@ -44,6 +44,13 @@ class MediaSelectionTest {
     }
 
     @Test
+    fun trashedFilesShowTheirOriginalName() {
+        assertEquals("a.png", RecycleBinNames.original(".trashed-1794496770-a.png"))
+        assertEquals(".trashed-x-a.png", RecycleBinNames.original(".trashed-x-a.png"))
+        assertEquals("b.jpg", RecycleBinNames.original("b.jpg"))
+    }
+
+    @Test
     fun aMultiShareUsesTheCommonType() {
         assertEquals("image/png", GalleryOperations.sharedType(listOf("image/png", "IMAGE/PNG")))
         assertEquals("image/*", GalleryOperations.sharedType(listOf("image/png", "image/jpeg")))

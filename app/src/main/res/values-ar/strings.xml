@@ -5,6 +5,7 @@
     <string name="action_convert_image">تحويل الصورة</string>
     <string name="action_copy">نسخ</string>
     <string name="action_delete">حذف</string>
+    <string name="action_delete_forever">حذف نهائي</string>
     <string name="action_dismiss_hint">تجاهل</string>
     <string name="action_edit_image">تحرير الصورة</string>
     <string name="action_favorite">المفضلة</string>
@@ -16,10 +17,12 @@
     <string name="action_print">طباعة / حفظ PDF</string>
     <string name="action_rename">إعادة التسمية</string>
     <string name="action_reset_zoom">اعادة ضبط التكبير</string>
+    <string name="action_restore">استعادة</string>
     <string name="action_resume_animation">متابعة الحركة</string>
     <string name="action_rotate_clockwise">تدوير 90° باتجاه عقارب الساعة</string>
     <string name="action_share">مشاركة</string>
     <string name="action_show_image_details">عرض التفاصيل</string>
+    <string name="action_undo">تراجع</string>
     <string name="action_view_image">عرض الصورة</string>
     <string name="apk_info_format">التنسيق</string>
     <string name="details_count">الصور</string>
@@ -71,6 +74,9 @@
     <string name="gallery_choose_image">اختيار صورة</string>
     <string name="gallery_columns">الأعمدة</string>
     <string name="gallery_columns_value">%1$d أعمدة</string>
+    <string name="gallery_delete_confirm_title">حذف نهائيا?</string>
+    <string name="gallery_delete_folder_note">لا تنتقل الصور الموجودة في المجلدات المصرح بها إلى سلة المحذوفات.</string>
+    <string name="gallery_delete_too_large">هذه الصور أكبر من سعة سلة المحذوفات (عشر المساحة الفارغة كحد أقصى, حتى 2 GiB). هل تريد حذفها نهائيا? لا يمكن التراجع عن ذلك.</string>
     <string name="gallery_empty_album_title">هذا الالبوم فارغ</string>
     <string name="gallery_empty_no_images_body">تظهر هنا الصور من مكتبة الجهاز ومن المجلدات المصرح بها</string>
     <string name="gallery_empty_no_images_title">لم يتم العثور على صور</string>
@@ -153,6 +159,11 @@
     <string name="metadata_unavailable">معلومات الصورة غير متاحة</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">عرض الصور وتحريرها وتحويل صيغها</string>
+    <string name="recycle_bin_empty_action">إفراغ سلة المحذوفات</string>
+    <string name="recycle_bin_empty_body">تبقى الصور المحذوفة هنا 30 يوما ثم تحذف نهائيا</string>
+    <string name="recycle_bin_empty_confirm">حذف كل ما في سلة المحذوفات نهائيا? لا يمكن التراجع عن ذلك.</string>
+    <string name="recycle_bin_empty_title">سلة المحذوفات فارغة</string>
+    <string name="recycle_bin_title">سلة المحذوفات</string>
     <string name="release_history">سجل الإصدارات</string>
     <string name="release_history_unavailable">سجل الإصدارات غير متاح</string>
     <string name="selection_exit">إنهاء التحديد</string>

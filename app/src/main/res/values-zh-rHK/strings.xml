@@ -5,6 +5,7 @@
     <string name="action_convert_image">轉換圖像</string>
     <string name="action_copy">複製</string>
     <string name="action_delete">刪除</string>
+    <string name="action_delete_forever">永久刪除</string>
     <string name="action_dismiss_hint">關閉提示</string>
     <string name="action_edit_image">編輯圖像</string>
     <string name="action_favorite">收藏</string>
@@ -16,10 +17,12 @@
     <string name="action_print">列印 / 儲存 PDF</string>
     <string name="action_rename">重新命名</string>
     <string name="action_reset_zoom">重設縮放</string>
+    <string name="action_restore">還原</string>
     <string name="action_resume_animation">繼續播放</string>
     <string name="action_rotate_clockwise">順時針旋轉 90 度</string>
     <string name="action_share">分享</string>
     <string name="action_show_image_details">顯示詳情</string>
+    <string name="action_undo">復原</string>
     <string name="action_view_image">檢視圖像</string>
     <string name="apk_info_format">格式</string>
     <string name="details_count">圖片數</string>
@@ -71,6 +74,9 @@
     <string name="gallery_choose_image">選擇圖像</string>
     <string name="gallery_columns">欄數</string>
     <string name="gallery_columns_value">%1$d 欄</string>
+    <string name="gallery_delete_confirm_title">永久刪除?</string>
+    <string name="gallery_delete_folder_note">已授權資料夾中的圖片不會進入回收筒.</string>
+    <string name="gallery_delete_too_large">這些圖片超出了回收筒容量 (最多佔用可用空間的十分之一, 上限 2 GiB). 要永久刪除嗎? 此操作無法復原.</string>
     <string name="gallery_empty_album_title">此相簿為空</string>
     <string name="gallery_empty_no_images_body">裝置媒體庫與已授權資料夾中的圖像會顯示在這裡</string>
     <string name="gallery_empty_no_images_title">找不到圖像</string>
@@ -153,6 +159,11 @@
     <string name="metadata_unavailable">圖像資料不可用</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">圖片檢視, 編輯與格式轉換</string>
+    <string name="recycle_bin_empty_action">清空回收筒</string>
+    <string name="recycle_bin_empty_body">刪除的圖片會在這裡保留 30 天, 之後永久刪除</string>
+    <string name="recycle_bin_empty_confirm">永久刪除回收筒中的全部圖片? 此操作無法復原.</string>
+    <string name="recycle_bin_empty_title">回收筒是空的</string>
+    <string name="recycle_bin_title">回收筒</string>
     <string name="release_history">發行歷史</string>
     <string name="release_history_unavailable">發行歷史暫不可用</string>
     <string name="selection_exit">結束選取</string>

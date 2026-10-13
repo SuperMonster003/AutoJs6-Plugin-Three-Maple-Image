@@ -5,6 +5,7 @@
     <string name="action_convert_image">Convertir imagen</string>
     <string name="action_copy">Copiar</string>
     <string name="action_delete">Eliminar</string>
+    <string name="action_delete_forever">Eliminar para siempre</string>
     <string name="action_dismiss_hint">Descartar</string>
     <string name="action_edit_image">Editar imagen</string>
     <string name="action_favorite">Favorito</string>
@@ -16,10 +17,12 @@
     <string name="action_print">Imprimir / guardar PDF</string>
     <string name="action_rename">Cambiar nombre</string>
     <string name="action_reset_zoom">Restablecer zoom</string>
+    <string name="action_restore">Restaurar</string>
     <string name="action_resume_animation">Reanudar animación</string>
     <string name="action_rotate_clockwise">Girar 90° a la derecha</string>
     <string name="action_share">Compartir</string>
     <string name="action_show_image_details">Mostrar detalles</string>
+    <string name="action_undo">Deshacer</string>
     <string name="action_view_image">Ver imagen</string>
     <string name="apk_info_format">Formato</string>
     <string name="details_count">Imágenes</string>
@@ -71,6 +74,9 @@
     <string name="gallery_choose_image">Elegir imagen</string>
     <string name="gallery_columns">Columnas</string>
     <string name="gallery_columns_value">%1$d columnas</string>
+    <string name="gallery_delete_confirm_title">¿Eliminar definitivamente?</string>
+    <string name="gallery_delete_folder_note">Las imágenes de las carpetas autorizadas no van a la papelera.</string>
+    <string name="gallery_delete_too_large">Estas imágenes superan la capacidad de la papelera (como máximo la décima parte del espacio libre, hasta 2 GiB). ¿Eliminarlas definitivamente? Esta acción no se puede deshacer.</string>
     <string name="gallery_empty_album_title">Este álbum está vacío</string>
     <string name="gallery_empty_no_images_body">Aquí aparecen las imágenes de la biblioteca del dispositivo y de las carpetas autorizadas</string>
     <string name="gallery_empty_no_images_title">No se encontraron imágenes</string>
@@ -153,6 +159,11 @@
     <string name="metadata_unavailable">La información de la imagen no está disponible</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Visualización, edición y conversión de imágenes</string>
+    <string name="recycle_bin_empty_action">Vaciar papelera</string>
+    <string name="recycle_bin_empty_body">Las imágenes eliminadas se guardan aquí 30 días y luego se eliminan definitivamente</string>
+    <string name="recycle_bin_empty_confirm">¿Eliminar definitivamente todo el contenido de la papelera? Esta acción no se puede deshacer.</string>
+    <string name="recycle_bin_empty_title">La papelera está vacía</string>
+    <string name="recycle_bin_title">Papelera</string>
     <string name="release_history">Historial de versiones</string>
     <string name="release_history_unavailable">El historial de versiones no está disponible</string>
     <string name="selection_exit">Salir de la selección</string>

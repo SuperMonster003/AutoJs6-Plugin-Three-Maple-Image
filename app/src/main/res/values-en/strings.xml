@@ -5,6 +5,7 @@
     <string name="action_convert_image">Convert image</string>
     <string name="action_copy">Copy</string>
     <string name="action_delete">Delete</string>
+    <string name="action_delete_forever">Delete forever</string>
     <string name="action_dismiss_hint">Dismiss</string>
     <string name="action_edit_image">Edit image</string>
     <string name="action_favorite">Favorite</string>
@@ -16,10 +17,12 @@
     <string name="action_print">Print / Save PDF</string>
     <string name="action_rename">Rename</string>
     <string name="action_reset_zoom">Reset zoom</string>
+    <string name="action_restore">Restore</string>
     <string name="action_resume_animation">Resume animation</string>
     <string name="action_rotate_clockwise">Rotate 90° clockwise</string>
     <string name="action_share">Share</string>
     <string name="action_show_image_details">Show details</string>
+    <string name="action_undo">Undo</string>
     <string name="action_view_image">View image</string>
     <string name="apk_info_format">Format</string>
     <string name="details_count">Images</string>
@@ -71,6 +74,9 @@
     <string name="gallery_choose_image">Choose image</string>
     <string name="gallery_columns">Columns</string>
     <string name="gallery_columns_value">%1$d columns</string>
+    <string name="gallery_delete_confirm_title">Delete permanently?</string>
+    <string name="gallery_delete_folder_note">Images in authorized folders do not go to the recycle bin.</string>
+    <string name="gallery_delete_too_large">These images are too large for the recycle bin (it uses at most a tenth of the free space, up to 2 GiB). Delete them permanently? This cannot be undone.</string>
     <string name="gallery_empty_album_title">This album is empty</string>
     <string name="gallery_empty_no_images_body">Images from the device library and from authorized folders appear here</string>
     <string name="gallery_empty_no_images_title">No images found</string>
@@ -153,6 +159,11 @@
     <string name="metadata_unavailable">Image information is unavailable</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Image viewing, editing and format conversion</string>
+    <string name="recycle_bin_empty_action">Empty recycle bin</string>
+    <string name="recycle_bin_empty_body">Deleted images stay here for 30 days, then they are removed for good</string>
+    <string name="recycle_bin_empty_confirm">Delete everything in the recycle bin permanently? This cannot be undone.</string>
+    <string name="recycle_bin_empty_title">The recycle bin is empty</string>
+    <string name="recycle_bin_title">Recycle bin</string>
     <string name="release_history">Release history</string>
     <string name="release_history_unavailable">Release history is unavailable</string>
     <string name="selection_exit">Exit selection</string>

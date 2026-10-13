@@ -20,6 +20,8 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.Alb
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumGridScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaGridCallbacks
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.RecycleBinCallbacks
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.RecycleBinScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaGridScreen
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -33,6 +35,7 @@ class HomeActivity : ConfiguredActivity() {
     private lateinit var permissionGate: MediaPermissionGate
     private lateinit var operations: GalleryOperations
     private val gallery by viewModels<GalleryViewModel>()
+    private val recycleBin by viewModels<RecycleBinViewModel>()
     private val requestPhotoAccess = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
         permissionGate.recordResult(grants)
         updatePhotoAccess()
@@ -67,7 +70,7 @@ class HomeActivity : ConfiguredActivity() {
         actions = HomeActions(this)
         actions.restore(savedInstanceState)
         permissionGate = MediaPermissionGate(this)
-        operations = GalleryOperations(this, gallery)
+        operations = GalleryOperations(this, gallery, recycleBin)
         if (savedInstanceState == null) requestPhotoAccessOnce()
         val callbacks = AlbumGridCallbacks(
             onOpenAlbum = { album -> navigate?.invoke("album/${album.kind.name}/${album.id}") },
@@ -84,6 +87,7 @@ class HomeActivity : ConfiguredActivity() {
             onRetry = gallery::reload,
             onRefresh = gallery::refreshAlbums,
             onShowAll = { navigate?.invoke("album/${AlbumKind.ALL.name}/${MediaCatalog.ALL_BUCKETS}") },
+            onRecycleBin = { navigate?.invoke(ROUTE_RECYCLE_BIN) },
         )
         setContent {
             MapleTheme(palette = appPalette) {
@@ -131,6 +135,28 @@ class HomeActivity : ConfiguredActivity() {
                                 onInvertSelection = gallery::invertSelection,
                             ),
                             selectionActions = operations.actionsFor(grid),
+                            snackbarHostState = operations.snackbar,
+                        )
+                        operations.Dialogs()
+                    }
+                    composable(ROUTE_RECYCLE_BIN) {
+                        val bin by recycleBin.state.collectAsState()
+                        LaunchedEffect(Unit) { recycleBin.load() }
+                        RecycleBinScreen(
+                            state = bin,
+                            callbacks = RecycleBinCallbacks(
+                                onBack = {
+                                    recycleBin.clearSelection()
+                                    controller.popBackStack()
+                                },
+                                onToggle = recycleBin::toggle,
+                                onSelectAll = recycleBin::selectAll,
+                                onClearSelection = recycleBin::clearSelection,
+                                onRestore = operations::restoreFromBin,
+                                onDeleteForever = operations::deleteFromBin,
+                                onEmpty = operations::emptyBin,
+                            ),
+                            columns = grid.columns,
                             snackbarHostState = operations.snackbar,
                         )
                         operations.Dialogs()
@@ -244,5 +270,6 @@ class HomeActivity : ConfiguredActivity() {
     private companion object {
         const val ROUTE_ALBUMS = "albums"
         const val ROUTE_ALBUM = "album/{kind}/{id}"
+        const val ROUTE_RECYCLE_BIN = "recycle-bin"
     }
 }

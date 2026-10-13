@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="gallery_delete_confirm_message">
+        <item quantity="one">%1$d image will be deleted permanently. This cannot be undone.</item>
+        <item quantity="other">%1$d images will be deleted permanently. This cannot be undone.</item>
+    </plurals>
+    <plurals name="gallery_deleted_count">
+        <item quantity="one">%1$d image deleted</item>
+        <item quantity="other">%1$d images deleted</item>
+    </plurals>
+    <plurals name="gallery_failed_count">
+        <item quantity="one">%1$d image could not be changed</item>
+        <item quantity="other">%1$d images could not be changed</item>
+    </plurals>
     <plurals name="gallery_image_count">
         <item quantity="one">%1$d image</item>
         <item quantity="other">%1$d images</item>
@@ -7,5 +19,17 @@
     <plurals name="gallery_selected_count">
         <item quantity="one">%1$d selected</item>
         <item quantity="other">%1$d selected</item>
+    </plurals>
+    <plurals name="gallery_trashed_count">
+        <item quantity="one">%1$d image moved to the recycle bin</item>
+        <item quantity="other">%1$d images moved to the recycle bin</item>
+    </plurals>
+    <plurals name="recycle_bin_days_left">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="recycle_bin_restored_count">
+        <item quantity="one">%1$d image restored</item>
+        <item quantity="other">%1$d images restored</item>
     </plurals>
 </resources>

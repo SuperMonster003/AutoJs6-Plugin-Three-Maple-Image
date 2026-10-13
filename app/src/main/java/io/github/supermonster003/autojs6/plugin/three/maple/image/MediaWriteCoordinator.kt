@@ -103,6 +103,18 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
 
     val privateRecycleBin: PrivateRecycleBin get() = recycleBin
 
+    /** Android 7-10 recycle bin view: puts entries back (asking for the storage write permission if needed). */
+    suspend fun restoreFromPrivateBin(ids: List<Long>): WriteOutcome {
+        if (ids.isEmpty()) return WriteOutcome()
+        routeForIds(MediaWriteOperation.RESTORE, emptyList()) ?: return WriteOutcome(cancelled = true)
+        val (restored, paths) = recycleBin.restore(ids)
+        scan(paths)
+        return WriteOutcome(succeeded = restored, failed = ids.size - restored)
+    }
+
+    suspend fun deleteFromPrivateBin(ids: List<Long>): WriteOutcome =
+        if (ids.isEmpty()) WriteOutcome() else WriteOutcome(succeeded = recycleBin.deletePermanently(ids))
+
     /** Renames one image inside its album. */
     suspend fun rename(item: MediaItem, newName: String): WriteOutcome {
         if (newName == item.displayName) return WriteOutcome()

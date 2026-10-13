@@ -62,6 +62,7 @@ internal class AlbumGridCallbacks(
     val onRetry: () -> Unit,
     val onRefresh: () -> Unit,
     val onShowAll: () -> Unit,
+    val onRecycleBin: () -> Unit = {},
 )
 
 /**
@@ -87,6 +88,7 @@ internal fun AlbumGridScreen(state: GalleryUiState, home: HomeUiState, callbacks
             DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                 if (state.canReadMediaStore) {
                     DropdownMenuItem(text = { Text(stringResource(R.string.gallery_show_all)) }, onClick = { menuOpen = false; callbacks.onShowAll() }, modifier = Modifier.testTag("maple.gallery.menu.showAll"))
+                    DropdownMenuItem(text = { Text(stringResource(R.string.recycle_bin_title)) }, onClick = { menuOpen = false; callbacks.onRecycleBin() }, modifier = Modifier.testTag("maple.gallery.menu.recycleBin"))
                 }
                 DropdownMenuItem(text = { Text(stringResource(R.string.action_view_image)) }, enabled = !home.working, onClick = { menuOpen = false; callbacks.onChooseImage() }, modifier = Modifier.testTag("maple.gallery.menu.view"))
                 DropdownMenuItem(text = { Text(stringResource(R.string.action_edit_image)) }, enabled = !home.working, onClick = { menuOpen = false; callbacks.onEditImage() }, modifier = Modifier.testTag("maple.gallery.menu.edit"))
