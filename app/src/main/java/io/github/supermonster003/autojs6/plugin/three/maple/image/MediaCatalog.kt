@@ -48,6 +48,9 @@ internal data class MediaSort(val field: MediaSortField = MediaSortField.DATE_MO
  */
 internal object MediaCatalog {
 
+    /** Bucket id meaning "every bucket": the flat "all images" view and its viewer source (ROADMAP 6.2). */
+    const val ALL_BUCKETS = Long.MIN_VALUE
+
     /** Supported formats only (ROADMAP D2); zero-byte rows are placeholders MediaStore has not finished writing. */
     fun isCataloged(item: MediaItem, supports: (String, String) -> Boolean): Boolean =
         item.sizeBytes > 0L && supports(item.displayName, item.mimeType)

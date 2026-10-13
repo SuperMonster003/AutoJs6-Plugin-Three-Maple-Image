@@ -78,6 +78,8 @@ class HomeActivity : ConfiguredActivity() {
             onOpenHost = ::openHost,
             onSettings = { startActivity(Intent(this, AppSettingsActivity::class.java)) },
             onRetry = gallery::reload,
+            onRefresh = gallery::refreshAlbums,
+            onShowAll = { navigate?.invoke("album/${AlbumKind.ALL.name}/${MediaCatalog.ALL_BUCKETS}") },
         )
         setContent {
             MapleTheme(palette = appPalette) {
@@ -107,6 +109,8 @@ class HomeActivity : ConfiguredActivity() {
                             onLoadMore = gallery::loadMore,
                             onSort = gallery::setGridSort,
                             onRevealed = gallery::clearReveal,
+                            onColumns = gallery::setColumns,
+                            onRefresh = gallery::refreshGrid,
                         )
                     }
                 }
@@ -164,7 +168,7 @@ class HomeActivity : ConfiguredActivity() {
         val start = ViewerSource.request(item)
         val spec = when {
             album == null -> null
-            album.kind == AlbumKind.MEDIA -> ViewerSourceSpec.MediaAlbum(album.id, grid.sort, item.id)
+            album.kind == AlbumKind.MEDIA || album.kind == AlbumKind.ALL -> ViewerSourceSpec.MediaAlbum(album.id, grid.sort, item.id)
             album.folder != null -> ViewerSourceSpec.AuthorizedFolder(album.folder.treeUri, grid.sort, item.id)
             else -> null
         }

@@ -50,9 +50,12 @@
     <string name="exif_orientation_normal">Normal (0°)</string>
     <string name="exif_unavailable">No EXIF data available</string>
     <string name="gallery_album_root">Storage root</string>
+    <string name="gallery_all_images">All images</string>
     <string name="gallery_banner_partial">Only selected photos are accessible</string>
     <string name="gallery_choose_folder">Choose folder</string>
     <string name="gallery_choose_image">Choose image</string>
+    <string name="gallery_columns">Columns</string>
+    <string name="gallery_columns_value">%1$d columns</string>
     <string name="gallery_empty_album_title">This album is empty</string>
     <string name="gallery_empty_no_images_body">Images from the device library and from authorized folders appear here</string>
     <string name="gallery_empty_no_images_title">No images found</string>
@@ -65,6 +68,7 @@
     <string name="gallery_retry">Retry</string>
     <string name="gallery_section_albums">Albums</string>
     <string name="gallery_section_tools">Tools</string>
+    <string name="gallery_show_all">Show all folder contents</string>
     <string name="gallery_sort">Sort</string>
     <string name="gallery_sort_ascending">Ascending</string>
     <string name="gallery_sort_date_modified">Date modified</string>

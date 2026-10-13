@@ -15,10 +15,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +57,8 @@ internal class AlbumGridCallbacks(
     val onOpenHost: () -> Unit,
     val onSettings: () -> Unit,
     val onRetry: () -> Unit,
+    val onRefresh: () -> Unit,
+    val onShowAll: () -> Unit,
 )
 
 /**
@@ -62,6 +66,7 @@ internal class AlbumGridCallbacks(
  * banner for partial access, and the no-permission state with the file picker tools. The former home actions
  * (view / edit / convert / save / host / settings) live in the "more" menu.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AlbumGridScreen(state: GalleryUiState, home: HomeUiState, callbacks: AlbumGridCallbacks) {
     var menuOpen by remember { mutableStateOf(false) }
@@ -77,6 +82,9 @@ internal fun AlbumGridScreen(state: GalleryUiState, home: HomeUiState, callbacks
                 Icon(painterResource(R.drawable.ic_more_vert_24), contentDescription = stringResource(R.string.action_more))
             }
             DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                if (state.canReadMediaStore) {
+                    DropdownMenuItem(text = { Text(stringResource(R.string.gallery_show_all)) }, onClick = { menuOpen = false; callbacks.onShowAll() }, modifier = Modifier.testTag("maple.gallery.menu.showAll"))
+                }
                 DropdownMenuItem(text = { Text(stringResource(R.string.action_view_image)) }, enabled = !home.working, onClick = { menuOpen = false; callbacks.onChooseImage() }, modifier = Modifier.testTag("maple.gallery.menu.view"))
                 DropdownMenuItem(text = { Text(stringResource(R.string.action_edit_image)) }, enabled = !home.working, onClick = { menuOpen = false; callbacks.onEditImage() }, modifier = Modifier.testTag("maple.gallery.menu.edit"))
                 DropdownMenuItem(text = { Text(stringResource(R.string.action_convert_image)) }, enabled = !home.working, onClick = { menuOpen = false; callbacks.onConvertImage() }, modifier = Modifier.testTag("maple.gallery.menu.convert"))
@@ -128,7 +136,13 @@ internal fun AlbumGridScreen(state: GalleryUiState, home: HomeUiState, callbacks
                             modifier = Modifier.testTag("maple.gallery.empty"),
                         )
                     } else {
-                        AlbumGrid(state, callbacks, showTools = false, home = home)
+                        PullToRefreshBox(
+                            isRefreshing = state.refreshing,
+                            onRefresh = callbacks.onRefresh,
+                            modifier = Modifier.fillMaxSize().testTag("maple.gallery.refresh"),
+                        ) {
+                            AlbumGrid(state, callbacks, showTools = false, home = home)
+                        }
                     }
                 }
             }

@@ -50,9 +50,12 @@
     <string name="exif_orientation_normal">正常 (0°)</string>
     <string name="exif_unavailable">沒有 EXIF 資料</string>
     <string name="gallery_album_root">儲存根目錄</string>
+    <string name="gallery_all_images">所有圖片</string>
     <string name="gallery_banner_partial">只可存取部分相片</string>
     <string name="gallery_choose_folder">選擇資料夾</string>
     <string name="gallery_choose_image">選擇圖像</string>
+    <string name="gallery_columns">欄數</string>
+    <string name="gallery_columns_value">%1$d 欄</string>
     <string name="gallery_empty_album_title">此相簿為空</string>
     <string name="gallery_empty_no_images_body">裝置媒體庫與已授權資料夾中的圖像會顯示在這裡</string>
     <string name="gallery_empty_no_images_title">找不到圖像</string>
@@ -65,6 +68,7 @@
     <string name="gallery_retry">重試</string>
     <string name="gallery_section_albums">相簿</string>
     <string name="gallery_section_tools">工具</string>
+    <string name="gallery_show_all">顯示所有資料夾內容</string>
     <string name="gallery_sort">排序</string>
     <string name="gallery_sort_ascending">升序</string>
     <string name="gallery_sort_date_modified">修改時間</string>

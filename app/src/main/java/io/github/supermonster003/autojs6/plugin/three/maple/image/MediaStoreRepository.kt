@@ -63,13 +63,13 @@ internal class MediaStoreRepository(
      */
     suspend fun loadBucket(bucketId: Long, sort: MediaSort = MediaSort.DEFAULT, limit: Int, offset: Int = 0): List<MediaItem> {
         if (sort.field == MediaSortField.NAME) {
-            val album = loadAll().filter { it.bucketId == bucketId }
+            val album = loadAll().filter { bucketId == MediaCatalog.ALL_BUCKETS || it.bucketId == bucketId }
             return MediaCatalog.sort(album, sort).drop(offset).take(limit)
         }
         return withContext(Dispatchers.IO) {
             val rows = query(
-                selection = "${MediaStore.Images.Media.BUCKET_ID} = ?",
-                selectionArgs = arrayOf(bucketId.toString()),
+                selection = bucketSelection(bucketId),
+                selectionArgs = bucketSelectionArgs(bucketId),
                 sort = sort,
                 limit = limit,
                 offset = offset,
@@ -78,15 +78,21 @@ internal class MediaStoreRepository(
         }
     }
 
+    private fun bucketSelection(bucketId: Long): String? =
+        if (bucketId == MediaCatalog.ALL_BUCKETS) null else "${MediaStore.Images.Media.BUCKET_ID} = ?"
+
+    private fun bucketSelectionArgs(bucketId: Long): Array<String>? =
+        if (bucketId == MediaCatalog.ALL_BUCKETS) null else arrayOf(bucketId.toString())
+
     /** Every image of one album in the requested order; the viewer pages through this list (ROADMAP 6.3). */
     suspend fun loadBucketAll(bucketId: Long, sort: MediaSort = MediaSort.DEFAULT): List<MediaItem> {
         if (sort.field == MediaSortField.NAME) {
-            return MediaCatalog.sort(loadAll().filter { it.bucketId == bucketId }, sort)
+            return MediaCatalog.sort(loadAll().filter { bucketId == MediaCatalog.ALL_BUCKETS || it.bucketId == bucketId }, sort)
         }
         return withContext(Dispatchers.IO) {
             val rows = query(
-                selection = "${MediaStore.Images.Media.BUCKET_ID} = ?",
-                selectionArgs = arrayOf(bucketId.toString()),
+                selection = bucketSelection(bucketId),
+                selectionArgs = bucketSelectionArgs(bucketId),
                 sort = sort,
                 limit = null,
                 offset = 0,

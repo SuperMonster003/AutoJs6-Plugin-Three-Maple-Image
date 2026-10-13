@@ -50,9 +50,12 @@
     <string name="exif_orientation_normal">Normal (0°)</string>
     <string name="exif_unavailable">Sin datos EXIF</string>
     <string name="gallery_album_root">Raíz del almacenamiento</string>
+    <string name="gallery_all_images">Todas las imágenes</string>
     <string name="gallery_banner_partial">Solo se puede acceder a las fotos seleccionadas</string>
     <string name="gallery_choose_folder">Elegir carpeta</string>
     <string name="gallery_choose_image">Elegir imagen</string>
+    <string name="gallery_columns">Columnas</string>
+    <string name="gallery_columns_value">%1$d columnas</string>
     <string name="gallery_empty_album_title">Este álbum está vacío</string>
     <string name="gallery_empty_no_images_body">Aquí aparecen las imágenes de la biblioteca del dispositivo y de las carpetas autorizadas</string>
     <string name="gallery_empty_no_images_title">No se encontraron imágenes</string>
@@ -65,6 +68,7 @@
     <string name="gallery_retry">Reintentar</string>
     <string name="gallery_section_albums">Álbumes</string>
     <string name="gallery_section_tools">Herramientas</string>
+    <string name="gallery_show_all">Mostrar el contenido de todas las carpetas</string>
     <string name="gallery_sort">Ordenar</string>
     <string name="gallery_sort_ascending">Ascendente</string>
     <string name="gallery_sort_date_modified">Fecha de modificación</string>

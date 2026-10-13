@@ -50,9 +50,12 @@
     <string name="exif_orientation_normal">기본 (0°)</string>
     <string name="exif_unavailable">EXIF 데이터 없음</string>
     <string name="gallery_album_root">저장공간 루트</string>
+    <string name="gallery_all_images">모든 이미지</string>
     <string name="gallery_banner_partial">선택한 사진만 접근할 수 있습니다</string>
     <string name="gallery_choose_folder">폴더 선택</string>
     <string name="gallery_choose_image">이미지 선택</string>
+    <string name="gallery_columns">열 수</string>
+    <string name="gallery_columns_value">%1$d열</string>
     <string name="gallery_empty_album_title">이 앨범은 비어 있습니다</string>
     <string name="gallery_empty_no_images_body">기기 미디어 라이브러리와 승인된 폴더의 이미지가 여기에 표시됩니다</string>
     <string name="gallery_empty_no_images_title">이미지를 찾을 수 없습니다</string>
@@ -65,6 +68,7 @@
     <string name="gallery_retry">다시 시도</string>
     <string name="gallery_section_albums">앨범</string>
     <string name="gallery_section_tools">도구</string>
+    <string name="gallery_show_all">모든 폴더 내용 표시</string>
     <string name="gallery_sort">정렬</string>
     <string name="gallery_sort_ascending">오름차순</string>
     <string name="gallery_sort_date_modified">수정 날짜</string>

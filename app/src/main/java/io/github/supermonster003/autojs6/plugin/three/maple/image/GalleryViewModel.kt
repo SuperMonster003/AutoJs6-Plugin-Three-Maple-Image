@@ -11,7 +11,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-internal enum class AlbumKind { MEDIA, FOLDER }
+internal enum class AlbumKind {
+    MEDIA,
+    FOLDER,
+    /** The flat "all images" view over every MediaStore bucket (ROADMAP 6.2). */
+    ALL,
+}
 
 /** One entry of the album grid: a MediaStore bucket or an authorized folder (design draft 8.1). */
 internal data class AlbumSummary(
@@ -32,6 +37,8 @@ internal data class GalleryUiState(
     val folders: List<AlbumSummary> = emptyList(),
     val albumSort: MediaSort = MediaSort.DEFAULT,
     val failed: Boolean = false,
+    /** A user-initiated reload (pull to refresh) is in flight while the current albums stay on screen. */
+    val refreshing: Boolean = false,
 ) {
     val canReadMediaStore: Boolean get() = access?.canReadMediaStore == true
 }
@@ -45,6 +52,8 @@ internal data class MediaGridUiState(
     val limit: DocumentTreeLimit = DocumentTreeLimit.NONE,
     /** Item the grid should scroll to (set when the viewer returns); cleared through [GalleryViewModel.clearReveal]. */
     val reveal: Long? = null,
+    val columns: Int = GalleryPreferences.DEFAULT_COLUMNS,
+    val refreshing: Boolean = false,
 )
 
 /**
@@ -56,8 +65,9 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
 
     private val media = MediaStoreRepository(application)
     private val folderRepository = AuthorizedFolderRepository(application)
+    private val preferences = GalleryPreferences(application)
     private val _albums = MutableStateFlow(GalleryUiState())
-    private val _grid = MutableStateFlow(MediaGridUiState())
+    private val _grid = MutableStateFlow(MediaGridUiState(columns = preferences.mediaColumns))
     private var access: MediaPermissionResolution? = null
     private var gridJob: Job? = null
     private var reloadJob: Job? = null
@@ -91,6 +101,20 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
      * [retryOnce] covers the moments right after a runtime grant, when MediaStore may still answer the first query
      * with the old permission state (a SecurityException or an empty cursor): one delayed retry before giving up.
      */
+    /** Pull to refresh on the album grid: reload while the current albums stay visible. */
+    fun refreshAlbums() {
+        _albums.update { it.copy(refreshing = true) }
+        reload()
+    }
+
+    /** Pull to refresh on the media grid: reopen the album with its current sort. */
+    fun refreshGrid() {
+        val album = _grid.value.album ?: return
+        folderRepository.invalidateCache()
+        _grid.update { it.copy(refreshing = true) }
+        openAlbum(album, keepSort = true)
+    }
+
     fun reload(retryOnce: Boolean = false) {
         reloadJob?.cancel()
         reloadJob = viewModelScope.launch {
@@ -127,7 +151,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                     folder = folder,
                 )
             }
-            _albums.update { it.copy(loading = false, albums = sortAlbums(albums, it.albumSort), folders = folders) }
+            _albums.update { it.copy(loading = false, refreshing = false, albums = sortAlbums(albums, it.albumSort), folders = folders) }
             folders.filter { it.available && it.count < 0 }.forEach { summary -> enumerateFolder(summary) }
         }
     }
@@ -140,21 +164,58 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         }
     }
 
-    fun findAlbum(kind: AlbumKind, id: Long): AlbumSummary? =
-        (if (kind == AlbumKind.MEDIA) _albums.value.albums else _albums.value.folders).firstOrNull { it.id == id }
+    fun findAlbum(kind: AlbumKind, id: Long): AlbumSummary? = when (kind) {
+        AlbumKind.MEDIA -> _albums.value.albums.firstOrNull { it.id == id }
+        AlbumKind.FOLDER -> _albums.value.folders.firstOrNull { it.id == id }
+        AlbumKind.ALL -> allImagesAlbum()
+    }
+
+    /** The flat view over every bucket ("show all folder contents"); null without photo access. */
+    fun allImagesAlbum(): AlbumSummary? {
+        val state = _albums.value
+        if (!state.canReadMediaStore) return null
+        return AlbumSummary(
+            kind = AlbumKind.ALL,
+            id = MediaCatalog.ALL_BUCKETS,
+            name = getApplication<Application>().getString(R.string.gallery_all_images),
+            count = state.albums.sumOf { it.count },
+            coverUri = state.albums.firstOrNull()?.coverUri,
+            subtitle = "",
+        )
+    }
 
     fun openAlbum(album: AlbumSummary, keepSort: Boolean = false) {
         gridJob?.cancel()
-        val sort = if (keepSort && _grid.value.album?.id == album.id) _grid.value.sort else MediaSort.DEFAULT
-        _grid.value = MediaGridUiState(album = album, loading = true, sort = sort)
+        val sort = if (keepSort && _grid.value.album?.id == album.id) {
+            _grid.value.sort
+        } else {
+            preferences.sortFor(album.kind, album.id) ?: preferences.defaultSort
+        }
+        _grid.value = MediaGridUiState(
+            album = album,
+            loading = true,
+            sort = sort,
+            columns = preferences.mediaColumns,
+            refreshing = _grid.value.refreshing && _grid.value.album?.id == album.id,
+        )
         loadPage(reset = true)
     }
 
+    /** Remembered per album and as the default for albums without a memory (ROADMAP 6.2 sort memory). */
     fun setGridSort(sort: MediaSort) {
+        val album = _grid.value.album
+        if (album != null) preferences.rememberSort(album.kind, album.id, sort)
         if (_grid.value.sort == sort) return
         gridJob?.cancel()
         _grid.update { it.copy(sort = sort, items = emptyList(), loading = true, endReached = false) }
         loadPage(reset = true)
+    }
+
+    /** Media grid columns (3..6), from the menu or a pinch; persisted for every album. */
+    fun setColumns(columns: Int) {
+        val clamped = GalleryPreferences.clampColumns(columns)
+        preferences.mediaColumns = clamped
+        _grid.update { if (it.columns == clamped) it else it.copy(columns = clamped) }
     }
 
     fun loadMore() {
@@ -196,7 +257,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             val sort = _grid.value.sort
             val page: List<MediaItem>
             var limit = DocumentTreeLimit.NONE
-            if (album.kind == AlbumKind.MEDIA) {
+            if (album.kind != AlbumKind.FOLDER) {
                 page = runCatching { media.loadBucket(album.id, sort, PAGE_SIZE, offset) }.getOrDefault(emptyList())
             } else {
                 val folder = album.folder
@@ -209,6 +270,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                 state.copy(
                     items = if (reset) page else state.items + page,
                     loading = false,
+                    refreshing = false,
                     endReached = page.size < PAGE_SIZE,
                     limit = limit,
                 )
@@ -229,7 +291,8 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     }
 
     companion object {
-        const val PAGE_SIZE = 120
+        /** Larger pages mean fewer list appends (each one recomposes the grid) while flinging through a big album. */
+        const val PAGE_SIZE = 360
         private const val GRANT_SETTLE_MILLIS = 800L
         private const val MAX_REVEAL_PAGES = 100
     }

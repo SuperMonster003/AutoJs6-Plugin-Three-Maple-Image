@@ -50,9 +50,12 @@
     <string name="exif_orientation_normal">Обычная (0°)</string>
     <string name="exif_unavailable">Данные EXIF отсутствуют</string>
     <string name="gallery_album_root">Корень хранилища</string>
+    <string name="gallery_all_images">Все изображения</string>
     <string name="gallery_banner_partial">Доступны только выбранные фото</string>
     <string name="gallery_choose_folder">Выбрать папку</string>
     <string name="gallery_choose_image">Выбрать изображение</string>
+    <string name="gallery_columns">Столбцы</string>
+    <string name="gallery_columns_value">Столбцов: %1$d</string>
     <string name="gallery_empty_album_title">Этот альбом пуст</string>
     <string name="gallery_empty_no_images_body">Здесь появятся изображения из медиатеки устройства и из разрешенных папок</string>
     <string name="gallery_empty_no_images_title">Изображения не найдены</string>
@@ -65,6 +68,7 @@
     <string name="gallery_retry">Повторить</string>
     <string name="gallery_section_albums">Альбомы</string>
     <string name="gallery_section_tools">Инструменты</string>
+    <string name="gallery_show_all">Показать содержимое всех папок</string>
     <string name="gallery_sort">Сортировка</string>
     <string name="gallery_sort_ascending">По возрастанию</string>
     <string name="gallery_sort_date_modified">Дата изменения</string>

@@ -772,6 +772,7 @@ Simple Gallery 的 "高级编辑器" (第三方 SDK 界面, 仅作形态参考):
 
 | 2026-10-13 | AVD_API_33 (Android 13 模拟器, 1080 x 2340, 浅色) | README 截图重采 (查看器, 2.5 倍, 分享面板) | 缺陷: 浅色模式下查看器与编辑器的状态栏图标不可见, 因为 `ConfiguredActivity` 按页面调色板把状态栏图标改成深色, 覆盖了 `enableEdgeToEdge` 的浅色图标设置; 两页现在声明 `usesDarkSystemBars` 跳过该逻辑, 复核后图标可见 |
 | 2026-10-13 | QV710AF65F (API 31) | 3.0.0 分页查看器与缩略图条 (Download 17 页, QQ_Images 113 页), 存 `.bak/visual/3.0.0/` | 与 8.3 线框一致: 缩略图条在元数据行上方, 当前页描边并居中, 单击画面后浮层连同缩略图条一起隐藏; 1 倍左右滑动翻页, 双击放大后拖到边缘翻页. 缺陷: Pager 预测量但尚未布局的页让 Glide 退回 "屏幕长边 x 长边" 的目标尺寸, 超长 WebP 解码到 115 MB 触发 "Canvas: trying to draw too large bitmap" 崩溃, 已改为显式窗口尺寸 + `BudgetedDownsampleStrategy` 预算限制并复核 (113 页连续翻页不再崩溃) |
+| 2026-10-13 | QV770340J7 (XQ-DQ72, API 33, 120 Hz) | 3.0.0 平铺视图 "所有图片" 2265 项: 列数 3 / 4 / 6, 快速滚动条, 下拉刷新, 存 `.bak/visual/3.0.0/gallery-all-images-fastscroll.png` 等 | 与 8.2 线框一致 (方形缩略图 2 dp 间隔, 角标, 列数菜单); 快速滚动条在滚动时出现于右缘. 性能: 每页 120 项时 18 次快速 fling janky 19.5%, 原因是滚动中追加页触发整页重组; 每页 360 项 + 提前续载后 6.9% (P90 16 ms), 全部加载后 5.2%; 6.5 继续优化 |
 
 TalkBack 朗读与实体键盘可达尚未核对, 列在 ROADMAP 5.2 设置页条目待办.
 
