@@ -4,6 +4,14 @@
         <item quantity="one">%1$d image with the same name is already there</item>
         <item quantity="other">%1$d images with the same names are already there</item>
     </plurals>
+    <plurals name="favorites_added_count">
+        <item quantity="one">%1$d image added to favorites</item>
+        <item quantity="other">%1$d images added to favorites</item>
+    </plurals>
+    <plurals name="favorites_removed_count">
+        <item quantity="one">%1$d image removed from favorites</item>
+        <item quantity="other">%1$d images removed from favorites</item>
+    </plurals>
     <plurals name="gallery_copied_count">
         <item quantity="one">%1$d image copied to %2$s</item>
         <item quantity="other">%1$d images copied to %2$s</item>

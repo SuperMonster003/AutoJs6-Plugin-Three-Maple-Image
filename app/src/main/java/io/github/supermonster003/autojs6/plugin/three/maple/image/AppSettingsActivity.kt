@@ -1,6 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.lifecycleScope
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleChoice
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleChoiceDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
@@ -16,6 +18,7 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.Map
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleThemeColorLabels
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SettingsScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SettingsSummaries
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 /**
@@ -39,6 +42,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
     private var launcherIconSummary by mutableStateOf("")
     private var viewerRotationGesture by mutableStateOf(true)
     private var recycleBinEnabled by mutableStateOf(true)
+    private var syncSystemFavorites by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +50,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         settings = settingsStore.load()
         viewerRotationGesture = settings.viewerRotationGesture
         recycleBinEnabled = settings.recycleBinEnabled
+        syncSystemFavorites = settings.syncSystemFavorites
         hostResult = AutoJs6HostSettingsClient.query(this)
         launcherIconSummary = getString(launcherIconLabels[LauncherIcons.current(this).ordinal])
         setContent {
@@ -66,6 +71,8 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     onViewerRotationGesture = ::updateViewerRotationGesture,
                     recycleBinEnabled = recycleBinEnabled,
                     onRecycleBinEnabled = ::updateRecycleBinEnabled,
+                    syncSystemFavorites = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) syncSystemFavorites else null,
+                    onSyncSystemFavorites = ::updateSyncSystemFavorites,
                     onStoragePermission = { startActivity(StoragePermissionActivity.intent(this)) },
                     onReleaseHistory = { startActivity(Intent(this, ReleaseHistoryActivity::class.java)) },
                     onAbout = { startActivity(Intent(this, AboutActivity::class.java)) },
@@ -85,6 +92,17 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         recycleBinEnabled = enabled
         settings = settings.copy(recycleBinEnabled = enabled)
         settingsStore.saveRecycleBinEnabled(enabled)
+    }
+
+    /** Switching the sync on brings the system's favorites into the local table once. */
+    private fun updateSyncSystemFavorites(enabled: Boolean) {
+        syncSystemFavorites = enabled
+        settings = settings.copy(syncSystemFavorites = enabled)
+        settingsStore.saveSyncSystemFavorites(enabled)
+        if (enabled) {
+            val context = applicationContext
+            lifecycleScope.launch { runCatching { FavoritesRepository(context).importSystemFavorites(MediaStoreRepository(context).loadAll()) } }
+        }
     }
 
     private fun open(target: SettingsDialog) {

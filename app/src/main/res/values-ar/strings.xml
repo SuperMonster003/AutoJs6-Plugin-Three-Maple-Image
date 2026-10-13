@@ -23,6 +23,7 @@
     <string name="action_share">مشاركة</string>
     <string name="action_show_image_details">عرض التفاصيل</string>
     <string name="action_undo">تراجع</string>
+    <string name="action_unfavorite">إزالة من المفضلة</string>
     <string name="action_view_image">عرض الصورة</string>
     <string name="apk_info_format">التنسيق</string>
     <string name="conflict_auto_rename">الاحتفاظ بالاثنين</string>
@@ -73,6 +74,7 @@
     <string name="exif_orientation_mirrored_clockwise">معكوسة · %1$d° مع عقارب الساعة</string>
     <string name="exif_orientation_normal">عادي (0°)</string>
     <string name="exif_unavailable">لا تتوفر بيانات EXIF</string>
+    <string name="favorites_title">المفضلة</string>
     <string name="gallery_album_root">جذر التخزين</string>
     <string name="gallery_all_images">كل الصور</string>
     <string name="gallery_banner_partial">يمكن الوصول الى الصور المحددة فقط</string>
@@ -193,6 +195,8 @@
     <string name="selection_start">تحديد</string>
     <string name="settings_recycle_bin_summary">تحفظ الصور المحذوفة 30 يوما ويمكن استعادتها; عند الإيقاف يكون الحذف نهائيا</string>
     <string name="settings_recycle_bin_title">سلة المحذوفات</string>
+    <string name="settings_sync_favorites_summary">يضع علامة المفضلة في مكتبة وسائط النظام أيضا لتراها تطبيقات المعرض الأخرى; عند التشغيل تستورد المفضلة الموجودة</string>
+    <string name="settings_sync_favorites_title">مزامنة مفضلة النظام</string>
     <string name="standalone_about_app_summary">تفاصيل الإصدار وترخيص المصدر المفتوح وروابط المشروع</string>
     <string name="standalone_about_title">حول التطبيق والمطور</string>
     <string name="standalone_dark_mode_dark">داكن</string>

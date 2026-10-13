@@ -51,6 +51,9 @@ internal object MediaCatalog {
     /** Bucket id meaning "every bucket": the flat "all images" view and its viewer source (ROADMAP 6.2). */
     const val ALL_BUCKETS = Long.MIN_VALUE
 
+    /** Id of the "Favorites" virtual album (ROADMAP 7.4); never a MediaStore bucket id in practice. */
+    const val FAVORITES = Long.MIN_VALUE + 1
+
     /** Supported formats only (ROADMAP D2); zero-byte rows are placeholders MediaStore has not finished writing. */
     fun isCataloged(item: MediaItem, supports: (String, String) -> Boolean): Boolean =
         item.sizeBytes > 0L && supports(item.displayName, item.mimeType)

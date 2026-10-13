@@ -208,11 +208,13 @@ private fun AlbumGrid(
         if (header != null) {
             item(key = "header.explanation", span = { GridItemSpan(maxLineSpan) }) { header() }
         }
-        if (state.albums.isNotEmpty()) {
+        // The favorites album leads the albums while it has images (ROADMAP 7.0).
+        val albums = listOfNotNull(state.favorites) + state.albums
+        if (albums.isNotEmpty()) {
             item(key = "header.albums", span = { GridItemSpan(maxLineSpan) }) {
                 MapleSectionHeader(stringResource(R.string.gallery_section_albums))
             }
-            itemsIndexed(state.albums, key = { _, album -> "media.${album.id}" }) { index, album ->
+            itemsIndexed(albums, key = { _, album -> "${album.kind.name.lowercase()}.${album.id}" }) { index, album ->
                 AlbumCell(album, callbacks, Modifier.padding(cellPadding(index)))
             }
         }
@@ -272,7 +274,11 @@ private fun AlbumCell(album: AlbumSummary, callbacks: AlbumGridCallbacks, modifi
         name = album.name,
         count = if (album.available) count else stringResource(R.string.storage_folder_unavailable),
         coverModel = album.coverUri?.let(Uri::parse),
-        badge = if (album.kind == AlbumKind.FOLDER) painterResource(R.drawable.ic_folder_24) else null,
+        badge = when (album.kind) {
+            AlbumKind.FOLDER -> painterResource(R.drawable.ic_folder_24)
+            AlbumKind.FAVORITES -> painterResource(R.drawable.ic_favorite_24)
+            else -> null
+        },
         enabled = album.available,
         onClick = { callbacks.onOpenAlbum(album) },
         modifier = modifier.testTag("maple.gallery.album.${album.kind.name.lowercase()}.${album.id}"),

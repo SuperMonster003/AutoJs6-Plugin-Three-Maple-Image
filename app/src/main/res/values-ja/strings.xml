@@ -23,6 +23,7 @@
     <string name="action_share">共有</string>
     <string name="action_show_image_details">詳細を表示</string>
     <string name="action_undo">元に戻す</string>
+    <string name="action_unfavorite">お気に入り解除</string>
     <string name="action_view_image">画像を表示</string>
     <string name="apk_info_format">形式</string>
     <string name="conflict_auto_rename">両方を残す</string>
@@ -73,6 +74,7 @@
     <string name="exif_orientation_mirrored_clockwise">反転 · 時計回り %1$d°</string>
     <string name="exif_orientation_normal">標準 (0°)</string>
     <string name="exif_unavailable">EXIF データがありません</string>
+    <string name="favorites_title">お気に入り</string>
     <string name="gallery_album_root">ストレージのルート</string>
     <string name="gallery_all_images">すべての画像</string>
     <string name="gallery_banner_partial">選択した写真のみアクセスできます</string>
@@ -193,6 +195,8 @@
     <string name="selection_start">選択</string>
     <string name="settings_recycle_bin_summary">削除した写真は 30 日間保管され, 復元できます. オフにすると削除は完全削除になります</string>
     <string name="settings_recycle_bin_title">ゴミ箱</string>
+    <string name="settings_sync_favorites_summary">システムのメディアライブラリにもお気に入りを記録し, 他のギャラリーアプリでも表示されます. オンにすると既存のお気に入りを取り込みます</string>
+    <string name="settings_sync_favorites_title">システムのお気に入りと同期</string>
     <string name="standalone_about_app_summary">バージョン情報, オープンソースライセンス, プロジェクトのリンク</string>
     <string name="standalone_about_title">アプリと開発者について</string>
     <string name="standalone_dark_mode_dark">ダーク</string>

@@ -18,6 +18,8 @@ internal enum class AlbumKind {
     FOLDER,
     /** The flat "all images" view over every MediaStore bucket (ROADMAP 6.2). */
     ALL,
+    /** The "Favorites" virtual album, first in the album grid when it has images (ROADMAP 7.4). */
+    FAVORITES,
 }
 
 /** One entry of the album grid: a MediaStore bucket or an authorized folder (design draft 8.1). */
@@ -37,6 +39,8 @@ internal data class GalleryUiState(
     val access: MediaPermissionResolution? = null,
     val albums: List<AlbumSummary> = emptyList(),
     val folders: List<AlbumSummary> = emptyList(),
+    /** Shown before the albums while it has images. */
+    val favorites: AlbumSummary? = null,
     val albumSort: MediaSort = MediaSort.DEFAULT,
     val failed: Boolean = false,
     /** A user-initiated reload (pull to refresh) is in flight while the current albums stay on screen. */
@@ -58,6 +62,8 @@ internal data class MediaGridUiState(
     val refreshing: Boolean = false,
     /** Ids selected in the grid (ROADMAP 7.1); kept across rotation and refreshes of the same album. */
     val selection: Set<Long> = emptySet(),
+    /** Media ids of the favorites; the selection bar shows "remove from favorites" when it covers the selection. */
+    val favoriteIds: Set<Long> = emptySet(),
 ) {
     val selecting: Boolean get() = selection.isNotEmpty()
 }
@@ -72,6 +78,9 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     private val media = MediaStoreRepository(application)
     private val folderRepository = AuthorizedFolderRepository(application)
     private val preferences = GalleryPreferences(application)
+    private val favorites = FavoritesRepository(application)
+    private var favoriteIds: Set<Long> = emptySet()
+    private var favoriteOrder: Pair<MediaSort, List<MediaItem>>? = null
     private val _albums = MutableStateFlow(GalleryUiState())
     private val _grid = MutableStateFlow(MediaGridUiState(columns = preferences.mediaColumns))
     private var access: MediaPermissionResolution? = null
@@ -99,6 +108,48 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                 if (visible) reloadAfterChange() else stale = true
             }
         }
+        viewModelScope.launch {
+            favorites.observeIds().collect { ids ->
+                if (ids == favoriteIds) return@collect
+                favoriteIds = ids
+                favoriteOrder = null
+                _grid.update { it.copy(favoriteIds = ids) }
+                refreshFavorites()
+            }
+        }
+    }
+
+    /** The favorites album summary, and the open favorites grid, after a favorite was added or removed. */
+    private fun refreshFavorites() = viewModelScope.launch {
+        val summary = favoritesAlbum()
+        _albums.update { it.copy(favorites = summary) }
+        val open = _grid.value.album
+        if (open?.kind == AlbumKind.FAVORITES) {
+            if (summary != null) openAlbum(summary, keepSort = true) else _grid.update { it.copy(items = emptyList(), album = open.copy(count = 0)) }
+        }
+    }
+
+    private suspend fun favoritesAlbum(): AlbumSummary? {
+        if (!_albums.value.canReadMediaStore) return null
+        val items = runCatching { favorites.resolve(media.loadAll()) }.getOrDefault(emptyList())
+        if (items.isEmpty()) return null
+        return AlbumSummary(
+            kind = AlbumKind.FAVORITES,
+            id = MediaCatalog.FAVORITES,
+            name = getApplication<Application>().getString(R.string.favorites_title),
+            count = items.size,
+            coverUri = items.first().contentUri,
+            subtitle = "",
+        )
+    }
+
+    /** Favorites in [sort] order; the default sort keeps "most recently added first". */
+    private suspend fun favoriteItems(sort: MediaSort): List<MediaItem> {
+        favoriteOrder?.let { (cachedSort, items) -> if (cachedSort == sort) return items }
+        val resolved = runCatching { favorites.resolve(media.loadAll()) }.getOrDefault(emptyList())
+        val ordered = if (sort == MediaSort.DEFAULT) resolved else withContext(Dispatchers.Default) { MediaCatalog.sort(resolved, sort) }
+        favoriteOrder = sort to ordered
+        return ordered
     }
 
     fun setVisible(value: Boolean) {
@@ -110,6 +161,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     }
 
     private fun reloadAfterChange() {
+        favoriteOrder = null
         reload()
         _grid.value.album?.let { openAlbum(it, keepSort = true) }
     }
@@ -179,7 +231,9 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                     folder = folder,
                 )
             }
-            _albums.update { it.copy(loading = false, refreshing = false, albums = sortAlbums(albums, it.albumSort), folders = folders) }
+            favoriteOrder = null
+            val favoritesSummary = favoritesAlbum()
+            _albums.update { it.copy(loading = false, refreshing = false, albums = sortAlbums(albums, it.albumSort), folders = folders, favorites = favoritesSummary) }
             // The open album's title and count follow the reloaded list (after a delete or move, for example).
             _grid.update { grid ->
                 val open = grid.album ?: return@update grid
@@ -202,6 +256,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         AlbumKind.MEDIA -> _albums.value.albums.firstOrNull { it.id == id }
         AlbumKind.FOLDER -> _albums.value.folders.firstOrNull { it.id == id }
         AlbumKind.ALL -> allImagesAlbum()
+        AlbumKind.FAVORITES -> _albums.value.favorites
     }
 
     /** The flat view over every bucket ("show all folder contents"); null without photo access. */
@@ -354,6 +409,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         val state = _grid.value
         val album = state.album ?: return emptyList()
         if (state.endReached) return state.items
+        if (album.kind == AlbumKind.FAVORITES) return favoriteItems(state.sort)
         return if (album.kind != AlbumKind.FOLDER) {
             runCatching { media.loadBucketAll(album.id, state.sort) }.getOrDefault(state.items)
         } else {
@@ -379,7 +435,10 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             val sort = _grid.value.sort
             val page: List<MediaItem>
             var limit = DocumentTreeLimit.NONE
-            if (album.kind != AlbumKind.FOLDER) {
+            if (album.kind == AlbumKind.FAVORITES) {
+                val ordered = favoriteItems(sort)
+                page = ordered.subList(offset.coerceAtMost(ordered.size), (offset + PAGE_SIZE).coerceAtMost(ordered.size))
+            } else if (album.kind != AlbumKind.FOLDER) {
                 page = runCatching { media.loadBucket(album.id, sort, PAGE_SIZE, offset) }.getOrDefault(emptyList())
             } else {
                 val folder = album.folder

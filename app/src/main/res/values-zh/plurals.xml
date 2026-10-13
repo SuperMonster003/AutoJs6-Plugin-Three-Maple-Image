@@ -3,6 +3,12 @@
     <plurals name="conflict_title">
         <item quantity="other">目标相册已有 %1$d 张同名图片</item>
     </plurals>
+    <plurals name="favorites_added_count">
+        <item quantity="other">已收藏 %1$d 张图片</item>
+    </plurals>
+    <plurals name="favorites_removed_count">
+        <item quantity="other">已取消收藏 %1$d 张图片</item>
+    </plurals>
     <plurals name="gallery_copied_count">
         <item quantity="other">已将 %1$d 张图片复制到 %2$s</item>
     </plurals>

@@ -92,6 +92,7 @@ internal class GalleryOperations(
     private var job: Job? = null
     private var snackbarJob: Job? = null
     private val preferences = GalleryPreferences(activity)
+    private val favorites = FavoritesRepository(activity)
     private var renameError by mutableStateOf<String?>(null)
     private var renameBusy by mutableStateOf(false)
     private var progressDone by mutableIntStateOf(0)
@@ -103,11 +104,13 @@ internal class GalleryOperations(
         val library = album.kind != AlbumKind.FOLDER
         return MediaSelectionActions(
             onShare = ::share,
+            onFavorite = if (library) ::favorite else null,
             onMove = if (library) ::move else null,
             onDelete = ::delete,
             onCopy = if (library) ::copy else null,
             onRename = ::rename,
             onDetails = ::details,
+            favorited = library && state.selection.isNotEmpty() && state.favoriteIds.containsAll(state.selection),
         )
     }
 
@@ -177,6 +180,22 @@ internal class GalleryOperations(
         if (items.isNotEmpty()) show(GalleryDialog.Details(items))
     }
 
+    // ---- favorites (ROADMAP 7.4) ----
+
+    /** Adds the selection to the favorites, or removes it when every selected image is one already. */
+    fun favorite() = launch {
+        val items = gallery.selectedItems()
+        if (items.isEmpty()) return@launch
+        val known = gallery.grid.value.favoriteIds
+        val remove = items.all { it.id in known }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && ApplicationSettingsStore(activity).load().syncSystemFavorites) {
+            if (coordinator.setSystemFavorite(items, favorite = !remove).cancelled) return@launch
+        }
+        if (remove) favorites.remove(items.map { it.id }) else favorites.add(items.filter { it.id !in known })
+        gallery.clearSelection()
+        notify(quantity(if (remove) R.plurals.favorites_removed_count else R.plurals.favorites_added_count, items.size))
+    }
+
     // ---- delete (ROADMAP 7.2) ----
 
     /** Media library images go to the recycle bin unless it is switched off; folder documents ask first. */
@@ -205,6 +224,7 @@ internal class GalleryOperations(
     private fun deleteForGood(items: List<MediaItem>, reason: DeleteReason) = launch {
         val outcome = if (reason == DeleteReason.AUTHORIZED_FOLDER) deleteDocuments(items) else coordinator.delete(items)
         if (outcome.cancelled) return@launch
+        if (reason != DeleteReason.AUTHORIZED_FOLDER) favorites.remove(items.map { it.id })
         afterGridWrite(items)
         notify(summary(R.plurals.gallery_deleted_count, outcome))
     }
@@ -363,6 +383,8 @@ internal class GalleryOperations(
             coordinator.deleteFromPrivateBin(entries.map { it.id })
         }
         if (outcome.cancelled) return@launch
+        // Android 11+ bin entries carry media ids; Android 7-10 favorites of binned images were rebound or dropped already.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) favorites.remove(entries.map { it.id })
         recycleBin.clearSelection()
         recycleBin.load()
         notify(summary(R.plurals.gallery_deleted_count, outcome))

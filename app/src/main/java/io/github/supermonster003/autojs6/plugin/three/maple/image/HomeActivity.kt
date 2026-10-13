@@ -226,7 +226,8 @@ class HomeActivity : ConfiguredActivity() {
         val start = ViewerSource.request(item)
         val spec = when {
             album == null -> null
-            album.kind == AlbumKind.MEDIA || album.kind == AlbumKind.ALL -> ViewerSourceSpec.MediaAlbum(album.id, grid.sort, item.id)
+            album.kind == AlbumKind.MEDIA || album.kind == AlbumKind.ALL || album.kind == AlbumKind.FAVORITES ->
+                ViewerSourceSpec.MediaAlbum(album.id, grid.sort, item.id)
             album.folder != null -> ViewerSourceSpec.AuthorizedFolder(album.folder.treeUri, grid.sort, item.id)
             else -> null
         }

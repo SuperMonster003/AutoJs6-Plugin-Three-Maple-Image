@@ -23,6 +23,7 @@
     <string name="action_share">Share</string>
     <string name="action_show_image_details">Show details</string>
     <string name="action_undo">Undo</string>
+    <string name="action_unfavorite">Unfavorite</string>
     <string name="action_view_image">View image</string>
     <string name="apk_info_format">Format</string>
     <string name="conflict_auto_rename">Keep both</string>
@@ -73,6 +74,7 @@
     <string name="exif_orientation_mirrored_clockwise">Mirrored · %1$d° clockwise</string>
     <string name="exif_orientation_normal">Normal (0°)</string>
     <string name="exif_unavailable">No EXIF data available</string>
+    <string name="favorites_title">Favorites</string>
     <string name="gallery_album_root">Storage root</string>
     <string name="gallery_all_images">All images</string>
     <string name="gallery_banner_partial">Only selected photos are accessible</string>
@@ -193,6 +195,8 @@
     <string name="selection_start">Select</string>
     <string name="settings_recycle_bin_summary">Deleted photos are kept for 30 days and can be restored; when off, deleting removes them for good</string>
     <string name="settings_recycle_bin_title">Recycle bin</string>
+    <string name="settings_sync_favorites_summary">Also marks favorites in the system media library so other gallery apps see them; turning it on imports the favorites already there</string>
+    <string name="settings_sync_favorites_title">Sync system favorites</string>
     <string name="standalone_about_app_summary">Version details, open source license, and project links</string>
     <string name="standalone_about_title">About app and developer</string>
     <string name="standalone_dark_mode_dark">Dark</string>

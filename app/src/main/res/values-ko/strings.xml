@@ -23,6 +23,7 @@
     <string name="action_share">공유</string>
     <string name="action_show_image_details">세부 정보 보기</string>
     <string name="action_undo">실행 취소</string>
+    <string name="action_unfavorite">즐겨찾기 해제</string>
     <string name="action_view_image">이미지 보기</string>
     <string name="apk_info_format">형식</string>
     <string name="conflict_auto_rename">둘 다 유지</string>
@@ -73,6 +74,7 @@
     <string name="exif_orientation_mirrored_clockwise">좌우 반전 · 시계 방향 %1$d°</string>
     <string name="exif_orientation_normal">기본 (0°)</string>
     <string name="exif_unavailable">EXIF 데이터 없음</string>
+    <string name="favorites_title">즐겨찾기</string>
     <string name="gallery_album_root">저장공간 루트</string>
     <string name="gallery_all_images">모든 이미지</string>
     <string name="gallery_banner_partial">선택한 사진만 접근할 수 있습니다</string>
@@ -193,6 +195,8 @@
     <string name="selection_start">선택</string>
     <string name="settings_recycle_bin_summary">삭제한 사진은 30일 동안 보관되며 복원할 수 있습니다. 끄면 삭제 시 영구 삭제됩니다</string>
     <string name="settings_recycle_bin_title">휴지통</string>
+    <string name="settings_sync_favorites_summary">시스템 미디어 라이브러리에도 즐겨찾기를 표시해 다른 갤러리 앱에서도 볼 수 있습니다. 켜면 기존 즐겨찾기를 가져옵니다</string>
+    <string name="settings_sync_favorites_title">시스템 즐겨찾기 동기화</string>
     <string name="standalone_about_app_summary">버전 정보, 오픈 소스 라이선스 및 프로젝트 링크</string>
     <string name="standalone_about_title">앱 및 개발자 정보</string>
     <string name="standalone_dark_mode_dark">다크</string>

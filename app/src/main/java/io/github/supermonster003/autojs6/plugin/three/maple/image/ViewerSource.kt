@@ -109,7 +109,16 @@ internal class ViewerSourceLoader(
     private val loadFolder: suspend (treeUri: String, sort: MediaSort) -> List<MediaItem>,
 ) {
     constructor(context: Context) : this(
-        loadAlbum = { bucketId, sort -> MediaStoreRepository(context).loadBucketAll(bucketId, sort) },
+        loadAlbum = { bucketId, sort ->
+            val media = MediaStoreRepository(context)
+            if (bucketId == MediaCatalog.FAVORITES) {
+                // The favorites album pages through the favorites in the grid's order.
+                val favorites = FavoritesRepository(context).resolve(media.loadAll())
+                if (sort == MediaSort.DEFAULT) favorites else MediaCatalog.sort(favorites, sort)
+            } else {
+                media.loadBucketAll(bucketId, sort)
+            }
+        },
         loadFolder = { treeUri, sort ->
             val repository = AuthorizedFolderRepository(context)
             val folder = repository.list().firstOrNull { it.treeUri == treeUri && it.available }

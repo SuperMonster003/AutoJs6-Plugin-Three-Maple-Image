@@ -5,6 +5,16 @@
         <item quantity="many">Ya existen %1$d imágenes con los mismos nombres</item>
         <item quantity="other">Ya existen %1$d imágenes con los mismos nombres</item>
     </plurals>
+    <plurals name="favorites_added_count">
+        <item quantity="one">%1$d imagen añadida a favoritos</item>
+        <item quantity="many">%1$d imágenes añadidas a favoritos</item>
+        <item quantity="other">%1$d imágenes añadidas a favoritos</item>
+    </plurals>
+    <plurals name="favorites_removed_count">
+        <item quantity="one">%1$d imagen quitada de favoritos</item>
+        <item quantity="many">%1$d imágenes quitadas de favoritos</item>
+        <item quantity="other">%1$d imágenes quitadas de favoritos</item>
+    </plurals>
     <plurals name="gallery_copied_count">
         <item quantity="one">%1$d imagen copiada a %2$s</item>
         <item quantity="many">%1$d imágenes copiadas a %2$s</item>

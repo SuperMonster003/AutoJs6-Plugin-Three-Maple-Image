@@ -74,6 +74,23 @@ class MediaWriteCoordinatorInstrumentationTest {
     }
 
     @Test
+    fun aFavoriteSurvivesAMoveAndARename() = runBlocking {
+        insert("a.png", Color.RED)
+        val a = items(folder).single()
+        val favorites = FavoritesRepository(context)
+        favorites.add(listOf(a))
+        try {
+            assertEquals(1, main { coordinator.move(listOf(a), relativePath(target), NameConflictChoice.AUTO_RENAME) }.succeeded)
+            val moved = items(target).single()
+            assertEquals(1, main { coordinator.rename(moved, "b.png") }.succeeded)
+            val resolved = favorites.resolve(MediaStoreRepository(context).also { it.invalidate() }.loadAll())
+            assertEquals(listOf("b.png"), resolved.filter { it.relativePath == relativePath(target) }.map { it.displayName })
+        } finally {
+            favorites.remove(listOf(a.id) + items(target).map { it.id })
+        }
+    }
+
+    @Test
     fun copiesNeverOverwriteAndSkipOnRequest() = runBlocking {
         insert("a.png", Color.RED)
         val a = items(folder).single()

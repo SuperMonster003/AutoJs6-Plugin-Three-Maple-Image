@@ -39,6 +39,8 @@ internal data class ApplicationSettings(
     val viewerRotationGesture: Boolean = true,
     /** Deletes go to the recycle bin first (ROADMAP 7.2, on by default); off deletes for good after a confirmation. */
     val recycleBinEnabled: Boolean = true,
+    /** Android 11+: favorites are also marked in the media library (ROADMAP 7.4, off by default). */
+    val syncSystemFavorites: Boolean = false,
 )
 
 internal object AppSettingsPolicy {
@@ -164,6 +166,7 @@ internal class ApplicationSettingsStore(context: Context) {
         ),
         viewerRotationGesture = preferences.getBoolean(KEY_VIEWER_ROTATION_GESTURE, true),
         recycleBinEnabled = preferences.getBoolean(KEY_RECYCLE_BIN_ENABLED, true),
+        syncSystemFavorites = preferences.getBoolean(KEY_SYNC_SYSTEM_FAVORITES, false),
     )
 
     fun save(settings: ApplicationSettings) {
@@ -177,6 +180,7 @@ internal class ApplicationSettingsStore(context: Context) {
             .putString(KEY_LANGUAGE, settings.language.name)
             .putBoolean(KEY_VIEWER_ROTATION_GESTURE, settings.viewerRotationGesture)
             .putBoolean(KEY_RECYCLE_BIN_ENABLED, settings.recycleBinEnabled)
+            .putBoolean(KEY_SYNC_SYSTEM_FAVORITES, settings.syncSystemFavorites)
             .putLong(KEY_REVISION, revision() + 1L)
             .apply()
     }
@@ -191,6 +195,10 @@ internal class ApplicationSettingsStore(context: Context) {
         preferences.edit().putBoolean(KEY_RECYCLE_BIN_ENABLED, enabled).apply()
     }
 
+    fun saveSyncSystemFavorites(enabled: Boolean) {
+        preferences.edit().putBoolean(KEY_SYNC_SYSTEM_FAVORITES, enabled).apply()
+    }
+
     fun revision(): Long = preferences.getLong(KEY_REVISION, 0L)
 
     private companion object {
@@ -201,6 +209,7 @@ internal class ApplicationSettingsStore(context: Context) {
         const val KEY_LANGUAGE = "language"
         const val KEY_VIEWER_ROTATION_GESTURE = "viewer-rotation-gesture"
         const val KEY_RECYCLE_BIN_ENABLED = "recycle-bin-enabled"
+        const val KEY_SYNC_SYSTEM_FAVORITES = "sync-system-favorites"
         const val KEY_REVISION = "revision"
     }
 }

@@ -94,6 +94,8 @@ internal class MediaSelectionActions(
     val onCopy: (() -> Unit)? = null,
     val onRename: (() -> Unit)? = null,
     val onDetails: (() -> Unit)? = null,
+    /** Every selected image is a favorite already: the favorite action removes them instead. */
+    val favorited: Boolean = false,
 )
 
 /**
@@ -305,12 +307,12 @@ private class DragPointer {
 private fun SelectionBar(selectionCount: Int, actions: MediaSelectionActions) {
     var moreOpen by remember { mutableStateOf(false) }
     val share = painterResource(R.drawable.ic_share_24)
-    val favorite = painterResource(R.drawable.ic_favorite_border_24)
+    val favorite = painterResource(if (actions.favorited) R.drawable.ic_favorite_24 else R.drawable.ic_favorite_border_24)
     val move = painterResource(R.drawable.ic_drive_file_move_24)
     val delete = painterResource(R.drawable.ic_delete_24)
     val more = painterResource(R.drawable.ic_more_vert_24)
     val shareLabel = stringResource(R.string.action_share)
-    val favoriteLabel = stringResource(R.string.action_favorite)
+    val favoriteLabel = stringResource(if (actions.favorited) R.string.action_unfavorite else R.string.action_favorite)
     val moveLabel = stringResource(R.string.action_move)
     val deleteLabel = stringResource(R.string.action_delete)
     val moreLabel = stringResource(R.string.action_more)

@@ -23,6 +23,7 @@
     <string name="action_share">Отправить</string>
     <string name="action_show_image_details">Показать сведения</string>
     <string name="action_undo">Отменить</string>
+    <string name="action_unfavorite">Из избранного</string>
     <string name="action_view_image">Просмотреть изображение</string>
     <string name="apk_info_format">Формат</string>
     <string name="conflict_auto_rename">Оставить оба</string>
@@ -73,6 +74,7 @@
     <string name="exif_orientation_mirrored_clockwise">Зеркально · %1$d° по часовой стрелке</string>
     <string name="exif_orientation_normal">Обычная (0°)</string>
     <string name="exif_unavailable">Данные EXIF отсутствуют</string>
+    <string name="favorites_title">Избранное</string>
     <string name="gallery_album_root">Корень хранилища</string>
     <string name="gallery_all_images">Все изображения</string>
     <string name="gallery_banner_partial">Доступны только выбранные фото</string>
@@ -193,6 +195,8 @@
     <string name="selection_start">Выбрать</string>
     <string name="settings_recycle_bin_summary">Удалённые фото хранятся 30 дней, их можно восстановить; если выключено, удаление необратимо</string>
     <string name="settings_recycle_bin_title">Корзина</string>
+    <string name="settings_sync_favorites_summary">Избранное отмечается и в системной медиатеке, его видят другие галереи; при включении импортируется уже существующее избранное</string>
+    <string name="settings_sync_favorites_title">Синхронизировать системное избранное</string>
     <string name="standalone_about_app_summary">Сведения о версии, лицензия открытого кода и ссылки проекта</string>
     <string name="standalone_about_title">О приложении и разработчике</string>
     <string name="standalone_dark_mode_dark">Темная</string>

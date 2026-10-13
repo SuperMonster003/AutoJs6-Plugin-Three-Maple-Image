@@ -23,6 +23,7 @@
     <string name="action_share">Partager</string>
     <string name="action_show_image_details">Afficher les détails</string>
     <string name="action_undo">Annuler</string>
+    <string name="action_unfavorite">Retirer des favoris</string>
     <string name="action_view_image">Afficher l\'image</string>
     <string name="apk_info_format">Format</string>
     <string name="conflict_auto_rename">Conserver les deux</string>
@@ -73,6 +74,7 @@
     <string name="exif_orientation_mirrored_clockwise">En miroir · %1$d° dans le sens horaire</string>
     <string name="exif_orientation_normal">Normale (0°)</string>
     <string name="exif_unavailable">Aucune donnée EXIF</string>
+    <string name="favorites_title">Favoris</string>
     <string name="gallery_album_root">Racine du stockage</string>
     <string name="gallery_all_images">Toutes les images</string>
     <string name="gallery_banner_partial">Seules les photos sélectionnées sont accessibles</string>
@@ -193,6 +195,8 @@
     <string name="selection_start">Sélectionner</string>
     <string name="settings_recycle_bin_summary">Les photos supprimées sont conservées 30 jours et peuvent être restaurées; désactivée, la suppression est définitive</string>
     <string name="settings_recycle_bin_title">Corbeille</string>
+    <string name="settings_sync_favorites_summary">Marque aussi les favoris dans la médiathèque du système pour que les autres galeries les voient; l\'activation importe les favoris existants</string>
+    <string name="settings_sync_favorites_title">Synchroniser les favoris du système</string>
     <string name="standalone_about_app_summary">Détails de version, licence libre et liens du projet</string>
     <string name="standalone_about_title">À propos de l\'application et du développeur</string>
     <string name="standalone_dark_mode_dark">Sombre</string>

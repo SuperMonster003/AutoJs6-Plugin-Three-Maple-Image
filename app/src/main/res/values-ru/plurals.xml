@@ -6,6 +6,18 @@
         <item quantity="many">Там уже есть %1$d изображений с такими же именами</item>
         <item quantity="other">Там уже есть %1$d изображения с такими же именами</item>
     </plurals>
+    <plurals name="favorites_added_count">
+        <item quantity="one">%1$d изображение добавлено в избранное</item>
+        <item quantity="few">%1$d изображения добавлены в избранное</item>
+        <item quantity="many">%1$d изображений добавлено в избранное</item>
+        <item quantity="other">%1$d изображения добавлены в избранное</item>
+    </plurals>
+    <plurals name="favorites_removed_count">
+        <item quantity="one">%1$d изображение удалено из избранного</item>
+        <item quantity="few">%1$d изображения удалены из избранного</item>
+        <item quantity="many">%1$d изображений удалено из избранного</item>
+        <item quantity="other">%1$d изображения удалены из избранного</item>
+    </plurals>
     <plurals name="gallery_copied_count">
         <item quantity="one">%1$d изображение скопировано в %2$s</item>
         <item quantity="few">%1$d изображения скопированы в %2$s</item>

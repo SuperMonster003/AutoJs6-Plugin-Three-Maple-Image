@@ -23,6 +23,7 @@
     <string name="action_share">分享</string>
     <string name="action_show_image_details">顯示詳細資訊</string>
     <string name="action_undo">復原</string>
+    <string name="action_unfavorite">取消收藏</string>
     <string name="action_view_image">檢視圖片</string>
     <string name="apk_info_format">格式</string>
     <string name="conflict_auto_rename">保留兩者</string>
@@ -73,6 +74,7 @@
     <string name="exif_orientation_mirrored_clockwise">已鏡像 · 順時針 %1$d°</string>
     <string name="exif_orientation_normal">正常 (0°)</string>
     <string name="exif_unavailable">沒有 EXIF 資料</string>
+    <string name="favorites_title">收藏</string>
     <string name="gallery_album_root">儲存空間根目錄</string>
     <string name="gallery_all_images">所有圖片</string>
     <string name="gallery_banner_partial">僅可存取部分相片</string>
@@ -193,6 +195,8 @@
     <string name="selection_start">選取</string>
     <string name="settings_recycle_bin_summary">刪除的相片保留 30 天, 期間可以還原; 關閉後刪除即永久刪除</string>
     <string name="settings_recycle_bin_title">資源回收筒</string>
+    <string name="settings_sync_favorites_summary">同時在系統媒體庫中標記收藏, 其他圖庫應用程式也能看到; 開啟時匯入系統中已有的收藏</string>
+    <string name="settings_sync_favorites_title">同步系統收藏</string>
     <string name="standalone_about_app_summary">版本資訊, 開放原始碼授權與專案連結</string>
     <string name="standalone_about_title">關於應用程式與開發者</string>
     <string name="standalone_dark_mode_dark">深色</string>

@@ -189,6 +189,31 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         return !outcome.cancelled && !outcome.tooLargeForRecycleBin
     }
 
+    /**
+     * "Sync system favorites" (Android 11+, ROADMAP 7.4): marks [items] in the media library as well, with one
+     * system confirmation unless the images are the app's own or all files access writes directly.
+     */
+    @RequiresApi(Build.VERSION_CODES.R)
+    suspend fun setSystemFavorite(items: List<MediaItem>, favorite: Boolean): WriteOutcome {
+        if (items.isEmpty()) return WriteOutcome()
+        val uris = items.map(::uriOf)
+        val route = routeFor(MediaWriteOperation.FAVORITE, items) ?: return WriteOutcome(cancelled = true)
+        if (route == MediaWriteRoute.DIRECT) {
+            val refused = ArrayList<Uri>()
+            withContext(Dispatchers.IO) {
+                for (uri in uris) {
+                    val values = ContentValues().apply { put(MediaStore.MediaColumns.IS_FAVORITE, if (favorite) 1 else 0) }
+                    if (runCatching { resolver.update(uri, values, null, null) }.getOrDefault(0) == 0) refused += uri
+                }
+            }
+            if (refused.isEmpty()) return WriteOutcome(succeeded = uris.size)
+            val granted = systemRequest(MediaStore.createFavoriteRequest(resolver, refused, favorite))
+            return if (granted) WriteOutcome(succeeded = uris.size) else WriteOutcome(succeeded = uris.size - refused.size, failed = refused.size)
+        }
+        val granted = systemRequest(MediaStore.createFavoriteRequest(resolver, uris, favorite))
+        return if (granted) WriteOutcome(succeeded = uris.size) else WriteOutcome(cancelled = true)
+    }
+
     // ---- routes ----
 
     /** The route for a batch, asking for the legacy write permission first when the policy needs it; null = refused. */

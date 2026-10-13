@@ -51,6 +51,9 @@ internal fun SettingsScreen(
     onViewerRotationGesture: (Boolean) -> Unit,
     recycleBinEnabled: Boolean,
     onRecycleBinEnabled: (Boolean) -> Unit,
+    /** Null hides the row (before Android 11). */
+    syncSystemFavorites: Boolean?,
+    onSyncSystemFavorites: (Boolean) -> Unit,
     onStoragePermission: () -> Unit,
     onReleaseHistory: () -> Unit,
     onAbout: () -> Unit,
@@ -111,6 +114,16 @@ internal fun SettingsScreen(
                 onToggle = onRecycleBinEnabled,
                 modifier = Modifier.testTag("maple.settings.recycleBin"),
             )
+            if (syncSystemFavorites != null) {
+                MapleSwitchRow(
+                    title = stringResource(R.string.settings_sync_favorites_title),
+                    summary = stringResource(R.string.settings_sync_favorites_summary),
+                    iconResource = R.drawable.ic_favorite_border_24,
+                    checked = syncSystemFavorites,
+                    onToggle = onSyncSystemFavorites,
+                    modifier = Modifier.testTag("maple.settings.syncFavorites"),
+                )
+            }
             MapleSectionHeader(stringResource(R.string.standalone_settings_section_information))
             MapleSettingsRow(
                 title = stringResource(R.string.standalone_release_history_title),
