@@ -12,6 +12,9 @@
 plugins {
     id("com.android.application") version System.getProperty("gradle.agp.version") apply false
     id("org.jetbrains.kotlin.plugin.compose") version System.getProperty("gradle.kotlin.version") apply false
+    // Room's annotation processor for favorites and the recycle bin index (ROADMAP T8, M3); the version comes from
+    // the platform plugin like AGP's.
+    id("com.google.devtools.ksp") version System.getProperty("gradle.ksp.version") apply false
 }
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.

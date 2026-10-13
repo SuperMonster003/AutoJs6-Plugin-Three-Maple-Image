@@ -13,9 +13,15 @@ plugins {
     id("org.autojs.build.jvm-convention")
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("com.google.devtools.ksp")
 }
 
 val globalApplicationId = "io.github.supermonster003.autojs6.plugin.three.maple.image"
+
+// Room exports the schema of every database version so a later migration can be checked against it.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
 
 val buildTypeDebug = "debug"
 val buildTypeRelease = "release"
@@ -162,6 +168,10 @@ dependencies {
     // ROADMAP T3: Glide stays the single image pipeline; its Compose integration drives grids and thumbnail strips.
     implementation(libs.glide.compose)
     implementation(libs.navigation.compose)
+    // ROADMAP T8: favorites, excluded / pinned folders and the API 24-29 recycle bin index.
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.test.ext.junit)
