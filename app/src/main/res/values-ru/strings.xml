@@ -64,12 +64,6 @@
     <string name="gallery_empty_no_permission_title">Доступ к фото еще не предоставлен</string>
     <string name="gallery_folder_limit_depth">Подпапки глубже %1$d уровней не показаны</string>
     <string name="gallery_folder_limit_items">Показаны только первые %1$d изображений</string>
-    <plurals name="gallery_image_count">
-        <item quantity="one">%1$d изображение</item>
-        <item quantity="few">%1$d изображения</item>
-        <item quantity="many">%1$d изображений</item>
-        <item quantity="other">%1$d изображения</item>
-    </plurals>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">Чтение папки...</string>
     <string name="gallery_retry">Повторить</string>
     <string name="gallery_section_albums">Альбомы</string>

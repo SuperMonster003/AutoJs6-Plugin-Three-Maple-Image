@@ -64,11 +64,6 @@
     <string name="gallery_empty_no_permission_title">Accès aux photos pas encore accordé</string>
     <string name="gallery_folder_limit_depth">Les sous-dossiers au-delà de %1$d niveaux ne sont pas listés</string>
     <string name="gallery_folder_limit_items">Seules les %1$d premières images sont listées</string>
-    <plurals name="gallery_image_count">
-        <item quantity="one">%1$d image</item>
-        <item quantity="many">%1$d images</item>
-        <item quantity="other">%1$d images</item>
-    </plurals>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">Lecture du dossier...</string>
     <string name="gallery_retry">Réessayer</string>
     <string name="gallery_section_albums">Albums</string>

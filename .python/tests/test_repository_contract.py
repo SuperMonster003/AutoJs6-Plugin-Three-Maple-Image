@@ -41,6 +41,30 @@ class RepositoryContractTest(unittest.TestCase):
                     placeholder = r'%(?:\d+\$)?[sdf]'
                     self.assertEqual(sorted(re.findall(placeholder, reference[key])), sorted(re.findall(placeholder, text)), (qualifier, key))
 
+    def test_localized_plurals_match_the_default_language(self):
+        base = ROOT / 'app/src/main/res'
+        qualifiers = ['', 'en', 'ar', 'es', 'fr', 'ja', 'ko', 'ru', 'zh', 'zh-rHK', 'zh-rTW']
+        quantities = {'zero', 'one', 'two', 'few', 'many', 'other'}
+        placeholder = r'%(?:\d+\$)?[sdf]'
+        reference = None
+        for qualifier in qualifiers:
+            path = base / ('values' + ('-'+qualifier if qualifier else '')) / 'plurals.xml'
+            elements = list(ET.parse(path).getroot())
+            self.assertTrue(all(item.tag == 'plurals' for item in elements), str(path))
+            names = [item.get('name') for item in elements]
+            self.assertEqual(sorted(names), names, str(path))
+            if reference is None:
+                reference = {item.get('name'): {q.get('quantity'): ''.join(q.itertext()) for q in item} for item in elements}
+            self.assertEqual(set(reference), set(names), str(path))
+            for item in elements:
+                forms = {q.get('quantity'): ''.join(q.itertext()) for q in item}
+                self.assertLessEqual(set(forms), quantities, (path, item.get('name')))
+                self.assertIn('other', forms, (path, item.get('name')))
+                expected = sorted(re.findall(placeholder, reference[item.get('name')]['other']))
+                for text in forms.values():
+                    self.assertIsNone(re.search(r'[‐-‧　-〿＀-￯]', text), (path, text))
+                    self.assertEqual(expected, sorted(re.findall(placeholder, text)), (path, text))
+
     def test_generator_check_never_writes_missing_or_drifted_output(self):
         spec = importlib.util.spec_from_file_location('repository_generator', ROOT / '.python/generate_markdown.py')
         module = importlib.util.module_from_spec(spec)

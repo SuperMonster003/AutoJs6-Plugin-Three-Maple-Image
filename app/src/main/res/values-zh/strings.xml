@@ -64,9 +64,6 @@
     <string name="gallery_empty_no_permission_title">尚未授予照片访问权限</string>
     <string name="gallery_folder_limit_depth">超过 %1$d 层的子文件夹未列出</string>
     <string name="gallery_folder_limit_items">仅列出前 %1$d 张图片</string>
-    <plurals name="gallery_image_count">
-        <item quantity="other">%1$d 张图片</item>
-    </plurals>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">正在读取文件夹...</string>
     <string name="gallery_retry">重试</string>
     <string name="gallery_section_albums">相册</string>

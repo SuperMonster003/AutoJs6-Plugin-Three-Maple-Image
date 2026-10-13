@@ -64,14 +64,6 @@
     <string name="gallery_empty_no_permission_title">لم يمنح الوصول الى الصور بعد</string>
     <string name="gallery_folder_limit_depth">المجلدات الفرعية الاعمق من %1$d مستويات غير مدرجة</string>
     <string name="gallery_folder_limit_items">تم ادراج اول %1$d صورة فقط</string>
-    <plurals name="gallery_image_count">
-        <item quantity="zero">%1$d صورة</item>
-        <item quantity="one">%1$d صورة</item>
-        <item quantity="two">%1$d صورتان</item>
-        <item quantity="few">%1$d صور</item>
-        <item quantity="many">%1$d صورة</item>
-        <item quantity="other">%1$d صورة</item>
-    </plurals>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">جار قراءة المجلد...</string>
     <string name="gallery_retry">اعادة المحاولة</string>
     <string name="gallery_section_albums">الالبومات</string>

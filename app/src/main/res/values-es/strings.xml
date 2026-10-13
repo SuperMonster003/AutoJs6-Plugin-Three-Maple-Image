@@ -64,11 +64,6 @@
     <string name="gallery_empty_no_permission_title">Acceso a fotos aún no concedido</string>
     <string name="gallery_folder_limit_depth">No se listan las subcarpetas con más de %1$d niveles de profundidad</string>
     <string name="gallery_folder_limit_items">Solo se listan las primeras %1$d imágenes</string>
-    <plurals name="gallery_image_count">
-        <item quantity="one">%1$d imagen</item>
-        <item quantity="many">%1$d imágenes</item>
-        <item quantity="other">%1$d imágenes</item>
-    </plurals>
     <string name="gallery_loading_folder" tools:ignore="TypographyEllipsis">Leyendo la carpeta...</string>
     <string name="gallery_retry">Reintentar</string>
     <string name="gallery_section_albums">Álbumes</string>
