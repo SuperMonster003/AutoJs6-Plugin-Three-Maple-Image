@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -124,17 +126,19 @@ internal fun AlbumGridScreen(state: GalleryUiState, home: HomeUiState, callbacks
                     if (state.loading) {
                         MapleLoading()
                     } else if (state.albums.isEmpty() && state.folders.isEmpty()) {
-                        MapleEmptyState(
-                            title = stringResource(R.string.gallery_empty_no_images_title),
-                            body = stringResource(R.string.gallery_empty_no_images_body),
-                            icon = painterResource(R.drawable.ic_image_24),
-                            primaryAction = MapleEmptyAction(stringResource(R.string.gallery_retry), callbacks.onRetry, "maple.gallery.retry"),
-                            secondaryActions = listOf(
-                                MapleEmptyAction(stringResource(R.string.gallery_choose_folder), callbacks.onChooseFolder, "maple.gallery.chooseFolder"),
-                                MapleEmptyAction(stringResource(R.string.gallery_choose_image), callbacks.onChooseImage, "maple.gallery.chooseImage"),
-                            ),
-                            modifier = Modifier.testTag("maple.gallery.empty"),
-                        )
+                        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                            MapleEmptyState(
+                                title = stringResource(R.string.gallery_empty_no_images_title),
+                                body = stringResource(R.string.gallery_empty_no_images_body),
+                                icon = painterResource(R.drawable.ic_image_24),
+                                primaryAction = MapleEmptyAction(stringResource(R.string.gallery_retry), callbacks.onRetry, "maple.gallery.retry"),
+                                secondaryActions = listOf(
+                                    MapleEmptyAction(stringResource(R.string.gallery_choose_folder), callbacks.onChooseFolder, "maple.gallery.chooseFolder"),
+                                    MapleEmptyAction(stringResource(R.string.gallery_choose_image), callbacks.onChooseImage, "maple.gallery.chooseImage"),
+                                ),
+                                modifier = Modifier.fillMaxWidth().testTag("maple.gallery.empty"),
+                            )
+                        }
                     } else {
                         PullToRefreshBox(
                             isRefreshing = state.refreshing,
@@ -154,7 +158,9 @@ internal fun AlbumGridScreen(state: GalleryUiState, home: HomeUiState, callbacks
 private fun NoPermissionContent(state: GalleryUiState, home: HomeUiState, callbacks: AlbumGridCallbacks) {
     val access = state.access ?: return
     val primaryLabel = if (access.nextAction == MediaPermissionAction.OPEN_APP_SETTINGS) R.string.storage_open_app_settings else R.string.storage_grant_photo_access
-    Column(modifier = Modifier.fillMaxSize()) {
+    // The explanation scrolls with the folders and tool rows: on a small phone in landscape it is taller than the
+    // window, and the tools below it must stay reachable.
+    AlbumGrid(state, callbacks, showTools = true, home = home) {
         MapleEmptyState(
             title = stringResource(R.string.gallery_empty_no_permission_title),
             body = stringResource(R.string.gallery_empty_no_permission_body),
@@ -164,15 +170,23 @@ private fun NoPermissionContent(state: GalleryUiState, home: HomeUiState, callba
                 MapleEmptyAction(stringResource(R.string.gallery_choose_folder), callbacks.onChooseFolder, "maple.gallery.chooseFolder"),
                 MapleEmptyAction(stringResource(R.string.gallery_choose_image), callbacks.onChooseImage, "maple.gallery.chooseImage"),
             ),
-            modifier = Modifier.testTag("maple.gallery.noPermission"),
+            modifier = Modifier.fillMaxWidth().testTag("maple.gallery.noPermission"),
         )
-        AlbumGrid(state, callbacks, showTools = true, home = home)
     }
 }
 
-/** Albums, authorized folders and (without photo access) the tool rows, in one lazy grid with full-span headers. */
+/**
+ * Albums, authorized folders and (without photo access) the tool rows, in one lazy grid with full-span headers;
+ * [header] (the no-permission explanation) is the first full-span row so everything scrolls together.
+ */
 @Composable
-private fun AlbumGrid(state: GalleryUiState, callbacks: AlbumGridCallbacks, showTools: Boolean, home: HomeUiState) {
+private fun AlbumGrid(
+    state: GalleryUiState,
+    callbacks: AlbumGridCallbacks,
+    showTools: Boolean,
+    home: HomeUiState,
+    header: (@Composable () -> Unit)? = null,
+) {
     val columns = MapleGridDefaults.albumColumns(LocalConfiguration.current.screenWidthDp)
     val horizontal = MapleSettingsDefaults.horizontalPadding
     // Full-span rows (headers, tool rows) carry their own 24 dp inset, so the grid itself has no horizontal
@@ -188,6 +202,9 @@ private fun AlbumGrid(state: GalleryUiState, callbacks: AlbumGridCallbacks, show
         verticalArrangement = Arrangement.spacedBy(MapleGridDefaults.albumRowSpacing),
         modifier = Modifier.fillMaxSize().testTag("maple.gallery.grid"),
     ) {
+        if (header != null) {
+            item(key = "header.explanation", span = { GridItemSpan(maxLineSpan) }) { header() }
+        }
         if (state.albums.isNotEmpty()) {
             item(key = "header.albums", span = { GridItemSpan(maxLineSpan) }) {
                 MapleSectionHeader(stringResource(R.string.gallery_section_albums))
