@@ -62,6 +62,8 @@ La visualización usa entradas de solo lectura. La edición y conversión crean 
 
 - Inicio con álbumes: al abrirse por sí sola, la aplicación muestra una cuadrícula de álbumes con las imágenes del dispositivo (portada, nombre, cantidad) y las carpetas autorizadas en su propio grupo; `Mostrar el contenido de todas las carpetas` en el menú abre una vista plana. La cuadrícula ofrece 3-6 columnas (menú o pellizco), orden por nombre, fecha de modificación, fecha de captura o tamaño recordado por álbum, barra de desplazamiento rápido con fecha y deslizar para actualizar.
 - Visor paginado con tira de miniaturas: las imágenes abiertas desde la cuadrícula se recorren deslizando por todo el álbum, la tira resalta la página actual y salta al tocarla, y la cuadrícula vuelve a la última imagen vista. Gire la imagen con dos dedos; al soltar se ajusta al cuarto de vuelta más cercano (solo visualización; se desactiva en `Ajustes` > `Visor` > `Rotación con dos dedos`).
+- Selección múltiple y organización: mantenga pulsada una imagen de la cuadrícula para empezar a seleccionar, toque para añadir o quitar y, sin levantar el dedo tras la pulsación larga, arrastre para elegir un rango (la cuadrícula se desplaza cerca del borde superior o inferior); también hay `Seleccionar todo` e `Invertir selección`. Comparta, marque como favoritas, mueva, copie o elimine muchas imágenes a la vez, o cambie el nombre de una y vea sus detalles. Mover y copiar ofrecen sus álbumes o un álbum nuevo, con los usados recientemente primero; si un nombre ya existe se pregunta una sola vez (conservar ambas, omitir o reemplazar), y los lotes grandes muestran el progreso y se pueden cancelar.
+- Papelera, deshacer y favoritos: las imágenes eliminadas van primero a la papelera (la del sistema en Android 11+, la propia de la aplicación en Android 7-10, durante 30 días), y tras eliminar, mover o cambiar el nombre aparece abajo la opción de deshacer; `Papelera` en el menú superior derecho del inicio permite restaurar, eliminar para siempre o vaciar. Las imágenes favoritas se reúnen en el álbum `Favoritos` al principio de la lista de álbumes; en el visor abierto desde un álbum, el corazón de la barra superior marca la imagen actual como favorita y `Eliminar` en la barra inferior la elimina.
 - Permisos solo cuando hacen falta: el inicio independiente pide acceso a fotos una sola vez, en el primer arranque, y nunca más por sí mismo; sin él, `Elegir imagen`, `Elegir carpeta`, `Editar imagen` y `Convertir imagen` siguen funcionando con el selector del sistema. Android 14+ permite dar acceso solo a fotos seleccionadas (`Gestionar fotos seleccionadas`). `Ajustes` > `Permiso de almacenamiento` vuelve a conceder acceso, gestiona las carpetas autorizadas (se muestran como álbumes incluso sin acceso a fotos) y el opcional `Acceso a todos los archivos`. Abrir imágenes desde AutoJs6 u otras aplicaciones nunca pide permisos.
 - Ver como álbum: en el menú de una carpeta del gestor de archivos de AutoJs6, elija `Ver como álbum` para ver sus imágenes en cuadrícula y abrir sus subcarpetas, en solo lectura a través de la sesión del anfitrión, sin pedir permisos ni mostrar rutas absolutas.
 - Abrir una selección exacta: en el modo de selección de AutoJs6, elija hasta 128 imágenes compatibles de una carpeta y toque `Ver imagen`; el visor conserva el orden de selección del anfitrión y solo permite deslizar dentro de ese grupo.
@@ -171,7 +173,7 @@ Desde la instalación hasta la primera imagen hay 4 pasos:
 3. En el gestor de archivos de AutoJs6, localice cualquier archivo de imagen compatible (por ejemplo `screenshot.png`).
 4. Toque el archivo. La imagen se abre en el visor dedicado. Elija `Ver como álbum` en el menú de una carpeta para ver sus imágenes en cuadrícula.
 
-Dentro del visor: a escala 1x, deslice a izquierda o derecha para pasar a la imagen compatible anterior o siguiente de la misma carpeta. Pellizque para hacer zoom alrededor de los dedos (de 1x a 5x), arrastre con un dedo para desplazarse y haga doble toque para alternar entre el ajuste a pantalla y un zoom de 2,5x centrado en el punto tocado. El aumento actual aparece durante el pellizco y brevemente después de un doble toque. Toque `Girar` para girar solo la vista; se conserva el zoom activo, mientras que `Restablecer zoom`, en el menú superior derecho, recupera tanto la orientación original como el ajuste. Los GIF animados muestran un botón flotante `Pausar animación` / `Reanudar animación`; las imágenes estáticas no. Tocar la imagen oculta o muestra las barras superpuestas, y `Detalles` abre un panel inferior con los datos del archivo y los campos EXIF. `Compartir` y `Abrir con` están disponibles en la imagen abierta inicialmente; se desactivan en las páginas hermanas de sesión porque estas no tienen intencionadamente un content URI transferible. Las imágenes abiertas desde el inicio independiente o desde otra aplicación ofrecen además `Editar`, que abre el editor y permite guardar el resultado; las entradas del host y las páginas hermanas no lo ofrecen.
+Dentro del visor: a escala 1x, deslice a izquierda o derecha para pasar a la imagen compatible anterior o siguiente de la misma carpeta. Pellizque para hacer zoom alrededor de los dedos (de 1x a 5x), arrastre con un dedo para desplazarse y haga doble toque para alternar entre el ajuste a pantalla y un zoom de 2,5x centrado en el punto tocado. El aumento actual aparece durante el pellizco y brevemente después de un doble toque. Toque `Girar` para girar solo la vista; se conserva el zoom activo, mientras que `Restablecer zoom`, en el menú superior derecho, recupera tanto la orientación original como el ajuste. Los GIF animados muestran un botón flotante `Pausar animación` / `Reanudar animación`; las imágenes estáticas no. Tocar la imagen oculta o muestra las barras superpuestas, y `Detalles` abre un panel inferior con los datos del archivo y los campos EXIF. `Compartir` y `Abrir con` están disponibles en la imagen abierta inicialmente; se desactivan en las páginas hermanas de sesión porque estas no tienen intencionadamente un content URI transferible. Las imágenes abiertas desde el inicio independiente o desde otra aplicación ofrecen además `Editar`, que abre el editor y permite guardar el resultado; las entradas del host y las páginas hermanas no lo ofrecen. En las imágenes abiertas desde un álbum, el corazón de la barra superior marca la imagen actual como favorita, `Eliminar` en la barra inferior la envía a la papelera (con opción de deshacer), y `Abrir con`, `Cambiar nombre`, `Mover` y `Copiar` están en el menú superior derecho.
 
 ******
 
@@ -203,7 +205,11 @@ El acceso limitado solo expone las fotos elegidas en el selector de fotos del si
 
 **Para qué sirve `Acceso a todos los archivos`? Lo necesito?**
 
-No. Es un interruptor avanzado opcional que abre la página de ajustes del sistema; recorrer los álbumes solo necesita acceso a fotos. Queda reservado para funciones posteriores como carpetas ocultas (.nomedia) y acciones en lote sin confirmación, y se puede desactivar en cualquier momento en los ajustes del sistema.
+No. Es un interruptor avanzado opcional que abre la página de ajustes del sistema; recorrer los álbumes solo necesita acceso a fotos. Con él activado, eliminar, mover y cambiar el nombre de imágenes guardadas por otras aplicaciones ya no pide confirmación al sistema en cada lote (en Android 12+ basta con activar solo `Gestión de contenido multimedia` en `Ajustes` > `Permiso de almacenamiento`); las carpetas ocultas (.nomedia) y funciones parecidas llegarán en versiones posteriores. Se puede desactivar en cualquier momento en los ajustes del sistema.
+
+**Adónde van las imágenes eliminadas? Por qué el sistema pide confirmación al eliminar o mover?**
+
+Las imágenes eliminadas van primero a la papelera y se pueden restaurar desde `Papelera` en el menú superior derecho del inicio. Android 11+ usa la papelera del sistema, que el sistema vacía al cabo de unos 30 días; Android 7-10 usa la papelera propia de la aplicación, que guarda las imágenes 30 días, ocupa como máximo una décima parte del espacio libre (hasta 2 GiB) y se borra al desinstalar la aplicación. Con `Papelera` desactivada en `Ajustes`, eliminar pide confirmación y no se puede deshacer. En Android 11+ modificar imágenes guardadas por otras aplicaciones requiere la confirmación del sistema, una vez por lote; con `Gestión de contenido multimedia` (Android 12+) o `Acceso a todos los archivos` activados ya no se pide cada vez.
 
 **El menú del archivo no muestra `Editar imagen` y `Convertir imagen`?**
 
@@ -238,8 +244,9 @@ La visualización admite un grupo seleccionado; la edición y conversión proces
 El complemento se basa en el principio de denegación por defecto. Todas las medidas siguientes están siempre activas y no pueden desactivarse:
 
 - La visualización usa entradas de solo lectura. La edición y conversión crean un archivo independiente y conservan el original. La aplicación independiente usa el selector de documentos de Android.
-- Abrir imágenes desde AutoJs6 (`Ver imagen`, `Ver como álbum`) o desde otras aplicaciones nunca solicita permisos en tiempo de ejecución; el inicio independiente pide acceso a fotos como máximo una vez por sí mismo, y `Acceso a todos los archivos` solo lo puede activar usted en los ajustes del sistema.
+- Abrir imágenes desde AutoJs6 (`Ver imagen`, `Ver como álbum`) o desde otras aplicaciones nunca solicita permisos en tiempo de ejecución; el inicio independiente pide acceso a fotos como máximo una vez por sí mismo, y `Acceso a todos los archivos` y `Gestión de contenido multimedia` solo los puede activar usted en los ajustes del sistema.
 - El plugin no declara el permiso de red (`INTERNET`): los álbumes, las miniaturas y los detalles de las imágenes se leen en el dispositivo y nunca salen de él.
+- Eliminar, mover y cambiar el nombre solo ocurre cuando usted lo elige en un álbum o en el visor; las imágenes abiertas desde AutoJs6 u otras aplicaciones no ofrecen estas acciones.
 
 ******
 
@@ -279,6 +286,20 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v3.1.0
+
+###### 2026/10/14
+
+* `Aviso` Las imágenes eliminadas van primero a una papelera: en Android 11+ la del sistema (también la ven otras galerías), que el sistema vacía tras unos 30 días; en Android 7-10 la de la aplicación, que las guarda 30 días y usa como máximo la décima parte del espacio libre (hasta 2 GiB), y se borra junto con la aplicación. Se puede desactivar en Ajustes > Papelera; entonces eliminar pide confirmación y no se puede deshacer
+* `Aviso` En Android 11+ el sistema confirma cada lote que elimina, mueve o cambia el nombre de imágenes guardadas por otras aplicaciones; activar Gestión de contenido multimedia (Android 12+) en Ajustes > Permiso de almacenamiento quita esas confirmaciones
+* `Función` La cuadrícula de imágenes admite selección múltiple: mantén pulsada una imagen para empezar, toca para añadir o quitar, tras la pulsación larga arrastra sin levantar el dedo para seleccionar un tramo (la cuadrícula se desplaza cerca del borde superior o inferior), selecciona todo o invierte; comparte, marca como favoritas, mueve, copia o elimina varias imágenes a la vez, cambia el nombre de una o mira sus detalles
+* `Función` Una eliminación se puede deshacer desde la barra inferior; el menú de inicio añade Papelera, que muestra los días restantes de cada imagen y permite restaurar, eliminar para siempre o vaciar
+* `Función` Mover y copiar ofrecen un álbum o un álbum nuevo en Pictures, con los usados recientemente primero; si el destino ya tiene imágenes con los mismos nombres preguntan una vez: conservar ambos (se añade un número al nombre nuevo), omitir o reemplazar (las imágenes existentes van a la papelera); los lotes muestran el progreso y se pueden cancelar; mover y cambiar el nombre se pueden deshacer
+* `Función` Favoritos: las imágenes favoritas se reúnen en el álbum Favoritos al principio de la lista; en Android 11+ Sincronizar favoritos del sistema en Ajustes permite que otras galerías también los vean
+* `Función` Abierto desde un álbum, el visor añade un botón de corazón en la barra superior, y Eliminar sustituye a Abrir con en la barra inferior; Abrir con, Cambiar nombre, Mover y Copiar están en el menú superior derecho
+* `Función` Las imágenes de las carpetas autorizadas se pueden eliminar (definitivamente, tras confirmar, sin papelera) y cambiar de nombre
+* `Dependencia` Se añade Room 2.8.1 para guardar los favoritos y los registros de la papelera de Android 7-10
+
 #### v3.0.0
 
 ###### 2026/10/13
@@ -312,15 +333,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 * `Dependencia` Se añade la integración Glide Compose 1.0.0-beta10 para cargar imágenes en las pantallas Compose
 * `Dependencia` Se actualiza Glide 5.0.5 -> 5.0.9
 * `Dependencia` Se actualizan los plugins AutoJs6 Gradle Platform Versions y Native Alignment 1.9.0 -> 1.9.1
-
-#### v2.0.0
-
-###### 2026/10/04
-
-* `Aviso` El identificador cambia de io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools a io.github.supermonster003.autojs6.plugin.three.maple.image. Android lo instala como una aplicación independiente; se pueden conservar las aplicaciones y los datos anteriores, sin migración automática de ajustes
-* `Función` Image Viewer e Image Tools se combinan en 3-Maple Image para ver, editar y convertir imágenes
-* `Función` Una pantalla de inicio independiente permite abrir, editar o convertir imágenes locales y guardar el resultado en el destino elegido
-* `Función` Los ajustes comunes ofrecen idioma, modo oscuro, color y cuatro opciones de icono del lanzador
 
 ##### Historial completo
 

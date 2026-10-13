@@ -5,6 +5,24 @@
   "changelog_label_improvement": "Amélioration",
   "changelog_label_dependency": "Dépendance",
   "$data": {
+    "v3.1.0": {
+      "released_date": "2026/10/14",
+      "hint": [
+        "Les images supprimées vont d'abord dans une corbeille: sur Android 11+ celle du système (visible aussi dans les autres galeries), vidée par le système après environ 30 jours; sur Android 7-10 celle de l'application, conservée 30 jours et limitée à un dixième de l'espace libre (2 GiB au plus), supprimée avec l'application. Elle peut être désactivée dans Paramètres > Corbeille; la suppression demande alors une confirmation et ne peut pas être annulée",
+        "Sur Android 11+ le système confirme chaque lot qui supprime, déplace ou renomme des images enregistrées par d'autres applications; activer Gestion des médias (Android 12+) dans Paramètres > Autorisation de stockage supprime ces confirmations"
+      ],
+      "feature": [
+        "La grille d'images permet la sélection multiple: appui long sur une image pour commencer, appui pour ajouter ou retirer, garder le doigt posé après l'appui long et glisser pour sélectionner une plage (la grille défile près du haut ou du bas), tout sélectionner ou inverser; partager, ajouter aux favoris, déplacer, copier ou supprimer plusieurs images à la fois, renommer une image ou afficher ses détails",
+        "Une suppression peut être annulée depuis la barre du bas; le menu de l'accueil gagne Corbeille, qui indique les jours restants de chaque image et permet de restaurer, supprimer définitivement ou vider",
+        "Déplacer et copier proposent un album ou un nouvel album dans Pictures, les albums récents en premier; si la cible contient déjà des images du même nom, une seule question: conserver les deux (un numéro est ajouté au nouveau nom), ignorer, ou remplacer (les images existantes vont dans la corbeille); les lots affichent la progression et peuvent être annulés; déplacer et renommer peuvent être annulés",
+        "Favoris: les images favorites sont réunies dans l'album Favoris en tête de la liste des albums; sur Android 11+ Synchroniser les favoris du système dans les paramètres les rend visibles aux autres galeries",
+        "Ouverte depuis un album, la visionneuse gagne un bouton cœur dans la barre du haut, et Supprimer remplace Ouvrir avec dans la barre du bas; Ouvrir avec, Renommer, Déplacer et Copier sont dans le menu en haut à droite",
+        "Les images des dossiers autorisés peuvent être supprimées (définitivement, après confirmation, sans corbeille) et renommées"
+      ],
+      "dependency": [
+        "Ajout de Room 2.8.1 pour conserver les favoris et les entrées de la corbeille d'Android 7-10"
+      ]
+    },
     "v3.0.0": {
       "released_date": "2026/10/13",
       "hint": [

@@ -62,6 +62,8 @@ La lecture utilise des entrées en lecture seule. La retouche et la conversion c
 
 - Accueil en albums: lancée seule, l'application affiche une grille d'albums des images de l'appareil (couverture, nom, nombre), avec les dossiers autorisés dans leur propre groupe; `Afficher le contenu de tous les dossiers` dans le menu ouvre une vue à plat. La grille propose 3 à 6 colonnes (menu ou pincement), un tri par nom, date de modification, date de prise de vue ou taille mémorisé par album, une barre de défilement rapide avec bulle de date et l'actualisation par glissement.
 - Visionneuse paginée avec bande de miniatures: les images ouvertes depuis la grille se parcourent dans tout l'album, la bande met en évidence la page courante et y saute au toucher, et la grille revient à la dernière image vue. Faites pivoter l'image à deux doigts; au relâchement elle se cale sur le quart de tour le plus proche (affichage seulement; désactivable dans `Paramètres` > `Visionneuse` > `Rotation à deux doigts`).
+- Sélection multiple et rangement: un appui long sur une image de la grille lance la sélection, un toucher ajoute ou retire, et en gardant le doigt posé après l'appui long on fait glisser pour choisir une plage (la grille défile près du bord haut ou bas); `Tout sélectionner` et `Inverser la sélection` sont aussi là. Partagez, ajoutez aux favoris, déplacez, copiez ou supprimez plusieurs images d'un coup, ou renommez-en une et affichez ses détails. Déplacer et copier proposent vos albums ou un nouvel album, les plus récents en premier; si un nom existe déjà, la question n'est posée qu'une fois (garder les deux, ignorer ou remplacer), et les lots importants affichent la progression et peuvent être annulés.
+- Corbeille, annulation et favoris: les images supprimées passent d'abord par la corbeille (celle du système sur Android 11+, celle de l'application sur Android 7-10, conservées 30 jours), et après une suppression, un déplacement ou un renommage une barre en bas propose d'annuler; `Corbeille` dans le menu en haut à droite de l'accueil permet de restaurer, supprimer définitivement ou vider. Les images favorites sont réunies dans l'album `Favoris` en tête de la liste des albums; dans la visionneuse ouverte depuis un album, le coeur de la barre du haut ajoute l'image courante aux favoris et `Supprimer` dans la barre du bas la supprime.
 - Autorisations seulement si nécessaire: l'accueil autonome demande l'accès aux photos une seule fois, au premier lancement, puis plus jamais de lui-même; sans cet accès, `Choisir une image`, `Choisir un dossier`, `Modifier l'image` et `Convertir l'image` fonctionnent toujours via le sélecteur du système. Android 14+ permet de n'autoriser que certaines photos (`Gérer les photos sélectionnées`). `Paramètres` > `Autorisation de stockage` permet d'accorder à nouveau l'accès, de gérer les dossiers autorisés (affichés comme albums même sans accès aux photos) et l'option `Accès à tous les fichiers`. Ouvrir des images depuis AutoJs6 ou d'autres applications ne demande jamais d'autorisation.
 - Afficher comme album: dans le menu d'un dossier du gestionnaire de fichiers d'AutoJs6, choisissez `Afficher comme album` pour voir ses images en grille et ouvrir ses sous-dossiers, en lecture seule via la session de l'hôte, sans demande d'autorisation ni chemin absolu affiché.
 - Ouvrir une sélection précise: dans le mode de sélection d'AutoJs6, choisissez jusqu'à 128 images prises en charge dans un même dossier puis touchez `Afficher l'image`; la visionneuse conserve l'ordre de sélection de l'hôte et limite le balayage à ce groupe.
@@ -171,7 +173,7 @@ Il faut 4 étapes entre l'installation et la première image affichée:
 3. Dans le gestionnaire de fichiers d'AutoJs6, localisez un fichier image pris en charge (par exemple `screenshot.png`).
 4. Touchez le fichier. L'image s'ouvre dans la visionneuse dédiée. Choisissez `Afficher comme album` dans le menu d'un dossier pour voir ses images en grille.
 
-Dans la visionneuse: à l'échelle 1x, glissez à gauche ou à droite pour passer à l'image prise en charge précédente ou suivante du même dossier. Pincez pour zoomer autour de vos doigts (1x à 5x), faites glisser un doigt pour vous déplacer et double-touchez pour basculer entre l'ajustement à l'écran et un zoom 2,5x centré sur le point touché. Le facteur actuel apparaît pendant le pincement et brièvement après un double toucher. Touchez `Pivoter` pour ne faire pivoter que la vue; le zoom actif est conservé, tandis que `Réinitialiser le zoom`, dans le menu en haut à droite, rétablit l'orientation d'origine et l'ajustement. Les GIF animés affichent un bouton flottant `Mettre l'animation en pause` / `Reprendre l'animation`, absent pour les images statiques. Toucher l'image masque ou affiche les barres en surimpression, et `Détails` ouvre un panneau inférieur avec les informations du fichier et les champs EXIF. `Partager` et `Ouvrir avec` restent disponibles sur l'image ouverte initialement; ces actions sont désactivées pour les pages voisines de session, qui ne possèdent volontairement aucun content URI transférable. Les images ouvertes depuis l'accueil autonome ou depuis une autre application proposent aussi `Editer`, qui ouvre l'éditeur et permet d'enregistrer le résultat; les entrées de l'hôte et les pages voisines ne le proposent pas.
+Dans la visionneuse: à l'échelle 1x, glissez à gauche ou à droite pour passer à l'image prise en charge précédente ou suivante du même dossier. Pincez pour zoomer autour de vos doigts (1x à 5x), faites glisser un doigt pour vous déplacer et double-touchez pour basculer entre l'ajustement à l'écran et un zoom 2,5x centré sur le point touché. Le facteur actuel apparaît pendant le pincement et brièvement après un double toucher. Touchez `Pivoter` pour ne faire pivoter que la vue; le zoom actif est conservé, tandis que `Réinitialiser le zoom`, dans le menu en haut à droite, rétablit l'orientation d'origine et l'ajustement. Les GIF animés affichent un bouton flottant `Mettre l'animation en pause` / `Reprendre l'animation`, absent pour les images statiques. Toucher l'image masque ou affiche les barres en surimpression, et `Détails` ouvre un panneau inférieur avec les informations du fichier et les champs EXIF. `Partager` et `Ouvrir avec` restent disponibles sur l'image ouverte initialement; ces actions sont désactivées pour les pages voisines de session, qui ne possèdent volontairement aucun content URI transférable. Les images ouvertes depuis l'accueil autonome ou depuis une autre application proposent aussi `Editer`, qui ouvre l'éditeur et permet d'enregistrer le résultat; les entrées de l'hôte et les pages voisines ne le proposent pas. Pour les images ouvertes depuis un album, le coeur de la barre du haut ajoute l'image courante aux favoris, `Supprimer` dans la barre du bas l'envoie à la corbeille (avec annulation), et `Ouvrir avec`, `Renommer`, `Déplacer` et `Copier` se trouvent dans le menu en haut à droite.
 
 ******
 
@@ -203,7 +205,11 @@ L'accès limité n'expose que les photos choisies dans le sélecteur de photos d
 
 **À quoi sert `Accès à tous les fichiers`? En ai-je besoin?**
 
-Non. C'est un interrupteur avancé facultatif qui ouvre la page des paramètres du système; parcourir les albums ne demande que l'accès aux photos. Il est réservé à des fonctions ultérieures comme les dossiers masqués (.nomedia) et les actions groupées sans confirmation, et peut être désactivé à tout moment dans les paramètres du système.
+Non. C'est un interrupteur avancé facultatif qui ouvre la page des paramètres du système; parcourir les albums ne demande que l'accès aux photos. Une fois activé, supprimer, déplacer et renommer des images enregistrées par d'autres applications ne demande plus de confirmation au système à chaque lot (sur Android 12+, il suffit d'activer `Gestion des médias` dans `Paramètres` > `Autorisation de stockage`); les dossiers masqués (.nomedia) et fonctions semblables viendront dans des versions ultérieures. Il peut être désactivé à tout moment dans les paramètres du système.
+
+**Où vont les images supprimées? Pourquoi le système demande-t-il une confirmation quand je supprime ou déplace?**
+
+Les images supprimées passent d'abord par la corbeille et peuvent être restaurées depuis `Corbeille` dans le menu en haut à droite de l'accueil. Android 11+ utilise la corbeille du système, vidée par le système après environ 30 jours; Android 7-10 utilise la corbeille de l'application, qui garde les images 30 jours, occupe au plus un dixième de l'espace libre (2 GiB au maximum) et disparaît avec l'application. Si `Corbeille` est désactivée dans `Paramètres`, la suppression demande confirmation et ne peut pas être annulée. Sur Android 11+, modifier des images enregistrées par d'autres applications exige la confirmation du système, une fois par lot; avec `Gestion des médias` (Android 12+) ou `Accès à tous les fichiers` activé, elle n'est plus demandée à chaque fois.
 
 **Le menu du fichier n'affiche pas `Modifier l'image` et `Convertir l'image`?**
 
@@ -238,8 +244,9 @@ La lecture accepte une sélection d'images; la retouche et la conversion traiten
 Le plugin applique le principe du refus par défaut. Toutes les mesures suivantes sont toujours actives et ne peuvent pas être désactivées:
 
 - La lecture utilise des entrées en lecture seule. La retouche et la conversion créent un fichier distinct en conservant la source. L'application autonome utilise le sélecteur de documents Android.
-- Ouvrir des images depuis AutoJs6 (`Afficher l'image`, `Afficher comme album`) ou d'autres applications ne demande jamais d'autorisation d'exécution; l'accueil autonome demande l'accès aux photos au plus une fois de lui-même, et seul vous pouvez activer `Accès à tous les fichiers` dans les paramètres du système.
+- Ouvrir des images depuis AutoJs6 (`Afficher l'image`, `Afficher comme album`) ou d'autres applications ne demande jamais d'autorisation d'exécution; l'accueil autonome demande l'accès aux photos au plus une fois de lui-même, et seul vous pouvez activer `Accès à tous les fichiers` et `Gestion des médias` dans les paramètres du système.
 - Le plugin ne déclare pas l'autorisation réseau (`INTERNET`): albums, miniatures et détails des images sont lus sur l'appareil et ne le quittent jamais.
+- Supprimer, déplacer et renommer n'ont lieu que lorsque vous le choisissez dans un album ou la visionneuse; les images ouvertes depuis AutoJs6 ou d'autres applications ne proposent pas ces actions.
 
 ******
 
@@ -279,6 +286,20 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
+#### v3.1.0
+
+###### 2026/10/14
+
+* `Note` Les images supprimées vont d'abord dans une corbeille: sur Android 11+ celle du système (visible aussi dans les autres galeries), vidée par le système après environ 30 jours; sur Android 7-10 celle de l'application, conservée 30 jours et limitée à un dixième de l'espace libre (2 GiB au plus), supprimée avec l'application. Elle peut être désactivée dans Paramètres > Corbeille; la suppression demande alors une confirmation et ne peut pas être annulée
+* `Note` Sur Android 11+ le système confirme chaque lot qui supprime, déplace ou renomme des images enregistrées par d'autres applications; activer Gestion des médias (Android 12+) dans Paramètres > Autorisation de stockage supprime ces confirmations
+* `Fonctionnalité` La grille d'images permet la sélection multiple: appui long sur une image pour commencer, appui pour ajouter ou retirer, garder le doigt posé après l'appui long et glisser pour sélectionner une plage (la grille défile près du haut ou du bas), tout sélectionner ou inverser; partager, ajouter aux favoris, déplacer, copier ou supprimer plusieurs images à la fois, renommer une image ou afficher ses détails
+* `Fonctionnalité` Une suppression peut être annulée depuis la barre du bas; le menu de l'accueil gagne Corbeille, qui indique les jours restants de chaque image et permet de restaurer, supprimer définitivement ou vider
+* `Fonctionnalité` Déplacer et copier proposent un album ou un nouvel album dans Pictures, les albums récents en premier; si la cible contient déjà des images du même nom, une seule question: conserver les deux (un numéro est ajouté au nouveau nom), ignorer, ou remplacer (les images existantes vont dans la corbeille); les lots affichent la progression et peuvent être annulés; déplacer et renommer peuvent être annulés
+* `Fonctionnalité` Favoris: les images favorites sont réunies dans l'album Favoris en tête de la liste des albums; sur Android 11+ Synchroniser les favoris du système dans les paramètres les rend visibles aux autres galeries
+* `Fonctionnalité` Ouverte depuis un album, la visionneuse gagne un bouton cœur dans la barre du haut, et Supprimer remplace Ouvrir avec dans la barre du bas; Ouvrir avec, Renommer, Déplacer et Copier sont dans le menu en haut à droite
+* `Fonctionnalité` Les images des dossiers autorisés peuvent être supprimées (définitivement, après confirmation, sans corbeille) et renommées
+* `Dépendance` Ajout de Room 2.8.1 pour conserver les favoris et les entrées de la corbeille d'Android 7-10
+
 #### v3.0.0
 
 ###### 2026/10/13
@@ -312,15 +333,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 * `Dépendance` Ajout de l'intégration Glide Compose 1.0.0-beta10 pour le chargement des images dans les écrans Compose
 * `Dépendance` Mise à jour de Glide 5.0.5 -> 5.0.9
 * `Dépendance` Mise à jour des plugins AutoJs6 Gradle Platform Versions et Native Alignment 1.9.0 -> 1.9.1
-
-#### v2.0.0
-
-###### 2026/10/04
-
-* `Note` L'identifiant passe de io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools à io.github.supermonster003.autojs6.plugin.three.maple.image. Android installe une application distincte; les anciennes applications et leurs données peuvent être conservées, sans migration automatique des paramètres
-* `Fonctionnalité` Image Viewer et Image Tools sont réunis dans 3-Maple Image pour afficher, retoucher et convertir les images
-* `Fonctionnalité` Un écran d'accueil autonome permet de choisir une image, de la retoucher ou convertir et d'enregistrer le résultat à l'emplacement choisi
-* `Fonctionnalité` Les paramètres communs proposent la langue, le mode sombre, la couleur et quatre icônes de lanceur
 
 ##### Historique complet
 

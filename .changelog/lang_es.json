@@ -5,6 +5,24 @@
   "changelog_label_improvement": "Mejora",
   "changelog_label_dependency": "Dependencia",
   "$data": {
+    "v3.1.0": {
+      "released_date": "2026/10/14",
+      "hint": [
+        "Las imágenes eliminadas van primero a una papelera: en Android 11+ la del sistema (también la ven otras galerías), que el sistema vacía tras unos 30 días; en Android 7-10 la de la aplicación, que las guarda 30 días y usa como máximo la décima parte del espacio libre (hasta 2 GiB), y se borra junto con la aplicación. Se puede desactivar en Ajustes > Papelera; entonces eliminar pide confirmación y no se puede deshacer",
+        "En Android 11+ el sistema confirma cada lote que elimina, mueve o cambia el nombre de imágenes guardadas por otras aplicaciones; activar Gestión de contenido multimedia (Android 12+) en Ajustes > Permiso de almacenamiento quita esas confirmaciones"
+      ],
+      "feature": [
+        "La cuadrícula de imágenes admite selección múltiple: mantén pulsada una imagen para empezar, toca para añadir o quitar, tras la pulsación larga arrastra sin levantar el dedo para seleccionar un tramo (la cuadrícula se desplaza cerca del borde superior o inferior), selecciona todo o invierte; comparte, marca como favoritas, mueve, copia o elimina varias imágenes a la vez, cambia el nombre de una o mira sus detalles",
+        "Una eliminación se puede deshacer desde la barra inferior; el menú de inicio añade Papelera, que muestra los días restantes de cada imagen y permite restaurar, eliminar para siempre o vaciar",
+        "Mover y copiar ofrecen un álbum o un álbum nuevo en Pictures, con los usados recientemente primero; si el destino ya tiene imágenes con los mismos nombres preguntan una vez: conservar ambos (se añade un número al nombre nuevo), omitir o reemplazar (las imágenes existentes van a la papelera); los lotes muestran el progreso y se pueden cancelar; mover y cambiar el nombre se pueden deshacer",
+        "Favoritos: las imágenes favoritas se reúnen en el álbum Favoritos al principio de la lista; en Android 11+ Sincronizar favoritos del sistema en Ajustes permite que otras galerías también los vean",
+        "Abierto desde un álbum, el visor añade un botón de corazón en la barra superior, y Eliminar sustituye a Abrir con en la barra inferior; Abrir con, Cambiar nombre, Mover y Copiar están en el menú superior derecho",
+        "Las imágenes de las carpetas autorizadas se pueden eliminar (definitivamente, tras confirmar, sin papelera) y cambiar de nombre"
+      ],
+      "dependency": [
+        "Se añade Room 2.8.1 para guardar los favoritos y los registros de la papelera de Android 7-10"
+      ]
+    },
     "v3.0.0": {
       "released_date": "2026/10/13",
       "hint": [

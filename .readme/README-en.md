@@ -62,6 +62,8 @@ Viewing uses read-only inputs. Editing and conversion produce a separate output;
 
 - Album home: launched on its own, the app opens an album grid of the images on the device (cover, name, count), with authorized folders as their own group; `Show all folder contents` in the menu opens a flat view. The media grid offers 3-6 columns (menu or pinch), sorting by name, date modified, date taken or size remembered per album, a fast scroller with a date bubble, and pull to refresh.
 - Paged viewer with a thumbnail strip: images opened from the grid swipe through the whole album, the strip highlights the current page and jumps on tap, and the grid scrolls back to the last image viewed. Rotate the picture with two fingers; it snaps to the nearest quarter turn on release (display only; turn it off in `Settings` > `Viewer` > `Two-finger rotation`).
+- Multi-select and organizing: long-press an image in the grid to start selecting, tap to add or remove, and keep your finger down after the long press to drag over a range (the grid scrolls near the top or bottom edge); `Select all` and `Invert selection` are there too. Share, favorite, move, copy or delete many images at once, or rename one and view its details. Move and copy offer your albums or a new album, with recently used ones first; when a name is already taken you are asked once (keep both, skip or replace), and larger batches show progress and can be cancelled.
+- Recycle bin, undo and favorites: deleted images go to a recycle bin first (the system one on Android 11+, the app's own on Android 7-10, kept for 30 days), and a bar at the bottom offers undo after deleting, moving or renaming; `Recycle bin` in the home's top-right menu restores, deletes for good or empties it. Favorited images gather in the `Favorites` album at the front of the album list; in the viewer opened from an album, the heart in the top bar favorites the current image and `Delete` in the bottom bar deletes it.
 - Permissions only when needed: the standalone home asks for photo access once, on its first launch, and never again by itself; without it, `Choose image`, `Choose folder`, `Edit image` and `Convert image` keep working through the system picker. Android 14+ supports access to selected photos only (`Manage selected photos`). `Settings` > `Storage permission` grants access again, manages authorized folders (shown as albums even without photo access) and the optional `All files access`. Opening images from AutoJs6 or other apps never asks for a permission.
 - View as album: in the folder menu of the AutoJs6 file manager, choose `View as album` to see the folder's images as a grid and open its subfolders, read-only through the host session, with no permission request and no absolute paths shown.
 - Open an exact selection: in AutoJs6 selection mode, choose up to 128 supported images from one folder and tap `View image`; the viewer keeps the host selection order and swipes only within that chosen group.
@@ -171,7 +173,7 @@ It takes 4 steps from installation to your first image:
 3. In the AutoJs6 file manager, locate any supported image file (such as `screenshot.png`).
 4. Tap the file. The image opens in the dedicated viewer. Choose `View as album` in a folder's menu to see the images of that folder as a grid.
 
-Inside the viewer: at 1x, swipe left or right to move to the previous or next supported image in the same folder. Pinch to zoom around your fingers (1x to 5x), drag with one finger to pan, and double-tap to switch between fit-to-screen and a 2.5x zoom centered on the touch point. The current multiplier appears while pinching and briefly after a double-tap. Tap `Rotate` for a view-only quarter turn; an active zoom is preserved, while `Reset zoom` in the top-right menu restores both the original orientation and fitted size. Animated GIFs show a floating `Pause animation` / `Resume animation` button, while static images do not. Tapping the image hides or reveals the overlay bars, and `Details` opens a bottom sheet with the file facts and EXIF fields. `Share` and `Open with` are available on the originally opened image; they are disabled on session-only sibling pages because those pages intentionally have no transferable content URI. Images opened from the standalone home or from another app also offer `Edit`, which opens the editor and lets you save the result; host entries and sibling pages do not.
+Inside the viewer: at 1x, swipe left or right to move to the previous or next supported image in the same folder. Pinch to zoom around your fingers (1x to 5x), drag with one finger to pan, and double-tap to switch between fit-to-screen and a 2.5x zoom centered on the touch point. The current multiplier appears while pinching and briefly after a double-tap. Tap `Rotate` for a view-only quarter turn; an active zoom is preserved, while `Reset zoom` in the top-right menu restores both the original orientation and fitted size. Animated GIFs show a floating `Pause animation` / `Resume animation` button, while static images do not. Tapping the image hides or reveals the overlay bars, and `Details` opens a bottom sheet with the file facts and EXIF fields. `Share` and `Open with` are available on the originally opened image; they are disabled on session-only sibling pages because those pages intentionally have no transferable content URI. Images opened from the standalone home or from another app also offer `Edit`, which opens the editor and lets you save the result; host entries and sibling pages do not. For images opened from an album, the heart in the top bar favorites the current image, `Delete` in the bottom bar moves it to the recycle bin (with undo), and `Open with`, `Rename`, `Move` and `Copy` are in the top-right menu.
 
 ******
 
@@ -203,7 +205,11 @@ Limited access only exposes the photos picked in the system photo picker, so onl
 
 **What is `All files access` for? Do I need it?**
 
-No. It is an optional advanced switch that opens the system settings page; browsing albums only needs photo access. It is reserved for later features such as hidden (.nomedia) folders and bulk actions without confirmation, and it can be turned off at any time in the system settings.
+No. It is an optional advanced switch that opens the system settings page; browsing albums only needs photo access. With it on, deleting, moving and renaming images saved by other apps no longer asks the system for confirmation batch by batch (on Android 12+ you can instead turn on just `Media management` in `Settings` > `Storage permission`); hidden (.nomedia) folders and similar features come in later versions. It can be turned off at any time in the system settings.
+
+**Where do deleted images go? Why does the system ask for confirmation when I delete or move?**
+
+Deleted images go to the recycle bin first and can be restored from `Recycle bin` in the home's top-right menu. Android 11+ uses the system recycle bin, which the system empties after about 30 days; Android 7-10 uses the app's own recycle bin, which keeps images for 30 days, uses at most a tenth of the free space (up to 2 GiB) and is removed together with the app. With `Recycle bin` turned off in `Settings`, deleting asks first and cannot be undone. On Android 11+ changing images saved by other apps needs the system's confirmation, once per batch; with `Media management` (Android 12+) or `All files access` turned on it is no longer asked each time.
 
 **The file menu does not show `Edit image` and `Convert image`?**
 
@@ -238,8 +244,9 @@ Viewing supports a selected group of images. Editing and conversion handle one i
 The plugin is built on a deny-by-default principle. All of the following measures are always on and cannot be disabled:
 
 - Viewing uses read-only inputs. Editing and conversion produce a separate output; the source image is preserved. Standalone file access uses the Android document picker.
-- Opening images from AutoJs6 (`View image`, `View as album`) or from other apps never requests a runtime permission; the standalone home asks for photo access at most once by itself, and `All files access` can only be turned on by you in the system settings.
+- Opening images from AutoJs6 (`View image`, `View as album`) or from other apps never requests a runtime permission; the standalone home asks for photo access at most once by itself, and `All files access` and `Media management` can only be turned on by you in the system settings.
 - The plugin does not declare the network permission (`INTERNET`): albums, thumbnails and image details are read on the device and never leave it.
+- Deleting, moving and renaming only happen after you choose them in an album or the viewer; images opened from AutoJs6 or other apps do not offer these actions.
 
 ******
 
@@ -279,6 +286,20 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v3.1.0
+
+###### 2026/10/14
+
+* `Hint` Deleted images go to a recycle bin first: on Android 11+ the system's (other gallery apps see it too), cleared by the system after about 30 days; on Android 7-10 the app's own, kept for 30 days and using at most a tenth of the free space (up to 2 GiB), removed together with the app. It can be switched off in Settings > Recycle bin; deleting then asks first and cannot be undone
+* `Hint` On Android 11+ the system confirms each batch that deletes, moves or renames images saved by other apps; turning on Media management (Android 12+) in Settings > Storage permission removes these confirmations
+* `Added` The image grid supports multi-select: long press an image to start, tap to add or remove, keep the finger down after the long press and drag to select a range (the grid scrolls near the top or bottom), select all or invert; share, favorite, move, copy or delete several images at once, rename one or show details
+* `Added` A deletion can be undone from the bar at the bottom; the home screen menu gains Recycle bin, which shows the days left for each image and restores, deletes forever or empties
+* `Added` Move and copy offer an album or a new album in Pictures, with recently used albums first; when the target already has images with the same names they ask once: keep both (a number is added to the new name), skip, or replace (the existing images go to the recycle bin); batches show progress and can be cancelled; moving and renaming can be undone
+* `Added` Favorites: favorite images are gathered in the Favorites album at the top of the album list; on Android 11+ Sync system favorites in Settings lets other gallery apps see them
+* `Added` Opened from an album, the viewer gains a heart button in the top bar, and Delete replaces Open with in the bottom bar; Open with, Rename, Move and Copy are in the top right menu
+* `Added` Images in authorized folders can be deleted (for good, after a confirmation, without the recycle bin) and renamed
+* `Dependency` Added Room 2.8.1 to keep the favorites and the Android 7-10 recycle bin records
+
 #### v3.0.0
 
 ###### 2026/10/13
@@ -312,15 +333,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Dependency` Added the Glide Compose integration 1.0.0-beta10 for image loading in Compose screens
 * `Dependency` Upgraded Glide 5.0.5 -> 5.0.9
 * `Dependency` Upgraded the AutoJs6 Gradle Platform Versions and Native Alignment plugins 1.9.0 -> 1.9.1
-
-#### v2.0.0
-
-###### 2026/10/04
-
-* `Hint` The application ID changes from io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools to io.github.supermonster003.autojs6.plugin.three.maple.image. Android installs this as a separate app; existing apps and data can remain, and settings are not migrated automatically
-* `Added` Image Viewer and Image Tools are combined in 3-Maple Image, with viewing, editing and format conversion in one app
-* `Added` A standalone home screen opens local images, starts editing or conversion, and saves the result to a chosen destination
-* `Added` Language, dark mode, theme color and four launcher icon choices are available in the shared settings layout
 
 ##### Full history
 
