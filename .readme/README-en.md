@@ -292,6 +292,13 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v3.2.0
+
+###### 2026/10/15
+
+* `Hint` Requires AutoJs6 6.8.0 (a development or stable build including protocol v24, introduced on 2026-10-14, with build number 5352 or higher); earlier development builds also numbered 5352 do not meet this requirement
+* `Hint` Hosts without protocol v24 ignore all of this plugin's file manager actions, including viewing an image, viewing selected images, browsing a folder as an album, editing, conversion and batch conversion
+
 #### v3.1.2
 
 ###### 2026/10/14
@@ -316,20 +323,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Added` Search: the home screen searches album names and file names, and an opened image pages through the results; inside an album the search filters by file name
 * `Fixed` Moving an image from a storage card into an album on the internal storage (or the other way round) left it on its old storage, in another album with the same name, and copies always went to the internal storage; both now land in the chosen album
 * `Fixed` On Android 7-10 deleting, moving or renaming images on a storage card could leave copies behind or create stray folders on the internal storage; these versions do not let apps change a storage card, so such images now stay as they are with a message
-
-#### v3.1.0
-
-###### 2026/10/14
-
-* `Hint` Deleted images go to a recycle bin first: on Android 11+ the system's (other gallery apps see it too), cleared by the system after about 30 days; on Android 7-10 the app's own, kept for 30 days and using at most a tenth of the free space (up to 2 GiB), removed together with the app. It can be switched off in Settings > Recycle bin; deleting then asks first and cannot be undone
-* `Hint` On Android 11+ the system confirms each batch that deletes, moves or renames images saved by other apps; turning on Media management (Android 12+) in Settings > Storage permission removes these confirmations
-* `Added` The image grid supports multi-select: long press an image to start, tap to add or remove, keep the finger down after the long press and drag to select a range (the grid scrolls near the top or bottom), select all or invert; share, favorite, move, copy or delete several images at once, rename one or show details
-* `Added` A deletion can be undone from the bar at the bottom; the home screen menu gains Recycle bin, which shows the days left for each image and restores, deletes forever or empties
-* `Added` Move and copy offer an album or a new album in Pictures, with recently used albums first; when the target already has images with the same names they ask once: keep both (a number is added to the new name), skip, or replace (the existing images go to the recycle bin); batches show progress and can be cancelled; moving and renaming can be undone
-* `Added` Favorites: favorite images are gathered in the Favorites album at the top of the album list; on Android 11+ Sync system favorites in Settings lets other gallery apps see them
-* `Added` Opened from an album, the viewer gains a heart button in the top bar, and Delete replaces Open with in the bottom bar; Open with, Rename, Move and Copy are in the top right menu
-* `Added` Images in authorized folders can be deleted (for good, after a confirmation, without the recycle bin) and renamed
-* `Dependency` Added Room 2.8.1 to keep the favorites and the Android 7-10 recycle bin records
 
 ##### Full history
 

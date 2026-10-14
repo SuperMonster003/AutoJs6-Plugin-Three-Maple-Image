@@ -292,6 +292,13 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v3.2.0
+
+###### 2026/10/15
+
+* `Aviso` Requiere AutoJs6 6.8.0 (una versión de desarrollo o estable que incluya el protocolo v24, introducido el 2026-10-14, con número de compilación 5352 o superior); las versiones de desarrollo anteriores también numeradas 5352 no cumplen este requisito
+* `Aviso` Los hosts sin el protocolo v24 ignoran todas las acciones de este plugin en el gestor de archivos, incluidas la visualización de una imagen o de imágenes seleccionadas, la exploración de una carpeta como álbum, la edición, la conversión y la conversión por lotes
+
 #### v3.1.2
 
 ###### 2026/10/14
@@ -316,20 +323,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 * `Función` Búsqueda: el inicio busca nombres de álbumes y de archivos, y la imagen abierta pasa por los resultados; dentro de un álbum se filtra por nombre de archivo
 * `Corrección` Al mover una imagen de una tarjeta de memoria a un álbum del almacenamiento interno (o al revés) se quedaba en su almacenamiento original, en otro álbum con el mismo nombre, y las copias siempre iban al almacenamiento interno; ahora ambas llegan al álbum elegido
 * `Corrección` En Android 7-10 eliminar, mover o cambiar el nombre de imágenes de una tarjeta de memoria podía dejar copias o crear carpetas sobrantes en el almacenamiento interno; esas versiones no permiten que las aplicaciones modifiquen la tarjeta, así que ahora esas imágenes se quedan como están con un aviso
-
-#### v3.1.0
-
-###### 2026/10/14
-
-* `Aviso` Las imágenes eliminadas van primero a una papelera: en Android 11+ la del sistema (también la ven otras galerías), que el sistema vacía tras unos 30 días; en Android 7-10 la de la aplicación, que las guarda 30 días y usa como máximo la décima parte del espacio libre (hasta 2 GiB), y se borra junto con la aplicación. Se puede desactivar en Ajustes > Papelera; entonces eliminar pide confirmación y no se puede deshacer
-* `Aviso` En Android 11+ el sistema confirma cada lote que elimina, mueve o cambia el nombre de imágenes guardadas por otras aplicaciones; activar Gestión de contenido multimedia (Android 12+) en Ajustes > Permiso de almacenamiento quita esas confirmaciones
-* `Función` La cuadrícula de imágenes admite selección múltiple: mantén pulsada una imagen para empezar, toca para añadir o quitar, tras la pulsación larga arrastra sin levantar el dedo para seleccionar un tramo (la cuadrícula se desplaza cerca del borde superior o inferior), selecciona todo o invierte; comparte, marca como favoritas, mueve, copia o elimina varias imágenes a la vez, cambia el nombre de una o mira sus detalles
-* `Función` Una eliminación se puede deshacer desde la barra inferior; el menú de inicio añade Papelera, que muestra los días restantes de cada imagen y permite restaurar, eliminar para siempre o vaciar
-* `Función` Mover y copiar ofrecen un álbum o un álbum nuevo en Pictures, con los usados recientemente primero; si el destino ya tiene imágenes con los mismos nombres preguntan una vez: conservar ambos (se añade un número al nombre nuevo), omitir o reemplazar (las imágenes existentes van a la papelera); los lotes muestran el progreso y se pueden cancelar; mover y cambiar el nombre se pueden deshacer
-* `Función` Favoritos: las imágenes favoritas se reúnen en el álbum Favoritos al principio de la lista; en Android 11+ Sincronizar favoritos del sistema en Ajustes permite que otras galerías también los vean
-* `Función` Abierto desde un álbum, el visor añade un botón de corazón en la barra superior, y Eliminar sustituye a Abrir con en la barra inferior; Abrir con, Cambiar nombre, Mover y Copiar están en el menú superior derecho
-* `Función` Las imágenes de las carpetas autorizadas se pueden eliminar (definitivamente, tras confirmar, sin papelera) y cambiar de nombre
-* `Dependencia` Se añade Room 2.8.1 para guardar los favoritos y los registros de la papelera de Android 7-10
 
 ##### Historial completo
 

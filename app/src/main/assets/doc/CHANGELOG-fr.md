@@ -4,6 +4,13 @@
 
 ******
 
+## v3.2.0
+
+###### 2026/10/15
+
+* `Note` Nécessite AutoJs6 6.8.0 (une version de développement ou stable intégrant le protocole v24, introduit le 2026-10-14, avec un numéro de build de 5352 ou plus); les versions de développement antérieures également numérotées 5352 ne suffisent pas
+* `Note` Les hôtes sans protocole v24 ignorent toutes les actions du gestionnaire de fichiers de ce plugin, y compris l'affichage d'une image ou des images sélectionnées, la navigation dans un dossier comme album, l'édition, la conversion et la conversion par lots
+
 ## v3.1.2
 
 ###### 2026/10/14

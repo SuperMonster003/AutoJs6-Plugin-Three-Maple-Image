@@ -4,6 +4,13 @@
 
 ******
 
+## v3.2.0
+
+###### 2026/10/15
+
+* `Hint` Requires AutoJs6 6.8.0 (a development or stable build including protocol v24, introduced on 2026-10-14, with build number 5352 or higher); earlier development builds also numbered 5352 do not meet this requirement
+* `Hint` Hosts without protocol v24 ignore all of this plugin's file manager actions, including viewing an image, viewing selected images, browsing a folder as an album, editing, conversion and batch conversion
+
 ## v3.1.2
 
 ###### 2026/10/14

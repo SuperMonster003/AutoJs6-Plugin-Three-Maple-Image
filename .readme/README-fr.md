@@ -292,6 +292,13 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
+#### v3.2.0
+
+###### 2026/10/15
+
+* `Note` Nécessite AutoJs6 6.8.0 (une version de développement ou stable intégrant le protocole v24, introduit le 2026-10-14, avec un numéro de build de 5352 ou plus); les versions de développement antérieures également numérotées 5352 ne suffisent pas
+* `Note` Les hôtes sans protocole v24 ignorent toutes les actions du gestionnaire de fichiers de ce plugin, y compris l'affichage d'une image ou des images sélectionnées, la navigation dans un dossier comme album, l'édition, la conversion et la conversion par lots
+
 #### v3.1.2
 
 ###### 2026/10/14
@@ -316,20 +323,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 * `Fonctionnalité` Recherche: l'accueil cherche dans les noms d'albums et de fichiers, et l'image ouverte parcourt les résultats; dans un album, la recherche filtre par nom de fichier
 * `Correctif` Déplacer une image d'une carte mémoire vers un album du stockage interne (ou l'inverse) la laissait sur son stockage d'origine, dans un autre album du même nom, et les copies allaient toujours sur le stockage interne; les deux arrivent maintenant dans l'album choisi
 * `Correctif` Sur Android 7-10, supprimer, déplacer ou renommer des images d'une carte mémoire pouvait laisser des copies ou créer des dossiers en trop sur le stockage interne; ces versions ne permettent pas aux applications de modifier la carte, ces images restent donc telles quelles avec un message
-
-#### v3.1.0
-
-###### 2026/10/14
-
-* `Note` Les images supprimées vont d'abord dans une corbeille: sur Android 11+ celle du système (visible aussi dans les autres galeries), vidée par le système après environ 30 jours; sur Android 7-10 celle de l'application, conservée 30 jours et limitée à un dixième de l'espace libre (2 GiB au plus), supprimée avec l'application. Elle peut être désactivée dans Paramètres > Corbeille; la suppression demande alors une confirmation et ne peut pas être annulée
-* `Note` Sur Android 11+ le système confirme chaque lot qui supprime, déplace ou renomme des images enregistrées par d'autres applications; activer Gestion des médias (Android 12+) dans Paramètres > Autorisation de stockage supprime ces confirmations
-* `Fonctionnalité` La grille d'images permet la sélection multiple: appui long sur une image pour commencer, appui pour ajouter ou retirer, garder le doigt posé après l'appui long et glisser pour sélectionner une plage (la grille défile près du haut ou du bas), tout sélectionner ou inverser; partager, ajouter aux favoris, déplacer, copier ou supprimer plusieurs images à la fois, renommer une image ou afficher ses détails
-* `Fonctionnalité` Une suppression peut être annulée depuis la barre du bas; le menu de l'accueil gagne Corbeille, qui indique les jours restants de chaque image et permet de restaurer, supprimer définitivement ou vider
-* `Fonctionnalité` Déplacer et copier proposent un album ou un nouvel album dans Pictures, les albums récents en premier; si la cible contient déjà des images du même nom, une seule question: conserver les deux (un numéro est ajouté au nouveau nom), ignorer, ou remplacer (les images existantes vont dans la corbeille); les lots affichent la progression et peuvent être annulés; déplacer et renommer peuvent être annulés
-* `Fonctionnalité` Favoris: les images favorites sont réunies dans l'album Favoris en tête de la liste des albums; sur Android 11+ Synchroniser les favoris du système dans les paramètres les rend visibles aux autres galeries
-* `Fonctionnalité` Ouverte depuis un album, la visionneuse gagne un bouton cœur dans la barre du haut, et Supprimer remplace Ouvrir avec dans la barre du bas; Ouvrir avec, Renommer, Déplacer et Copier sont dans le menu en haut à droite
-* `Fonctionnalité` Les images des dossiers autorisés peuvent être supprimées (définitivement, après confirmation, sans corbeille) et renommées
-* `Dépendance` Ajout de Room 2.8.1 pour conserver les favoris et les entrées de la corbeille d'Android 7-10
 
 ##### Historique complet
 
