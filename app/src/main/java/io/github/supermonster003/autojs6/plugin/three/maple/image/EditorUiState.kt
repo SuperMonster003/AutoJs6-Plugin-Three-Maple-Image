@@ -10,6 +10,8 @@ internal enum class EditorToolState {
     CROP,
     BRUSH,
     TEXT,
+    /** Annotation shapes (ROADMAP 8.1): drawn, selected and adjusted on the canvas, applied together. */
+    SHAPES,
 }
 
 internal enum class EditorColorTarget {
@@ -89,5 +91,7 @@ internal data class EditorUiState(
     val saveDialogDraft: EditorSaveOptions? = null,
     val colorDialogDraft: EditorColorDialogDraft? = null,
     val resizeDialogDraft: EditorResizeDraft? = null,
+    val shapeKind: ShapeKind = ShapeKind.RECTANGLE,
+    val shapeFilled: Boolean = false,
     val exitConfirmationVisible: Boolean = false,
 )

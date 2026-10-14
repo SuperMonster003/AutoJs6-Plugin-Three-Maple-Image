@@ -45,7 +45,20 @@ internal class ImageEditingView @JvmOverloads constructor(
             val strokes: List<ImageEditingEngine.BrushStroke>,
         ) : CanvasState
         data class Text(val spec: ImageEditingEngine.TextSpec) : CanvasState
+        data class Shapes(
+            val style: ShapeStyle,
+            val shapes: List<EditorShape>,
+            val selected: Int,
+        ) : CanvasState
     }
+
+    /** What the next shape looks like; color, width and fill also apply to the selected shape when they change. */
+    data class ShapeStyle(
+        val kind: ShapeKind,
+        val color: Int,
+        val widthOnScreen: Float,
+        val filled: Boolean,
+    )
 
     private enum class Mode(val hasToolGesture: Boolean) {
         NORMAL(false),
@@ -53,7 +66,10 @@ internal class ImageEditingView @JvmOverloads constructor(
         CROP(true),
         BRUSH(true),
         TEXT(true),
+        SHAPES(true),
     }
+
+    private enum class ShapeDrag { NONE, CREATE, MOVE, HANDLE }
 
     /** The original image for "compare" (ROADMAP 8.1): [bitmap] may be smaller than [width] x [height]. */
     class CompareImage(val bitmap: Bitmap, val width: Int, val height: Int)
@@ -88,6 +104,20 @@ internal class ImageEditingView @JvmOverloads constructor(
     private var mosaicBlockSizeOnScreen = dp(12f)
     private var mosaicBitmapCache: MosaicBitmapCache? = null
     private var textSpec: ImageEditingEngine.TextSpec? = null
+
+    /** Annotation shapes (ROADMAP 8.1) in bitmap pixels, drawn in order; [selectedShape] is -1 when none is. */
+    private val shapes = mutableListOf<EditorShape>()
+    private var selectedShape = -1
+    private var shapeStyle = ShapeStyle(ShapeKind.RECTANGLE, Color.RED, dp(4f), filled = false)
+    private var shapeDrag = ShapeDrag.NONE
+    private var shapeHandle = -1
+    private var shapeDragStart = ShapePoint(0f, 0f)
+    private var shapeBeforeDrag: EditorShape? = null
+    private var pendingShape: EditorShape? = null
+    private val shapePaint = ShapeRenderer.newPaint()
+
+    /** Called after shapes are added, removed or (de)selected, so the panel can follow. */
+    var onShapesChanged: (() -> Unit)? = null
 
     /** A downscaled render of the look being previewed (ROADMAP 8.1), drawn instead of [bitmap] while set. */
     private var previewBitmap: Bitmap? = null
@@ -256,6 +286,39 @@ internal class ImageEditingView @JvmOverloads constructor(
 
     fun textSpec(): ImageEditingEngine.TextSpec? = textSpec
 
+    fun beginShapes(style: ShapeStyle) {
+        clearToolState()
+        mode = Mode.SHAPES
+        shapeStyle = style
+        invalidate()
+    }
+
+    /** New settings for the next shapes; color, width and fill also change the selected shape. */
+    fun updateShapeStyle(style: ShapeStyle) {
+        val previous = shapeStyle
+        shapeStyle = style
+        val index = selectedShape
+        if (mode != Mode.SHAPES || index !in shapes.indices) return
+        var shape = shapes[index]
+        if (style.color != previous.color) shape = shape.copy(color = style.color)
+        if (style.widthOnScreen != previous.widthOnScreen) shape = shape.copy(strokeWidth = style.widthOnScreen / imageScale)
+        if (style.filled != previous.filled) shape = shape.copy(filled = style.filled)
+        shapes[index] = shape
+        invalidate()
+    }
+
+    fun shapes(): List<EditorShape> = shapes.toList()
+
+    fun hasSelectedShape(): Boolean = selectedShape in shapes.indices
+
+    fun deleteSelectedShape() {
+        if (selectedShape !in shapes.indices) return
+        shapes.removeAt(selectedShape)
+        selectedShape = -1
+        invalidate()
+        onShapesChanged?.invoke()
+    }
+
     fun captureCanvasState(): CanvasState = when (mode) {
         Mode.NORMAL -> CanvasState.Normal
         Mode.ROTATION -> CanvasState.Rotation(rotationPreviewDegrees)
@@ -268,6 +331,7 @@ internal class ImageEditingView @JvmOverloads constructor(
             brushStrokes(),
         )
         Mode.TEXT -> textSpec?.let(CanvasState::Text) ?: CanvasState.Normal
+        Mode.SHAPES -> CanvasState.Shapes(shapeStyle, shapes.toList(), selectedShape)
     }
 
     fun restoreCanvasState(state: CanvasState) {
@@ -303,6 +367,12 @@ internal class ImageEditingView @JvmOverloads constructor(
                 mode = Mode.TEXT
                 textSpec = state.spec
             }
+            is CanvasState.Shapes -> {
+                mode = Mode.SHAPES
+                shapeStyle = state.style
+                shapes += state.shapes
+                selectedShape = state.selected.takeIf { it in shapes.indices } ?: -1
+            }
         }
         invalidate()
     }
@@ -323,6 +393,11 @@ internal class ImageEditingView @JvmOverloads constructor(
         strokes.clear()
         currentStroke = null
         textSpec = null
+        shapes.clear()
+        selectedShape = -1
+        shapeDrag = ShapeDrag.NONE
+        shapeBeforeDrag = null
+        pendingShape = null
         invalidate()
     }
 
@@ -351,6 +426,7 @@ internal class ImageEditingView @JvmOverloads constructor(
             Mode.CROP -> drawCropOverlay(canvas)
             Mode.BRUSH -> drawBrushStrokes(canvas)
             Mode.TEXT -> drawTextOverlay(canvas)
+            Mode.SHAPES -> drawShapes(canvas)
             Mode.NORMAL -> Unit
         }
     }
@@ -372,6 +448,7 @@ internal class ImageEditingView @JvmOverloads constructor(
             Mode.CROP -> handleCropTouch(event)
             Mode.BRUSH -> handleBrushTouch(event)
             Mode.TEXT -> handleTextTouch(event)
+            Mode.SHAPES -> handleShapeTouch(event)
             Mode.NORMAL, Mode.ROTATION -> Unit
         }
         // Keep the gesture even when the tool ignores its first finger, so that a second finger can still zoom.
@@ -424,6 +501,13 @@ internal class ImageEditingView @JvmOverloads constructor(
         when (mode) {
             Mode.BRUSH -> currentStroke?.let(strokes::remove)
             Mode.CROP -> if (cropHandle != null) cropRect.set(cropStartRect)
+            Mode.SHAPES -> {
+                val before = shapeBeforeDrag
+                if (before != null && selectedShape in shapes.indices) shapes[selectedShape] = before
+                pendingShape = null
+                shapeDrag = ShapeDrag.NONE
+                shapeBeforeDrag = null
+            }
             else -> Unit
         }
         currentStroke = null
@@ -547,6 +631,126 @@ internal class ImageEditingView @JvmOverloads constructor(
             }
         }
     }
+
+    private fun drawShapes(canvas: Canvas) {
+        canvas.withClip(imageRect) {
+            withTranslation(imageRect.left, imageRect.top) {
+                withScale(imageScale, imageScale) {
+                    shapes.forEach { ShapeRenderer.draw(this, it, shapePaint) }
+                    pendingShape?.let { ShapeRenderer.draw(this, it, shapePaint) }
+                }
+            }
+        }
+        val selected = shapes.getOrNull(selectedShape) ?: return
+        val radius = dp(SHAPE_HANDLE_RADIUS_DP)
+        ShapeGeometry.handles(selected).forEach { handle ->
+            val x = imageRect.left + handle.x * imageScale
+            val y = imageRect.top + handle.y * imageScale
+            overlayPaint.style = Paint.Style.FILL
+            overlayPaint.color = Color.WHITE
+            canvas.drawCircle(x, y, radius, overlayPaint)
+            overlayPaint.style = Paint.Style.STROKE
+            overlayPaint.strokeWidth = dp(1.5f)
+            overlayPaint.color = SHAPE_HANDLE_OUTLINE
+            canvas.drawCircle(x, y, radius, overlayPaint)
+        }
+        overlayPaint.style = Paint.Style.FILL
+    }
+
+    /**
+     * Shapes: a drag on a handle of the selected shape resizes it, a drag on a shape selects and moves it, a drag
+     * elsewhere draws a new one; a tap elsewhere only clears the selection.
+     */
+    private fun handleShapeTouch(event: MotionEvent): Boolean {
+        val point = viewToBitmap(event.x, event.y, clamp = true) ?: return false
+        val source = bitmap ?: return false
+        val tolerance = dp(SHAPE_HIT_SLOP_DP) / imageScale
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                parent?.requestDisallowInterceptTouchEvent(true)
+                shapeDragStart = ShapePoint(point.x, point.y)
+                val selected = shapes.getOrNull(selectedShape)
+                val handle = selected?.let { ShapeGeometry.hitHandle(it, point.x, point.y, tolerance) }
+                val hit = ShapeGeometry.topmostHit(shapes, point.x, point.y, tolerance)
+                when {
+                    handle != null -> {
+                        shapeDrag = ShapeDrag.HANDLE
+                        shapeHandle = handle
+                        shapeBeforeDrag = selected
+                    }
+                    hit != null -> {
+                        shapeDrag = ShapeDrag.MOVE
+                        if (hit != selectedShape) {
+                            selectedShape = hit
+                            onShapesChanged?.invoke()
+                        }
+                        shapeBeforeDrag = shapes[hit]
+                    }
+                    else -> {
+                        shapeDrag = ShapeDrag.CREATE
+                        shapeBeforeDrag = null
+                        pendingShape = EditorShape(
+                            kind = shapeStyle.kind,
+                            startX = point.x,
+                            startY = point.y,
+                            endX = point.x,
+                            endY = point.y,
+                            color = shapeStyle.color,
+                            strokeWidth = shapeStyle.widthOnScreen / imageScale,
+                            filled = shapeStyle.filled,
+                        )
+                    }
+                }
+                invalidate()
+                return true
+            }
+            MotionEvent.ACTION_MOVE -> {
+                val before = shapeBeforeDrag
+                when (shapeDrag) {
+                    ShapeDrag.CREATE -> pendingShape = pendingShape?.copy(endX = point.x, endY = point.y)
+                    ShapeDrag.MOVE -> if (before != null && selectedShape in shapes.indices) {
+                        shapes[selectedShape] = ShapeGeometry.moved(
+                            before,
+                            point.x - shapeDragStart.x,
+                            point.y - shapeDragStart.y,
+                            source.width.toFloat(),
+                            source.height.toFloat(),
+                        )
+                    }
+                    ShapeDrag.HANDLE -> if (before != null && selectedShape in shapes.indices) {
+                        shapes[selectedShape] = ShapeGeometry.withHandle(before, shapeHandle, point.x, point.y, minimumShapeSize())
+                    }
+                    ShapeDrag.NONE -> Unit
+                }
+                invalidate()
+                return true
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                parent?.requestDisallowInterceptTouchEvent(false)
+                val pending = pendingShape
+                if (shapeDrag == ShapeDrag.CREATE) {
+                    if (event.actionMasked == MotionEvent.ACTION_UP && pending != null && !ShapeGeometry.isTooSmall(pending, minimumShapeSize())) {
+                        shapes += pending
+                        selectedShape = shapes.lastIndex
+                    } else {
+                        selectedShape = -1
+                    }
+                    onShapesChanged?.invoke()
+                } else if (event.actionMasked == MotionEvent.ACTION_CANCEL) {
+                    shapeBeforeDrag?.let { before -> if (selectedShape in shapes.indices) shapes[selectedShape] = before }
+                }
+                pendingShape = null
+                shapeDrag = ShapeDrag.NONE
+                shapeBeforeDrag = null
+                if (event.actionMasked == MotionEvent.ACTION_UP) performClick()
+                invalidate()
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun minimumShapeSize(): Float = dp(MIN_SHAPE_SCREEN_SIZE_DP) / imageScale
 
     private fun handleCropTouch(event: MotionEvent): Boolean {
         val point = viewToBitmap(event.x, event.y, clamp = true) ?: return false
@@ -760,6 +964,10 @@ internal class ImageEditingView @JvmOverloads constructor(
 
     private companion object {
         const val CROP_HIT_SLOP_DP = 24f
+        const val SHAPE_HIT_SLOP_DP = 20f
+        const val SHAPE_HANDLE_RADIUS_DP = 7f
+        const val MIN_SHAPE_SCREEN_SIZE_DP = 12f
+        const val SHAPE_HANDLE_OUTLINE = 0xFF202020.toInt()
 
         /** Fingers this close (mean distance from their center) only pan: their ratio would jump. */
         const val MIN_PINCH_SPAN_DP = 8f

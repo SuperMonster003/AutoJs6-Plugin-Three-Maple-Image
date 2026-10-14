@@ -34,7 +34,7 @@ import java.util.UUID
 
 /**
  * ROADMAP 8.1: holding "compare" shows the original, the canvas zooms and pans, tools hit the right pixels while
- * zoomed, a second finger turns a brush stroke into a zoom, and every touch target of the editor is at least 48 dp.
+ * zoomed, a second finger turns a brush stroke into a zoom, and every touch target of the editor (all six groups) is at least 48 dp.
  */
 @RunWith(AndroidJUnit4::class)
 class EditorCanvasInstrumentationTest {
@@ -188,7 +188,7 @@ class EditorCanvasInstrumentationTest {
         launch().use {
             val minimum = 48f * context.resources.displayMetrics.density - 1f
             val small = mutableListOf<String>()
-            listOf("transform", "adjust", "filter", "draw", "text").forEach { group ->
+            listOf("transform", "adjust", "filter", "draw", "annotate", "text").forEach { group ->
                 compose.onNodeWithTag("maple.editor.groups").performScrollToNode(hasTestTag("maple.tool.group.$group"))
                 compose.onNodeWithTag("maple.tool.group.$group").performClick()
                 compose.waitForIdle()

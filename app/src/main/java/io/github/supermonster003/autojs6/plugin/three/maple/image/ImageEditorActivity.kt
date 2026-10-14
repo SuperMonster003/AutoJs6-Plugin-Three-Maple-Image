@@ -81,6 +81,8 @@ open class ImageEditorActivity : ConfiguredActivity() {
     private var brushWidths = BrushWidthMemory()
     private var mosaicStrengthProgress = DEFAULT_MOSAIC_STRENGTH_PROGRESS
     private var cropAspectRatioPreset = CropAspectRatioPreset.FREE
+    private var shapeKind = ShapeKind.RECTANGLE
+    private var shapeFilled = false
     private var textStyleSettings = EditorTextStyleSettings()
     private var saveOptions = EditorSaveOptions()
     private var busy = false
@@ -130,7 +132,9 @@ open class ImageEditorActivity : ConfiguredActivity() {
             brushToolLabels = BrushTool.entries.map(::brushToolLabel),
             filterLabels = FilterPreset.entries.map { getString(filterLabel(it)) },
             adjustmentLabels = LookAdjustment.entries.map { getString(adjustmentTitle(it)) },
+            shapeKindLabels = ShapeKind.entries.map { getString(shapeLabel(it)) },
         )
+        editor.onShapesChanged = { ui = ui.copy(shapeSelected = editor.hasSelectedShape()) }
         renderBrushToolControls()
         val callbacks = EditorCallbacks(
             onBack = ::requestExit,
@@ -165,13 +169,13 @@ open class ImageEditorActivity : ConfiguredActivity() {
             onBrushTool = { index -> selectBrushTool(BrushTool.entries[index]) },
             onBrushWidth = ::onBrushWidth,
             onMosaicStrength = ::onMosaicStrength,
-            onBrushColor = {
-                showColorPicker(brushColor, EditorColorTarget.BRUSH) { selected ->
-                    brushColor = selected
-                    ui = ui.copy(brushColor = selected)
-                    editor.updateBrush(color = selected)
-                }
-            },
+            onBrushColor = { showColorPicker(brushColor, EditorColorTarget.BRUSH, onSelected = ::applyBrushColor) },
+            onShapeTool = { index -> beginShapes(ShapeKind.entries[index]) },
+            onShapeKind = { index -> onShapeStyle(kind = ShapeKind.entries[index]) },
+            onShapeFilled = { filled -> onShapeStyle(filled = filled) },
+            onShapeWidth = { progress -> onShapeStyle(widthProgress = progress) },
+            onShapeColor = { showColorPicker(brushColor, EditorColorTarget.BRUSH, onSelected = ::applyBrushColor) },
+            onDeleteShape = { editor.deleteSelectedShape() },
             onConfirmTool = ::confirmActiveTool,
             onCancelTool = ::cancelActiveTool,
         )
@@ -538,6 +542,68 @@ open class ImageEditorActivity : ConfiguredActivity() {
         commitOperation { ImageEditingEngine.applyBrush(it, strokes) }
     }
 
+    /** Brush and shapes share one color (ROADMAP 8.1). */
+    private fun applyBrushColor(selected: Int) {
+        brushColor = selected
+        ui = ui.copy(brushColor = selected)
+        editor.updateBrush(color = selected)
+        if (toolState == EditorToolState.SHAPES) editor.updateShapeStyle(shapeStyle())
+    }
+
+    private fun beginShapes(kind: ShapeKind) {
+        if (!canStartTool()) return
+        shapeKind = kind
+        toolState = EditorToolState.SHAPES
+        editor.beginShapes(shapeStyle())
+        renderShapeControls()
+        ui = ui.copy(interactionHelp = getString(R.string.image_editor_shape_help))
+        refreshActions()
+    }
+
+    /** The shapes use the pen's line width, so that the brush and the shapes remember one width. */
+    private fun shapeStyle() = ImageEditingView.ShapeStyle(
+        kind = shapeKind,
+        color = brushColor,
+        widthOnScreen = dp(brushWidths.progress(BrushTool.PEN) + MIN_BRUSH_WIDTH_DP),
+        filled = shapeFilled,
+    )
+
+    private fun onShapeStyle(kind: ShapeKind = shapeKind, filled: Boolean = shapeFilled, widthProgress: Int? = null) {
+        shapeKind = kind
+        shapeFilled = filled
+        widthProgress?.let { brushWidths = brushWidths.withProgress(BrushTool.PEN, it.coerceIn(0, BRUSH_WIDTH_MAX)) }
+        renderShapeControls()
+        if (toolState == EditorToolState.SHAPES) editor.updateShapeStyle(shapeStyle())
+    }
+
+    private fun renderShapeControls() {
+        ui = ui.copy(
+            shapeKindIndex = shapeKind.ordinal,
+            shapeFillVisible = shapeKind.fillable,
+            shapeFilled = shapeFilled,
+            shapeWidthProgress = brushWidths.progress(BrushTool.PEN).coerceIn(0, BRUSH_WIDTH_MAX),
+            brushColor = brushColor,
+            shapeSelected = editor.hasSelectedShape(),
+        )
+    }
+
+    private fun applyShapes() {
+        val shapes = editor.shapes()
+        if (shapes.isEmpty()) {
+            cancelActiveTool()
+            return
+        }
+        finishActiveToolUi()
+        commitOperation { ImageEditingEngine.drawShapes(it, shapes) }
+    }
+
+    private fun shapeLabel(kind: ShapeKind): Int = when (kind) {
+        ShapeKind.RECTANGLE -> R.string.image_editor_shape_rectangle
+        ShapeKind.ELLIPSE -> R.string.image_editor_shape_ellipse
+        ShapeKind.ARROW -> R.string.image_editor_shape_arrow
+        ShapeKind.LINE -> R.string.image_editor_shape_line
+    }
+
     private fun selectBrushTool(tool: BrushTool) {
         selectedBrushTool = tool
         renderBrushToolControls()
@@ -634,6 +700,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
             EditorToolState.LOOK -> applyLook()
             EditorToolState.ROTATION -> applyFineRotation()
             EditorToolState.BRUSH -> applyBrush()
+            EditorToolState.SHAPES -> applyShapes()
             EditorToolState.CROP, EditorToolState.TEXT -> applyInteractiveTool()
             EditorToolState.NORMAL -> Unit
         }
@@ -864,6 +931,8 @@ open class ImageEditorActivity : ConfiguredActivity() {
         },
         colorDialogDraft = colorDialog?.let { EditorColorDialogDraft(it.target, it.state.input) },
         resizeDialogDraft = resizeDialog?.draft,
+        shapeKind = shapeKind,
+        shapeFilled = shapeFilled,
         exitConfirmationVisible = exitConfirmationVisible,
     )
 
@@ -881,6 +950,8 @@ open class ImageEditorActivity : ConfiguredActivity() {
         textStyleSettings = state.textStyleSettings
         saveOptions = state.saveOptions
         cropAspectRatioPreset = state.cropAspectRatioPreset
+        shapeKind = state.shapeKind
+        shapeFilled = state.shapeFilled
         ui = ui.copy(
             group = state.group,
             rotationDegrees = rotationDegrees,
@@ -899,6 +970,10 @@ open class ImageEditorActivity : ConfiguredActivity() {
             EditorToolState.CROP -> ui = ui.copy(interactionHelp = getString(R.string.image_editor_crop_help))
             EditorToolState.BRUSH -> updateBrushPreviewSettings()
             EditorToolState.TEXT -> ui = ui.copy(interactionHelp = getString(R.string.image_editor_text_position_help))
+            EditorToolState.SHAPES -> {
+                renderShapeControls()
+                ui = ui.copy(interactionHelp = getString(R.string.image_editor_shape_help))
+            }
         }
         refreshActions()
         state.textDialogDraft?.let(::showTextDialog)
@@ -910,11 +985,8 @@ open class ImageEditorActivity : ConfiguredActivity() {
                     initialColor = brushColor,
                     target = EditorColorTarget.BRUSH,
                     initialInput = draft.input,
-                ) { selected ->
-                    brushColor = selected
-                    ui = ui.copy(brushColor = selected)
-                    editor.updateBrush(color = selected)
-                }
+                    onSelected = ::applyBrushColor,
+                )
                 EditorColorTarget.TEXT -> textDialog?.let { dialog ->
                     showColorPicker(
                         initialColor = dialog.color,

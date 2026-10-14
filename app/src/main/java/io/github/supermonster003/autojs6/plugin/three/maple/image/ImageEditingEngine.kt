@@ -224,6 +224,20 @@ internal object ImageEditingEngine {
         }
     }
 
+    /** The annotation shapes (ROADMAP 8.1) drawn onto a copy of [source], in list order. */
+    fun drawShapes(source: Bitmap, shapes: List<EditorShape>): Bitmap {
+        val target = mutableCopy(source)
+        return try {
+            val canvas = Canvas(target)
+            val paint = ShapeRenderer.newPaint()
+            shapes.forEach { ShapeRenderer.draw(canvas, it, paint) }
+            target
+        } catch (error: Throwable) {
+            target.recycle()
+            throw error
+        }
+    }
+
     fun addText(source: Bitmap, spec: TextSpec): Bitmap {
         val target = mutableCopy(source)
         return try {

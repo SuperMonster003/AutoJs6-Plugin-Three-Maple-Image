@@ -59,9 +59,10 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.EditorToolStat
 import io.github.supermonster003.autojs6.plugin.three.maple.image.LookAdjustment
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageEditingView
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ShapeKind
 
 /** First-level tool groups of the editor (design draft 7.5; filters added in ROADMAP 8.1). */
-internal enum class EditorGroup { TRANSFORM, ADJUST, FILTER, DRAW, TEXT }
+internal enum class EditorGroup { TRANSFORM, ADJUST, FILTER, DRAW, ANNOTATE, TEXT }
 
 internal object EditorScreenDefaults {
     val ADJUSTMENT_RANGE = -100..100
@@ -111,6 +112,13 @@ internal data class EditorUiModel(
     val mosaicStrengthVisible: Boolean = false,
     val mosaicStrengthProgress: Int = 8,
     val mosaicStrengthLabel: String = "",
+    val shapeKindLabels: List<String> = emptyList(),
+    val shapeKindIndex: Int = 0,
+    val shapeFillVisible: Boolean = true,
+    val shapeFilled: Boolean = false,
+    val shapeWidthProgress: Int = 6,
+    /** A shape is selected, so it can be deleted (and color, width and fill change it). */
+    val shapeSelected: Boolean = false,
 )
 
 internal class EditorCallbacks(
@@ -145,6 +153,12 @@ internal class EditorCallbacks(
     val onBrushWidth: (Int) -> Unit,
     val onMosaicStrength: (Int) -> Unit,
     val onBrushColor: () -> Unit,
+    val onShapeTool: (Int) -> Unit,
+    val onShapeKind: (Int) -> Unit,
+    val onShapeFilled: (Boolean) -> Unit,
+    val onShapeWidth: (Int) -> Unit,
+    val onShapeColor: () -> Unit,
+    val onDeleteShape: () -> Unit,
     val onConfirmTool: () -> Unit,
     val onCancelTool: () -> Unit,
 )
@@ -281,6 +295,14 @@ internal fun EditorScreen(
                             modifier = Modifier.testTag("maple.editor.mosaicStrength"),
                         )
                     }
+                }
+                EditorToolState.SHAPES -> MapleParameterPanel(
+                    onCancel = callbacks.onCancelTool,
+                    onConfirm = callbacks.onConfirmTool,
+                    cancelText = stringResource(R.string.dialog_button_cancel),
+                    confirmText = stringResource(R.string.dialog_button_confirm),
+                ) {
+                    ShapesPanel(model, callbacks)
                 }
             }
         }
@@ -434,6 +456,55 @@ private fun EditorTopBar(model: EditorUiModel, callbacks: EditorCallbacks) {
 }
 
 /**
+ * Annotation shapes (ROADMAP 8.1): the kind of the next shape, color and line width (shared with the brush), fill
+ * for rectangles and ellipses, and deleting the selected shape.
+ */
+@Composable
+private fun ShapesPanel(model: EditorUiModel, callbacks: EditorCallbacks) {
+    val canvas = MapleTheme.canvas
+    MapleSegmented(
+        options = model.shapeKindLabels,
+        selectedIndex = model.shapeKindIndex,
+        onSelect = callbacks.onShapeKind,
+        onDark = true,
+        tagPrefix = "maple.editor.shapeKind",
+    )
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {
+        MapleColorButton(
+            color = model.brushColor,
+            label = stringResource(R.string.text_color_palette),
+            onClick = callbacks.onShapeColor,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        Spacer(Modifier.weight(1f))
+        IconButton(onClick = callbacks.onDeleteShape, enabled = model.shapeSelected, modifier = Modifier.testTag("maple.editor.deleteShape")) {
+            Icon(
+                painterResource(R.drawable.ic_delete_24),
+                contentDescription = stringResource(R.string.image_editor_shape_delete),
+                tint = if (model.shapeSelected) canvas.onScrim else canvas.onScrimDisabled,
+            )
+        }
+    }
+    if (model.shapeFillVisible) {
+        MapleSegmented(
+            options = listOf(stringResource(R.string.image_editor_shape_outline), stringResource(R.string.image_editor_shape_filled)),
+            selectedIndex = if (model.shapeFilled) 1 else 0,
+            onSelect = { callbacks.onShapeFilled(it == 1) },
+            onDark = true,
+            tagPrefix = "maple.editor.shapeFill",
+        )
+    }
+    MapleSliderRow(
+        title = stringResource(R.string.image_editor_line_width),
+        value = model.shapeWidthProgress,
+        range = 0..EditorScreenDefaults.BRUSH_WIDTH_MAX,
+        onValueChange = callbacks.onShapeWidth,
+        modifier = Modifier.testTag("maple.editor.shapeWidth"),
+    )
+    HelpText(model.interactionHelp)
+}
+
+/**
  * Shows the original while pressed (ROADMAP 8.1). It is not a click: holding is the gesture. For accessibility
  * services the click action switches the comparison on and off instead.
  */
@@ -515,6 +586,12 @@ private fun SecondaryTools(model: EditorUiModel, callbacks: EditorCallbacks) {
         EditorGroup.DRAW -> listOf(
             MapleTool("brush", painterResource(R.drawable.ic_brush_24), stringResource(R.string.image_editor_brush), callbacks.onBrush),
         )
+        EditorGroup.ANNOTATE -> listOf(
+            MapleTool("shape.rectangle", painterResource(R.drawable.ic_shape_rectangle_24), stringResource(R.string.image_editor_shape_rectangle), onClick = { callbacks.onShapeTool(ShapeKind.RECTANGLE.ordinal) }),
+            MapleTool("shape.ellipse", painterResource(R.drawable.ic_shape_ellipse_24), stringResource(R.string.image_editor_shape_ellipse), onClick = { callbacks.onShapeTool(ShapeKind.ELLIPSE.ordinal) }),
+            MapleTool("shape.arrow", painterResource(R.drawable.ic_shape_arrow_24), stringResource(R.string.image_editor_shape_arrow), onClick = { callbacks.onShapeTool(ShapeKind.ARROW.ordinal) }),
+            MapleTool("shape.line", painterResource(R.drawable.ic_shape_line_24), stringResource(R.string.image_editor_shape_line), onClick = { callbacks.onShapeTool(ShapeKind.LINE.ordinal) }),
+        )
         EditorGroup.TEXT -> listOf(
             MapleTool("text", painterResource(R.drawable.ic_text_24), stringResource(R.string.image_editor_text), callbacks.onText),
         )
@@ -529,6 +606,7 @@ private fun PrimaryGroups(model: EditorUiModel, callbacks: EditorCallbacks) {
         MapleTool("group.adjust", painterResource(R.drawable.ic_tune_24), stringResource(R.string.image_editor_group_adjust), { callbacks.onGroup(EditorGroup.ADJUST) }, selected = model.group == EditorGroup.ADJUST),
         MapleTool("group.filter", painterResource(R.drawable.ic_filter_24), stringResource(R.string.image_editor_group_filter), { callbacks.onGroup(EditorGroup.FILTER) }, selected = model.group == EditorGroup.FILTER),
         MapleTool("group.draw", painterResource(R.drawable.ic_brush_24), stringResource(R.string.image_editor_group_draw), { callbacks.onGroup(EditorGroup.DRAW) }, selected = model.group == EditorGroup.DRAW),
+        MapleTool("group.annotate", painterResource(R.drawable.ic_annotate_24), stringResource(R.string.image_editor_group_annotate), { callbacks.onGroup(EditorGroup.ANNOTATE) }, selected = model.group == EditorGroup.ANNOTATE),
         MapleTool("group.text", painterResource(R.drawable.ic_text_24), stringResource(R.string.image_editor_text), { callbacks.onGroup(EditorGroup.TEXT) }, selected = model.group == EditorGroup.TEXT),
     )
     Row(modifier = Modifier.fillMaxWidth()) {
