@@ -8,7 +8,6 @@ import org.autojs.plugin.common.api.PluginInfo
 import org.autojs.plugin.explorer.api.ExplorerActionCapabilityKeys
 import org.autojs.plugin.explorer.api.ExplorerActionCatalogKeys
 import org.autojs.plugin.explorer.api.ExplorerActionPluginIds
-import org.autojs.plugin.explorer.api.ExplorerActionProtocol
 import org.autojs.plugin.explorer.api.ExplorerActionValues
 
 internal object ImageToolsPlugin {
@@ -49,7 +48,7 @@ internal fun Context.imageToolsPluginInfo(): PluginInfo {
         supportedAbis = emptyArray()
         capabilities = Bundle().apply {
             putLong(PluginCapabilityKeys.REQUIRES_HOST_VERSION, ImageToolsPlugin.REQUIRED_HOST_VERSION)
-            putInt(ExplorerActionCapabilityKeys.PROTOCOL_VERSION, ExplorerActionProtocol.VERSION)
+            putInt(ExplorerActionCapabilityKeys.PROTOCOL_VERSION, ThreeMapleImagePlugin.PROTOCOL_VERSION)
         }
     }
 }
@@ -90,7 +89,7 @@ internal fun imageToolsActionCatalog(): Bundle {
     }
 
     return Bundle().apply {
-        putInt(ExplorerActionCatalogKeys.PROTOCOL_VERSION, ExplorerActionProtocol.VERSION)
+        putInt(ExplorerActionCatalogKeys.PROTOCOL_VERSION, ThreeMapleImagePlugin.PROTOCOL_VERSION)
         putParcelableArrayList(
             ExplorerActionCatalogKeys.ACTIONS,
             arrayListOf(

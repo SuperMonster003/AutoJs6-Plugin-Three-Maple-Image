@@ -6,8 +6,6 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.RectF
 import android.net.Uri
-import android.os.Bundle
-import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
 import androidx.test.core.app.ActivityScenario
@@ -17,7 +15,6 @@ import androidx.exifinterface.media.ExifInterface
 import java.io.File
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.abs
-import org.autojs.plugin.explorer.api.IExplorerActionHostSession
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertTrue
@@ -352,7 +349,7 @@ class TiledImageDrawableInstrumentationTest {
 
     private class RecordingHostSession(
         private val file: File,
-    ) : IExplorerActionHostSession.Stub() {
+    ) : UnsupportedHostSessionStub() {
 
         val openedPaths = CopyOnWriteArrayList<String>()
 
@@ -364,59 +361,6 @@ class TiledImageDrawableInstrumentationTest {
             openedPaths += relativePath.orEmpty()
             return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
         }
-
-        override fun listChildren(
-            targetId: String?,
-            relativePath: String?,
-            offset: Int,
-            limit: Int,
-        ): Bundle = throw UnsupportedOperationException()
-
-        override fun prepareOutput(
-            displayName: String?,
-            mimeType: String?,
-            conflictPolicy: Int,
-        ): Bundle = throw UnsupportedOperationException()
-
-        override fun openOutput(transactionId: String?): ParcelFileDescriptor =
-            throw UnsupportedOperationException()
-
-        override fun commitOutput(transactionId: String?): Bundle = throw UnsupportedOperationException()
-
-        override fun abortOutput(transactionId: String?) = Unit
-
-        override fun openPendingOutput(transactionId: String?): ParcelFileDescriptor =
-            throw UnsupportedOperationException()
-
-        override fun prepareTargetReplacement(targetId: String?): Bundle =
-            throw UnsupportedOperationException()
-
-        override fun prepareOutputTree(displayName: String?, conflictPolicy: Int): Bundle =
-            throw UnsupportedOperationException()
-
-        override fun createOutputDirectory(transactionId: String?, relativePath: String?) = Unit
-
-        override fun openOutputFile(
-            transactionId: String?,
-            relativePath: String?,
-        ): ParcelFileDescriptor = throw UnsupportedOperationException()
-
-        override fun queryOutput(transactionId: String?): Bundle = throw UnsupportedOperationException()
-
-        override fun listOutputs(): Bundle = throw UnsupportedOperationException()
-
-        override fun attachClient(clientToken: IBinder?) = Unit
-
-        override fun getPlaybackProgress(targetId: String?, relativePath: String?): Bundle =
-            throw UnsupportedOperationException()
-
-        override fun reportPlaybackProgress(
-            targetId: String?,
-            relativePath: String?,
-            positionMillis: Long,
-            durationMillis: Long,
-            reportState: Int,
-        ) = Unit
 
         override fun close() {
             closeCount += 1

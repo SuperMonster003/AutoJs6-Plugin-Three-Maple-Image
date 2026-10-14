@@ -10,7 +10,6 @@ import android.os.Process
 import org.autojs.plugin.explorer.api.ExplorerActionIntentExtras
 import org.autojs.plugin.explorer.api.ExplorerActionIntentValues
 import org.autojs.plugin.explorer.api.ExplorerActionPluginActions
-import org.autojs.plugin.explorer.api.ExplorerActionProtocol
 import java.util.Locale
 import java.util.UUID
 
@@ -38,7 +37,7 @@ internal object ImageToolsRequestPolicy {
             if (intent.getStringExtra(ExplorerActionIntentExtras.ACTION_ID) != expectedActionId) return null
             if (
                 intent.getIntExtra(ExplorerActionIntentExtras.PROTOCOL_VERSION, Int.MIN_VALUE) !=
-                ExplorerActionProtocol.VERSION
+                ThreeMapleImagePlugin.PROTOCOL_VERSION
             ) return null
             if (
                 intent.getStringExtra(ExplorerActionIntentExtras.SOURCE_SURFACE) !=

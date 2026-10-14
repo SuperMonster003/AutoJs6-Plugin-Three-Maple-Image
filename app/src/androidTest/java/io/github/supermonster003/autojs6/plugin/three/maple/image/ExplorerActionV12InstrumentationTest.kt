@@ -7,7 +7,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -557,7 +556,7 @@ class ExplorerActionV12InstrumentationTest {
         private val children: List<Bundle> = emptyList(),
         private val pageSize: Int = Int.MAX_VALUE,
         private val openedFile: File? = null,
-    ) : IExplorerActionHostSession.Stub() {
+    ) : UnsupportedHostSessionStub() {
 
         val listCalls = mutableListOf<ListCall>()
         val openCalls = mutableListOf<Pair<String?, String?>>()
@@ -587,49 +586,6 @@ class ExplorerActionV12InstrumentationTest {
                 ParcelFileDescriptor.MODE_READ_ONLY,
             )
         }
-
-        override fun prepareOutput(displayName: String?, mimeType: String?, conflictPolicy: Int): Bundle =
-            throw UnsupportedOperationException()
-
-        override fun openOutput(transactionId: String?): ParcelFileDescriptor =
-            throw UnsupportedOperationException()
-
-        override fun commitOutput(transactionId: String?): Bundle = throw UnsupportedOperationException()
-
-        override fun abortOutput(transactionId: String?) = Unit
-
-        override fun close() = Unit
-
-        override fun openPendingOutput(transactionId: String?): ParcelFileDescriptor =
-            throw UnsupportedOperationException()
-
-        override fun prepareTargetReplacement(targetId: String?): Bundle =
-            throw UnsupportedOperationException()
-
-        override fun prepareOutputTree(displayName: String?, conflictPolicy: Int): Bundle =
-            throw UnsupportedOperationException()
-
-        override fun createOutputDirectory(transactionId: String?, relativePath: String?) = Unit
-
-        override fun openOutputFile(transactionId: String?, relativePath: String?): ParcelFileDescriptor =
-            throw UnsupportedOperationException()
-
-        override fun queryOutput(transactionId: String?): Bundle = throw UnsupportedOperationException()
-
-        override fun listOutputs(): Bundle = throw UnsupportedOperationException()
-
-        override fun attachClient(clientToken: IBinder?) = Unit
-
-        override fun getPlaybackProgress(targetId: String?, relativePath: String?): Bundle =
-            throw UnsupportedOperationException()
-
-        override fun reportPlaybackProgress(
-            targetId: String?,
-            relativePath: String?,
-            positionMillis: Long,
-            durationMillis: Long,
-            reportState: Int,
-        ) = Unit
     }
 
     private companion object {

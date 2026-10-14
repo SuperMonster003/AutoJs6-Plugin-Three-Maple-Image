@@ -2,8 +2,6 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
-import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
@@ -12,7 +10,6 @@ import com.bumptech.glide.Glide
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import org.autojs.plugin.explorer.api.IExplorerActionHostSession
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -188,67 +185,12 @@ class ModernImageFormatInstrumentationTest {
 
     private class RecordingHostSession(
         private val openCalls: AtomicInteger,
-    ) : IExplorerActionHostSession.Stub() {
-
-        override fun listChildren(
-            targetId: String?,
-            relativePath: String?,
-            offset: Int,
-            limit: Int,
-        ): Bundle = throw UnsupportedOperationException()
+    ) : UnsupportedHostSessionStub() {
 
         override fun openFile(targetId: String?, relativePath: String?): ParcelFileDescriptor {
             openCalls.incrementAndGet()
             throw AssertionError("Unsupported modern sibling must not be opened")
         }
-
-        override fun prepareOutput(
-            displayName: String?,
-            mimeType: String?,
-            conflictPolicy: Int,
-        ): Bundle = throw UnsupportedOperationException()
-
-        override fun openOutput(transactionId: String?): ParcelFileDescriptor =
-            throw UnsupportedOperationException()
-
-        override fun commitOutput(transactionId: String?): Bundle = throw UnsupportedOperationException()
-
-        override fun abortOutput(transactionId: String?) = Unit
-
-        override fun close() = Unit
-
-        override fun openPendingOutput(transactionId: String?): ParcelFileDescriptor =
-            throw UnsupportedOperationException()
-
-        override fun prepareTargetReplacement(targetId: String?): Bundle =
-            throw UnsupportedOperationException()
-
-        override fun prepareOutputTree(displayName: String?, conflictPolicy: Int): Bundle =
-            throw UnsupportedOperationException()
-
-        override fun createOutputDirectory(transactionId: String?, relativePath: String?) = Unit
-
-        override fun openOutputFile(
-            transactionId: String?,
-            relativePath: String?,
-        ): ParcelFileDescriptor = throw UnsupportedOperationException()
-
-        override fun queryOutput(transactionId: String?): Bundle = throw UnsupportedOperationException()
-
-        override fun listOutputs(): Bundle = throw UnsupportedOperationException()
-
-        override fun attachClient(clientToken: IBinder?) = Unit
-
-        override fun getPlaybackProgress(targetId: String?, relativePath: String?): Bundle =
-            throw UnsupportedOperationException()
-
-        override fun reportPlaybackProgress(
-            targetId: String?,
-            relativePath: String?,
-            positionMillis: Long,
-            durationMillis: Long,
-            reportState: Int,
-        ) = Unit
     }
 
     private companion object {

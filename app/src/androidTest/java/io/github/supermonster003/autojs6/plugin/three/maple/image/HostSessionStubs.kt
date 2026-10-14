@@ -47,6 +47,21 @@ internal open class UnsupportedHostSessionStub : IExplorerActionHostSession.Stub
 
     override fun attachClient(clientToken: IBinder?) = Unit
 
+    override fun prepareOutputBatch(transactionIds: MutableList<String>?): Bundle = throw UnsupportedOperationException()
+
+    override fun commitOutputBatch(batchId: String?): Bundle = throw UnsupportedOperationException()
+
+    override fun abortOutputBatch(batchId: String?) = Unit
+
+    override fun queryOutputBatch(batchId: String?): Bundle = throw UnsupportedOperationException()
+
+    override fun listOutputBatches(): Bundle = throw UnsupportedOperationException()
+
+    override fun moveTargetsToTrash(targetIds: MutableList<String>?, outputTransactionIds: MutableList<String>?): Bundle =
+        throw UnsupportedOperationException()
+
+    override fun queryTargetTrash(): Bundle = throw UnsupportedOperationException()
+
     override fun getPlaybackProgress(targetId: String?, relativePath: String?): Bundle =
         throw UnsupportedOperationException()
 
@@ -57,4 +72,15 @@ internal open class UnsupportedHostSessionStub : IExplorerActionHostSession.Stub
         durationMillis: Long,
         reportState: Int,
     ) = Unit
+
+    override fun queryTargetReplacement(targetId: String?): Bundle = throw UnsupportedOperationException()
+
+    override fun undoTargetReplacement(targetId: String?, replacementHistoryId: String?): Bundle =
+        throw UnsupportedOperationException()
+
+    override fun queryTargetTrashBatch(targetTrashBatchId: String?): Bundle = throw UnsupportedOperationException()
+
+    override fun listTargetTrashBatches(): Bundle = throw UnsupportedOperationException()
+
+    override fun undoTargetTrashBatch(targetTrashBatchId: String?): Bundle = throw UnsupportedOperationException()
 }
