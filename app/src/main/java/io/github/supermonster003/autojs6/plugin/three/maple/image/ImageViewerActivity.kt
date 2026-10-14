@@ -204,7 +204,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             state = state,
             pageCount = count,
             pageKey = { index -> resolved.pages[index].image.targetUri.toString() },
-            acquire = { index -> pageHosts.getOrPut(index) { createHost(index) } },
+            acquire = { index -> acquirePage(pageHosts, index) },
             release = { index -> releasePage(pageHosts, index) },
             thumbnail = ::thumbnailModel,
             thumbnailDescription = { index -> getString(R.string.viewer_thumbnail_description, index + 1, count) },
@@ -329,7 +329,18 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     private fun currentHost(): ViewerPageHost? = hosts[currentIndex]
 
-    private fun acquirePage(index: Int): ViewerPageHost = hosts.getOrPut(index) { createHost(index) }
+    private fun acquirePage(index: Int): ViewerPageHost = acquirePage(hosts, index)
+
+    /**
+     * The host is in [map] before its load starts: a metadata read can finish on the IO thread before the main thread
+     * suspends (withContext then continues without suspending), and isLive must already see the host then, or the
+     * load is dropped and the page keeps its spinner for good.
+     */
+    private fun acquirePage(map: HashMap<Int, ViewerPageHost>, index: Int): ViewerPageHost =
+        map[index] ?: createHost(index).also { host ->
+            map[index] = host
+            startLoad(host)
+        }
 
     /** The gallery page as the management operations see it (ROADMAP 7.0 viewer actions). */
     private val viewerTarget = object : OperationTarget {
@@ -447,7 +458,6 @@ class ImageViewerActivity : ConfiguredActivity() {
                 syncRotationHint()
             }
         }
-        startLoad(host)
         return host
     }
 
