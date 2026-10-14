@@ -187,6 +187,7 @@ internal class ImageEditorViewModel(application: Application) : AndroidViewModel
             allowedOutputMimeTypes = activeRequest.allowedOutputMimeTypes,
             targetSize = ImagePixelSize(currentBitmap.width, currentBitmap.height),
             sdkInt = Build.VERSION.SDK_INT,
+            preservableExif = sourceInfo?.preservableExifMetadata ?: PreservedExifMetadata.EMPTY,
         )
         if (!outputGuard.tryStart()) return
         if (!outputLedger.tryClaim(activeRequest.transactionId)) {

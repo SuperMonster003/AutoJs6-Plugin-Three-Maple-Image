@@ -35,7 +35,8 @@ import kotlinx.coroutines.launch
 class HomeActivity : ConfiguredActivity() {
     private lateinit var actions: HomeActions
     private lateinit var permissionGate: MediaPermissionGate
-    private lateinit var operations: GalleryOperations
+    internal lateinit var operations: GalleryOperations
+        private set
     private val gallery by viewModels<GalleryViewModel>()
     private val recycleBin by viewModels<RecycleBinViewModel>()
     private val batch by viewModels<BatchConversionViewModel>()

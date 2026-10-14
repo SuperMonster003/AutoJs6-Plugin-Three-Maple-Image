@@ -212,6 +212,12 @@
     <string name="image_editor_rotation_degrees">%1$d°</string>
     <string name="image_editor_saturation">Saturation</string>
     <string name="image_editor_save_follow_source">Conserver le format source (%1$s)</string>
+    <string name="image_editor_save_keep_exif">Conserver les infos de prise de vue</string>
+    <string name="image_editor_save_keep_exif_summary">L\'appareil, la date et l\'exposition sont conservés; la position est toujours supprimée</string>
+    <string name="image_editor_save_new_name">Nouveau fichier : %1$s</string>
+    <string name="image_editor_save_overwrite">Remplacer l\'original</string>
+    <string name="image_editor_save_overwrite_summary">Le format reste le même. Vous pouvez annuler juste après l\'enregistrement</string>
+    <string name="image_editor_save_replaces_name">Remplace : %1$s</string>
     <string name="image_editor_shadows">Ombres</string>
     <string name="image_editor_shape_arrow">Flèche</string>
     <string name="image_editor_shape_delete">Supprimer la forme</string>
@@ -251,6 +257,11 @@
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">Les informations de l\'image ne sont pas disponibles</string>
+    <string name="overwrite_confirm">Remplacer</string>
+    <string name="overwrite_failed">Impossible de remplacer l\'original. Enregistrez la modification dans un nouveau fichier</string>
+    <string name="overwrite_saved">Original remplacé</string>
+    <string name="overwrite_without_undo_message">Il n\'y a pas assez de place pour garder une copie de l\'original, ce remplacement ne pourra pas être annulé.</string>
+    <string name="overwrite_without_undo_title">Remplacer sans pouvoir annuler ?</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Affichage, retouche et conversion d\'images</string>
     <string name="progress_copying">Copie des images</string>

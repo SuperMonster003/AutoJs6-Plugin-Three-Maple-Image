@@ -114,7 +114,18 @@ internal object RecycleBinPolicy {
         NameConflictPolicy.uniqueName("$deletedAtMillis-$displayName", existing)
 }
 
-internal enum class MediaWriteOperation { TRASH, RESTORE, DELETE, RENAME, MOVE, COPY, FAVORITE }
+internal enum class MediaWriteOperation {
+    TRASH,
+    RESTORE,
+    DELETE,
+    RENAME,
+    MOVE,
+    COPY,
+    FAVORITE,
+
+    /** Writes new content over an image (ROADMAP 8.2): routed like a rename. */
+    OVERWRITE,
+}
 
 /** How one batch reaches the files (ROADMAP 7.1 `MediaWriteCoordinator`). */
 internal enum class MediaWriteRoute {

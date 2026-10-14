@@ -212,6 +212,12 @@
     <string name="image_editor_rotation_degrees">%1$d°</string>
     <string name="image_editor_saturation">饱和度</string>
     <string name="image_editor_save_follow_source">跟随源格式 (%1$s)</string>
+    <string name="image_editor_save_keep_exif">保留拍摄信息</string>
+    <string name="image_editor_save_keep_exif_summary">相机, 日期与曝光参数保留; 位置信息始终移除</string>
+    <string name="image_editor_save_new_name">新文件: %1$s</string>
+    <string name="image_editor_save_overwrite">覆盖原图</string>
+    <string name="image_editor_save_overwrite_summary">格式不变, 保存后可以立即撤销</string>
+    <string name="image_editor_save_replaces_name">将替换: %1$s</string>
     <string name="image_editor_shadows">阴影</string>
     <string name="image_editor_shape_arrow">箭头</string>
     <string name="image_editor_shape_delete">删除形状</string>
@@ -251,6 +257,11 @@
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">图像信息不可用</string>
+    <string name="overwrite_confirm">覆盖</string>
+    <string name="overwrite_failed">无法覆盖原图, 请把编辑结果另存为新文件</string>
+    <string name="overwrite_saved">已覆盖原图</string>
+    <string name="overwrite_without_undo_message">没有空间保留原图的副本, 这次覆盖将无法撤销.</string>
+    <string name="overwrite_without_undo_title">覆盖后无法撤销, 继续吗?</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">图片查看, 编辑与格式转换</string>
     <string name="progress_copying">正在复制图片</string>

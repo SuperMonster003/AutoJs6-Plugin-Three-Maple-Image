@@ -212,6 +212,12 @@
     <string name="image_editor_rotation_degrees">%1$d°</string>
     <string name="image_editor_saturation">飽和度</string>
     <string name="image_editor_save_follow_source">沿用來源格式 (%1$s)</string>
+    <string name="image_editor_save_keep_exif">保留拍攝資訊</string>
+    <string name="image_editor_save_keep_exif_summary">相機, 日期與曝光參數保留; 位置資訊始終移除</string>
+    <string name="image_editor_save_new_name">新檔案: %1$s</string>
+    <string name="image_editor_save_overwrite">覆蓋原圖</string>
+    <string name="image_editor_save_overwrite_summary">格式不變, 儲存後可以立即復原</string>
+    <string name="image_editor_save_replaces_name">將取代: %1$s</string>
     <string name="image_editor_shadows">陰影</string>
     <string name="image_editor_shape_arrow">箭頭</string>
     <string name="image_editor_shape_delete">刪除形狀</string>
@@ -251,6 +257,11 @@
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">圖片資訊無法使用</string>
+    <string name="overwrite_confirm">覆蓋</string>
+    <string name="overwrite_failed">無法覆蓋原圖, 請把編輯結果另存為新檔案</string>
+    <string name="overwrite_saved">已覆蓋原圖</string>
+    <string name="overwrite_without_undo_message">沒有空間保留原圖的副本, 這次覆蓋將無法復原.</string>
+    <string name="overwrite_without_undo_title">覆蓋後無法復原, 繼續嗎?</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">圖片檢視, 編輯與格式轉換</string>
     <string name="progress_copying">正在複製圖片</string>

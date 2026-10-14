@@ -67,12 +67,25 @@ internal class EditorSaveDialogState(
     formatIndex: Int,
     quality: Int,
     webpLossless: Boolean,
+    keepExif: Boolean = false,
+    /** The original can be replaced (ROADMAP 8.2); the switch is hidden otherwise. */
+    val overwriteAvailable: Boolean = false,
+    /** The original has capture details worth keeping; the switch is hidden otherwise. */
+    val keepExifAvailable: Boolean = false,
 ) {
     var formatIndex by mutableIntStateOf(formatIndex)
     var quality by mutableIntStateOf(quality)
     var webpLossless by mutableStateOf(webpLossless)
     var losslessAvailable by mutableStateOf(false)
     var qualityEnabled by mutableStateOf(true)
+    var keepExif by mutableStateOf(keepExif)
+
+    /** Set once the user touched "keep capture details": switching overwrite on no longer changes it then. */
+    var keepExifTouched = false
+    var overwrite by mutableStateOf(false)
+
+    /** "New file: photo_edited.jpg" or "Replaces: photo.jpg". */
+    var fileNote by mutableStateOf("")
     var onChanged: () -> Unit = {}
 }
 
@@ -165,7 +178,6 @@ internal fun EditorTextDialog(
 @Composable
 internal fun EditorSaveDialog(
     state: EditorSaveDialogState,
-    hint: String,
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
 ) {
@@ -183,10 +195,12 @@ internal fun EditorSaveDialog(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 4.dp),
             )
+            // An overwrite keeps the original's format, so the choice is shown but locked.
             MapleChipFlow(
                 options = state.formatLabels,
-                selectedIndex = state.formatIndex,
+                selectedIndex = if (state.overwrite) 0 else state.formatIndex,
                 onSelect = { state.formatIndex = it; state.onChanged() },
+                enabled = !state.overwrite,
             )
             Spacer(Modifier.height(12.dp))
             MapleSliderRow(
@@ -207,11 +221,34 @@ internal fun EditorSaveDialog(
                 modifier = Modifier.testTag("maple.editor.save.lossless"),
             )
         }
+        if (state.keepExifAvailable) {
+            MapleSwitchRow(
+                title = stringResource(R.string.image_editor_save_keep_exif),
+                summary = stringResource(R.string.image_editor_save_keep_exif_summary),
+                checked = state.keepExif,
+                onToggle = { state.keepExif = it; state.keepExifTouched = true; state.onChanged() },
+                modifier = Modifier.testTag("maple.editor.save.keepExif"),
+            )
+        }
+        if (state.overwriteAvailable) {
+            MapleSwitchRow(
+                title = stringResource(R.string.image_editor_save_overwrite),
+                summary = stringResource(R.string.image_editor_save_overwrite_summary),
+                checked = state.overwrite,
+                onToggle = { checked ->
+                    state.overwrite = checked
+                    // Overwriting without the capture details would lose the date the gallery sorts by.
+                    if (!state.keepExifTouched) state.keepExif = checked
+                    state.onChanged()
+                },
+                modifier = Modifier.testTag("maple.editor.save.overwrite"),
+            )
+        }
         Text(
-            text = hint,
+            text = state.fileNote,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = MapleDialogDefaults.contentPadding, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = MapleDialogDefaults.contentPadding, vertical = 8.dp).testTag("maple.editor.save.fileNote"),
         )
     }
 }

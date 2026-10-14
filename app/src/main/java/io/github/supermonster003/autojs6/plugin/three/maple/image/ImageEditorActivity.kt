@@ -85,6 +85,9 @@ open class ImageEditorActivity : ConfiguredActivity() {
     private var shapeFilled = false
     private var textStyleSettings = EditorTextStyleSettings()
     private var saveOptions = EditorSaveOptions()
+
+    /** The last save replaces the original (ROADMAP 8.2); the standalone caller writes it back. */
+    private var savedWithOverwrite = false
     private var busy = false
     private var currentStateId = INITIAL_STATE_ID
     private var savedStateId = INITIAL_STATE_ID
@@ -232,7 +235,6 @@ open class ImageEditorActivity : ConfiguredActivity() {
         saveDialog?.let { state ->
             EditorSaveDialog(
                 state = state,
-                hint = getString(R.string.text_image_conversion_filename_strategy),
                 onDismissRequest = { saveDialog = null; syncDialogFlag() },
                 onConfirm = { confirmSaveDialog(state) },
             )
@@ -345,7 +347,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
                 Intent().putExtra(
                     org.autojs.plugin.explorer.api.ExplorerActionIntentExtras.OUTPUT_TRANSACTION_ID,
                     activeRequest.transactionId,
-                ),
+                ).apply { if (savedWithOverwrite) putExtra(StandaloneImageWork.EXTRA_OVERWRITE, true) },
             )
             toast(R.string.text_done)
         } else {
@@ -812,14 +814,22 @@ open class ImageEditorActivity : ConfiguredActivity() {
                 requireNotNull(format.explicitOutputFormat).displayName
             }
         }
+        val overwriteFormat = EditorSavePolicy.overwriteFormat(sourceInfo.mimeType, activeRequest.allowedOutputMimeTypes)
+            .takeIf { activeRequest.canOverwrite }
         val state = EditorSaveDialogState(
             formatLabels = labels,
             formatIndex = formats.indexOf(initial.format).coerceAtLeast(0),
             quality = initial.quality.coerceIn(ImageConversionOptions.MIN_QUALITY, EditorDialogDefaults.QUALITY_MAX),
             webpLossless = initial.webpLossless && ImageOutputEncodingPolicy.isWebpLosslessAvailable(Build.VERSION.SDK_INT),
+            keepExif = initial.keepExif,
+            overwriteAvailable = overwriteFormat != null,
+            keepExifAvailable = !sourceInfo.preservableExifMetadata.isEmpty,
         )
-        state.onChanged = { refreshSaveDialog(state, formats, sourceInfo.mimeType, activeRequest.allowedOutputMimeTypes) }
-        refreshSaveDialog(state, formats, sourceInfo.mimeType, activeRequest.allowedOutputMimeTypes)
+        // Only a dialog restored after a configuration change keeps its overwrite choice (T11: never remembered).
+        state.overwrite = draft?.overwrite == true && overwriteFormat != null
+        state.keepExifTouched = draft != null
+        state.onChanged = { refreshSaveDialog(state, formats, sourceInfo.mimeType, activeRequest) }
+        refreshSaveDialog(state, formats, sourceInfo.mimeType, activeRequest)
         saveDialog = state
         syncDialogFlag()
     }
@@ -828,14 +838,17 @@ open class ImageEditorActivity : ConfiguredActivity() {
         state: EditorSaveDialogState,
         formats: List<EditorSaveFormat>,
         detectedMimeType: String,
-        allowedOutputMimeTypes: Set<String>,
+        activeRequest: ImageToolsRequest,
     ) {
         val selected = formats.getOrElse(state.formatIndex) { formats.first() }
         val effectiveFormat = EditorSavePolicy.effectiveFormat(
             selection = selected,
             detectedMimeType = detectedMimeType,
-            allowedOutputMimeTypes = allowedOutputMimeTypes,
+            allowedOutputMimeTypes = activeRequest.allowedOutputMimeTypes,
+            overwrite = state.overwrite,
         )
+        val name = EditorSavePolicy.outputFileName(activeRequest.displayName, effectiveFormat, activeRequest.outputNameSuffix, state.overwrite)
+        state.fileNote = getString(if (state.overwrite) R.string.image_editor_save_replaces_name else R.string.image_editor_save_new_name, name)
         state.losslessAvailable = effectiveFormat == ImageOutputFormat.WEBP &&
             ImageOutputEncodingPolicy.isWebpLosslessAvailable(Build.VERSION.SDK_INT)
         state.qualityEnabled = ImageOutputEncodingPolicy.qualityEnabled(
@@ -852,8 +865,11 @@ open class ImageEditorActivity : ConfiguredActivity() {
             format = formats.getOrElse(state.formatIndex) { formats.first() },
             quality = state.quality,
             webpLossless = state.webpLossless && state.losslessAvailable,
+            keepExif = state.keepExif && state.keepExifAvailable,
+            overwrite = state.overwrite && state.overwriteAvailable,
         )
-        saveOptions = options
+        saveOptions = options.copy(overwrite = false)
+        savedWithOverwrite = options.overwrite
         saveDialog = null
         syncDialogFlag()
         model.save(options)
@@ -938,6 +954,8 @@ open class ImageEditorActivity : ConfiguredActivity() {
                 format = formats.getOrElse(state.formatIndex) { EditorSaveFormat.FOLLOW_SOURCE },
                 quality = state.quality,
                 webpLossless = state.webpLossless,
+                keepExif = state.keepExif,
+                overwrite = state.overwrite,
             )
         },
         colorDialogDraft = colorDialog?.let { EditorColorDialogDraft(it.target, it.state.input) },

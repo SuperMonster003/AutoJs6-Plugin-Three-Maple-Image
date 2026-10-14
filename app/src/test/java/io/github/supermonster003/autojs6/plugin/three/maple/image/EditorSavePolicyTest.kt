@@ -122,4 +122,51 @@ class EditorSavePolicyTest {
         assertEquals(confirmed, state.saveOptions)
         assertEquals(draft, state.saveDialogDraft)
     }
+
+    @Test
+    fun overwritingKeepsTheOriginalFormatAndIsNotOfferedForOthers() {
+        assertEquals(ImageOutputFormat.JPEG, EditorSavePolicy.overwriteFormat("image/jpeg", allMimeTypes))
+        assertEquals(ImageOutputFormat.WEBP, EditorSavePolicy.overwriteFormat("image/webp", allMimeTypes))
+        // GIF would become PNG under the same name: no overwrite.
+        assertEquals(null, EditorSavePolicy.overwriteFormat("image/gif", allMimeTypes))
+        assertEquals(null, EditorSavePolicy.overwriteFormat("image/heic", allMimeTypes))
+        assertEquals(null, EditorSavePolicy.overwriteFormat("image/png", setOf("image/jpeg")))
+        // The overwrite wins over a format picked before it was switched on.
+        assertEquals(
+            ImageOutputFormat.PNG,
+            EditorSavePolicy.effectiveFormat(EditorSaveFormat.JPEG, "image/png", allMimeTypes, overwrite = true),
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            EditorSavePolicy.effectiveFormat(EditorSaveFormat.FOLLOW_SOURCE, "image/gif", allMimeTypes, overwrite = true)
+        }
+    }
+
+    @Test
+    fun theFileNameShowsTheSuffixOrTheOriginalName() {
+        assertEquals("photo_edited.webp", EditorSavePolicy.outputFileName("photo.jpg", ImageOutputFormat.WEBP, "edited", overwrite = false))
+        assertEquals("photo.jpg", EditorSavePolicy.outputFileName("photo.jpg", ImageOutputFormat.JPEG, "edited", overwrite = true))
+        assertEquals("a.b_edited.png", EditorSavePolicy.outputFileName("a.b.gif", ImageOutputFormat.PNG, "edited", overwrite = false))
+        assertEquals("README_edited.jpg", EditorSavePolicy.outputFileName("README", ImageOutputFormat.JPEG, "edited", overwrite = false))
+        assertEquals(".hidden_edited.jpg", EditorSavePolicy.outputFileName(".hidden", ImageOutputFormat.JPEG, "edited", overwrite = false))
+    }
+
+    @Test
+    fun capturedDetailsAreKeptOnlyWhenAsked() {
+        val metadata = PreservedExifMetadata.from(mapOf("Make" to "Maple", "Model" to "Test"))
+        fun options(keep: Boolean) = EditorSavePolicy.conversionOptions(
+            saveOptions = EditorSaveOptions(keepExif = keep),
+            detectedMimeType = "image/jpeg",
+            allowedOutputMimeTypes = allMimeTypes,
+            targetSize = ImagePixelSize(10, 10),
+            sdkInt = 33,
+            preservableExif = metadata,
+        )
+        assertEquals(metadata.attributes, options(keep = true).preservedExifMetadata?.attributes)
+        assertEquals(null, options(keep = false).preservedExifMetadata)
+        // Nothing to keep: no metadata step at all.
+        val empty = EditorSavePolicy.conversionOptions(
+            EditorSaveOptions(keepExif = true), "image/jpeg", allMimeTypes, ImagePixelSize(10, 10), 33, PreservedExifMetadata.EMPTY,
+        )
+        assertEquals(null, empty.preservedExifMetadata)
+    }
 }

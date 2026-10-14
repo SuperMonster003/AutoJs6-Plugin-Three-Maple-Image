@@ -88,6 +88,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         activity = this,
         onBusy = { busy -> editBusy = busy },
         onMessage = { resource -> Toast.makeText(this, resource, Toast.LENGTH_SHORT).show() },
+        overwrite = { original, output -> operations.overwriteOriginal(original, output) },
     )
     private val memoryClassMebibytes: Int by lazy {
         getSystemService(ActivityManager::class.java)?.memoryClass ?: 128
@@ -156,7 +157,8 @@ class ImageViewerActivity : ConfiguredActivity() {
                     state = uiState,
                     pager = pagerUi,
                     callbacks = callbacks,
-                    snackbarHostState = operations.snackbar.takeIf { launchRequest.source != null },
+                    // Every viewer shows it: an overwrite of an opened file offers its undo there too.
+                    snackbarHostState = operations.snackbar,
                 )
                 operations.Dialogs()
             }

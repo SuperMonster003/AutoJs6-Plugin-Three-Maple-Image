@@ -212,6 +212,12 @@
     <string name="image_editor_rotation_degrees">%1$d°</string>
     <string name="image_editor_saturation">Saturación</string>
     <string name="image_editor_save_follow_source">Seguir formato de origen (%1$s)</string>
+    <string name="image_editor_save_keep_exif">Conservar los datos de captura</string>
+    <string name="image_editor_save_keep_exif_summary">Se conservan la cámara, la fecha y la exposición; la ubicación siempre se elimina</string>
+    <string name="image_editor_save_new_name">Archivo nuevo: %1$s</string>
+    <string name="image_editor_save_overwrite">Sobrescribir el original</string>
+    <string name="image_editor_save_overwrite_summary">Mantiene su formato. Puedes deshacerlo justo después de guardar</string>
+    <string name="image_editor_save_replaces_name">Reemplaza: %1$s</string>
     <string name="image_editor_shadows">Sombras</string>
     <string name="image_editor_shape_arrow">Flecha</string>
     <string name="image_editor_shape_delete">Eliminar forma</string>
@@ -251,6 +257,11 @@
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">La información de la imagen no está disponible</string>
+    <string name="overwrite_confirm">Sobrescribir</string>
+    <string name="overwrite_failed">No se pudo sobrescribir el original. Guarda la edición como un archivo nuevo</string>
+    <string name="overwrite_saved">Original sobrescrito</string>
+    <string name="overwrite_without_undo_message">No hay espacio para guardar una copia del original, así que no se podrá deshacer.</string>
+    <string name="overwrite_without_undo_title">Sobrescribir sin poder deshacer?</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Visualización, edición y conversión de imágenes</string>
     <string name="progress_copying">Copiando imágenes</string>

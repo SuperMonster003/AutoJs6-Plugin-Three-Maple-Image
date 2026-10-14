@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -61,7 +62,7 @@ class EditorDialogsTest {
         state.onChanged = { changes++ }
         compose.setContent {
             MapleTheme(palette = testPalette()) {
-                EditorSaveDialog(state = state, hint = "hint", onDismissRequest = {}, onConfirm = {})
+                EditorSaveDialog(state = state, onDismissRequest = {}, onConfirm = {})
             }
         }
         compose.onNodeWithTag("maple.chip.0").assertIsSelected()
@@ -77,6 +78,55 @@ class EditorDialogsTest {
         compose.waitForIdle()
         assertTrue(state.webpLossless)
         assertEquals(2, changes)
+    }
+
+    @Test
+    fun overwriteLocksTheFormatAndTurnsOnTheCaptureDetailsUntilTheyAreTouched() {
+        val state = EditorSaveDialogState(
+            formatLabels = listOf("Follow source (JPEG)", "JPEG", "PNG", "WebP"),
+            formatIndex = 2,
+            quality = 92,
+            webpLossless = false,
+            overwriteAvailable = true,
+            keepExifAvailable = true,
+        )
+        state.fileNote = "New file: photo_edited.png"
+        compose.setContent {
+            MapleTheme(palette = testPalette()) {
+                EditorSaveDialog(state = state, onDismissRequest = {}, onConfirm = {})
+            }
+        }
+        compose.onNodeWithTag("maple.editor.save.fileNote").assertTextEquals("New file: photo_edited.png")
+        compose.onNodeWithTag("maple.editor.save.overwrite").performScrollTo().performClick()
+        compose.waitForIdle()
+        assertTrue(state.overwrite)
+        assertTrue("capture details follow an overwrite", state.keepExif)
+        // The format shows the original's own and cannot change.
+        compose.onNodeWithTag("maple.chip.0").assertIsSelected().assertIsNotEnabled()
+        compose.onNodeWithTag("maple.chip.2").assertIsNotEnabled()
+        compose.onNodeWithTag("maple.editor.save.overwrite").performClick()
+        compose.waitForIdle()
+        assertFalse(state.keepExif)
+        compose.onNodeWithTag("maple.chip.2").assertIsSelected().assertIsEnabled()
+        // Once the user decided about the details, overwriting leaves them alone.
+        compose.onNodeWithTag("maple.editor.save.keepExif").performScrollTo().performClick()
+        compose.onNodeWithTag("maple.editor.save.keepExif").performClick()
+        compose.onNodeWithTag("maple.editor.save.overwrite").performClick()
+        compose.waitForIdle()
+        assertTrue(state.overwrite)
+        assertFalse(state.keepExif)
+    }
+
+    @Test
+    fun overwriteAndCaptureDetailsAreHiddenWhenTheyDoNotApply() {
+        val state = EditorSaveDialogState(formatLabels = listOf("Follow source (PNG)", "JPEG", "PNG", "WebP"), formatIndex = 0, quality = 92, webpLossless = false)
+        compose.setContent {
+            MapleTheme(palette = testPalette()) {
+                EditorSaveDialog(state = state, onDismissRequest = {}, onConfirm = {})
+            }
+        }
+        compose.onNodeWithTag("maple.editor.save.overwrite").assertDoesNotExist()
+        compose.onNodeWithTag("maple.editor.save.keepExif").assertDoesNotExist()
     }
 
     @Test

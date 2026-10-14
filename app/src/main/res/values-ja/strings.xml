@@ -212,6 +212,12 @@
     <string name="image_editor_rotation_degrees">%1$d°</string>
     <string name="image_editor_saturation">彩度</string>
     <string name="image_editor_save_follow_source">元の形式に従う (%1$s)</string>
+    <string name="image_editor_save_keep_exif">撮影情報を残す</string>
+    <string name="image_editor_save_keep_exif_summary">カメラ, 日時, 露出は残り, 位置情報は常に削除されます</string>
+    <string name="image_editor_save_new_name">新しいファイル: %1$s</string>
+    <string name="image_editor_save_overwrite">元の画像に上書き</string>
+    <string name="image_editor_save_overwrite_summary">形式はそのままです. 保存直後に元に戻せます</string>
+    <string name="image_editor_save_replaces_name">置き換え: %1$s</string>
     <string name="image_editor_shadows">シャドウ</string>
     <string name="image_editor_shape_arrow">矢印</string>
     <string name="image_editor_shape_delete">図形を削除</string>
@@ -251,6 +257,11 @@
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">画像情報を利用できません</string>
+    <string name="overwrite_confirm">上書き</string>
+    <string name="overwrite_failed">元の画像に上書きできませんでした. 新しいファイルとして保存してください</string>
+    <string name="overwrite_saved">元の画像に上書きしました</string>
+    <string name="overwrite_without_undo_message">元の画像のコピーを残す空き容量がないため, この上書きは元に戻せません.</string>
+    <string name="overwrite_without_undo_title">元に戻せません. 上書きしますか?</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">画像の表示, 編集, 形式変換</string>
     <string name="progress_copying">画像をコピーしています</string>

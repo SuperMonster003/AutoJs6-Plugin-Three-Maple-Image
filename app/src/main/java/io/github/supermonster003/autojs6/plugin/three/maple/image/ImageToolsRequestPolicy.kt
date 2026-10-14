@@ -24,6 +24,8 @@ internal data class ImageToolsRequest(
     val allowedOutputMimeTypes: Set<String>,
     val maxOutputBytes: Long,
     val outputNameSuffix: String,
+    /** The original may be replaced (ROADMAP 8.2): the save dialog then offers "Overwrite the original". */
+    val canOverwrite: Boolean = false,
 )
 
 /** Strictly validates the v3 read-only input and host-owned output transaction. */

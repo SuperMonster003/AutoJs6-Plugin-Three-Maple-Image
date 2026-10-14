@@ -30,6 +30,9 @@ internal class HomeActions(private val activity: HomeActivity) {
     private var pending: String? = null
     private var exportName = "image"
     private var pendingDisplayName: String? = null
+
+    /** The picked original of the pending edit, written over when the user chose to overwrite it (ROADMAP 8.2). */
+    private var pendingOriginal: Uri? = null
     internal var uiState by mutableStateOf(HomeUiState())
     private var unsavedPromptFor by mutableStateOf<String?>(null)
 
@@ -39,7 +42,12 @@ internal class HomeActions(private val activity: HomeActivity) {
     private val processImage = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val id = pending
         if (id != null && result.resultCode == Activity.RESULT_OK && result.data?.getStringExtra(ExplorerActionIntentExtras.OUTPUT_TRANSACTION_ID) == id) {
-            activity.runWork { prepareExport() }
+            val original = pendingOriginal
+            if (result.data?.getBooleanExtra(StandaloneImageWork.EXTRA_OVERWRITE, false) == true && original != null) {
+                activity.runWork { overwriteOrExport(id, original) }
+            } else {
+                activity.runWork { prepareExport() }
+            }
         } else if (id != null) {
             StandaloneImageWork.discard(activity, id)
             pending = null
@@ -110,14 +118,34 @@ internal class HomeActions(private val activity: HomeActivity) {
         } else {
             // Keep a previous finished edit available until it is explicitly saved or replaced.
             val newId = withContext(Dispatchers.IO) {
-                StandaloneImageWork.create(activity, document, if (mode == MODE_EDIT) ImageToolsPlugin.EDIT_ACTION_ID else ImageToolsPlugin.CONVERT_ACTION_ID)
+                // Only the editor offers to overwrite so far; the converter follows with ROADMAP 8.3.
+                val overwritable = mode == MODE_EDIT && StandaloneOverwrite.isOverwritable(activity, document)
+                StandaloneImageWork.create(
+                    activity,
+                    document,
+                    if (mode == MODE_EDIT) ImageToolsPlugin.EDIT_ACTION_ID else ImageToolsPlugin.CONVERT_ACTION_ID,
+                    overwritable,
+                )
             }
+            pendingOriginal = uri
             pending?.let { StandaloneImageWork.discard(activity, it) }
             pending = newId
             exportName = document.name.substringBeforeLast('.', document.name)
             pendingDisplayName = document.name
             val target = if (mode == MODE_EDIT) StandaloneImageEditorActivity::class.java else StandaloneImageConverterActivity::class.java
             processImage.launch(Intent(activity, target).putExtra(StandaloneImageWork.EXTRA_SESSION, newId))
+        }
+    }
+
+    /** Writes the result over the picked original; when that does not happen, the result is saved as a new file. */
+    private suspend fun overwriteOrExport(id: String, original: Uri) {
+        val output = runCatching { withContext(Dispatchers.IO) { StandaloneImageWork.outputFile(activity, id) } }.getOrNull()
+        if (output != null && activity.operations.overwriteOriginal(original, output)) {
+            StandaloneImageWork.discard(activity, id)
+            if (pending == id) pending = null
+            refresh()
+        } else {
+            prepareExport()
         }
     }
 
@@ -128,7 +156,7 @@ internal class HomeActions(private val activity: HomeActivity) {
         saveImage.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = mime
-            putExtra(Intent.EXTRA_TITLE, "$exportName.$extension")
+            putExtra(Intent.EXTRA_TITLE, "${exportName}_${if (mode == MODE_CONVERT) "converted" else "edited"}.$extension")
         })
     }
 
@@ -142,6 +170,7 @@ internal class HomeActions(private val activity: HomeActivity) {
         state.putString("maple.pending", pending)
         state.putString("maple.exportName", exportName)
         state.putString("maple.pendingDisplayName", pendingDisplayName)
+        state.putString("maple.pendingOriginal", pendingOriginal?.toString())
         state.putString("maple.unsavedPromptFor", unsavedPromptFor)
     }
 
@@ -150,6 +179,7 @@ internal class HomeActions(private val activity: HomeActivity) {
         pending = state?.getString("maple.pending")
         exportName = state?.getString("maple.exportName") ?: "image"
         pendingDisplayName = state?.getString("maple.pendingDisplayName")
+        pendingOriginal = state?.getString("maple.pendingOriginal")?.let(Uri::parse)
         unsavedPromptFor = state?.getString("maple.unsavedPromptFor")
         activity.composeDialogOpen = unsavedPromptFor != null
     }

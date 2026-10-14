@@ -212,6 +212,12 @@
     <string name="image_editor_rotation_degrees">%1$d°</string>
     <string name="image_editor_saturation">Насыщенность</string>
     <string name="image_editor_save_follow_source">Как в исходном файле (%1$s)</string>
+    <string name="image_editor_save_keep_exif">Сохранить данные съёмки</string>
+    <string name="image_editor_save_keep_exif_summary">Камера, дата и экспозиция сохраняются; местоположение всегда удаляется</string>
+    <string name="image_editor_save_new_name">Новый файл: %1$s</string>
+    <string name="image_editor_save_overwrite">Перезаписать оригинал</string>
+    <string name="image_editor_save_overwrite_summary">Формат не меняется. Сразу после сохранения можно отменить</string>
+    <string name="image_editor_save_replaces_name">Заменит: %1$s</string>
     <string name="image_editor_shadows">Тени</string>
     <string name="image_editor_shape_arrow">Стрелка</string>
     <string name="image_editor_shape_delete">Удалить фигуру</string>
@@ -251,6 +257,11 @@
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">Сведения об изображении недоступны</string>
+    <string name="overwrite_confirm">Перезаписать</string>
+    <string name="overwrite_failed">Не удалось перезаписать оригинал. Сохраните результат как новый файл</string>
+    <string name="overwrite_saved">Оригинал перезаписан</string>
+    <string name="overwrite_without_undo_message">Нет места для копии оригинала, поэтому перезапись нельзя будет отменить.</string>
+    <string name="overwrite_without_undo_title">Перезаписать без отмены?</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Просмотр, редактирование и преобразование изображений</string>
     <string name="progress_copying">Копирование изображений</string>

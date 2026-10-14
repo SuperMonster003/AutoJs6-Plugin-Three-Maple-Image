@@ -12,13 +12,17 @@ import java.util.UUID
 /** Private standalone sessions never broaden the exported host's strict URI grant contract. */
 internal object StandaloneImageWork {
     const val EXTRA_SESSION = "io.github.supermonster003.autojs6.plugin.three.maple.image.extra.STANDALONE_SESSION"
+
+    /** Result extra of a standalone tool: the output replaces the original instead of becoming a new file. */
+    const val EXTRA_OVERWRITE = "io.github.supermonster003.autojs6.plugin.three.maple.image.extra.STANDALONE_OVERWRITE"
     private val sessionPattern = Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
     private fun directory(context: Context, id: String): File {
         require(sessionPattern.matches(id))
         val root = File(context.cacheDir, "standalone-images").canonicalFile
         return File(root, id).canonicalFile.also { require(it.parentFile == root) }
     }
-    fun create(context: Context, document: StandaloneDocument, action: String): String {
+    /** [overwritable]: the caller can write [document] back, so the tool may offer to overwrite it (ROADMAP 8.2). */
+    fun create(context: Context, document: StandaloneDocument, action: String, overwritable: Boolean = false): String {
         require(action == ImageToolsPlugin.EDIT_ACTION_ID || action == ImageToolsPlugin.CONVERT_ACTION_ID)
         require(document.size <= ImageToolsRequestPolicy.MAX_INPUT_BYTES)
         val id = UUID.randomUUID().toString()
@@ -40,7 +44,7 @@ internal object StandaloneImageWork {
             } ?: error("Input is unavailable")
             require(input.length() > 0)
             val metadata = JSONObject().put("action", action).put("name", document.name)
-                .put("mime", document.mimeType).put("size", input.length())
+                .put("mime", document.mimeType).put("size", input.length()).put("overwrite", overwritable)
             File(directory, "session.json").writeText(metadata.toString())
             return id
         } catch (error: Throwable) {
@@ -62,7 +66,8 @@ internal object StandaloneImageWork {
             FileProvider.getUriForFile(context, authority, input),
             FileProvider.getUriForFile(context, authority, File(folder, "output.bin")),
             id, name, size, metadata.getString("mime"), ImageToolsPlugin.OUTPUT_MIME_TYPES.toSet(),
-            ImageToolsPlugin.MAX_OUTPUT_BYTES, if (expectedAction == ImageToolsPlugin.EDIT_ACTION_ID) "edited" else "converted")
+            ImageToolsPlugin.MAX_OUTPUT_BYTES, if (expectedAction == ImageToolsPlugin.EDIT_ACTION_ID) "edited" else "converted",
+            canOverwrite = metadata.optBoolean("overwrite", false))
     }.getOrNull()
     fun hasOutput(context: Context, id: String): Boolean = runCatching {
         File(directory(context, id), "output.bin").length() > 0
@@ -75,6 +80,12 @@ internal object StandaloneImageWork {
         require(options.outWidth > 0 && options.outHeight > 0)
         return requireNotNull(options.outMimeType).also { require(it in ImageToolsPlugin.OUTPUT_MIME_TYPES) }
     }
+    /** The tool's output of session [id], checked to be an image the tools write. */
+    fun outputFile(context: Context, id: String): File {
+        outputMime(context, id)
+        return File(directory(context, id), "output.bin")
+    }
+
     fun export(context: Context, id: String, target: Uri) {
         require(target.scheme == "content" && target.authority != context.packageName + ".standalone-images")
         outputMime(context, id)

@@ -212,6 +212,12 @@
     <string name="image_editor_rotation_degrees">%1$d°</string>
     <string name="image_editor_saturation">Saturation</string>
     <string name="image_editor_save_follow_source">Follow source (%1$s)</string>
+    <string name="image_editor_save_keep_exif">Keep capture details</string>
+    <string name="image_editor_save_keep_exif_summary">Camera, date and exposure stay; the location is always removed</string>
+    <string name="image_editor_save_new_name">New file: %1$s</string>
+    <string name="image_editor_save_overwrite">Overwrite the original</string>
+    <string name="image_editor_save_overwrite_summary">Keeps its format. You can undo it right after saving</string>
+    <string name="image_editor_save_replaces_name">Replaces: %1$s</string>
     <string name="image_editor_shadows">Shadows</string>
     <string name="image_editor_shape_arrow">Arrow</string>
     <string name="image_editor_shape_delete">Delete shape</string>
@@ -251,6 +257,11 @@
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">Image information is unavailable</string>
+    <string name="overwrite_confirm">Overwrite</string>
+    <string name="overwrite_failed">The original could not be overwritten. Save the edit as a new file instead</string>
+    <string name="overwrite_saved">Original overwritten</string>
+    <string name="overwrite_without_undo_message">There is no room to keep a copy of the original, so this overwrite cannot be undone.</string>
+    <string name="overwrite_without_undo_title">Overwrite without undo?</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">Image viewing, editing and format conversion</string>
     <string name="progress_copying">Copying images</string>

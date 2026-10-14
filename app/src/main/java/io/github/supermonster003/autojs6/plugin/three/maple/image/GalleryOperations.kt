@@ -1,5 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
+import java.io.File
+import kotlinx.coroutines.CompletableDeferred
 import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
@@ -82,6 +84,9 @@ internal sealed interface GalleryDialog {
     /** Rename an album folder (ROADMAP 7.4); [imagesOnly]: no folder rename, its images move to the new name. */
     data class RenameAlbum(val album: AlbumSummary, val imagesOnly: Boolean) : GalleryDialog
 
+    /** No room to back up the original: overwrite it anyway, without undo (ROADMAP 8.2)? */
+    data class ConfirmOverwriteWithoutUndo(val answer: CompletableDeferred<Boolean>) : GalleryDialog
+
     /** Delete whole albums (ROADMAP 7.4): their [items] go to the recycle bin, or for good when it is off. */
     data class ConfirmDeleteAlbums(val albumCount: Int, val items: List<MediaItem>, val forGood: Boolean) : GalleryDialog
 
@@ -156,6 +161,41 @@ internal class GalleryOperations(
     private var progressDone by mutableIntStateOf(0)
     private var progressTotal by mutableIntStateOf(0)
     private val batch by lazy { ViewModelProvider(activity)[BatchConversionViewModel::class.java] }
+    private val overwriteBackup by lazy { OverwriteBackup(activity) }
+
+    /**
+     * Writes [output] over the original behind [original] (ROADMAP 8.2): the original is backed up first, so the
+     * snackbar can undo it; without room for that copy the user confirms an overwrite that cannot be undone. False
+     * when nothing was written (refused, cancelled or failed): the caller keeps the edit and saves it as a new file.
+     */
+    suspend fun overwriteOriginal(original: Uri, output: File): Boolean {
+        val undoable = withContext(Dispatchers.IO) { overwriteBackup.store(activity.contentResolver, original) }
+        if (!undoable && !confirmOverwriteWithoutUndo()) return false
+        val outcome = coordinator.overwrite(original) { output.inputStream() }
+        if (outcome.succeeded != 1) {
+            overwriteBackup.clear()
+            if (!explainRefusedPermission()) notify(activity.getString(R.string.overwrite_failed))
+            return false
+        }
+        target.afterWrite()
+        notify(
+            activity.getString(R.string.overwrite_saved),
+            undo = if (undoable) ({ undoOverwrite(original) }) else null,
+            afterUndo = { target.afterWrite() },
+        )
+        return true
+    }
+
+    private suspend fun undoOverwrite(original: Uri): WriteOutcome {
+        if (!overwriteBackup.holds(original)) return WriteOutcome(failed = 1)
+        return coordinator.overwrite(original) { overwriteBackup.open() }.also { if (it.succeeded == 1) overwriteBackup.clear() }
+    }
+
+    private suspend fun confirmOverwriteWithoutUndo(): Boolean {
+        val answer = CompletableDeferred<Boolean>()
+        show(GalleryDialog.ConfirmOverwriteWithoutUndo(answer))
+        return answer.await()
+    }
 
     /** What the bar offers for [state]'s album: authorized folders only share, delete, rename and show details. */
     fun actionsFor(state: MediaGridUiState): MediaSelectionActions {
@@ -744,6 +784,19 @@ internal class GalleryOperations(
                 onConfirm = {
                     show(null)
                     runHide(current.albums)
+                },
+            )
+            is GalleryDialog.ConfirmOverwriteWithoutUndo -> ConfirmDialog(
+                title = stringResource(R.string.overwrite_without_undo_title),
+                message = stringResource(R.string.overwrite_without_undo_message),
+                confirmText = stringResource(R.string.overwrite_confirm),
+                onDismiss = {
+                    show(null)
+                    current.answer.complete(false)
+                },
+                onConfirm = {
+                    show(null)
+                    current.answer.complete(true)
                 },
             )
             GalleryDialog.HideNeedsAccess -> ConfirmDialog(

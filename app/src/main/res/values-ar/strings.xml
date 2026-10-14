@@ -212,6 +212,12 @@
     <string name="image_editor_rotation_degrees">%1$d°</string>
     <string name="image_editor_saturation">التشبع</string>
     <string name="image_editor_save_follow_source">اتباع تنسيق المصدر (%1$s)</string>
+    <string name="image_editor_save_keep_exif">الاحتفاظ بتفاصيل الالتقاط</string>
+    <string name="image_editor_save_keep_exif_summary">تبقى الكاميرا والتاريخ والتعريض, ويُزال الموقع دائما</string>
+    <string name="image_editor_save_new_name">ملف جديد: %1$s</string>
+    <string name="image_editor_save_overwrite">استبدال الصورة الأصلية</string>
+    <string name="image_editor_save_overwrite_summary">يبقى التنسيق كما هو, ويمكنك التراجع مباشرة بعد الحفظ</string>
+    <string name="image_editor_save_replaces_name">يستبدل: %1$s</string>
     <string name="image_editor_shadows">الظلال</string>
     <string name="image_editor_shape_arrow">سهم</string>
     <string name="image_editor_shape_delete">حذف الشكل</string>
@@ -251,6 +257,11 @@
     <string name="metadata_summary">%1$s | %2$s | %3$s</string>
     <string name="metadata_summary_with_color">%1$s | %2$s | %3$s | %4$s</string>
     <string name="metadata_unavailable">معلومات الصورة غير متاحة</string>
+    <string name="overwrite_confirm">استبدال</string>
+    <string name="overwrite_failed">تعذر استبدال الصورة الأصلية. احفظ التعديل كملف جديد بدلا من ذلك</string>
+    <string name="overwrite_saved">تم استبدال الصورة الأصلية</string>
+    <string name="overwrite_without_undo_message">لا توجد مساحة للاحتفاظ بنسخة من الصورة الأصلية, لذا لا يمكن التراجع عن هذا الاستبدال.</string>
+    <string name="overwrite_without_undo_title">الاستبدال دون تراجع؟</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">عرض الصور وتحريرها وتحويل صيغها</string>
     <string name="progress_copying">جار نسخ الصور</string>

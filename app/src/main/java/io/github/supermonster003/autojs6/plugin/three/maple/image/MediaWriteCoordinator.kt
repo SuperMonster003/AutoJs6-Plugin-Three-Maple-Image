@@ -1,5 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
+import java.io.InputStream
+import java.io.FileOutputStream
 import android.Manifest
 import android.app.Activity
 import android.app.PendingIntent
@@ -357,6 +359,47 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
      * permission when it is missing. False when it was refused ([consumeWritePermissionRefused] is then set).
      */
     suspend fun prepareCreate(): Boolean = routeForIds(MediaWriteOperation.COPY, emptyList()) != null
+
+    /**
+     * Writes [content] over the image behind [uri] (ROADMAP 8.2). A media library image takes the route of a rename:
+     * the file on Android 7-10 (internal storage, with the storage permission), a direct write with all files
+     * access or for the app's own images, and one `createWriteRequest` confirmation otherwise. Any other document
+     * is written through its own write grant. The file is truncated first, so callers keep a backup.
+     */
+    suspend fun overwrite(uri: Uri, content: () -> InputStream): WriteOutcome {
+        if (uri.authority != MediaStore.AUTHORITY) {
+            return if (withContext(Dispatchers.IO) { writeOver(uri, content) }) WriteOutcome(succeeded = 1) else WriteOutcome(failed = 1)
+        }
+        val route = routeForUris(MediaWriteOperation.OVERWRITE, listOf(uri)) ?: return WriteOutcome(cancelled = true)
+        val path = withContext(Dispatchers.IO) { StandaloneOverwrite.mediaFilePath(resolver, uri) }
+        val written = when (route) {
+            MediaWriteRoute.LEGACY_FILE -> path != null && withContext(Dispatchers.IO) {
+                runCatching {
+                    FileOutputStream(File(path)).use { output -> content().use { it.copyTo(output) } }
+                    true
+                }.getOrDefault(false)
+            }
+            MediaWriteRoute.DIRECT -> withContext(Dispatchers.IO) { writeOver(uri, content) } ||
+                // All files access may still be refused by the provider for another app's image: ask then.
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && requestWrite(uri) && withContext(Dispatchers.IO) { writeOver(uri, content) })
+            MediaWriteRoute.SYSTEM_REQUEST -> {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || !requestWrite(uri)) return WriteOutcome(cancelled = true)
+                withContext(Dispatchers.IO) { writeOver(uri, content) }
+            }
+            else -> false
+        }
+        if (!written) return WriteOutcome(failed = 1)
+        // The size, dimensions and dates in the media library follow the new content.
+        path?.let { scan(listOf(it)) }
+        return WriteOutcome(succeeded = 1)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private suspend fun requestWrite(uri: Uri): Boolean = systemRequest(MediaStore.createWriteRequest(resolver, listOf(uri)))
+
+    private fun writeOver(uri: Uri, content: () -> InputStream): Boolean = runCatching {
+        resolver.openOutputStream(uri, "wt")?.use { output -> content().use { it.copyTo(output) } } != null
+    }.getOrDefault(false)
 
     // ---- routes ----
 

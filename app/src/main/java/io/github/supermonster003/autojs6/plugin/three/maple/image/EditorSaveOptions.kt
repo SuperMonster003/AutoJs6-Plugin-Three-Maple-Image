@@ -13,6 +13,10 @@ internal data class EditorSaveOptions(
     val format: EditorSaveFormat = EditorSaveFormat.FOLLOW_SOURCE,
     val quality: Int = ImageConversionOptions.DEFAULT_QUALITY,
     val webpLossless: Boolean = false,
+    /** Keep the camera and capture details of the original (never its location), as the converter offers. */
+    val keepExif: Boolean = false,
+    /** Replace the original instead of creating a new file (D3); never remembered, each save dialog starts off. */
+    val overwrite: Boolean = false,
 ) {
     init {
         require(quality in ImageConversionOptions.MIN_QUALITY..ImageConversionOptions.MAX_QUALITY) {
@@ -35,11 +39,29 @@ internal object EditorSavePolicy {
             require(formats.size > 1) { "No permitted image output format is available" }
         }
 
+    /**
+     * The format an overwrite keeps (ROADMAP 8.2): the original's own format, or null when the original is in a
+     * format the editor cannot write (GIF, HEIF, BMP...), where overwriting is not offered.
+     */
+    fun overwriteFormat(detectedMimeType: String, allowedOutputMimeTypes: Set<String>): ImageOutputFormat? =
+        ImageOutputFormat.entries.firstOrNull { it.mimeType == detectedMimeType && it.mimeType in allowedOutputMimeTypes }
+
+    /** The name the new file gets (`photo_edited.jpg`), or the original's name when it is overwritten. */
+    fun outputFileName(displayName: String, format: ImageOutputFormat, suffix: String, overwrite: Boolean): String {
+        if (overwrite) return displayName
+        val base = displayName.substringBeforeLast('.', displayName).ifBlank { displayName }
+        return "${base}_$suffix.${format.extension}"
+    }
+
     fun effectiveFormat(
         selection: EditorSaveFormat,
         detectedMimeType: String,
         allowedOutputMimeTypes: Set<String>,
+        overwrite: Boolean = false,
     ): ImageOutputFormat {
+        if (overwrite) {
+            return requireNotNull(overwriteFormat(detectedMimeType, allowedOutputMimeTypes)) { "The original's format cannot be written" }
+        }
         val permitted = ImageOutputFormat.entries.filter {
             it.mimeType in allowedOutputMimeTypes
         }
@@ -58,11 +80,13 @@ internal object EditorSavePolicy {
         allowedOutputMimeTypes: Set<String>,
         targetSize: ImagePixelSize,
         sdkInt: Int,
+        preservableExif: PreservedExifMetadata = PreservedExifMetadata.EMPTY,
     ): ImageConversionOptions {
         val outputFormat = effectiveFormat(
             selection = saveOptions.format,
             detectedMimeType = detectedMimeType,
             allowedOutputMimeTypes = allowedOutputMimeTypes,
+            overwrite = saveOptions.overwrite,
         )
         return ImageConversionOptions(
             format = outputFormat,
@@ -73,6 +97,7 @@ internal object EditorSavePolicy {
                 requested = saveOptions.webpLossless,
                 sdkInt = sdkInt,
             ),
+            preservedExifMetadata = preservableExif.takeIf { saveOptions.keepExif && !it.isEmpty },
         )
     }
 }
