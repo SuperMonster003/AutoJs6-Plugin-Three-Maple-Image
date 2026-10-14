@@ -27,7 +27,7 @@ Les photos sont automatiquement pivotées ou mises en miroir selon leur orientat
 
 Dans le gestionnaire de fichiers, `Afficher comme album` dans le menu d'un dossier ouvre ce dossier comme album via la session de l'hôte. Les sous-dossiers jusqu'à 8 niveaux apparaissent comme cellules de dossier, les images s'ouvrent dans la visionneuse avec pagination dans ce dossier et seules les 4096 premières entrées de chaque dossier sont listées. Ce mode ne requiert aucune permission de stockage et ne divulgue aucun chemin de fichier; les actions de gestion n'y sont pas disponibles.
 
-La version 5276 ou ultérieure de l'hôte est requise.
+La version 5352 ou ultérieure de l'hôte est requise.
 
 Limites de sécurité et de confidentialité:
 

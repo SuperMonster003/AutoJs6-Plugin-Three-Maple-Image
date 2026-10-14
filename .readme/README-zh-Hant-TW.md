@@ -163,7 +163,7 @@ Image Viewer 與 Image Tools 合併為 3-Maple Image, 在同一應用程式提�
 
 ```text
 host app: AutoJs6 (org.autojs.autojs6)
-minimum host build: 5276
+minimum host build: 5352
 minimum android: 7.0 (API 24)
 plugin package: io.github.supermonster003.autojs6.plugin.three.maple.image
 ```
@@ -219,7 +219,7 @@ AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 **檔案的選單裡沒有出現 `編輯影像` 和 `轉換影像`?**
 
-請依序檢查: AutoJs6 版本代碼是否不低於 5276; 外掛是否已在 `外掛中心` 啟用; 副檔名或 MIME 類型是否在支援清單中. 三者任一不滿足, 選單動作都不會出現.
+請依序檢查: AutoJs6 版本代碼是否不低於 5352; 外掛是否已在 `外掛中心` 啟用; 副檔名或 MIME 類型是否在支援清單中. 三者任一不滿足, 選單動作都不會出現. 3.2.0 起本外掛聲明 explorer-action 協定 24, 不支援該協定的 AutoJs6 會忽略本外掛的全部選單動作 (包括 `檢視圖像` 與 `以相簿瀏覽`); 請更新 AutoJs6. 相簿與獨立首頁中的編輯和轉換不受影響.
 
 **開啟時提示 `無法讀取圖片資訊` 或頁面一閃而過?**
 
@@ -227,7 +227,7 @@ AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 **處理結果儲存在哪裡? 會覆寫原圖嗎?**
 
-不會覆寫原圖. 從 AutoJs6 使用時, 結果作為新檔案儲存在原檔案旁; 從獨立首頁開始時, 處理完成後由你選擇儲存位置.
+預設不會覆蓋. 從 AutoJs6 呼叫時, 結果作為新檔案 (`名稱_edited` 或 `名稱_converted`) 儲存在原檔案旁; 在相簿或獨立首頁中處理時, 完成後由你選擇儲存位置. 只有在儲存對話框或轉換頁開啟 `覆蓋原圖` 時才會取代原圖, 格式保持不變; 取代後可以立即復原: 從 AutoJs6 呼叫時由宿主保留上一版本, 在相簿與獨立首頁中由外掛保留一份備份.
 
 **轉換大圖時提示記憶體不足或像素數超限?**
 
@@ -269,12 +269,12 @@ plugin id: three-maple-image
 engine: explorer-action
 variant: default
 explorer action id: view-image
-protocol version: 12
+protocol version: 24
 MIME type: Explorer: avif/bmp/gif/heic/heif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
-required host build: 5276
+required host build: 5352
 ```
 
-目前實作基於 explorer-action 協定版本 12: 主要動作聲明單一檔案目標, 唯讀存取與 `readSiblings`. 主程式工作階段只公開同一目錄的直屬檔案; 外掛僅保留受支援, 可讀且非符號連結的圖片, 按自然檔案名稱排序, 並在選取圖片周圍維持最多 128 頁的有界視窗. 第二個唯讀選取工具列動作聲明多個檔案且不啟用 `readSiblings`; 它接受同一上層目錄下 1 至 128 張受支援圖片, 保留主程式選取順序, 並只傳遞主程式明確授權的目標. 圖片編輯, 轉換, 檔案資訊, 刪除, 移動與重新命名仍由主程式提供; 未安裝本外掛時, 主程式降級為唯讀的外部 `ACTION_VIEW` 請求. 第三個選取工具列動作 `convert-images` 聲明多個檔案與 `ACCESS_CREATE_IN_PARENT`: 每張圖片在原目錄建立一個新檔案, 讀回驗證後以輸出批次一起發布, 任何一張失敗則全部回復.
+目前實作基於 explorer-action 協定版本 24: 主要動作聲明單一檔案目標, 唯讀存取與 `readSiblings`. 主程式工作階段只公開同一目錄的直屬檔案; 外掛僅保留受支援, 可讀且非符號連結的圖片, 按自然檔案名稱排序, 並在選取圖片周圍維持最多 128 頁的有界視窗. 第二個唯讀選取工具列動作聲明多個檔案且不啟用 `readSiblings`; 它接受同一上層目錄下 1 至 128 張受支援圖片, 保留主程式選取順序, 並只傳遞主程式明確授權的目標. 圖片編輯, 轉換, 檔案資訊, 刪除, 移動與重新命名仍由主程式提供; 未安裝本外掛時, 主程式降級為唯讀的外部 `ACTION_VIEW` 請求. 第三個選取工具列動作 `convert-images` 聲明多個檔案與 `ACCESS_CREATE_IN_PARENT`: 每張圖片在原目錄建立一個新檔案, 讀回驗證後以輸出批次一起發布, 任何一張失敗則全部回復.
 
 ******
 

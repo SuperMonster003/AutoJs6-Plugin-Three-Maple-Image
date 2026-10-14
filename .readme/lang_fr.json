@@ -84,7 +84,7 @@
     },
     {
       "question": "Le menu du fichier n'affiche pas `Modifier l'image` et `Convertir l'image`?",
-      "answer": "Vérifiez dans l'ordre: le code de version d'AutoJs6 est au moins {{ required_host_build }}; le plugin est activé dans le `Centre des plugins`; l'extension du fichier ou son type MIME figure dans la liste prise en charge. Si l'une des trois conditions manque, les actions n'apparaissent pas."
+      "answer": "Vérifiez dans l'ordre: le code de version d'AutoJs6 est au moins {{ required_host_build }}; le plugin est activé dans le `Centre des plugins`; l'extension du fichier ou son type MIME figure dans la liste prise en charge. Si l'une des trois conditions manque, les actions n'apparaissent pas. Depuis la 3.2.0, le plugin déclare le protocole explorer-action 24; un AutoJs6 qui ne le prend pas en charge ignore toutes les actions de menu du plugin (y compris `Afficher l'image` et `Parcourir comme album`), mettez donc AutoJs6 à jour. L'édition et la conversion depuis la galerie et l'écran d'accueil autonome ne sont pas concernées."
     },
     {
       "question": "L'ouverture échoue avec `Impossible de lire les informations de l'image` ou l'écran se ferme aussitôt?",
@@ -92,7 +92,7 @@
     },
     {
       "question": "Où le résultat est-il enregistré? Écrase-t-il l'original?",
-      "answer": "L'original n'est jamais écrasé. Depuis AutoJs6, le résultat est enregistré comme un nouveau fichier à côté de la source; depuis l'accueil autonome, vous choisissez où l'enregistrer après la retouche ou la conversion."
+      "answer": "Pas par défaut. Depuis AutoJs6, le résultat est enregistré dans un nouveau fichier (`nom_edited` ou `nom_converted`) à côté de l'original; depuis la galerie ou l'écran d'accueil autonome, vous choisissez l'emplacement une fois terminé. L'original n'est remplacé que si vous activez `Remplacer l'original` dans la boîte d'enregistrement ou sur la page de conversion, et il garde son format; juste après, vous pouvez annuler: depuis AutoJs6 l'hôte conserve la version précédente, dans la galerie et sur l'écran d'accueil le plugin garde une copie."
     },
     {
       "question": "La conversion d'une grande image signale une mémoire insuffisante ou trop de pixels?",

@@ -84,7 +84,7 @@
     },
     {
       "question": "El menú del archivo no muestra `Editar imagen` y `Convertir imagen`?",
-      "answer": "Compruebe en orden: que el código de versión de AutoJs6 sea al menos {{ required_host_build }}; que el complemento esté activado en el `Centro de plugins`; y que la extensión del archivo o su tipo MIME figure en la lista compatible. Si falla cualquiera de las tres condiciones, las acciones no aparecen."
+      "answer": "Compruebe en orden: que el código de versión de AutoJs6 sea al menos {{ required_host_build }}; que el complemento esté activado en el `Centro de plugins`; y que la extensión del archivo o su tipo MIME figure en la lista compatible. Si falla cualquiera de las tres condiciones, las acciones no aparecen. Desde la 3.2.0 el complemento declara el protocolo explorer-action 24; un AutoJs6 que no lo admite ignora todas las acciones de menú del complemento (incluidas `Ver imagen` y `Ver como álbum`), así que actualiza AutoJs6. Editar y convertir desde la galería y la pantalla de inicio independiente no se ven afectados."
     },
     {
       "question": "Al abrir aparece `No se puede leer la información de la imagen` o la pantalla se cierra al instante?",
@@ -92,7 +92,7 @@
     },
     {
       "question": "Dónde se guarda el resultado? Sobrescribe el original?",
-      "answer": "El original nunca se sobrescribe. Desde AutoJs6, el resultado se guarda como un archivo nuevo junto al original; desde el inicio independiente, usted elige dónde guardarlo después de editar o convertir."
+      "answer": "No de forma predeterminada. Desde AutoJs6, el resultado se guarda como un archivo nuevo (`nombre_edited` o `nombre_converted`) junto al original; desde la galería o la pantalla de inicio independiente, eliges dónde guardarlo al terminar. El original solo se reemplaza si activas `Sobrescribir el original` en el diálogo de guardado o en la página de conversión, y conserva su formato; justo después puedes deshacerlo: desde AutoJs6 el host guarda la versión anterior, en la galería y en la pantalla de inicio el complemento guarda una copia."
     },
     {
       "question": "Convertir una imagen grande avisa de memoria insuficiente o de demasiados píxeles?",

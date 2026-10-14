@@ -43,7 +43,7 @@ android {
         resValue("string", "plugin_id", "three-maple-image")
         resValue("string", "plugin_engine", "explorer-action")
         resValue("string", "plugin_variant", "default")
-        resValue("string", "plugin_requires_host_version", "5276")
+        resValue("string", "plugin_requires_host_version", "5352")
         resValue("string", "plugin_version_date", utils.getDateString("MMM d, yyyy", "GMT+08:00"))
     }
 

@@ -163,7 +163,7 @@ Avant de commencer, vérifiez les prérequis suivants:
 
 ```text
 host app: AutoJs6 (org.autojs.autojs6)
-minimum host build: 5276
+minimum host build: 5352
 minimum android: 7.0 (API 24)
 plugin package: io.github.supermonster003.autojs6.plugin.three.maple.image
 ```
@@ -219,7 +219,7 @@ Les images supprimées passent d'abord par la corbeille et peuvent être restaur
 
 **Le menu du fichier n'affiche pas `Modifier l'image` et `Convertir l'image`?**
 
-Vérifiez dans l'ordre: le code de version d'AutoJs6 est au moins 5276; le plugin est activé dans le `Centre des plugins`; l'extension du fichier ou son type MIME figure dans la liste prise en charge. Si l'une des trois conditions manque, les actions n'apparaissent pas.
+Vérifiez dans l'ordre: le code de version d'AutoJs6 est au moins 5352; le plugin est activé dans le `Centre des plugins`; l'extension du fichier ou son type MIME figure dans la liste prise en charge. Si l'une des trois conditions manque, les actions n'apparaissent pas. Depuis la 3.2.0, le plugin déclare le protocole explorer-action 24; un AutoJs6 qui ne le prend pas en charge ignore toutes les actions de menu du plugin (y compris `Afficher l'image` et `Parcourir comme album`), mettez donc AutoJs6 à jour. L'édition et la conversion depuis la galerie et l'écran d'accueil autonome ne sont pas concernées.
 
 **L'ouverture échoue avec `Impossible de lire les informations de l'image` ou l'écran se ferme aussitôt?**
 
@@ -227,7 +227,7 @@ Le fichier ne peut pas être lu pour le moment: il a peut-être été déplacé 
 
 **Où le résultat est-il enregistré? Écrase-t-il l'original?**
 
-L'original n'est jamais écrasé. Depuis AutoJs6, le résultat est enregistré comme un nouveau fichier à côté de la source; depuis l'accueil autonome, vous choisissez où l'enregistrer après la retouche ou la conversion.
+Pas par défaut. Depuis AutoJs6, le résultat est enregistré dans un nouveau fichier (`nom_edited` ou `nom_converted`) à côté de l'original; depuis la galerie ou l'écran d'accueil autonome, vous choisissez l'emplacement une fois terminé. L'original n'est remplacé que si vous activez `Remplacer l'original` dans la boîte d'enregistrement ou sur la page de conversion, et il garde son format; juste après, vous pouvez annuler: depuis AutoJs6 l'hôte conserve la version précédente, dans la galerie et sur l'écran d'accueil le plugin garde une copie.
 
 **La conversion d'une grande image signale une mémoire insuffisante ou trop de pixels?**
 
@@ -269,12 +269,12 @@ plugin id: three-maple-image
 engine: explorer-action
 variant: default
 explorer action id: view-image
-protocol version: 12
+protocol version: 24
 MIME type: Explorer: avif/bmp/gif/heic/heif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
-required host build: 5276
+required host build: 5352
 ```
 
-L'implémentation actuelle vise la version 12 du protocole explorer-action: l'action principale déclare une cible mono-fichier, un accès en lecture seule et `readSiblings`. La session de l'hôte n'expose que les voisins directs; le plugin conserve les images prises en charge, lisibles et non symboliques, applique l'ordre naturel des noms et maintient une fenêtre limitée à 128 pages autour de l'image sélectionnée. Une seconde action en lecture seule dans la barre de sélection déclare plusieurs fichiers sans `readSiblings`; elle accepte de 1 à 128 images prises en charge sous un même parent, conserve l'ordre de sélection de l'hôte et ne transmet que les cibles explicitement autorisées. L'édition, la conversion, les détails de fichiers, la suppression, le déplacement et le renommage restent des fonctions de l'hôte; sans le plugin, l'hôte se rabat sur une demande externe `ACTION_VIEW` en lecture seule. Une troisième action de la barre de sélection, `convert-images`, déclare plusieurs fichiers avec `ACCESS_CREATE_IN_PARENT`: chaque image devient un nouveau fichier dans le dossier source, relu pour vérification, et les fichiers sont publiés ensemble comme un lot de sortie entièrement annulé si une image échoue.
+L'implémentation actuelle vise la version 24 du protocole explorer-action: l'action principale déclare une cible mono-fichier, un accès en lecture seule et `readSiblings`. La session de l'hôte n'expose que les voisins directs; le plugin conserve les images prises en charge, lisibles et non symboliques, applique l'ordre naturel des noms et maintient une fenêtre limitée à 128 pages autour de l'image sélectionnée. Une seconde action en lecture seule dans la barre de sélection déclare plusieurs fichiers sans `readSiblings`; elle accepte de 1 à 128 images prises en charge sous un même parent, conserve l'ordre de sélection de l'hôte et ne transmet que les cibles explicitement autorisées. L'édition, la conversion, les détails de fichiers, la suppression, le déplacement et le renommage restent des fonctions de l'hôte; sans le plugin, l'hôte se rabat sur une demande externe `ACTION_VIEW` en lecture seule. Une troisième action de la barre de sélection, `convert-images`, déclare plusieurs fichiers avec `ACCESS_CREATE_IN_PARENT`: chaque image devient un nouveau fichier dans le dossier source, relu pour vérification, et les fichiers sont publiés ensemble comme un lot de sortie entièrement annulé si une image échoue.
 
 ******
 

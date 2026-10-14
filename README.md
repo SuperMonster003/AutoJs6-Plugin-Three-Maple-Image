@@ -163,7 +163,7 @@ Image Viewer 与 Image Tools 合并为 3-Maple Image, 在同一应用中提供�
 
 ```text
 host app: AutoJs6 (org.autojs.autojs6)
-minimum host build: 5276
+minimum host build: 5352
 minimum android: 7.0 (API 24)
 plugin package: io.github.supermonster003.autojs6.plugin.three.maple.image
 ```
@@ -219,7 +219,7 @@ AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 **文件的菜单里没有出现 `编辑图像` 和 `转换图像`?**
 
-请依次检查: AutoJs6 版本代码是否不低于 5276; 插件是否已在 `插件中心` 启用; 文件扩展名或 MIME 类型是否在支持列表中. 三者任一不满足, 菜单动作都不会出现.
+请依次检查: AutoJs6 版本代码是否不低于 5352; 插件是否已在 `插件中心` 启用; 文件扩展名或 MIME 类型是否在支持列表中. 三者任一不满足, 菜单动作都不会出现. 3.2.0 起本插件声明 explorer-action 协议 24, 不支持该协议的 AutoJs6 会忽略本插件的全部菜单动作 (包括 `查看图像` 与 `以相册浏览`); 请更新 AutoJs6. 相册与独立首页中的编辑和转换不受影响.
 
 **打开时提示 `无法读取图片信息` 或页面一闪而过?**
 
@@ -227,7 +227,7 @@ AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG, WEBP
 
 **处理结果保存在哪里? 会覆盖原图吗?**
 
-不会覆盖原图. 从 AutoJs6 调用时, 结果作为新文件保存在原文件旁; 从独立首页开始时, 处理完成后由你选择保存位置.
+默认不会覆盖. 从 AutoJs6 调用时, 结果作为新文件 (`名称_edited` 或 `名称_converted`) 保存在原文件旁; 在相册或独立首页中处理时, 完成后由你选择保存位置. 只有在保存对话框或转换页打开 `覆盖原图` 时才会替换原图, 格式保持不变; 替换后可以立即撤销: 从 AutoJs6 调用时由宿主保留上一版本, 在相册与独立首页中由插件保留一份备份.
 
 **转换大图时提示内存不足或像素数超限?**
 
@@ -269,12 +269,12 @@ plugin id: three-maple-image
 engine: explorer-action
 variant: default
 explorer action id: view-image
-protocol version: 12
+protocol version: 24
 MIME type: Explorer: avif/bmp/gif/heic/heif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
-required host build: 5276
+required host build: 5352
 ```
 
-当前实现基于 explorer-action 协议版本 12: 主要动作声明单文件目标, 只读访问与 `readSiblings`. 宿主会话只暴露同目录直属文件; 插件仅保留受支持, 可读且非符号链接的图像, 按自然文件名排序, 并在选中图像周围维持最多 128 页的有界窗口. 第二个只读选择工具栏动作声明多文件且不启用 `readSiblings`; 它接受同一父目录下 1 至 128 张受支持图像, 保留宿主选择顺序, 且只传递宿主明确授权的目标. 图像编辑, 转换, 文件信息, 删除, 移动与重命名仍由宿主提供; 未安装本插件时, 宿主降级为只读的外部 `ACTION_VIEW` 请求. 第三个选择工具栏动作 `convert-images` 声明多个文件与 `ACCESS_CREATE_IN_PARENT`: 每张图片在原目录创建一个新文件, 读回校验后以输出批次一起发布, 任何一张失败则全部回滚.
+当前实现基于 explorer-action 协议版本 24: 主要动作声明单文件目标, 只读访问与 `readSiblings`. 宿主会话只暴露同目录直属文件; 插件仅保留受支持, 可读且非符号链接的图像, 按自然文件名排序, 并在选中图像周围维持最多 128 页的有界窗口. 第二个只读选择工具栏动作声明多文件且不启用 `readSiblings`; 它接受同一父目录下 1 至 128 张受支持图像, 保留宿主选择顺序, 且只传递宿主明确授权的目标. 图像编辑, 转换, 文件信息, 删除, 移动与重命名仍由宿主提供; 未安装本插件时, 宿主降级为只读的外部 `ACTION_VIEW` 请求. 第三个选择工具栏动作 `convert-images` 声明多个文件与 `ACCESS_CREATE_IN_PARENT`: 每张图片在原目录创建一个新文件, 读回校验后以输出批次一起发布, 任何一张失败则全部回滚.
 
 ******
 

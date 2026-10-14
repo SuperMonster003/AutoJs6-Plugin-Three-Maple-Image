@@ -16,11 +16,14 @@ internal object ThreeMapleImagePlugin {
     const val MULTIPLE_ACTION_ID = "view-images"
     const val VARIANT = "default"
     /**
-     * v18: edit and convert manage their target (v9) to overwrite it, with the host's one-step undo (v18); the
-     * host behaves the same as at v12 for everything else this plugin declares.
+     * v24 for every action (ROADMAP T18): edit and convert manage their target (v9) with the host's one-step undo
+     * (v18), and the viewers may move their request targets to the host Trash (v24). For everything else the host
+     * behaves as at v12.
      */
-    const val PROTOCOL_VERSION = 18
-    const val REQUIRED_HOST_VERSION = 5276L
+    const val PROTOCOL_VERSION = 24
+
+    /** The host build that brought protocol v24 (AutoJs6 6.8.0, 2026-10-14). */
+    const val REQUIRED_HOST_VERSION = 5352L
     const val LABEL_RESOURCE_NAME = "action_view_image"
     const val LABEL_FALLBACK = "View image"
     const val ACTIVITY_CLASS_NAME =

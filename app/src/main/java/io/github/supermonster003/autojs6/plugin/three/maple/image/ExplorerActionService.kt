@@ -22,6 +22,10 @@ class ExplorerActionService : Service() {
 
         override fun openArchiveV11(source: ParcelFileDescriptor, request: Bundle): Bundle =
             Bundle().also { source.close() }
+
+        // Host file information v1 is an opt-in capability this plugin does not advertise, so hosts never call it.
+        override fun getHostFileInfo(source: ParcelFileDescriptor, request: Bundle): Bundle =
+            Bundle().also { source.close() }
     }
 
     override fun onBind(intent: Intent?): IBinder = binder

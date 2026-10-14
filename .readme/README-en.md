@@ -163,7 +163,7 @@ Before starting, confirm the following requirements:
 
 ```text
 host app: AutoJs6 (org.autojs.autojs6)
-minimum host build: 5276
+minimum host build: 5352
 minimum android: 7.0 (API 24)
 plugin package: io.github.supermonster003.autojs6.plugin.three.maple.image
 ```
@@ -219,7 +219,7 @@ Deleted images go to the recycle bin first and can be restored from `Recycle bin
 
 **The file menu does not show `Edit image` and `Convert image`?**
 
-Check the following in order: the AutoJs6 version code is at least 5276; the plugin is enabled in the `Plugin center`; and the file extension or MIME type is in the supported list. If any of the three fails, the menu actions will not appear.
+Check the following in order: the AutoJs6 version code is at least 5352; the plugin is enabled in the `Plugin center`; and the file extension or MIME type is in the supported list. If any of the three fails, the menu actions will not appear. Since 3.2.0 the plugin declares explorer-action protocol 24; an AutoJs6 that does not support it ignores all of the plugin's menu actions (including `View image` and `View as album`), so update AutoJs6. Editing and converting from the gallery and the standalone home screen are not affected.
 
 **Opening fails with `Unable to read image information` or the screen flashes and closes?**
 
@@ -227,7 +227,7 @@ The file cannot be read right now: it may have been moved or deleted, the app th
 
 **Where is the result saved? Does it overwrite the original?**
 
-The original is never overwritten. From AutoJs6, the result is saved as a new file next to the source; from the standalone home screen, you choose where to save it after editing or converting.
+Not by default. From AutoJs6, the result is saved as a new file (`name_edited` or `name_converted`) next to the source; from the gallery or the standalone home screen, you choose where to save it when you are done. The original is replaced only when you turn on `Overwrite the original` in the save dialog or on the converter page, and it keeps its format; right after that you can undo it: from AutoJs6 the host keeps the previous version, in the gallery and on the home screen the plugin keeps one backup.
 
 **Converting a large image reports insufficient memory or too many pixels?**
 
@@ -269,12 +269,12 @@ plugin id: three-maple-image
 engine: explorer-action
 variant: default
 explorer action id: view-image
-protocol version: 12
+protocol version: 24
 MIME type: Explorer: avif/bmp/gif/heic/heif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
-required host build: 5276
+required host build: 5352
 ```
 
-The current implementation targets explorer-action protocol version 12: the primary action declares a single-file target, read-only access, and `readSiblings`. The host session exposes only direct siblings; the plugin filters supported readable non-link images, applies natural file-name ordering, and keeps a bounded window of at most 128 pages around the selected image. A second read-only selection-toolbar action declares multiple files without `readSiblings`; it accepts 1 to 128 supported images under one parent, preserves host selection order, and transfers only explicitly granted targets. Editing, conversion, file details, deletion, moving, and renaming remain host features; without the plugin, the host falls back to a read-only external `ACTION_VIEW` request. A third selection toolbar action, `convert-images`, declares multiple files with `ACCESS_CREATE_IN_PARENT`: each image becomes a new file in the source directory, is read back, and the files are published together as one output batch that rolls back completely if any image fails.
+The current implementation targets explorer-action protocol version 24: the primary action declares a single-file target, read-only access, and `readSiblings`. The host session exposes only direct siblings; the plugin filters supported readable non-link images, applies natural file-name ordering, and keeps a bounded window of at most 128 pages around the selected image. A second read-only selection-toolbar action declares multiple files without `readSiblings`; it accepts 1 to 128 supported images under one parent, preserves host selection order, and transfers only explicitly granted targets. Editing, conversion, file details, deletion, moving, and renaming remain host features; without the plugin, the host falls back to a read-only external `ACTION_VIEW` request. A third selection toolbar action, `convert-images`, declares multiple files with `ACCESS_CREATE_IN_PARENT`: each image becomes a new file in the source directory, is read back, and the files are published together as one output batch that rolls back completely if any image fails.
 
 ******
 

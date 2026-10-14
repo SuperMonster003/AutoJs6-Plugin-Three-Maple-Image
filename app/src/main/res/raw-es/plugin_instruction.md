@@ -27,7 +27,7 @@ Las fotos se giran o reflejan automáticamente según su orientación EXIF. `Gir
 
 En el administrador de archivos, `Ver como álbum` en el menú de un directorio abre ese directorio como álbum a través de la sesión del anfitrión: las subcarpetas hasta 8 niveles aparecen como celdas de carpeta, las imágenes se abren en el visor con paginación dentro de esa carpeta y solo se listan las primeras 4096 entradas de cada carpeta. Este modo no necesita permiso de almacenamiento ni revela rutas de archivos; las acciones de gestión no están disponibles en él.
 
-Se requiere la compilación 5276 o posterior del anfitrión.
+Se requiere la compilación 5352 o posterior del anfitrión.
 
 Límites de seguridad y privacidad:
 

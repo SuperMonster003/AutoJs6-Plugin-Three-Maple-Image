@@ -163,7 +163,7 @@ Antes de empezar, confirme los siguientes requisitos:
 
 ```text
 host app: AutoJs6 (org.autojs.autojs6)
-minimum host build: 5276
+minimum host build: 5352
 minimum android: 7.0 (API 24)
 plugin package: io.github.supermonster003.autojs6.plugin.three.maple.image
 ```
@@ -219,7 +219,7 @@ Las imágenes eliminadas van primero a la papelera y se pueden restaurar desde `
 
 **El menú del archivo no muestra `Editar imagen` y `Convertir imagen`?**
 
-Compruebe en orden: que el código de versión de AutoJs6 sea al menos 5276; que el complemento esté activado en el `Centro de plugins`; y que la extensión del archivo o su tipo MIME figure en la lista compatible. Si falla cualquiera de las tres condiciones, las acciones no aparecen.
+Compruebe en orden: que el código de versión de AutoJs6 sea al menos 5352; que el complemento esté activado en el `Centro de plugins`; y que la extensión del archivo o su tipo MIME figure en la lista compatible. Si falla cualquiera de las tres condiciones, las acciones no aparecen. Desde la 3.2.0 el complemento declara el protocolo explorer-action 24; un AutoJs6 que no lo admite ignora todas las acciones de menú del complemento (incluidas `Ver imagen` y `Ver como álbum`), así que actualiza AutoJs6. Editar y convertir desde la galería y la pantalla de inicio independiente no se ven afectados.
 
 **Al abrir aparece `No se puede leer la información de la imagen` o la pantalla se cierra al instante?**
 
@@ -227,7 +227,7 @@ El archivo no se puede leer en este momento: puede haberse movido o eliminado, l
 
 **Dónde se guarda el resultado? Sobrescribe el original?**
 
-El original nunca se sobrescribe. Desde AutoJs6, el resultado se guarda como un archivo nuevo junto al original; desde el inicio independiente, usted elige dónde guardarlo después de editar o convertir.
+No de forma predeterminada. Desde AutoJs6, el resultado se guarda como un archivo nuevo (`nombre_edited` o `nombre_converted`) junto al original; desde la galería o la pantalla de inicio independiente, eliges dónde guardarlo al terminar. El original solo se reemplaza si activas `Sobrescribir el original` en el diálogo de guardado o en la página de conversión, y conserva su formato; justo después puedes deshacerlo: desde AutoJs6 el host guarda la versión anterior, en la galería y en la pantalla de inicio el complemento guarda una copia.
 
 **Convertir una imagen grande avisa de memoria insuficiente o de demasiados píxeles?**
 
@@ -269,12 +269,12 @@ plugin id: three-maple-image
 engine: explorer-action
 variant: default
 explorer action id: view-image
-protocol version: 12
+protocol version: 24
 MIME type: Explorer: avif/bmp/gif/heic/heif/jfif/jpe/jpeg/jpg/png/webp; ACTION_VIEW: image/*
-required host build: 5276
+required host build: 5352
 ```
 
-La implementación actual se basa en la versión 12 del protocolo explorer-action: la acción principal declara un destino de archivo único, acceso de solo lectura y `readSiblings`. La sesión del anfitrión solo expone hermanos directos; el complemento conserva imágenes compatibles, legibles y sin enlace simbólico, aplica el orden natural de nombre y mantiene una ventana limitada a 128 páginas alrededor de la imagen seleccionada. Una segunda acción de solo lectura para la barra de selección declara varios archivos sin `readSiblings`; acepta de 1 a 128 imágenes compatibles bajo un mismo padre, conserva el orden de selección del anfitrión y transfiere solo los destinos autorizados explícitamente. La edición, la conversión, los detalles de archivo, la eliminación, el movimiento y el renombrado siguen siendo funciones del anfitrión; sin el complemento, el anfitrión recurre a una solicitud externa `ACTION_VIEW` de solo lectura. Una tercera acción de la barra de selección, `convert-images`, declara varios archivos con `ACCESS_CREATE_IN_PARENT`: cada imagen se convierte en un archivo nuevo en el directorio de origen, se relee y los archivos se publican juntos como un lote de salida que se revierte por completo si falla alguna imagen.
+La implementación actual se basa en la versión 24 del protocolo explorer-action: la acción principal declara un destino de archivo único, acceso de solo lectura y `readSiblings`. La sesión del anfitrión solo expone hermanos directos; el complemento conserva imágenes compatibles, legibles y sin enlace simbólico, aplica el orden natural de nombre y mantiene una ventana limitada a 128 páginas alrededor de la imagen seleccionada. Una segunda acción de solo lectura para la barra de selección declara varios archivos sin `readSiblings`; acepta de 1 a 128 imágenes compatibles bajo un mismo padre, conserva el orden de selección del anfitrión y transfiere solo los destinos autorizados explícitamente. La edición, la conversión, los detalles de archivo, la eliminación, el movimiento y el renombrado siguen siendo funciones del anfitrión; sin el complemento, el anfitrión recurre a una solicitud externa `ACTION_VIEW` de solo lectura. Una tercera acción de la barra de selección, `convert-images`, declara varios archivos con `ACCESS_CREATE_IN_PARENT`: cada imagen se convierte en un archivo nuevo en el directorio de origen, se relee y los archivos se publican juntos como un lote de salida que se revierte por completo si falla alguna imagen.
 
 ******
 

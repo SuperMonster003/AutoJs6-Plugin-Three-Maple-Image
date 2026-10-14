@@ -83,4 +83,7 @@ internal open class UnsupportedHostSessionStub : IExplorerActionHostSession.Stub
     override fun listTargetTrashBatches(): Bundle = throw UnsupportedOperationException()
 
     override fun undoTargetTrashBatch(targetTrashBatchId: String?): Bundle = throw UnsupportedOperationException()
+
+    override fun openRelatedFile(targetId: String?, relatedFileSuffix: String?): ParcelFileDescriptor =
+        throw UnsupportedOperationException()
 }

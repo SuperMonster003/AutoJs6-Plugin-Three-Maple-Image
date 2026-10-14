@@ -27,7 +27,7 @@ Photos are automatically rotated or mirrored to their EXIF orientation. `Rotate`
 
 In the file manager, `View as album` in a directory's menu opens that directory as an album through the host session: subfolders up to 8 levels deep appear as folder cells, images open in the viewer with left/right paging inside that folder, and only the first 4096 entries of a folder are listed. This mode needs no storage permission and never discloses file paths; management actions are not available in it.
 
-Host build 5276 or later is required.
+Host build 5352 or later is required.
 
 Safety and privacy limits:
 

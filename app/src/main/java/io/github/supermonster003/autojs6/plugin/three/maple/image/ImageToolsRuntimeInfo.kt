@@ -14,7 +14,7 @@ internal object ImageToolsPlugin {
     const val PACKAGE_NAME = "io.github.supermonster003.autojs6.plugin.three.maple.image"
     const val ID = "three-maple-image"
     const val VARIANT = "default"
-    const val REQUIRED_HOST_VERSION = 5269L
+    const val REQUIRED_HOST_VERSION = ThreeMapleImagePlugin.REQUIRED_HOST_VERSION
     const val EDIT_ACTION_ID = "edit-image"
     const val CONVERT_ACTION_ID = "convert-image"
     const val MAX_OUTPUT_BYTES = 256L * 1024L * 1024L

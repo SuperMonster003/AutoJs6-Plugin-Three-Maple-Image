@@ -84,7 +84,7 @@
     },
     {
       "question": "The file menu does not show `Edit image` and `Convert image`?",
-      "answer": "Check the following in order: the AutoJs6 version code is at least {{ required_host_build }}; the plugin is enabled in the `Plugin center`; and the file extension or MIME type is in the supported list. If any of the three fails, the menu actions will not appear."
+      "answer": "Check the following in order: the AutoJs6 version code is at least {{ required_host_build }}; the plugin is enabled in the `Plugin center`; and the file extension or MIME type is in the supported list. If any of the three fails, the menu actions will not appear. Since 3.2.0 the plugin declares explorer-action protocol 24; an AutoJs6 that does not support it ignores all of the plugin's menu actions (including `View image` and `View as album`), so update AutoJs6. Editing and converting from the gallery and the standalone home screen are not affected."
     },
     {
       "question": "Opening fails with `Unable to read image information` or the screen flashes and closes?",
@@ -92,7 +92,7 @@
     },
     {
       "question": "Where is the result saved? Does it overwrite the original?",
-      "answer": "The original is never overwritten. From AutoJs6, the result is saved as a new file next to the source; from the standalone home screen, you choose where to save it after editing or converting."
+      "answer": "Not by default. From AutoJs6, the result is saved as a new file (`name_edited` or `name_converted`) next to the source; from the gallery or the standalone home screen, you choose where to save it when you are done. The original is replaced only when you turn on `Overwrite the original` in the save dialog or on the converter page, and it keeps its format; right after that you can undo it: from AutoJs6 the host keeps the previous version, in the gallery and on the home screen the plugin keeps one backup."
     },
     {
       "question": "Converting a large image reports insufficient memory or too many pixels?",
