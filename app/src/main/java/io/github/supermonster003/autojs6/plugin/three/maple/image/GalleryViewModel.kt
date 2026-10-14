@@ -32,6 +32,7 @@ internal data class AlbumSummary(
     val subtitle: String,
     val available: Boolean = true,
     val folder: AuthorizedFolder? = null,
+    val volume: String = MediaCatalog.PRIMARY_VOLUME,
 )
 
 internal data class GalleryUiState(
@@ -216,7 +217,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             val rootName = getApplication<Application>().getString(R.string.gallery_album_root)
             val albums = buckets.map { bucket ->
                 val name = bucket.name.ifBlank { bucket.relativePath.trimEnd('/').substringAfterLast('/').ifBlank { rootName } }
-                AlbumSummary(AlbumKind.MEDIA, bucket.id, name, bucket.count, bucket.cover.contentUri, bucket.relativePath)
+                AlbumSummary(AlbumKind.MEDIA, bucket.id, name, bucket.count, bucket.cover.contentUri, bucket.relativePath, volume = bucket.volume)
             }
             val folders = folderRepository.list().map { folder ->
                 val cached = folderRepository.cached(folder)

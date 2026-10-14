@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.storage.StorageManager
 import android.provider.DocumentsContract
 import android.provider.Settings
 import android.text.format.Formatter
@@ -194,9 +195,18 @@ internal class GalleryOperations(
     /** Snackbar text for a finished batch: the success line, plus the failures when some items were refused. */
     private fun summary(resource: Int, outcome: WriteOutcome): String = buildString {
         if (outcome.succeeded > 0) append(quantity(resource, outcome.succeeded))
+        appendProblems(outcome)
+    }
+
+    /** Refused images, and storage card images Android 7-10 does not let the app change. */
+    private fun StringBuilder.appendProblems(outcome: WriteOutcome) {
         if (outcome.failed > 0) {
             if (isNotEmpty()) append(". ")
             append(failedMessage(outcome.failed))
+        }
+        if (outcome.readOnlyCard > 0) {
+            if (isNotEmpty()) append(". ")
+            append(quantity(R.plurals.gallery_card_read_only_count, outcome.readOnlyCard))
         }
     }
 
@@ -317,6 +327,7 @@ internal class GalleryOperations(
                 show(null)
                 explainRefusedPermission()
             }
+            outcome.readOnlyCard > 0 -> renameError = quantity(R.plurals.gallery_card_read_only_count, 1)
             outcome.succeeded == 0 -> renameError = activity.getString(R.string.rename_error_failed)
             else -> {
                 show(null)
@@ -350,24 +361,36 @@ internal class GalleryOperations(
         show(GalleryDialog.PickTarget(items, copy, recent, albums))
     }
 
-    /** Writable albums of the media library (Android 10+ only accepts DCIM/ and Pictures/), moves skip the open one. */
+    /**
+     * Writable albums of the media library (Android 10+ only accepts DCIM/ and Pictures/, Android 7-10 not a storage
+     * card), moves skip the open one; an album on a storage card is labelled with the card's name.
+     */
     private suspend fun targetAlbums(copy: Boolean): Pair<List<TargetAlbum>, List<TargetAlbum>> {
         val open = target.openAlbum
+        val openPath = open?.takeIf { it.kind == AlbumKind.MEDIA }?.let { AlbumPath(it.volume, it.subtitle) }
         val albums = target.albums()
-            .filter { it.kind == AlbumKind.MEDIA && it.subtitle.isNotEmpty() && MediaWriteCoordinator.isWritableAlbumPath(it.subtitle) }
-            .filter { copy || open?.kind != AlbumKind.MEDIA || it.id != open.id }
-            .map { TargetAlbum(it.name, it.subtitle) }
-            .distinctBy { it.relativePath }
-        val byPath = albums.associateBy { it.relativePath }
+            .filter { it.kind == AlbumKind.MEDIA && it.subtitle.isNotEmpty() && MediaWriteCoordinator.isWritableAlbum(AlbumPath(it.volume, it.subtitle)) }
+            .filter { copy || openPath == null || it.id != open.id }
+            .map { TargetAlbum(it.name, AlbumPath(it.volume, it.subtitle), storageLabel(it.volume)) }
+            .distinctBy { GalleryPreferences.encodeTarget(it.path) }
+        val byPath = albums.associateBy { GalleryPreferences.encodeTarget(it.path) }
         val recent = preferences.recentTargets
-            .filter { MediaWriteCoordinator.isWritableAlbumPath(it) && (copy || open?.kind != AlbumKind.MEDIA || it != open.subtitle) }
-            .map { path -> byPath[path] ?: TargetAlbum(path.trimEnd('/').substringAfterLast('/'), path) }
+            .filter { MediaWriteCoordinator.isWritableAlbum(it) && (copy || openPath == null || !it.sameAs(openPath)) }
+            .map { path -> byPath[GalleryPreferences.encodeTarget(path)] ?: TargetAlbum(path.relativePath.trimEnd('/').substringAfterLast('/'), path, storageLabel(path.volume)) }
         return recent to albums
+    }
+
+    /** The system's name of a storage card ("SanDisk SD card"); null for the internal storage. */
+    private fun storageLabel(volume: String): String? {
+        if (MediaCatalog.isPrimaryVolume(volume) || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
+        val storage = activity.getSystemService(StorageManager::class.java) ?: return volume.uppercase()
+        val match = storage.storageVolumes.firstOrNull { it.mediaStoreVolumeName.equals(volume, ignoreCase = true) }
+        return match?.getDescription(activity) ?: volume.uppercase()
     }
 
     private fun chooseTarget(items: List<MediaItem>, copy: Boolean, target: TargetAlbum) = launch {
         show(null)
-        val count = coordinator.conflicts(items, target.relativePath)
+        val count = coordinator.conflicts(items, target.path)
         if (count > 0) show(GalleryDialog.Conflict(items, copy, target, count)) else transfer(items, copy, target, NameConflictChoice.AUTO_RENAME)
     }
 
@@ -384,7 +407,7 @@ internal class GalleryOperations(
         progressTotal = items.size
         if (items.size > 1) show(GalleryDialog.Progress(copy, control))
         val outcome = try {
-            if (copy) coordinator.copy(items, target.relativePath, conflict, control) else coordinator.move(items, target.relativePath, conflict, control)
+            if (copy) coordinator.copy(items, target.path, conflict, control) else coordinator.move(items, target.path, conflict, control)
         } finally {
             if (dialog is GalleryDialog.Progress) show(null)
         }
@@ -392,15 +415,12 @@ internal class GalleryOperations(
             explainRefusedPermission()
             return
         }
-        if (outcome.succeeded > 0) preferences.rememberTarget(target.relativePath)
+        if (outcome.succeeded > 0) preferences.rememberTarget(target.path)
         finishWrite()
         val resource = if (copy) R.plurals.gallery_copied_count else R.plurals.gallery_moved_count
         val message = buildString {
             if (outcome.succeeded > 0) append(activity.resources.getQuantityString(resource, outcome.succeeded, outcome.succeeded, target.name))
-            if (outcome.failed > 0) {
-                if (isNotEmpty()) append(". ")
-                append(failedMessage(outcome.failed))
-            }
+            appendProblems(outcome)
         }
         if (message.isNotEmpty()) notify(message, if (copy) null else outcome.undo, afterUndo = ::refreshAll)
     }
@@ -504,7 +524,7 @@ internal class GalleryOperations(
             }
             is GalleryDialog.NewAlbum -> NewAlbumDialog(
                 onDismiss = { show(null) },
-                onConfirm = { name -> chooseTarget(current.items, current.copy, TargetAlbum(name, "${Environment.DIRECTORY_PICTURES}/$name/")) },
+                onConfirm = { name -> chooseTarget(current.items, current.copy, TargetAlbum(name, AlbumPath(MediaCatalog.PRIMARY_VOLUME, "${Environment.DIRECTORY_PICTURES}/$name/"))) },
             )
             is GalleryDialog.Conflict -> ConflictDialog(
                 count = current.count,

@@ -18,9 +18,23 @@ internal data class MediaItem(
     val relativePath: String,
     /** `content://media/...` as a string so the model stays free of Android types. */
     val contentUri: String,
+    /** MediaStore volume (`external_primary`, or a storage card such as `1eff-e702`); see [MediaCatalog.PRIMARY_VOLUME]. */
+    val volume: String = MediaCatalog.PRIMARY_VOLUME,
 ) {
     /** Capture time with the modification time as the fallback, in milliseconds. */
     val effectiveTakenMillis: Long get() = dateTakenMillis ?: (dateModifiedSeconds * 1000L)
+
+    val albumPath: AlbumPath get() = AlbumPath(volume, relativePath)
+}
+
+/**
+ * Where an album lives: a volume and a `RELATIVE_PATH` (`Pictures/Trips/`). Two albums with the same relative path
+ * on the internal storage and on a storage card are different albums (ROADMAP 7.3 cross-volume moves).
+ */
+internal data class AlbumPath(val volume: String, val relativePath: String) {
+    val isPrimary: Boolean get() = MediaCatalog.isPrimaryVolume(volume)
+
+    fun sameAs(other: AlbumPath): Boolean = relativePath == other.relativePath && MediaCatalog.sameVolume(volume, other.volume)
 }
 
 /** An album: every cataloged image that shares a `BUCKET_ID`. */
@@ -32,6 +46,7 @@ internal data class MediaBucket(
     /** The most recent image of the album (capture time, then modification time, then id). */
     val cover: MediaItem,
     val latestModifiedSeconds: Long,
+    val volume: String = MediaCatalog.PRIMARY_VOLUME,
 )
 
 internal enum class MediaSortField { NAME, DATE_MODIFIED, DATE_TAKEN, SIZE }
@@ -53,6 +68,14 @@ internal object MediaCatalog {
 
     /** Id of the "Favorites" virtual album (ROADMAP 7.4); never a MediaStore bucket id in practice. */
     const val FAVORITES = Long.MIN_VALUE + 1
+
+    /** `MediaStore.VOLUME_EXTERNAL_PRIMARY`: the internal shared storage. */
+    const val PRIMARY_VOLUME = "external_primary"
+
+    fun isPrimaryVolume(volume: String): Boolean = volume.equals(PRIMARY_VOLUME, ignoreCase = true) || volume.equals("external", ignoreCase = true)
+
+    /** MediaStore names storage cards by their lower-case file system id; compare without case. */
+    fun sameVolume(a: String, b: String): Boolean = (isPrimaryVolume(a) && isPrimaryVolume(b)) || a.equals(b, ignoreCase = true)
 
     /** Supported formats only (ROADMAP D2); zero-byte rows are placeholders MediaStore has not finished writing. */
     fun isCataloged(item: MediaItem, supports: (String, String) -> Boolean): Boolean =
@@ -91,6 +114,7 @@ internal object MediaCatalog {
                 count = rows.size,
                 cover = cover,
                 latestModifiedSeconds = rows.maxOf { it.dateModifiedSeconds },
+                volume = cover.volume,
             )
         }
         .let { sortBuckets(it, MediaSort.DEFAULT) }
@@ -110,10 +134,23 @@ internal object MediaCatalog {
     }
 
     /** The parent folder of a legacy `DATA` path relative to the external storage root, with a trailing slash. */
-    fun relativePathFromFilePath(path: String, externalRoots: List<String>): String {
+    fun relativePathFromFilePath(path: String, externalRoots: List<String>): String = albumPathFromFilePath(path, externalRoots).relativePath
+
+    /**
+     * The volume and parent folder of a legacy `DATA` path: under one of [externalRoots] it is the internal storage;
+     * under `/storage/<id>/` a storage card named like MediaStore names it on Android 10+ (`b832-11f4`).
+     */
+    fun albumPathFromFilePath(path: String, externalRoots: List<String>): AlbumPath {
         val parent = path.substringBeforeLast('/', missingDelimiterValue = "")
         val root = externalRoots.firstOrNull { parent == it || parent.startsWith("$it/") }
-        val relative = if (root == null) parent.trimStart('/') else parent.removePrefix(root).trimStart('/')
-        return if (relative.isEmpty()) "" else "$relative/"
+        val card = if (root == null) CARD_ROOT.matchEntire(parent) else null
+        val (volume, relative) = when {
+            root != null -> PRIMARY_VOLUME to parent.removePrefix(root).trimStart('/')
+            card != null -> card.groupValues[1].lowercase() to card.groupValues[2].trimStart('/')
+            else -> PRIMARY_VOLUME to parent.trimStart('/')
+        }
+        return AlbumPath(volume, if (relative.isEmpty()) "" else "$relative/")
     }
+
+    private val CARD_ROOT = Regex("/storage/([0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}|[0-9A-Fa-f]{8,16})(/.*)?")
 }

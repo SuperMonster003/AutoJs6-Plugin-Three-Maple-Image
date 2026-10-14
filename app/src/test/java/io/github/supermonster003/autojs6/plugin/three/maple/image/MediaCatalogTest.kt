@@ -1,6 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.random.Random
@@ -111,6 +112,26 @@ class MediaCatalogTest {
         assertEquals("DCIM/Camera/", MediaCatalog.relativePathFromFilePath("/storage/emulated/0/DCIM/Camera/a.jpg", roots))
         assertEquals("", MediaCatalog.relativePathFromFilePath("/storage/emulated/0/a.jpg", roots))
         assertEquals("Pictures/", MediaCatalog.relativePathFromFilePath("/sdcard/Pictures/b.png", roots))
-        assertEquals("storage/1234-5678/DCIM/", MediaCatalog.relativePathFromFilePath("/storage/1234-5678/DCIM/c.png", roots))
+        assertEquals("DCIM/", MediaCatalog.relativePathFromFilePath("/storage/1234-5678/DCIM/c.png", roots))
+    }
+
+    @Test
+    fun legacyPathsOnAStorageCardKeepTheirVolume() {
+        val roots = listOf("/storage/emulated/0", "/sdcard")
+        assertEquals(AlbumPath(MediaCatalog.PRIMARY_VOLUME, "DCIM/Camera/"), MediaCatalog.albumPathFromFilePath("/storage/emulated/0/DCIM/Camera/a.jpg", roots))
+        assertEquals(AlbumPath("b832-11f4", "Pictures/Trips/"), MediaCatalog.albumPathFromFilePath("/storage/B832-11F4/Pictures/Trips/a.jpg", roots))
+        assertEquals(AlbumPath("b832-11f4", ""), MediaCatalog.albumPathFromFilePath("/storage/B832-11F4/a.jpg", roots))
+        // Anything else outside the roots keeps the old behaviour: the whole parent path, on the internal storage.
+        assertEquals(AlbumPath(MediaCatalog.PRIMARY_VOLUME, "mnt/media_rw/x/"), MediaCatalog.albumPathFromFilePath("/mnt/media_rw/x/a.jpg", roots))
+    }
+
+    @Test
+    fun albumPathsCompareVolumesWithoutCase() {
+        val card = AlbumPath("1eff-e702", "Pictures/Trips/")
+        assertTrue(card.sameAs(AlbumPath("1EFF-E702", "Pictures/Trips/")))
+        assertFalse(card.sameAs(AlbumPath(MediaCatalog.PRIMARY_VOLUME, "Pictures/Trips/")))
+        assertTrue(AlbumPath("external", "DCIM/").sameAs(AlbumPath(MediaCatalog.PRIMARY_VOLUME, "DCIM/")))
+        assertFalse(card.isPrimary)
+        assertTrue(AlbumPath(MediaCatalog.PRIMARY_VOLUME, "DCIM/").isPrimary)
     }
 }

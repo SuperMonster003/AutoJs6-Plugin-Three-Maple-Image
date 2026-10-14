@@ -9,6 +9,9 @@
     <plurals name="favorites_removed_count">
         <item quantity="other">%1$d 枚の画像をお気に入りから外しました</item>
     </plurals>
+    <plurals name="gallery_card_read_only_count">
+        <item quantity="other">SD カード上の %1$d 枚の画像はそのままです (Android 10 以前ではアプリが SD カードを変更できません)</item>
+    </plurals>
     <plurals name="gallery_copied_count">
         <item quantity="other">%1$d 枚の画像を %2$s にコピーしました</item>
     </plurals>

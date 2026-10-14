@@ -12,6 +12,10 @@
         <item quantity="one">%1$d image removed from favorites</item>
         <item quantity="other">%1$d images removed from favorites</item>
     </plurals>
+    <plurals name="gallery_card_read_only_count">
+        <item quantity="one">%1$d image on the storage card was left as is (Android 10 and earlier do not let apps change storage cards)</item>
+        <item quantity="other">%1$d images on the storage card were left as is (Android 10 and earlier do not let apps change storage cards)</item>
+    </plurals>
     <plurals name="gallery_copied_count">
         <item quantity="one">%1$d image copied to %2$s</item>
         <item quantity="other">%1$d images copied to %2$s</item>

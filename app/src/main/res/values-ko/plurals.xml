@@ -9,6 +9,9 @@
     <plurals name="favorites_removed_count">
         <item quantity="other">이미지 %1$d개를 즐겨찾기에서 해제했습니다</item>
     </plurals>
+    <plurals name="gallery_card_read_only_count">
+        <item quantity="other">메모리 카드의 이미지 %1$d개는 그대로 두었습니다 (Android 10 이하에서는 앱이 메모리 카드를 변경할 수 없습니다)</item>
+    </plurals>
     <plurals name="gallery_copied_count">
         <item quantity="other">이미지 %1$d개를 %2$s(으)로 복사했습니다</item>
     </plurals>

@@ -30,12 +30,13 @@ internal class GalleryPreferences(private val preferences: SharedPreferences) {
             .apply()
     }
 
-    /** Move / copy targets (`Pictures/Trips/`) used lately, newest first (ROADMAP 7.3 album picker). */
-    val recentTargets: List<String>
-        get() = preferences.getString(KEY_RECENT_TARGETS, null).orEmpty().split('\n').filter { it.isNotBlank() }
+    /** Move / copy targets (`Pictures/Trips/` on a volume) used lately, newest first (ROADMAP 7.3 album picker). */
+    val recentTargets: List<AlbumPath>
+        get() = preferences.getString(KEY_RECENT_TARGETS, null).orEmpty().split('\n').filter { it.isNotBlank() }.map(::decodeTarget)
 
-    fun rememberTarget(relativePath: String) {
-        preferences.edit().putString(KEY_RECENT_TARGETS, pushRecent(recentTargets, relativePath).joinToString("\n")).apply()
+    fun rememberTarget(path: AlbumPath) {
+        val stored = recentTargets.map(::encodeTarget)
+        preferences.edit().putString(KEY_RECENT_TARGETS, pushRecent(stored, encodeTarget(path)).joinToString("\n")).apply()
     }
 
     companion object {
@@ -50,6 +51,16 @@ internal class GalleryPreferences(private val preferences: SharedPreferences) {
 
         /** [path] first, without duplicates, at most [MAX_RECENT_TARGETS]. */
         fun pushRecent(recent: List<String>, path: String): List<String> = (listOf(path) + recent.filter { it != path }).take(MAX_RECENT_TARGETS)
+
+        /** Internal storage targets stay a bare relative path (as 3.1.0 stored them); others add `volume::`. */
+        fun encodeTarget(path: AlbumPath): String = if (path.isPrimary) path.relativePath else path.volume.lowercase() + VOLUME_SEPARATOR + path.relativePath
+
+        fun decodeTarget(value: String): AlbumPath {
+            val split = value.indexOf(VOLUME_SEPARATOR)
+            return if (split < 0) AlbumPath(MediaCatalog.PRIMARY_VOLUME, value) else AlbumPath(value.substring(0, split), value.substring(split + VOLUME_SEPARATOR.length))
+        }
+
+        private const val VOLUME_SEPARATOR = "::"
 
         fun clampColumns(value: Int): Int = value.coerceIn(MIN_COLUMNS, MAX_COLUMNS)
 

@@ -18,6 +18,12 @@
         <item quantity="many">%1$d изображений удалено из избранного</item>
         <item quantity="other">%1$d изображения удалены из избранного</item>
     </plurals>
+    <plurals name="gallery_card_read_only_count">
+        <item quantity="one">%1$d изображение на карте памяти осталось без изменений (в Android 10 и ниже приложения не могут изменять карту памяти)</item>
+        <item quantity="few">%1$d изображения на карте памяти остались без изменений (в Android 10 и ниже приложения не могут изменять карту памяти)</item>
+        <item quantity="many">%1$d изображений на карте памяти остались без изменений (в Android 10 и ниже приложения не могут изменять карту памяти)</item>
+        <item quantity="other">%1$d изображения на карте памяти остались без изменений (в Android 10 и ниже приложения не могут изменять карту памяти)</item>
+    </plurals>
     <plurals name="gallery_copied_count">
         <item quantity="one">%1$d изображение скопировано в %2$s</item>
         <item quantity="few">%1$d изображения скопированы в %2$s</item>

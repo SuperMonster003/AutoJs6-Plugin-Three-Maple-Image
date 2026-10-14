@@ -360,7 +360,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             val root = getString(R.string.gallery_album_root)
             return runCatching { MediaStoreRepository(this@ImageViewerActivity).loadBuckets() }.getOrDefault(emptyList()).map { bucket ->
                 val name = bucket.name.ifBlank { bucket.relativePath.trimEnd('/').substringAfterLast('/').ifBlank { root } }
-                AlbumSummary(AlbumKind.MEDIA, bucket.id, name, bucket.count, bucket.cover.contentUri, bucket.relativePath)
+                AlbumSummary(AlbumKind.MEDIA, bucket.id, name, bucket.count, bucket.cover.contentUri, bucket.relativePath, volume = bucket.volume)
             }
         }
 

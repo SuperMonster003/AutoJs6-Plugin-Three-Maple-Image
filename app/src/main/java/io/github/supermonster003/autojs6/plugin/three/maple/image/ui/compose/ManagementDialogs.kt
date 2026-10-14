@@ -23,13 +23,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import io.github.supermonster003.autojs6.plugin.three.maple.image.AlbumPath
 import io.github.supermonster003.autojs6.plugin.three.maple.image.FileNameCheck
 import io.github.supermonster003.autojs6.plugin.three.maple.image.FileNameProblem
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaFileNamePolicy
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
 
 /** A move / copy target: an album of the media library, or a new one under `Pictures/`. */
-internal data class TargetAlbum(val name: String, val relativePath: String)
+/** A move / copy target; [location] names a storage card (the system's description) and is null for the internal storage. */
+internal data class TargetAlbum(val name: String, val path: AlbumPath, val location: String? = null)
 
 @Composable
 private fun problemText(problem: FileNameProblem): String = stringResource(
@@ -178,7 +180,7 @@ internal fun TargetAlbumDialog(
 private fun TargetRow(album: TargetAlbum, onPick: (TargetAlbum) -> Unit, tag: String) {
     MapleSettingsRow(
         title = album.name,
-        summary = album.relativePath,
+        summary = album.location?.let { "$it \u00b7 ${album.path.relativePath}" } ?: album.path.relativePath,
         iconResource = R.drawable.ic_folder_24,
         showChevron = false,
         onClick = { onPick(album) },

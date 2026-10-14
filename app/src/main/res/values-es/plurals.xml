@@ -15,6 +15,11 @@
         <item quantity="many">%1$d imágenes quitadas de favoritos</item>
         <item quantity="other">%1$d imágenes quitadas de favoritos</item>
     </plurals>
+    <plurals name="gallery_card_read_only_count">
+        <item quantity="one">%1$d imagen de la tarjeta de memoria se dejó igual (Android 10 y anteriores no permiten que las aplicaciones modifiquen la tarjeta)</item>
+        <item quantity="many">%1$d imágenes de la tarjeta de memoria se dejaron igual (Android 10 y anteriores no permiten que las aplicaciones modifiquen la tarjeta)</item>
+        <item quantity="other">%1$d imágenes de la tarjeta de memoria se dejaron igual (Android 10 y anteriores no permiten que las aplicaciones modifiquen la tarjeta)</item>
+    </plurals>
     <plurals name="gallery_copied_count">
         <item quantity="one">%1$d imagen copiada a %2$s</item>
         <item quantity="many">%1$d imágenes copiadas a %2$s</item>

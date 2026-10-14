@@ -69,7 +69,7 @@ class MediaWriteCoordinatorInstrumentationTest {
         main { requireNotNull(renamed.undo).invoke() }
         assertEquals(listOf("a.png", "b.png"), names(folder))
 
-        val moved = main { coordinator.move(listOf(a, b), relativePath(target), NameConflictChoice.AUTO_RENAME) }
+        val moved = main { coordinator.move(listOf(a, b), album(target), NameConflictChoice.AUTO_RENAME) }
         assertEquals(2, moved.succeeded)
         assertEquals(emptyList<String>(), names(folder))
         assertEquals(listOf("a.png", "b.png"), names(target))
@@ -84,7 +84,7 @@ class MediaWriteCoordinatorInstrumentationTest {
         val favorites = FavoritesRepository(context)
         favorites.add(listOf(a))
         try {
-            assertEquals(1, main { coordinator.move(listOf(a), relativePath(target), NameConflictChoice.AUTO_RENAME) }.succeeded)
+            assertEquals(1, main { coordinator.move(listOf(a), album(target), NameConflictChoice.AUTO_RENAME) }.succeeded)
             val moved = items(target).single()
             assertEquals(1, main { coordinator.rename(moved, "b.png") }.succeeded)
             val resolved = favorites.resolve(MediaStoreRepository(context).also { it.invalidate() }.loadAll())
@@ -98,10 +98,10 @@ class MediaWriteCoordinatorInstrumentationTest {
     fun copiesNeverOverwriteAndSkipOnRequest() = runBlocking {
         insert("a.png", Color.RED)
         val a = items(folder).single()
-        assertEquals(1, main { coordinator.copy(listOf(a), relativePath(folder), NameConflictChoice.AUTO_RENAME) }.succeeded)
+        assertEquals(1, main { coordinator.copy(listOf(a), album(folder), NameConflictChoice.AUTO_RENAME) }.succeeded)
         assertEquals(listOf("a (1).png", "a.png"), names(folder))
-        assertEquals(0, main { coordinator.copy(listOf(a), relativePath(folder), NameConflictChoice.SKIP) }.succeeded)
-        val copied = main { coordinator.copy(listOf(a), relativePath(target), NameConflictChoice.AUTO_RENAME) }
+        assertEquals(0, main { coordinator.copy(listOf(a), album(folder), NameConflictChoice.SKIP) }.succeeded)
+        val copied = main { coordinator.copy(listOf(a), album(target), NameConflictChoice.AUTO_RENAME) }
         assertEquals(1, copied.succeeded)
         assertEquals(null, copied.undo)
         assertEquals(listOf("a.png"), names(target))
@@ -115,9 +115,9 @@ class MediaWriteCoordinatorInstrumentationTest {
         MediaStoreTestImages.insert(context, target, "A.PNG", Color.BLUE)
         val (a, b) = items(folder).sortedBy { it.displayName }
         val old = items(target).single()
-        assertEquals(1, main { coordinator.conflicts(listOf(a, b), relativePath(target)) })
+        assertEquals(1, main { coordinator.conflicts(listOf(a, b), album(target)) })
 
-        val moved = main { coordinator.move(listOf(a, b), relativePath(target), NameConflictChoice.REPLACE) }
+        val moved = main { coordinator.move(listOf(a, b), album(target), NameConflictChoice.REPLACE) }
         assertEquals(2, moved.succeeded)
         assertEquals(listOf("a.png", "b.png"), names(target).map { it.lowercase() }.sorted())
         assertTrue("the moved image replaced the old one", items(target).none { it.id == old.id })
@@ -131,7 +131,7 @@ class MediaWriteCoordinatorInstrumentationTest {
         insert("c.png", Color.BLUE)
         lateinit var control: WriteControl
         control = WriteControl { done, _ -> if (done == 1) control.cancel() }
-        val copied = main { coordinator.copy(items(folder), relativePath(target), NameConflictChoice.AUTO_RENAME, control) }
+        val copied = main { coordinator.copy(items(folder), album(target), NameConflictChoice.AUTO_RENAME, control) }
         assertEquals(1, copied.succeeded)
         assertEquals(1, names(target).size)
     }
@@ -180,6 +180,8 @@ class MediaWriteCoordinatorInstrumentationTest {
     }
 
     private fun relativePath(name: String) = "${Environment.DIRECTORY_PICTURES}/$name/"
+
+    private fun album(name: String) = AlbumPath(MediaCatalog.PRIMARY_VOLUME, relativePath(name))
 
     private suspend fun items(name: String): List<MediaItem> {
         val path = relativePath(name)

@@ -61,9 +61,23 @@ class GalleryPreferencesTest {
 
     @Test
     fun recentTargetsKeepTheNewestFiveWithoutDuplicates() {
-        assertEquals(emptyList<String>(), preferences.recentTargets)
-        for (index in 1..6) preferences.rememberTarget("Pictures/A$index/")
-        preferences.rememberTarget("Pictures/A3/")
-        assertEquals(listOf("Pictures/A3/", "Pictures/A6/", "Pictures/A5/", "Pictures/A4/", "Pictures/A2/"), preferences.recentTargets)
+        assertEquals(emptyList<AlbumPath>(), preferences.recentTargets)
+        for (index in 1..6) preferences.rememberTarget(primary("Pictures/A$index/"))
+        preferences.rememberTarget(primary("Pictures/A3/"))
+        assertEquals(listOf("Pictures/A3/", "Pictures/A6/", "Pictures/A5/", "Pictures/A4/", "Pictures/A2/").map(::primary), preferences.recentTargets)
     }
+
+    @Test
+    fun recentTargetsKeepTheirVolume() {
+        val card = AlbumPath("1eff-e702", "Pictures/Trips/")
+        preferences.rememberTarget(primary("Pictures/Trips/"))
+        preferences.rememberTarget(card)
+        assertEquals(listOf(card, primary("Pictures/Trips/")), preferences.recentTargets)
+        // 3.1.0 stored bare relative paths: they still read as internal storage targets.
+        assertEquals(primary("DCIM/Camera/"), GalleryPreferences.decodeTarget("DCIM/Camera/"))
+        assertEquals("Pictures/Trips/", GalleryPreferences.encodeTarget(primary("Pictures/Trips/")))
+        assertEquals(card, GalleryPreferences.decodeTarget(GalleryPreferences.encodeTarget(AlbumPath("1EFF-E702", "Pictures/Trips/"))))
+    }
+
+    private fun primary(relativePath: String) = AlbumPath(MediaCatalog.PRIMARY_VOLUME, relativePath)
 }

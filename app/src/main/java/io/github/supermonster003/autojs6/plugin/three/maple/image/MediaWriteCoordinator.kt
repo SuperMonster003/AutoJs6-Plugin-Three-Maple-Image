@@ -41,6 +41,8 @@ internal data class WriteOutcome(
     val tooLargeForRecycleBin: Boolean = false,
     /** A rename / move target already holds the name and the batch was not attempted. */
     val nameTaken: Boolean = false,
+    /** Android 7-10: images on a storage card, which the app cannot change there; they were left as they are. */
+    val readOnlyCard: Int = 0,
     val undo: (suspend () -> WriteOutcome)? = null,
 )
 
@@ -75,17 +77,31 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         ownedByApp = owned,
     )
 
+    /**
+     * Android 7-10 writes through `java.io.File`, which can change the internal storage but not a storage card (apps
+     * only get their own folder there): such albums are read-only for the gallery.
+     */
+    private fun readOnly(path: AlbumPath): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.R && !path.isPrimary
+
+    /** [items] without the read-only ones, and how many those were (reported in [WriteOutcome.readOnlyCard]). */
+    private fun splitReadOnly(items: List<MediaItem>): Pair<List<MediaItem>, Int> {
+        val (writable, readOnly) = items.partition { !readOnly(it.albumPath) }
+        return writable to readOnly.size
+    }
+
     /** Moves [items] to the recycle bin (system trash on Android 11+, private bin on Android 7-10). */
     suspend fun trash(items: List<MediaItem>): WriteOutcome {
-        if (items.isEmpty()) return WriteOutcome()
-        return when (val route = routeFor(MediaWriteOperation.TRASH, items) ?: return WriteOutcome(cancelled = true)) {
-            MediaWriteRoute.PRIVATE_BIN -> trashToPrivateBin(items)
+        val (writable, onCard) = splitReadOnly(items)
+        if (writable.isEmpty()) return WriteOutcome(readOnlyCard = onCard)
+        val outcome = when (val route = routeFor(MediaWriteOperation.TRASH, writable) ?: return WriteOutcome(cancelled = true)) {
+            MediaWriteRoute.PRIVATE_BIN -> trashToPrivateBin(writable)
             else -> {
-                val uris = items.map(::uriOf)
+                val uris = writable.map(::uriOf)
                 val outcome = setTrashed(uris, trashed = true, route)
-                if (outcome.succeeded > 0) outcome.copy(undo = { setTrashed(uris, trashed = false, routeFor(MediaWriteOperation.RESTORE, items) ?: MediaWriteRoute.SYSTEM_REQUEST) }) else outcome
+                if (outcome.succeeded > 0) outcome.copy(undo = { setTrashed(uris, trashed = false, routeFor(MediaWriteOperation.RESTORE, writable) ?: MediaWriteRoute.SYSTEM_REQUEST) }) else outcome
             }
         }
+        return outcome.copy(readOnlyCard = onCard)
     }
 
     /** Takes system-trashed images (Android 11+) out of the trash again. */
@@ -95,8 +111,10 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
 
     /** Deletes [items] for good: the recycle bin is switched off, or the files do not fit into it. */
     suspend fun delete(items: List<MediaItem>): WriteOutcome {
-        if (items.isEmpty()) return WriteOutcome()
-        return deleteUris(items.map(::uriOf), routeFor(MediaWriteOperation.DELETE, items) ?: return WriteOutcome(cancelled = true))
+        val (writable, onCard) = splitReadOnly(items)
+        if (writable.isEmpty()) return WriteOutcome(readOnlyCard = onCard)
+        val route = routeFor(MediaWriteOperation.DELETE, writable) ?: return WriteOutcome(cancelled = true)
+        return deleteUris(writable.map(::uriOf), route).copy(readOnlyCard = onCard)
     }
 
     /** Deletes system-trashed images for good (Android 11+ recycle bin view). */
@@ -121,48 +139,53 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
     /** Renames one image inside its album. */
     suspend fun rename(item: MediaItem, newName: String): WriteOutcome {
         if (newName == item.displayName) return WriteOutcome()
-        val siblings = withContext(Dispatchers.IO) { namesIn(item.relativePath, excludeId = item.id) }
+        if (readOnly(item.albumPath)) return WriteOutcome(readOnlyCard = 1)
+        val siblings = namesIn(item.albumPath, excludeId = item.id)
         if (siblings.any { it.equals(newName, ignoreCase = true) }) return WriteOutcome(nameTaken = true)
         val route = routeFor(MediaWriteOperation.RENAME, listOf(item)) ?: return WriteOutcome(cancelled = true)
-        val (outcome, _) = relocate(listOf(Relocation(item, item.relativePath, newName)), route, WriteControl())
+        val (outcome, _) = relocate(listOf(Relocation(item, item.albumPath, newName)), route, WriteControl())
         return if (outcome.succeeded == 1) {
             outcome.copy(undo = { rename(item.copy(displayName = newName), item.displayName) })
         } else outcome
     }
 
-    /** How many of [items] would meet an existing name in [targetRelativePath] (ignoring case). */
-    suspend fun conflicts(items: List<MediaItem>, targetRelativePath: String): Int = withContext(Dispatchers.IO) {
-        val taken = namesIn(targetRelativePath, excludeId = null).mapTo(HashSet()) { it.lowercase() }
-        items.count { it.relativePath != targetRelativePath && it.displayName.lowercase() in taken }
+    /** How many of [items] would meet an existing name in [target] (ignoring case). */
+    suspend fun conflicts(items: List<MediaItem>, target: AlbumPath): Int {
+        val taken = namesIn(target, excludeId = null).mapTo(HashSet()) { it.lowercase() }
+        return items.count { !it.albumPath.sameAs(target) && it.displayName.lowercase() in taken }
     }
 
     /**
-     * Moves [items] into [targetRelativePath] (`Pictures/Trips/`); names already there follow [conflict] (replaced
-     * images go to the recycle bin first). [control] reports progress and stops between two images when
-     * cancelled; the undo only reverses the images that were moved.
+     * Moves [items] into [target] (`Pictures/Trips/` on one volume); names already there follow [conflict] (replaced
+     * images go to the recycle bin first). Within a volume the media library moves the file; across volumes
+     * (Android 11+) the image is copied to the target volume and the original removed. [control] reports progress
+     * and stops between two images when cancelled; the undo only reverses the images that were moved.
      */
-    suspend fun move(items: List<MediaItem>, targetRelativePath: String, conflict: NameConflictChoice, control: WriteControl = WriteControl()): WriteOutcome {
-        val candidates = items.filter { it.relativePath != targetRelativePath }
-        if (candidates.isEmpty()) return WriteOutcome()
-        if (conflict == NameConflictChoice.REPLACE && !replaceTargets(candidates, targetRelativePath)) return WriteOutcome(cancelled = true)
-        val plan = withContext(Dispatchers.IO) { planTargets(candidates, targetRelativePath, conflict) }
-        if (plan.isEmpty()) return WriteOutcome()
+    suspend fun move(items: List<MediaItem>, target: AlbumPath, conflict: NameConflictChoice, control: WriteControl = WriteControl()): WriteOutcome {
+        if (readOnly(target)) return WriteOutcome(readOnlyCard = items.size)
+        val (writable, onCard) = splitReadOnly(items)
+        val candidates = writable.filter { !it.albumPath.sameAs(target) }
+        if (candidates.isEmpty()) return WriteOutcome(readOnlyCard = onCard)
+        if (conflict == NameConflictChoice.REPLACE && !replaceTargets(candidates, target)) return WriteOutcome(cancelled = true)
+        val plan = planTargets(candidates, target, conflict)
+        if (plan.isEmpty()) return WriteOutcome(readOnlyCard = onCard)
         val route = routeFor(MediaWriteOperation.MOVE, plan.map { it.item }) ?: return WriteOutcome(cancelled = true)
         val (outcome, moved) = relocate(plan, route, control)
-        if (moved.isEmpty()) return outcome
-        return outcome.copy(undo = {
-            val back = moved.map { Relocation(it.item.copy(relativePath = it.targetRelativePath, displayName = it.targetName), it.item.relativePath, it.item.displayName) }
+        if (moved.isEmpty()) return outcome.copy(readOnlyCard = onCard)
+        return outcome.copy(readOnlyCard = onCard, undo = {
+            val back = moved.map { (entry, now) -> Relocation(now, entry.item.albumPath, entry.item.displayName) }
             relocate(back, routeFor(MediaWriteOperation.MOVE, back.map { it.item }) ?: MediaWriteRoute.SYSTEM_REQUEST, WriteControl()).first
         })
     }
 
-    /** Copies [items] into [targetRelativePath]; never asks for confirmation (new files belong to the app). */
-    suspend fun copy(items: List<MediaItem>, targetRelativePath: String, conflict: NameConflictChoice, control: WriteControl = WriteControl()): WriteOutcome {
+    /** Copies [items] into [target]; never asks for confirmation (new files belong to the app). */
+    suspend fun copy(items: List<MediaItem>, target: AlbumPath, conflict: NameConflictChoice, control: WriteControl = WriteControl()): WriteOutcome {
         if (items.isEmpty()) return WriteOutcome()
-        if (conflict == NameConflictChoice.REPLACE && !replaceTargets(items.filter { it.relativePath != targetRelativePath }, targetRelativePath)) {
+        if (readOnly(target)) return WriteOutcome(readOnlyCard = items.size)
+        if (conflict == NameConflictChoice.REPLACE && !replaceTargets(items.filter { !it.albumPath.sameAs(target) }, target)) {
             return WriteOutcome(cancelled = true)
         }
-        val plan = withContext(Dispatchers.IO) { planTargets(items, targetRelativePath, conflict) }
+        val plan = planTargets(items, target, conflict)
         if (plan.isEmpty()) return WriteOutcome()
         if (routeFor(MediaWriteOperation.COPY, items) == null) return WriteOutcome(cancelled = true)
         var done = 0
@@ -183,10 +206,10 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
      * "Replace": the images in [targetRelativePath] whose names the batch needs go to the recycle bin first (an
      * item of the batch itself is never replaced). False when the user refused that step.
      */
-    private suspend fun replaceTargets(items: List<MediaItem>, targetRelativePath: String): Boolean {
+    private suspend fun replaceTargets(items: List<MediaItem>, target: AlbumPath): Boolean {
         val names = items.mapTo(HashSet()) { it.displayName.lowercase() }
         val ids = items.mapTo(HashSet()) { it.id }
-        val existing = media.loadFolder(targetRelativePath).filter { it.displayName.lowercase() in names && it.id !in ids }
+        val existing = media.loadFolder(target).filter { it.displayName.lowercase() in names && it.id !in ids }
         if (existing.isEmpty()) return true
         val outcome = trash(existing)
         return !outcome.cancelled && !outcome.tooLargeForRecycleBin
@@ -330,10 +353,10 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
 
     // ---- rename / move / copy ----
 
-    private data class Relocation(val item: MediaItem, val targetRelativePath: String, val targetName: String)
+    private data class Relocation(val item: MediaItem, val target: AlbumPath, val targetName: String)
 
-    private fun planTargets(items: List<MediaItem>, targetRelativePath: String, conflict: NameConflictChoice): List<Relocation> {
-        val taken = namesIn(targetRelativePath, excludeId = null).toMutableList()
+    private suspend fun planTargets(items: List<MediaItem>, target: AlbumPath, conflict: NameConflictChoice): List<Relocation> {
+        val taken = namesIn(target, excludeId = null).toMutableList()
         val plan = ArrayList<Relocation>()
         for (item in items) {
             val clash = taken.any { it.equals(item.displayName, ignoreCase = true) }
@@ -343,30 +366,63 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
                 else -> NameConflictPolicy.uniqueName(item.displayName, taken)
             }
             taken += name
-            plan += Relocation(item, targetRelativePath, name)
+            plan += Relocation(item, target, name)
         }
         return plan
     }
 
-    /** Runs [plan] on [route]; returns the outcome and the entries that were actually relocated. */
-    private suspend fun relocate(plan: List<Relocation>, route: MediaWriteRoute, control: WriteControl): Pair<WriteOutcome, List<Relocation>> {
+    /** A cross-volume move whose copy exists while the original still waits for a delete confirmation. */
+    private class PendingDelete(val entry: Relocation, val copy: Uri)
+
+    /** Runs [plan] on [route]; returns the outcome and, for each image actually relocated, the image as it is now. */
+    private suspend fun relocate(plan: List<Relocation>, route: MediaWriteRoute, control: WriteControl): Pair<WriteOutcome, List<Pair<Relocation, MediaItem>>> {
         if (route == MediaWriteRoute.SYSTEM_REQUEST) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || !systemRequest(MediaStore.createWriteRequest(resolver, plan.map { uriOf(it.item) }))) {
                 return WriteOutcome(cancelled = true) to emptyList()
             }
         }
-        val done = ArrayList<Relocation>()
+        val done = ArrayList<Pair<Relocation, MediaItem>>()
         val refused = ArrayList<Relocation>()
+        val pending = ArrayList<PendingDelete>()
         val scanned = ArrayList<String>()
         withContext(Dispatchers.IO) {
             for ((index, entry) in plan.withIndex()) {
                 if (control.cancelRequested) break
-                val ok = if (route == MediaWriteRoute.LEGACY_FILE) relocateFile(entry, scanned) else relocateRow(entry)
-                if (ok) done += entry else refused += entry
+                fun record(now: MediaItem?) {
+                    if (now != null) done += entry to now else refused += entry
+                }
+                when {
+                    route == MediaWriteRoute.LEGACY_FILE -> record(relocateFile(entry, scanned))
+                    MediaCatalog.sameVolume(entry.item.volume, entry.target.volume) -> record(relocateRow(entry))
+                    else -> {
+                        val copy = insertCopy(entry)
+                        when {
+                            copy == null -> refused += entry
+                            deleteRow(uriOf(entry.item)) -> done += entry to movedCopy(entry, copy)
+                            else -> pending += PendingDelete(entry, copy)
+                        }
+                    }
+                }
                 control.report(index + 1, plan.size)
             }
         }
         scan(scanned)
+        if (pending.isNotEmpty()) {
+            // A write grant does not always cover deleting the original: one delete confirmation finishes the
+            // cross-volume moves, and refusing it takes their copies back.
+            val granted = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                systemRequest(MediaStore.createDeleteRequest(resolver, pending.map { uriOf(it.entry.item) }))
+            withContext(Dispatchers.IO) {
+                for (move in pending) {
+                    if (granted) {
+                        done += move.entry to movedCopy(move.entry, move.copy)
+                    } else {
+                        deleteRow(move.copy)
+                        refused += move.entry
+                    }
+                }
+            }
+        }
         // All files access may still be refused for some rows: one system request covers the rest.
         if (route != MediaWriteRoute.DIRECT || refused.isEmpty() || Build.VERSION.SDK_INT < Build.VERSION_CODES.R || control.cancelRequested) {
             return WriteOutcome(succeeded = done.size, failed = refused.size) to done
@@ -375,26 +431,40 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         return rest.copy(succeeded = rest.succeeded + done.size) to (done + restDone)
     }
 
-    /** Android 10+: MediaStore moves / renames the file itself when `RELATIVE_PATH` / `DISPLAY_NAME` change. */
-    private fun relocateRow(entry: Relocation): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return false
+    /** Android 10+, within a volume: MediaStore moves / renames the file itself when `RELATIVE_PATH` / `DISPLAY_NAME` change. */
+    private fun relocateRow(entry: Relocation): MediaItem? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return null
         val values = ContentValues().apply {
-            if (entry.targetRelativePath != entry.item.relativePath) put(MediaStore.MediaColumns.RELATIVE_PATH, entry.targetRelativePath)
+            if (entry.target.relativePath != entry.item.relativePath) put(MediaStore.MediaColumns.RELATIVE_PATH, entry.target.relativePath)
             if (entry.targetName != entry.item.displayName) put(MediaStore.MediaColumns.DISPLAY_NAME, entry.targetName)
         }
-        return runCatching { resolver.update(uriOf(entry.item), values, null, null) > 0 }.getOrDefault(false)
+        val updated = runCatching { resolver.update(uriOf(entry.item), values, null, null) > 0 }.getOrDefault(false)
+        return if (updated) entry.item.copy(relativePath = entry.target.relativePath, displayName = entry.targetName) else null
     }
 
+    /** The moved image of a cross-volume move: the copy's row on the target volume. */
+    private fun movedCopy(entry: Relocation, copy: Uri): MediaItem {
+        val id = ContentUris.parseId(copy)
+        return entry.item.copy(
+            id = id,
+            relativePath = entry.target.relativePath,
+            displayName = entry.targetName,
+            volume = entry.target.volume,
+            contentUri = ContentUris.withAppendedId(media.collection, id).toString(),
+        )
+    }
+
+    private fun deleteRow(uri: Uri): Boolean = runCatching { resolver.delete(uri, null, null) > 0 }.getOrDefault(false)
+
     /** Android 7-10: rename / move the file, then point the row at it (or let a scan re-create it). */
-    private fun relocateFile(entry: Relocation, scanned: MutableList<String>): Boolean {
+    private fun relocateFile(entry: Relocation, scanned: MutableList<String>): MediaItem? {
         val uri = uriOf(entry.item)
-        val source = filePathOf(uri)?.let(::File) ?: return false
-        val targetDir = File(externalRoot(), entry.targetRelativePath)
-        if (!targetDir.isDirectory && !targetDir.mkdirs()) return false
+        val source = filePathOf(uri)?.let(::File) ?: return null
+        val targetDir = File(externalRoot(), entry.target.relativePath)
+        if (!targetDir.isDirectory && !targetDir.mkdirs()) return null
         val target = File(targetDir, entry.targetName)
-        if (target.exists()) return false
-        val moved = source.renameTo(target) || (copyFile(source, target) && source.delete())
-        if (!moved) return false
+        if (target.exists()) return null
+        if (!source.renameTo(target) && !copyThenRemove(source, target)) return null
         val values = ContentValues().apply {
             @Suppress("DEPRECATION") put(MediaStore.MediaColumns.DATA, target.absolutePath)
             put(MediaStore.MediaColumns.DISPLAY_NAME, target.name)
@@ -404,33 +474,51 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
             runCatching { resolver.delete(uri, null, null) }
         }
         scanned += target.absolutePath
-        return true
+        return entry.item.copy(relativePath = entry.target.relativePath, displayName = entry.targetName)
+    }
+
+    /** A move across partitions: copy, then remove the original; if that is refused the copy goes again. */
+    private fun copyThenRemove(source: File, target: File): Boolean {
+        if (!copyFile(source, target)) return false
+        if (source.delete()) return true
+        target.delete()
+        return false
+    }
+
+    /**
+     * Android 10+: a new pending row on the target volume, filled from the source and then published; null when
+     * any step failed (nothing is left behind).
+     */
+    private fun insertCopy(entry: Relocation): Uri? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return null
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, entry.targetName)
+            put(MediaStore.MediaColumns.MIME_TYPE, entry.item.mimeType)
+            put(MediaStore.MediaColumns.RELATIVE_PATH, entry.target.relativePath)
+            entry.item.dateTakenMillis?.let { put(MediaStore.MediaColumns.DATE_TAKEN, it) }
+            put(MediaStore.MediaColumns.IS_PENDING, 1)
+        }
+        val volume = if (entry.target.isPrimary) MediaStore.VOLUME_EXTERNAL_PRIMARY else entry.target.volume
+        val target = runCatching { resolver.insert(MediaStore.Images.Media.getContentUri(volume), values) }.getOrNull() ?: return null
+        val copied = runCatching {
+            resolver.openInputStream(uriOf(entry.item)).use { input ->
+                resolver.openOutputStream(target, "w").use { output -> requireNotNull(input).copyTo(requireNotNull(output)) }
+            }
+        }.isSuccess
+        val published = copied && runCatching {
+            resolver.update(target, ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }, null, null) > 0
+        }.getOrDefault(false)
+        if (!published) {
+            deleteRow(target)
+            return null
+        }
+        return target
     }
 
     private fun copyOne(entry: Relocation, scanned: MutableList<String>): Boolean {
-        val source = uriOf(entry.item)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val values = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, entry.targetName)
-                put(MediaStore.MediaColumns.MIME_TYPE, entry.item.mimeType)
-                put(MediaStore.MediaColumns.RELATIVE_PATH, entry.targetRelativePath)
-                put(MediaStore.MediaColumns.IS_PENDING, 1)
-            }
-            val target = runCatching { resolver.insert(media.collection, values) }.getOrNull() ?: return false
-            val copied = runCatching {
-                resolver.openInputStream(source).use { input ->
-                    resolver.openOutputStream(target, "w").use { output -> requireNotNull(input).copyTo(requireNotNull(output)) }
-                }
-            }.isSuccess
-            if (!copied) {
-                runCatching { resolver.delete(target, null, null) }
-                return false
-            }
-            val publish = ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }
-            return runCatching { resolver.update(target, publish, null, null) > 0 }.getOrDefault(false)
-        }
-        val sourceFile = filePathOf(source)?.let(::File) ?: return false
-        val targetDir = File(externalRoot(), entry.targetRelativePath)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) return insertCopy(entry) != null
+        val sourceFile = filePathOf(uriOf(entry.item))?.let(::File) ?: return false
+        val targetDir = File(externalRoot(), entry.target.relativePath)
         if (!targetDir.isDirectory && !targetDir.mkdirs()) return false
         val target = File(targetDir, entry.targetName)
         if (!copyFile(sourceFile, target)) return false
@@ -463,22 +551,11 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         return owned && rows == ids.toSet().size
     }
 
-    /** Display names already in [relativePath] (case-insensitive comparisons are done by the callers). */
-    private fun namesIn(relativePath: String, excludeId: Long?): List<String> {
-        val names = ArrayList<String>()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            runCatching {
-                resolver.query(
-                    media.collection,
-                    arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DISPLAY_NAME),
-                    "${MediaStore.MediaColumns.RELATIVE_PATH} = ?",
-                    arrayOf(relativePath),
-                    null,
-                )?.use { cursor -> while (cursor.moveToNext()) if (cursor.getLong(0) != excludeId) names += cursor.getString(1).orEmpty() }
-            }
-        }
-        // Files the media library does not list (or Android 9 and older) still block a name.
-        File(externalRoot(), relativePath).list()?.let { names += it }
+    /** Display names already in [path] (case-insensitive comparisons are done by the callers). */
+    private suspend fun namesIn(path: AlbumPath, excludeId: Long?): List<String> {
+        val names = media.loadFolder(path).filter { it.id != excludeId }.mapTo(ArrayList()) { it.displayName }
+        // Files the media library does not list still block a name (the internal storage is the one the app can list).
+        if (path.isPrimary) withContext(Dispatchers.IO) { File(externalRoot(), path.relativePath).list() }?.let { names += it }
         return names
     }
 
@@ -517,6 +594,10 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         /** Album targets for move / copy: Android 10+ only accepts images under DCIM/ and Pictures/. */
         fun isWritableAlbumPath(relativePath: String, sdk: Int = Build.VERSION.SDK_INT): Boolean =
             sdk < Build.VERSION_CODES.Q || relativePath.startsWith("${Environment.DIRECTORY_DCIM}/") || relativePath.startsWith("${Environment.DIRECTORY_PICTURES}/")
+
+        /** [isWritableAlbumPath], and on Android 7-10 only on the internal storage (a storage card is read-only there). */
+        fun isWritableAlbum(path: AlbumPath, sdk: Int = Build.VERSION.SDK_INT): Boolean =
+            isWritableAlbumPath(path.relativePath, sdk) && (sdk >= Build.VERSION_CODES.R || path.isPrimary)
     }
 }
 

@@ -24,6 +24,14 @@
         <item quantity="many">تمت إزالة %1$d صورة من المفضلة</item>
         <item quantity="other">تمت إزالة %1$d صورة من المفضلة</item>
     </plurals>
+    <plurals name="gallery_card_read_only_count">
+        <item quantity="zero">لم تتغير %1$d صورة على بطاقة الذاكرة (لا يسمح Android 10 وما قبله للتطبيقات بتعديل بطاقة الذاكرة)</item>
+        <item quantity="one">لم تتغير صورة واحدة (%1$d) على بطاقة الذاكرة (لا يسمح Android 10 وما قبله للتطبيقات بتعديل بطاقة الذاكرة)</item>
+        <item quantity="two">لم تتغير صورتان (%1$d) على بطاقة الذاكرة (لا يسمح Android 10 وما قبله للتطبيقات بتعديل بطاقة الذاكرة)</item>
+        <item quantity="few">لم تتغير %1$d صور على بطاقة الذاكرة (لا يسمح Android 10 وما قبله للتطبيقات بتعديل بطاقة الذاكرة)</item>
+        <item quantity="many">لم تتغير %1$d صورة على بطاقة الذاكرة (لا يسمح Android 10 وما قبله للتطبيقات بتعديل بطاقة الذاكرة)</item>
+        <item quantity="other">لم تتغير %1$d صورة على بطاقة الذاكرة (لا يسمح Android 10 وما قبله للتطبيقات بتعديل بطاقة الذاكرة)</item>
+    </plurals>
     <plurals name="gallery_copied_count">
         <item quantity="zero">تم نسخ %1$d صورة إلى %2$s</item>
         <item quantity="one">تم نسخ صورة واحدة (%1$d) إلى %2$s</item>

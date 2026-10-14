@@ -147,16 +147,15 @@ internal class MediaStoreRepository(
     fun changes(quietMillis: Long = DEFAULT_QUIET_MILLIS, maxWaitMillis: Long = DEFAULT_MAX_WAIT_MILLIS): Flow<Unit> =
         rawChanges().settle(quietMillis, maxWaitMillis).onEach { invalidate() }
 
-    /** Every row of one folder (`Pictures/Trips/`), unfiltered: the name conflicts of a move or copy (ROADMAP 7.3). */
-    suspend fun loadFolder(relativePath: String): List<MediaItem> = withContext(Dispatchers.IO) {
+    /** Every row of one folder (`Pictures/Trips/` on one volume), unfiltered: the name conflicts of a move or copy (ROADMAP 7.3). */
+    suspend fun loadFolder(path: AlbumPath): List<MediaItem> = withContext(Dispatchers.IO) {
         runCatching {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                query("${MediaStore.Images.Media.RELATIVE_PATH} = ?", arrayOf(relativePath), MediaSort.DEFAULT, limit = null, offset = 0)
+                query("${MediaStore.Images.Media.RELATIVE_PATH} = ?", arrayOf(path.relativePath), MediaSort.DEFAULT, limit = null, offset = 0)
             } else {
                 @Suppress("DEPRECATION")
-                query("${MediaStore.Images.Media.DATA} LIKE ?", arrayOf("%/$relativePath%"), MediaSort.DEFAULT, limit = null, offset = 0)
-                    .filter { it.relativePath == relativePath }
-            }
+                query("${MediaStore.Images.Media.DATA} LIKE ?", arrayOf("%/${path.relativePath}%"), MediaSort.DEFAULT, limit = null, offset = 0)
+            }.filter { it.albumPath.sameAs(path) }
         }.getOrDefault(emptyList())
     }
 
@@ -210,7 +209,12 @@ internal class MediaStoreRepository(
         add(MediaStore.Images.Media.DATE_TAKEN)
         add(MediaStore.Images.Media.BUCKET_ID)
         add(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(MediaStore.Images.Media.RELATIVE_PATH) else @Suppress("DEPRECATION") add(MediaStore.Images.Media.DATA)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            add(MediaStore.Images.Media.RELATIVE_PATH)
+            add(MediaStore.Images.Media.VOLUME_NAME)
+        } else {
+            @Suppress("DEPRECATION") add(MediaStore.Images.Media.DATA)
+        }
     }.toTypedArray()
 
     private fun readRows(cursor: Cursor): List<MediaItem> {
@@ -230,13 +234,14 @@ internal class MediaStoreRepository(
             @Suppress("DEPRECATION")
             cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
         }
+        val volumeColumn = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) cursor.getColumnIndexOrThrow(MediaStore.Images.Media.VOLUME_NAME) else -1
         val items = ArrayList<MediaItem>(cursor.count)
         while (cursor.moveToNext()) {
             val id = cursor.getLong(idColumn)
-            val relativePath = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                cursor.getString(pathColumn).orEmpty()
+            val location = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                AlbumPath(cursor.getString(volumeColumn) ?: MediaCatalog.PRIMARY_VOLUME, cursor.getString(pathColumn).orEmpty())
             } else {
-                MediaCatalog.relativePathFromFilePath(cursor.getString(pathColumn).orEmpty(), externalRoots)
+                MediaCatalog.albumPathFromFilePath(cursor.getString(pathColumn).orEmpty(), externalRoots)
             }
             items.add(
                 MediaItem(
@@ -250,8 +255,9 @@ internal class MediaStoreRepository(
                     dateTakenMillis = if (cursor.isNull(takenColumn)) null else cursor.getLong(takenColumn).takeIf { it > 0L },
                     bucketId = cursor.getLong(bucketIdColumn),
                     bucketName = cursor.getString(bucketNameColumn).orEmpty(),
-                    relativePath = relativePath,
+                    relativePath = location.relativePath,
                     contentUri = ContentUris.withAppendedId(collection, id).toString(),
+                    volume = location.volume,
                 ),
             )
         }
