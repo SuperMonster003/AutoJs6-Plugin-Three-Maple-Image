@@ -165,6 +165,7 @@
     <string name="image_editor_brush_mosaic">모자이크</string>
     <string name="image_editor_brush_pen">펜</string>
     <string name="image_editor_brush_width">브러시 너비</string>
+    <string name="image_editor_compare">길게 눌러 원본 보기</string>
     <string name="image_editor_contrast">대비</string>
     <string name="image_editor_crop">자르기</string>
     <string name="image_editor_crop_aspect_ratio">종횡비</string>
@@ -199,6 +200,7 @@
     <string name="image_editor_hue">색조</string>
     <string name="image_editor_mosaic_strength">모자이크 강도</string>
     <string name="image_editor_mosaic_strength_value">%1$d</string>
+    <string name="image_editor_original">원본</string>
     <string name="image_editor_restore_original">원본 복원</string>
     <string name="image_editor_rotate_fine">미세 회전</string>
     <string name="image_editor_rotate_left">왼쪽으로 회전</string>

@@ -106,6 +106,9 @@ open class ImageEditorActivity : ConfiguredActivity() {
     /** The image as edited so far (test hook). */
     internal val editedBitmapForTesting: Bitmap? get() = bitmap
 
+    /** The canvas (test hook). */
+    internal val editingViewForTesting: ImageEditingView get() = editor
+
     override val usesDarkSystemBars: Boolean get() = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,6 +137,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
             onSave = ::save,
             onUndo = ::undo,
             onRedo = ::redo,
+            onCompare = ::onCompare,
             onRestoreOriginal = ::restoreOriginal,
             onReleaseHistory = ::showReleaseHistory,
             onGroup = { group ->
@@ -310,8 +314,17 @@ open class ImageEditorActivity : ConfiguredActivity() {
             canUndo = idle && state.canUndo,
             canRedo = idle && state.canRedo,
             canRestoreOriginal = idle && state.canRestoreOriginal,
+            canCompare = bitmap != null && !busy && model.compareImage != null,
             toolState = toolState,
         )
+        if (ui.comparing && !ui.canCompare) onCompare(false)
+    }
+
+    /** "Compare" (ROADMAP 8.1): the original replaces the edit on the canvas while [showing]; tools keep their state. */
+    private fun onCompare(showing: Boolean) {
+        val compare = model.compareImage?.takeIf { showing && bitmap != null && !busy }
+        editor.setCompareImage(compare)
+        ui = ui.copy(comparing = compare != null)
     }
 
     private fun handleTerminalResult(success: Boolean, error: Throwable? = null) {

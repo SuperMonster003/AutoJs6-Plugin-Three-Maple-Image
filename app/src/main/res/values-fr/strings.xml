@@ -165,6 +165,7 @@
     <string name="image_editor_brush_mosaic">Mosaïque</string>
     <string name="image_editor_brush_pen">Stylo</string>
     <string name="image_editor_brush_width">Épaisseur du pinceau</string>
+    <string name="image_editor_compare">Maintenez appuyé pour voir l\'original</string>
     <string name="image_editor_contrast">Contraste</string>
     <string name="image_editor_crop">Recadrer</string>
     <string name="image_editor_crop_aspect_ratio">Rapport largeur hauteur</string>
@@ -199,6 +200,7 @@
     <string name="image_editor_hue">Teinte</string>
     <string name="image_editor_mosaic_strength">Intensité de la mosaïque</string>
     <string name="image_editor_mosaic_strength_value">%1$d</string>
+    <string name="image_editor_original">Original</string>
     <string name="image_editor_restore_original">Restaurer l\'original</string>
     <string name="image_editor_rotate_fine">Rotation précise</string>
     <string name="image_editor_rotate_left">Tourner à gauche</string>

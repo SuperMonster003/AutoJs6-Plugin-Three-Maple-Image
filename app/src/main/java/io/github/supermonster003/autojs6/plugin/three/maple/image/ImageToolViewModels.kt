@@ -60,6 +60,10 @@ internal class ImageEditorViewModel(application: Application) : AndroidViewModel
     val historyWarnings: SharedFlow<Unit> = _historyWarnings.asSharedFlow()
     var uiState: EditorUiState = EditorUiState()
 
+    /** The original at most [COMPARE_PREVIEW_PIXELS] large, for "compare" (ROADMAP 8.1); null if it did not fit in memory. */
+    var compareImage: ImageEditingView.CompareImage? = null
+        private set
+
     fun initialize(value: ImageToolsRequest) {
         if (request != null) return
         request = value
@@ -80,6 +84,7 @@ internal class ImageEditorViewModel(application: Application) : AndroidViewModel
                         getApplication<Application>().contentResolver,
                         value.inputUri,
                     )
+                    compareImage = comparePreview(image)
                     Triple(info, image, history.initializeOriginal(image, INITIAL_STATE_ID))
                 }
                 sourceInfo = loaded.first
@@ -259,11 +264,25 @@ internal class ImageEditorViewModel(application: Application) : AndroidViewModel
     private fun clearOwnedResources() {
         bitmap?.takeUnless { it.isRecycled }?.recycle()
         bitmap = null
+        compareImage?.bitmap?.takeUnless { it.isRecycled }?.recycle()
+        compareImage = null
         history.clear()
+    }
+
+    /** A copy of [image] small enough to keep for the whole session; edits recycle [image] itself. */
+    private fun comparePreview(image: Bitmap): ImageEditingView.CompareImage? = try {
+        val small = ImageEditingEngine.downscale(image, COMPARE_PREVIEW_PIXELS)
+        val copy = if (small === image) image.copy(image.config ?: Bitmap.Config.ARGB_8888, false) else small
+        copy?.let { ImageEditingView.CompareImage(it, image.width, image.height) }
+    } catch (_: OutOfMemoryError) {
+        null
     }
 
     private companion object {
         const val INITIAL_STATE_ID = 0L
+
+        /** About a phone screen; the comparison is drawn at most at that size unless zoomed. */
+        const val COMPARE_PREVIEW_PIXELS = 2_000_000L
     }
 }
 

@@ -165,6 +165,7 @@
     <string name="image_editor_brush_mosaic">Мозаика</string>
     <string name="image_editor_brush_pen">Карандаш</string>
     <string name="image_editor_brush_width">Толщина кисти</string>
+    <string name="image_editor_compare">Удерживайте, чтобы увидеть оригинал</string>
     <string name="image_editor_contrast">Контрастность</string>
     <string name="image_editor_crop">Обрезка</string>
     <string name="image_editor_crop_aspect_ratio">Соотношение сторон</string>
@@ -199,6 +200,7 @@
     <string name="image_editor_hue">Оттенок</string>
     <string name="image_editor_mosaic_strength">Интенсивность мозаики</string>
     <string name="image_editor_mosaic_strength_value">%1$d</string>
+    <string name="image_editor_original">Оригинал</string>
     <string name="image_editor_restore_original">Восстановить оригинал</string>
     <string name="image_editor_rotate_fine">Точный поворот</string>
     <string name="image_editor_rotate_left">Повернуть влево</string>

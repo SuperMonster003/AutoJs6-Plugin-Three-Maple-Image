@@ -11,6 +11,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.graphics.withClip
@@ -18,6 +19,7 @@ import androidx.core.graphics.withRotation
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 import kotlin.math.abs
+import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -45,7 +47,16 @@ internal class ImageEditingView @JvmOverloads constructor(
         data class Text(val spec: ImageEditingEngine.TextSpec) : CanvasState
     }
 
-    private enum class Mode { NORMAL, ROTATION, CROP, BRUSH, TEXT }
+    private enum class Mode(val hasToolGesture: Boolean) {
+        NORMAL(false),
+        ROTATION(false),
+        CROP(true),
+        BRUSH(true),
+        TEXT(true),
+    }
+
+    /** The original image for "compare" (ROADMAP 8.1): [bitmap] may be smaller than [width] x [height]. */
+    class CompareImage(val bitmap: Bitmap, val width: Int, val height: Int)
 
     private data class MutableStroke(
         val tool: BrushTool,
@@ -81,8 +92,43 @@ internal class ImageEditingView @JvmOverloads constructor(
     /** A downscaled render of the look being previewed (ROADMAP 8.1), drawn instead of [bitmap] while set. */
     private var previewBitmap: Bitmap? = null
 
+    /** Zoom and pan of the canvas (ROADMAP 8.1); [imageRect] and [imageScale] follow it. */
+    private val viewport = EditorViewport()
+    private var compareImage: CompareImage? = null
+    private val compareRect = RectF()
+
+    /**
+     * True from the moment a gesture moves the canvas until all fingers are up. Without an active tool every gesture
+     * does; with one, a second finger turns the tool gesture into a canvas gesture (the stroke or drag is dropped).
+     */
+    private var viewportGesture = false
+    private var lastFocusX = 0f
+    private var lastFocusY = 0f
+
+    /**
+     * Mean distance of the fingers from their center at the previous event, 0 with one finger. Measured here rather
+     * than with ScaleGestureDetector, which ignores fingers closer than about 27 mm.
+     */
+    private var lastSpan = 0f
+    private val tapDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+        override fun onDoubleTap(e: MotionEvent): Boolean {
+            if (mode.hasToolGesture) return false
+            viewport.toggleZoom(e.x, e.y)
+            updateImageRect()
+            invalidate()
+            return true
+        }
+    })
+
+    /** Current zoom, 1 = fitted (test hook). */
+    val zoom: Float get() = viewport.zoom
+
+    /** Where a bitmap pixel is on the view (test hook for the zoomed canvas). */
+    fun bitmapToView(x: Float, y: Float): Pair<Float, Float> = viewport.toViewX(x) to viewport.toViewY(y)
+
     fun setBitmap(value: Bitmap?) {
         bitmap = value
+        viewport.setImage(value?.width ?: 0, value?.height ?: 0)
         clearToolState()
         updateImageRect()
         invalidate()
@@ -99,6 +145,18 @@ internal class ImageEditingView @JvmOverloads constructor(
      */
     fun setPreviewBitmap(value: Bitmap?) {
         previewBitmap = value
+        invalidate()
+    }
+
+    /** Shows [value] instead of the edited image while it is set ("compare"); null shows the edit again. */
+    fun setCompareImage(value: CompareImage?) {
+        compareImage = value
+        invalidate()
+    }
+
+    fun resetZoom() {
+        viewport.reset()
+        updateImageRect()
         invalidate()
     }
 
@@ -270,6 +328,7 @@ internal class ImageEditingView @JvmOverloads constructor(
 
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
         super.onSizeChanged(width, height, oldWidth, oldHeight)
+        viewport.setView(width.toFloat(), height.toFloat())
         updateImageRect()
     }
 
@@ -277,6 +336,10 @@ internal class ImageEditingView @JvmOverloads constructor(
         super.onDraw(canvas)
         val source = bitmap ?: return
         if (imageRect.isEmpty) updateImageRect()
+        compareImage?.takeUnless { it.bitmap.isRecycled }?.let { compare ->
+            canvas.drawBitmap(compare.bitmap, null, compareDestination(compare, source), plainBitmapPaint)
+            return
+        }
         val preview = previewBitmap?.takeUnless(Bitmap::isRecycled)
         when {
             mode == Mode.ROTATION -> drawRotationPreview(canvas, source)
@@ -294,14 +357,78 @@ internal class ImageEditingView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (bitmap == null || mode == Mode.NORMAL) return false
-        return when (mode) {
-            Mode.ROTATION -> false
+        if (bitmap == null || compareImage != null) return false
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> viewportGesture = !mode.hasToolGesture
+            MotionEvent.ACTION_POINTER_DOWN -> if (!viewportGesture) {
+                cancelToolGesture()
+                viewportGesture = true
+                parent?.requestDisallowInterceptTouchEvent(true)
+            }
+        }
+        if (!mode.hasToolGesture) tapDetector.onTouchEvent(event)
+        if (viewportGesture) return handleViewportTouch(event)
+        when (mode) {
             Mode.CROP -> handleCropTouch(event)
             Mode.BRUSH -> handleBrushTouch(event)
             Mode.TEXT -> handleTextTouch(event)
-            Mode.NORMAL -> false
+            Mode.NORMAL, Mode.ROTATION -> Unit
         }
+        // Keep the gesture even when the tool ignores its first finger, so that a second finger can still zoom.
+        return true
+    }
+
+    /** Pans by the movement of the fingers' center and zooms by the change of their spread around it. */
+    private fun handleViewportTouch(event: MotionEvent): Boolean {
+        val lifted = if (event.actionMasked == MotionEvent.ACTION_POINTER_UP) event.actionIndex else -1
+        var sumX = 0f
+        var sumY = 0f
+        var count = 0
+        for (index in 0 until event.pointerCount) {
+            if (index == lifted) continue
+            sumX += event.getX(index)
+            sumY += event.getY(index)
+            count++
+        }
+        if (count == 0) return true
+        val focusX = sumX / count
+        val focusY = sumY / count
+        var spanSum = 0f
+        for (index in 0 until event.pointerCount) {
+            if (index == lifted) continue
+            spanSum += hypot(event.getX(index) - focusX, event.getY(index) - focusY)
+        }
+        val span = if (count > 1) spanSum / count else 0f
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> parent?.requestDisallowInterceptTouchEvent(true)
+            MotionEvent.ACTION_MOVE -> {
+                viewport.panBy(focusX - lastFocusX, focusY - lastFocusY)
+                if (span > 0f && lastSpan >= dp(MIN_PINCH_SPAN_DP)) viewport.zoomBy(span / lastSpan, focusX, focusY)
+                updateImageRect()
+                invalidate()
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                parent?.requestDisallowInterceptTouchEvent(false)
+                viewportGesture = false
+                if (event.actionMasked == MotionEvent.ACTION_UP) performClick()
+            }
+        }
+        lastFocusX = focusX
+        lastFocusY = focusY
+        lastSpan = span
+        return true
+    }
+
+    /** A second finger came down during a tool gesture: the stroke is dropped and a crop drag goes back. */
+    private fun cancelToolGesture() {
+        when (mode) {
+            Mode.BRUSH -> currentStroke?.let(strokes::remove)
+            Mode.CROP -> if (cropHandle != null) cropRect.set(cropStartRect)
+            else -> Unit
+        }
+        currentStroke = null
+        cropHandle = null
+        invalidate()
     }
 
     override fun performClick(): Boolean {
@@ -315,12 +442,27 @@ internal class ImageEditingView @JvmOverloads constructor(
             return
         }
         if (width <= 0 || height <= 0) return
-        imageScale = min(width.toFloat() / source.width, height.toFloat() / source.height)
-        val drawnWidth = source.width * imageScale
-        val drawnHeight = source.height * imageScale
-        val left = (width - drawnWidth) / 2f
-        val top = (height - drawnHeight) / 2f
-        imageRect.set(left, top, left + drawnWidth, top + drawnHeight)
+        if (viewport.viewWidth != width.toFloat() || viewport.viewHeight != height.toFloat()) {
+            viewport.setView(width.toFloat(), height.toFloat())
+        }
+        if (viewport.imageWidth != source.width || viewport.imageHeight != source.height) {
+            viewport.setImage(source.width, source.height)
+        }
+        imageScale = viewport.scale
+        imageRect.set(viewport.left, viewport.top, viewport.right, viewport.bottom)
+    }
+
+    /**
+     * The original lies exactly under the edit when the size did not change (a zoomed comparison shows the same
+     * spot); after a crop or resize it is fitted and centered on its own.
+     */
+    private fun compareDestination(compare: CompareImage, source: Bitmap): RectF {
+        if (compare.width == source.width && compare.height == source.height) return imageRect
+        val scale = min(width.toFloat() / compare.width, height.toFloat() / compare.height)
+        val drawnWidth = compare.width * scale
+        val drawnHeight = compare.height * scale
+        compareRect.set((width - drawnWidth) / 2f, (height - drawnHeight) / 2f, (width + drawnWidth) / 2f, (height + drawnHeight) / 2f)
+        return compareRect
     }
 
     private fun applyCropAspectRatio(source: Bitmap) {
@@ -618,6 +760,9 @@ internal class ImageEditingView @JvmOverloads constructor(
 
     private companion object {
         const val CROP_HIT_SLOP_DP = 24f
+
+        /** Fingers this close (mean distance from their center) only pan: their ratio would jump. */
+        const val MIN_PINCH_SPAN_DP = 8f
         const val MIN_CROP_SCREEN_SIZE_DP = 48f
         const val MIN_CROP_BITMAP_SIZE = 8f
         const val MIN_BRUSH_POINT_DISTANCE_DP = 1.5f

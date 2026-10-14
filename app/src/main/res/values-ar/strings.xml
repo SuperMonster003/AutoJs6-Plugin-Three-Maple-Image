@@ -165,6 +165,7 @@
     <string name="image_editor_brush_mosaic">فسيفساء</string>
     <string name="image_editor_brush_pen">قلم</string>
     <string name="image_editor_brush_width">عرض الفرشاة</string>
+    <string name="image_editor_compare">اضغط مطولا لعرض الصورة الأصلية</string>
     <string name="image_editor_contrast">التباين</string>
     <string name="image_editor_crop">اقتصاص</string>
     <string name="image_editor_crop_aspect_ratio">نسبة العرض إلى الارتفاع</string>
@@ -199,6 +200,7 @@
     <string name="image_editor_hue">تدرج اللون</string>
     <string name="image_editor_mosaic_strength">قوة الفسيفساء</string>
     <string name="image_editor_mosaic_strength_value">%1$d</string>
+    <string name="image_editor_original">الأصلية</string>
     <string name="image_editor_restore_original">استعادة الصورة الأصلية</string>
     <string name="image_editor_rotate_fine">تدوير دقيق</string>
     <string name="image_editor_rotate_left">تدوير لليسار</string>

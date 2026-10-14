@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,16 +33,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -71,6 +82,9 @@ internal data class EditorUiModel(
     val canUndo: Boolean = false,
     val canRedo: Boolean = false,
     val canRestoreOriginal: Boolean = false,
+    val canCompare: Boolean = false,
+    /** The original is shown while the compare button is held. */
+    val comparing: Boolean = false,
     val toolState: EditorToolState = EditorToolState.NORMAL,
     val group: EditorGroup = EditorGroup.TRANSFORM,
     val adjustmentTitle: String = "",
@@ -104,6 +118,8 @@ internal class EditorCallbacks(
     val onSave: () -> Unit,
     val onUndo: () -> Unit,
     val onRedo: () -> Unit,
+    /** True while the compare button is held (or switched on through accessibility), false when it is let go. */
+    val onCompare: (Boolean) -> Unit,
     val onRestoreOriginal: () -> Unit,
     val onReleaseHistory: () -> Unit,
     val onGroup: (EditorGroup) -> Unit,
@@ -149,12 +165,25 @@ internal fun EditorScreen(
     Column(modifier = Modifier.fillMaxSize().background(canvas.editorCanvas)) {
         EditorTopBar(model, callbacks)
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-            AndroidView(factory = { editingView }, modifier = Modifier.fillMaxSize())
+            AndroidView(factory = { editingView }, modifier = Modifier.fillMaxSize().testTag("maple.editor.canvas"))
             if (model.busy) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).testTag("maple.editor.progress"),
                     color = canvas.accentOnScrim,
                     trackColor = canvas.accentOnScrim.copy(alpha = 0.3f),
+                )
+            }
+            if (model.comparing) {
+                Text(
+                    text = stringResource(R.string.image_editor_original),
+                    color = canvas.onScrim,
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 12.dp)
+                        .background(canvas.scrimStrong, RoundedCornerShape(16.dp))
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                        .testTag("maple.editor.originalLabel"),
                 )
             }
             if (model.loadFailed) {
@@ -379,6 +408,7 @@ private fun EditorTopBar(model: EditorUiModel, callbacks: EditorCallbacks) {
                 Icon(painterResource(R.drawable.ic_redo_24), contentDescription = stringResource(R.string.text_redo),
                     tint = if (model.canRedo) canvas.onScrim else canvas.onScrimDisabled)
             }
+            CompareButton(model, callbacks)
             IconButton(onClick = callbacks.onSave, enabled = model.canSave, modifier = Modifier.testTag("maple.editor.save")) {
                 Icon(painterResource(R.drawable.ic_save_24), contentDescription = stringResource(R.string.text_save),
                     tint = if (model.canSave) canvas.accentOnScrim else canvas.onScrimDisabled)
@@ -401,6 +431,56 @@ private fun EditorTopBar(model: EditorUiModel, callbacks: EditorCallbacks) {
             }
         },
     )
+}
+
+/**
+ * Shows the original while pressed (ROADMAP 8.1). It is not a click: holding is the gesture. For accessibility
+ * services the click action switches the comparison on and off instead.
+ */
+@Composable
+private fun CompareButton(model: EditorUiModel, callbacks: EditorCallbacks) {
+    val canvas = MapleTheme.canvas
+    val enabled = model.canCompare
+    val description = stringResource(R.string.image_editor_compare)
+    val currentModel by rememberUpdatedState(model)
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(48.dp)
+            .clip(CircleShape)
+            .background(if (model.comparing) canvas.accentOnScrim.copy(alpha = 0.2f) else Color.Transparent)
+            .pointerInput(enabled) {
+                if (!enabled) return@pointerInput
+                detectTapGestures(onPress = {
+                    callbacks.onCompare(true)
+                    try {
+                        tryAwaitRelease()
+                    } finally {
+                        callbacks.onCompare(false)
+                    }
+                })
+            }
+            .semantics {
+                contentDescription = description
+                role = Role.Button
+                if (enabled) {
+                    onClick { callbacks.onCompare(!currentModel.comparing); true }
+                } else {
+                    disabled()
+                }
+            }
+            .testTag("maple.editor.compare"),
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_compare_24),
+            contentDescription = null,
+            tint = when {
+                !enabled -> canvas.onScrimDisabled
+                model.comparing -> canvas.accentOnScrim
+                else -> canvas.onScrim
+            },
+        )
+    }
 }
 
 @Composable

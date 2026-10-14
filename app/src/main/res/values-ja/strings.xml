@@ -165,6 +165,7 @@
     <string name="image_editor_brush_mosaic">モザイク</string>
     <string name="image_editor_brush_pen">ペン</string>
     <string name="image_editor_brush_width">ブラシの太さ</string>
+    <string name="image_editor_compare">長押しで元の画像を表示</string>
     <string name="image_editor_contrast">コントラスト</string>
     <string name="image_editor_crop">切り抜き</string>
     <string name="image_editor_crop_aspect_ratio">アスペクト比</string>
@@ -199,6 +200,7 @@
     <string name="image_editor_hue">色相</string>
     <string name="image_editor_mosaic_strength">モザイク強度</string>
     <string name="image_editor_mosaic_strength_value">%1$d</string>
+    <string name="image_editor_original">元の画像</string>
     <string name="image_editor_restore_original">元の画像に戻す</string>
     <string name="image_editor_rotate_fine">微調整回転</string>
     <string name="image_editor_rotate_left">左に回転</string>

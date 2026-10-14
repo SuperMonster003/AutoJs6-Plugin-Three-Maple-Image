@@ -165,6 +165,7 @@
     <string name="image_editor_brush_mosaic">馬賽克</string>
     <string name="image_editor_brush_pen">畫筆</string>
     <string name="image_editor_brush_width">畫筆寬度</string>
+    <string name="image_editor_compare">按住顯示原圖</string>
     <string name="image_editor_contrast">對比度</string>
     <string name="image_editor_crop">裁切</string>
     <string name="image_editor_crop_aspect_ratio">長寬比</string>
@@ -199,6 +200,7 @@
     <string name="image_editor_hue">色調</string>
     <string name="image_editor_mosaic_strength">馬賽克強度</string>
     <string name="image_editor_mosaic_strength_value">%1$d</string>
+    <string name="image_editor_original">原圖</string>
     <string name="image_editor_restore_original">恢復原圖</string>
     <string name="image_editor_rotate_fine">微調旋轉</string>
     <string name="image_editor_rotate_left">向左旋轉</string>
