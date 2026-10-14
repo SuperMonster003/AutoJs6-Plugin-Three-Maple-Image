@@ -23,6 +23,7 @@
     <string name="action_restore">Восстановить</string>
     <string name="action_resume_animation">Продолжить анимацию</string>
     <string name="action_rotate_clockwise">Повернуть на 90° по часовой стрелке</string>
+    <string name="action_search">Поиск</string>
     <string name="action_share">Отправить</string>
     <string name="action_show_image_details">Показать сведения</string>
     <string name="action_undo">Отменить</string>
@@ -221,6 +222,13 @@
     <string name="rename_extension_warning">Расширение изменится, и некоторые приложения могут перестать открывать файл</string>
     <string name="rename_label">Имя файла</string>
     <string name="rename_title">Переименовать</string>
+    <string name="search_clear">Очистить</string>
+    <string name="search_hint_album">Поиск в этом альбоме</string>
+    <string name="search_hint_global">Поиск альбомов и изображений</string>
+    <string name="search_no_results">Ничего не найдено</string>
+    <string name="search_prompt">Введите часть названия альбома или имени файла; несколько слов должны совпасть все.</string>
+    <string name="search_section_albums">Альбомы</string>
+    <string name="search_section_images">Изображения</string>
     <string name="selection_exit">Выйти из выбора</string>
     <string name="selection_invert">Инвертировать выбор</string>
     <string name="selection_select_all">Выбрать все</string>

@@ -23,6 +23,7 @@
     <string name="action_restore">恢复</string>
     <string name="action_resume_animation">继续播放</string>
     <string name="action_rotate_clockwise">顺时针旋转 90 度</string>
+    <string name="action_search">搜索</string>
     <string name="action_share">分享</string>
     <string name="action_show_image_details">显示详情</string>
     <string name="action_undo">撤销</string>
@@ -221,6 +222,13 @@
     <string name="rename_extension_warning">扩展名改变后, 部分应用可能无法打开这个文件</string>
     <string name="rename_label">文件名</string>
     <string name="rename_title">重命名</string>
+    <string name="search_clear">清除</string>
+    <string name="search_hint_album">在本相册中搜索</string>
+    <string name="search_hint_global">搜索相册和图片</string>
+    <string name="search_no_results">没有匹配的结果</string>
+    <string name="search_prompt">输入相册名或文件名的一部分; 输入多个词时需要全部匹配.</string>
+    <string name="search_section_albums">相册</string>
+    <string name="search_section_images">图片</string>
     <string name="selection_exit">退出选择</string>
     <string name="selection_invert">反选</string>
     <string name="selection_select_all">全选</string>

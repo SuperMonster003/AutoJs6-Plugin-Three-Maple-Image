@@ -23,6 +23,7 @@
     <string name="action_restore">Restaurar</string>
     <string name="action_resume_animation">Reanudar animación</string>
     <string name="action_rotate_clockwise">Girar 90° a la derecha</string>
+    <string name="action_search">Buscar</string>
     <string name="action_share">Compartir</string>
     <string name="action_show_image_details">Mostrar detalles</string>
     <string name="action_undo">Deshacer</string>
@@ -221,6 +222,13 @@
     <string name="rename_extension_warning">La extensión cambia, por lo que algunas aplicaciones podrían no abrir el archivo</string>
     <string name="rename_label">Nombre del archivo</string>
     <string name="rename_title">Cambiar nombre</string>
+    <string name="search_clear">Borrar</string>
+    <string name="search_hint_album">Buscar en este álbum</string>
+    <string name="search_hint_global">Buscar álbumes e imágenes</string>
+    <string name="search_no_results">No hay coincidencias</string>
+    <string name="search_prompt">Escriba parte del nombre de un álbum o de un archivo; si escribe varias palabras, deben coincidir todas.</string>
+    <string name="search_section_albums">Álbumes</string>
+    <string name="search_section_images">Imágenes</string>
     <string name="selection_exit">Salir de la selección</string>
     <string name="selection_invert">Invertir selección</string>
     <string name="selection_select_all">Seleccionar todo</string>

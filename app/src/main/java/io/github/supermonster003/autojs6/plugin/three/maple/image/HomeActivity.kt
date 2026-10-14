@@ -91,6 +91,10 @@ class HomeActivity : ConfiguredActivity() {
             onAlbumLongPress = { album -> gallery.toggleAlbum(album.id) },
             onClearAlbumSelection = gallery::clearAlbumSelection,
             onSelectAllAlbums = gallery::selectAllAlbums,
+            onSearch = gallery::startSearch,
+            onSearchQuery = gallery::setSearchQuery,
+            onEndSearch = gallery::endSearch,
+            onOpenSearchResult = ::openSearchResult,
         )
         setContent {
             MapleTheme(palette = appPalette) {
@@ -98,6 +102,7 @@ class HomeActivity : ConfiguredActivity() {
                 navigate = { route -> controller.navigate(route) }
                 val albums by gallery.albums.collectAsState()
                 val grid by gallery.grid.collectAsState()
+                val search by gallery.search.collectAsState()
                 NavHost(navController = controller, startDestination = ROUTE_ALBUMS) {
                     composable(ROUTE_ALBUMS) {
                         // Reports "Fully drawn" once the album list (or the no-permission state) is on screen: the
@@ -109,6 +114,8 @@ class HomeActivity : ConfiguredActivity() {
                             callbacks = callbacks,
                             albumActions = operations.albumActionsFor(albums),
                             snackbarHostState = operations.snackbar,
+                            search = search,
+                            mediaColumns = grid.columns,
                         )
                         actions.Dialogs()
                         operations.Dialogs()
@@ -128,9 +135,11 @@ class HomeActivity : ConfiguredActivity() {
                             callbacks = MediaGridCallbacks(
                                 onBack = {
                                     gallery.clearSelection()
+                                    gallery.setGridQuery("")
                                     controller.popBackStack()
                                 },
                                 onOpen = ::openImage,
+                                onQuery = gallery::setGridQuery,
                                 onLoadMore = gallery::loadMore,
                                 onSort = { sort, grouping, thisAlbumOnly -> gallery.setGridSort(sort, grouping, thisAlbumOnly) },
                                 onRevealed = gallery::clearReveal,
@@ -200,6 +209,8 @@ class HomeActivity : ConfiguredActivity() {
         super.onStart()
         gallery.setVisible(true)
         gallery.refreshHiddenIfChanged()
+        // Back from the viewer: results may have been deleted, moved or renamed there.
+        gallery.refreshSearch()
     }
 
     override fun onStop() {
@@ -247,15 +258,24 @@ class HomeActivity : ConfiguredActivity() {
         }
     }
 
+    /** A home search result opens in the viewer with every result as its pages (ROADMAP 7.5). */
+    private fun openSearchResult(item: MediaItem) {
+        val query = gallery.search.value.query
+        val request = ImageViewerLaunchRequest.gallery(ViewerSource.request(item), ViewerSourceSpec.Search(query, MediaCatalog.ALL_BUCKETS, MediaSort.DEFAULT, item.id))
+        runCatching { openViewer.launch(ImageViewerContract.viewerIntent(this, request)) }.onFailure { showMessage(R.string.standalone_home_open_failed) }
+    }
+
     /** Opens one grid item in the paged viewer with the whole album as its source (ROADMAP 6.3). */
     private fun openImage(item: MediaItem) {
         val grid = gallery.grid.value
         val album = grid.album
         val start = ViewerSource.request(item)
+        val library = album != null && (album.kind == AlbumKind.MEDIA || album.kind == AlbumKind.ALL || album.kind == AlbumKind.FAVORITES)
         val spec = when {
             album == null -> null
-            album.kind == AlbumKind.MEDIA || album.kind == AlbumKind.ALL || album.kind == AlbumKind.FAVORITES ->
-                ViewerSourceSpec.MediaAlbum(album.id, grid.sort, item.id)
+            // The viewer pages through the search results of the album (ROADMAP 7.5).
+            library && grid.query.isNotBlank() -> ViewerSourceSpec.Search(grid.query, album.id, grid.sort, item.id)
+            library -> ViewerSourceSpec.MediaAlbum(album.id, grid.sort, item.id)
             album.folder != null -> ViewerSourceSpec.AuthorizedFolder(album.folder.treeUri, grid.sort, item.id)
             album.kind == AlbumKind.HIDDEN -> ViewerSourceSpec.HiddenFolder(album.subtitle, grid.sort, item.id)
             else -> null

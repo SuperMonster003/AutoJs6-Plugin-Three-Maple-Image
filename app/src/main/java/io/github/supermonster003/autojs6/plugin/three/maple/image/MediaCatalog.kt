@@ -1,6 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import java.util.Calendar
+import java.util.Locale
 import java.util.TimeZone
 import kotlin.random.Random
 
@@ -67,6 +68,25 @@ internal enum class MediaGrouping { NONE, DAY, MONTH }
 
 /** One section of a sorted album: [start] and [count] index its items; [day] is 0 for a month section. */
 internal data class MediaGroup(val year: Int, val month: Int, val day: Int, val start: Int, val count: Int)
+
+/** Search by name (ROADMAP 7.5): whitespace separates terms, and every term must appear, ignoring case. */
+internal object MediaSearch {
+    fun terms(query: String): List<String> = query.trim().lowercase(Locale.ROOT).split(WHITESPACE).filter { it.isNotEmpty() }
+
+    fun matches(name: String, terms: List<String>): Boolean {
+        if (terms.isEmpty()) return false
+        val lower = name.lowercase(Locale.ROOT)
+        return terms.all { it in lower }
+    }
+
+    /** The images of [items] whose file name matches [query], in their order; none for a blank query. */
+    fun items(items: List<MediaItem>, query: String): List<MediaItem> {
+        val terms = terms(query)
+        return if (terms.isEmpty()) emptyList() else items.filter { matches(it.displayName, terms) }
+    }
+
+    private val WHITESPACE = Regex("\\s+")
+}
 
 /**
  * Positions of a media grid with section headers (ROADMAP 7.5): each group adds one full-width header before its

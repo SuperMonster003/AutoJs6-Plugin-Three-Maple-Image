@@ -44,6 +44,17 @@ internal sealed interface ViewerSourceSpec {
         override val startItemId: Long,
     ) : ViewerSourceSpec
 
+    /**
+     * Search results (ROADMAP 7.5): the images of [bucketId] (an album, every album, or the favorites) whose file
+     * name matches [query], enumerated again by the viewer.
+     */
+    data class Search(
+        val query: String,
+        val bucketId: Long,
+        override val sort: MediaSort,
+        override val startItemId: Long,
+    ) : ViewerSourceSpec
+
     /** A hidden folder of the internal storage, by its relative path (`Pictures/Private/`). */
     data class HiddenFolder(
         val relativePath: String,
@@ -76,7 +87,7 @@ internal class ViewerSource(
             kind = when {
                 request.hostSession != null ->
                     if (request.pages.any { it.hostRelativePath == "" }) ViewerSourceKind.HOST_SIBLINGS else ViewerSourceKind.HOST_DIRECTORY
-                request.source is ViewerSourceSpec.MediaAlbum -> ViewerSourceKind.MEDIA_ALBUM
+                request.source is ViewerSourceSpec.MediaAlbum || request.source is ViewerSourceSpec.Search -> ViewerSourceKind.MEDIA_ALBUM
                 request.source is ViewerSourceSpec.AuthorizedFolder -> ViewerSourceKind.AUTHORIZED_FOLDER
                 request.source is ViewerSourceSpec.HiddenFolder -> ViewerSourceKind.HIDDEN_FOLDER
                 request.pages.size > 1 -> ViewerSourceKind.HOST_SELECTION
@@ -146,6 +157,7 @@ internal class ViewerSourceLoader(
     suspend fun items(spec: ViewerSourceSpec): List<MediaItem> = try {
         when (spec) {
             is ViewerSourceSpec.MediaAlbum -> loadAlbum(spec.bucketId, spec.sort)
+            is ViewerSourceSpec.Search -> MediaSearch.items(loadAlbum(spec.bucketId, spec.sort), spec.query)
             is ViewerSourceSpec.AuthorizedFolder -> loadFolder(spec.treeUri, spec.sort)
             is ViewerSourceSpec.HiddenFolder -> loadHidden(spec.relativePath, spec.sort)
         }
@@ -160,6 +172,7 @@ internal class ViewerSourceLoader(
         val items = try {
             when (spec) {
                 is ViewerSourceSpec.MediaAlbum -> loadAlbum(spec.bucketId, spec.sort)
+                is ViewerSourceSpec.Search -> MediaSearch.items(loadAlbum(spec.bucketId, spec.sort), spec.query)
                 is ViewerSourceSpec.AuthorizedFolder -> loadFolder(spec.treeUri, spec.sort)
                 is ViewerSourceSpec.HiddenFolder -> loadHidden(spec.relativePath, spec.sort)
             }
@@ -169,7 +182,7 @@ internal class ViewerSourceLoader(
             emptyList()
         }
         val kind = when (spec) {
-            is ViewerSourceSpec.MediaAlbum -> ViewerSourceKind.MEDIA_ALBUM
+            is ViewerSourceSpec.MediaAlbum, is ViewerSourceSpec.Search -> ViewerSourceKind.MEDIA_ALBUM
             is ViewerSourceSpec.AuthorizedFolder -> ViewerSourceKind.AUTHORIZED_FOLDER
             is ViewerSourceSpec.HiddenFolder -> ViewerSourceKind.HIDDEN_FOLDER
         }

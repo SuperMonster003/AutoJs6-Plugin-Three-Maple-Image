@@ -50,6 +50,8 @@ internal fun MapleTopBar(
     onNavigationClick: (() -> Unit)? = null,
     overlay: Boolean = false,
     actions: @Composable RowScope.() -> Unit = {},
+    /** Replaces the title and subtitle (a search field, ROADMAP 7.5). */
+    titleContent: (@Composable () -> Unit)? = null,
 ) {
     val canvas = MapleTheme.canvas
     val colors = if (overlay) {
@@ -71,6 +73,10 @@ internal fun MapleTopBar(
     }
     TopAppBar(
         title = {
+            if (titleContent != null) {
+                titleContent()
+                return@TopAppBar
+            }
             Column {
                 Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (!subtitle.isNullOrEmpty()) {

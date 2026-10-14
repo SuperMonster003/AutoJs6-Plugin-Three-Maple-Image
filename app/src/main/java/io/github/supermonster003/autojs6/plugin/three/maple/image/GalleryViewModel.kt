@@ -47,6 +47,16 @@ internal data class AlbumSummary(
     val path: AlbumPath get() = AlbumPath(volume, subtitle)
 }
 
+/** The home screen search (ROADMAP 7.5): albums by name and images by file name over the whole visible library. */
+internal data class SearchUiState(
+    val active: Boolean = false,
+    val query: String = "",
+    val albums: List<AlbumSummary> = emptyList(),
+    val items: List<MediaItem> = emptyList(),
+    /** A search for the current query is running. */
+    val searching: Boolean = false,
+)
+
 internal data class GalleryUiState(
     val loading: Boolean = true,
     val access: MediaPermissionResolution? = null,
@@ -90,6 +100,8 @@ internal data class MediaGridUiState(
     val groups: List<MediaGroup> = emptyList(),
     /** The open album keeps a sort of its own (the sort dialog's "this album only"). */
     val ownSort: Boolean = false,
+    /** Search inside the album (ROADMAP 7.5): with a query the grid shows the whole album filtered by file name. */
+    val query: String = "",
 ) {
     val selecting: Boolean get() = selection.isNotEmpty()
 }
@@ -128,6 +140,10 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     private var dragAnchor: Long? = null
 
     val albums: StateFlow<GalleryUiState> = _albums.asStateFlow()
+    private val _search = MutableStateFlow(SearchUiState())
+    val search: StateFlow<SearchUiState> = _search.asStateFlow()
+    private var searchJob: Job? = null
+    private var gridQueryJob: Job? = null
     val grid: StateFlow<MediaGridUiState> = _grid.asStateFlow()
 
     /** Set by the Activity between onStart and onStop; changes seen while hidden reload once on return. */
@@ -375,6 +391,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             grouping = grouping,
             groups = if (sameAlbum && sort == current.sort && grouping == current.grouping) current.groups else emptyList(),
             ownSort = preferences.hasOwnSort(album.kind, album.id),
+            query = if (sameAlbum) current.query else "",
             columns = preferences.mediaColumns,
             refreshing = current.refreshing && sameAlbum,
             selection = if (sameAlbum) current.selection else emptySet(),
@@ -441,6 +458,57 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
 
     fun clearReveal() {
         _grid.update { if (it.reveal == null) it else it.copy(reveal = null) }
+    }
+
+    // ---- search (ROADMAP 7.5) ----
+
+    fun startSearch() {
+        if (!_search.value.active) _search.value = SearchUiState(active = true)
+    }
+
+    fun endSearch() {
+        searchJob?.cancel()
+        _search.value = SearchUiState()
+    }
+
+    /** Runs the home search once typing pauses; albums come from the album list, images from the full scan. */
+    fun setSearchQuery(query: String) {
+        _search.update { it.copy(query = query) }
+        searchJob?.cancel()
+        if (MediaSearch.terms(query).isEmpty()) {
+            _search.update { it.copy(albums = emptyList(), items = emptyList(), searching = false) }
+            return
+        }
+        searchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_MILLIS)
+            _search.update { it.copy(searching = true) }
+            val terms = MediaSearch.terms(query)
+            val albumList = _albums.value.albums + _albums.value.folders
+            val library = runCatching { media.loadAll() }.getOrDefault(emptyList())
+            val (albums, items) = withContext(Dispatchers.Default) {
+                albumList.filter { MediaSearch.matches(it.name, terms) } to MediaSearch.items(marks.visible(library), query)
+            }
+            _search.update { if (it.query == query) it.copy(albums = albums, items = items, searching = false) else it }
+        }
+    }
+
+    /** Runs the home search again (after the library changed while the viewer was open). */
+    fun refreshSearch() {
+        val search = _search.value
+        if (search.active && MediaSearch.terms(search.query).isNotEmpty()) setSearchQuery(search.query)
+    }
+
+    /** Search inside the open album: a query filters the whole album by file name, an empty one pages normally again. */
+    fun setGridQuery(query: String) {
+        if (_grid.value.query == query) return
+        _grid.update { it.copy(query = query) }
+        gridQueryJob?.cancel()
+        gridQueryJob = viewModelScope.launch {
+            if (query.isNotBlank()) delay(SEARCH_DEBOUNCE_MILLIS)
+            gridJob?.cancel()
+            _grid.update { it.copy(items = emptyList(), groups = emptyList(), endReached = false, loading = true) }
+            loadPage(reset = true)
+        }
     }
 
     // ---- album selection (ROADMAP 7.4) ----
@@ -548,6 +616,18 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             val offset = if (reset) 0 else _grid.value.items.size
             val sort = _grid.value.sort
             val grouping = _grid.value.grouping
+            val query = _grid.value.query
+            if (query.isNotBlank()) {
+                // A search covers the whole album at once; no sections while searching.
+                if (!reset) return@launch
+                val (all, folderLimit) = wholeAlbum(album, sort)
+                val found = withContext(Dispatchers.Default) { MediaSearch.items(all, query) }
+                _grid.update { state ->
+                    if (state.album?.id != album.id || state.query != query) return@update state
+                    state.copy(items = found, groups = emptyList(), loading = false, refreshing = false, endReached = true, limit = folderLimit)
+                }
+                return@launch
+            }
             if (grouping != MediaGrouping.NONE && MediaCatalog.groupable(sort)) {
                 // Sections need the whole album: it is loaded at once (MediaStore albums come from the shared scan).
                 if (!reset) return@launch
@@ -626,6 +706,8 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     companion object {
         /** Larger pages mean fewer list appends (each one recomposes the grid) while flinging through a big album. */
         const val PAGE_SIZE = 360
+        /** Typing pauses this long before a search runs (ROADMAP 7.5). */
+        const val SEARCH_DEBOUNCE_MILLIS = 250L
         private const val GRANT_SETTLE_MILLIS = 800L
         private const val MAX_REVEAL_PAGES = 100
     }

@@ -42,7 +42,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import io.github.supermonster003.autojs6.plugin.three.maple.image.AlbumKind
 import io.github.supermonster003.autojs6.plugin.three.maple.image.AlbumSummary
+import io.github.supermonster003.autojs6.plugin.three.maple.image.GalleryPreferences
 import io.github.supermonster003.autojs6.plugin.three.maple.image.GalleryUiState
+import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaItem
+import io.github.supermonster003.autojs6.plugin.three.maple.image.SearchUiState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaAccessState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaPermissionAction
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaSort
@@ -68,6 +71,11 @@ internal class AlbumGridCallbacks(
     val onAlbumLongPress: (AlbumSummary) -> Unit = {},
     val onClearAlbumSelection: () -> Unit = {},
     val onSelectAllAlbums: () -> Unit = {},
+    /** Home search (ROADMAP 7.5). */
+    val onSearch: () -> Unit = {},
+    val onSearchQuery: (String) -> Unit = {},
+    val onEndSearch: () -> Unit = {},
+    val onOpenSearchResult: (MediaItem) -> Unit = {},
 )
 
 /** The album selection bar (ROADMAP 7.4); null hides an action. [allPinned] turns "pin" into "unpin". */
@@ -93,7 +101,34 @@ internal fun AlbumGridScreen(
     callbacks: AlbumGridCallbacks,
     albumActions: AlbumSelectionActions = AlbumSelectionActions(),
     snackbarHostState: SnackbarHostState? = null,
+    search: SearchUiState = SearchUiState(),
+    mediaColumns: Int = GalleryPreferences.DEFAULT_COLUMNS,
 ) {
+    if (search.active) {
+        BackHandler(onBack = callbacks.onEndSearch)
+        MapleScreen(
+            title = "",
+            onBack = callbacks.onEndSearch,
+            titleContent = { MapleSearchField(search.query, callbacks.onSearchQuery, stringResource(R.string.search_hint_global)) },
+            actions = {
+                if (search.query.isNotEmpty()) {
+                    IconButton(onClick = { callbacks.onSearchQuery("") }, modifier = Modifier.testTag("maple.search.clear")) {
+                        Icon(painterResource(R.drawable.ic_close_24), contentDescription = stringResource(R.string.search_clear))
+                    }
+                }
+            },
+            snackbarHostState = snackbarHostState,
+        ) { padding ->
+            SearchResults(
+                search = search,
+                columns = mediaColumns,
+                onOpenAlbum = callbacks.onOpenAlbum,
+                onOpenImage = callbacks.onOpenSearchResult,
+                modifier = Modifier.padding(padding),
+            )
+        }
+        return
+    }
     var menuOpen by remember { mutableStateOf(false) }
     var sortOpen by remember { mutableStateOf(false) }
     val selecting = state.selectingAlbums
@@ -111,6 +146,11 @@ internal fun AlbumGridScreen(
                     Icon(painterResource(R.drawable.ic_select_all_24), contentDescription = stringResource(R.string.selection_select_all))
                 }
                 return@MapleScreen
+            }
+            if (state.canReadMediaStore) {
+                IconButton(onClick = callbacks.onSearch, modifier = Modifier.testTag("maple.gallery.search")) {
+                    Icon(painterResource(R.drawable.ic_search_24), contentDescription = stringResource(R.string.action_search))
+                }
             }
             IconButton(onClick = { sortOpen = true }, modifier = Modifier.testTag("maple.gallery.sort")) {
                 Icon(painterResource(R.drawable.ic_swap_vert_24), contentDescription = stringResource(R.string.gallery_sort))

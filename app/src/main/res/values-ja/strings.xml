@@ -23,6 +23,7 @@
     <string name="action_restore">復元</string>
     <string name="action_resume_animation">アニメーションを再開</string>
     <string name="action_rotate_clockwise">右へ90°回転</string>
+    <string name="action_search">検索</string>
     <string name="action_share">共有</string>
     <string name="action_show_image_details">詳細を表示</string>
     <string name="action_undo">元に戻す</string>
@@ -221,6 +222,13 @@
     <string name="rename_extension_warning">拡張子が変わるため, 一部のアプリでファイルを開けなくなる可能性があります</string>
     <string name="rename_label">ファイル名</string>
     <string name="rename_title">名前を変更</string>
+    <string name="search_clear">クリア</string>
+    <string name="search_hint_album">このアルバム内を検索</string>
+    <string name="search_hint_global">アルバムと画像を検索</string>
+    <string name="search_no_results">一致する項目はありません</string>
+    <string name="search_prompt">アルバム名またはファイル名の一部を入力します. 複数の語はすべて一致する必要があります.</string>
+    <string name="search_section_albums">アルバム</string>
+    <string name="search_section_images">画像</string>
     <string name="selection_exit">選択を終了</string>
     <string name="selection_invert">選択を反転</string>
     <string name="selection_select_all">すべて選択</string>

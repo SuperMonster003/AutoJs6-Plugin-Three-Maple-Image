@@ -170,6 +170,32 @@ class ViewerSourceInstrumentationTest {
         }
     }
 
+    /** Search results (ROADMAP 7.5) page through the matches of the album only. */
+    @Test
+    fun searchSourcePagesThroughTheMatches() {
+        val fixture = HostFixture(context, listOf("beach-1.png" to Color.RED, "city.png" to Color.GREEN, "beach-2.png" to Color.BLUE))
+        try {
+            val items = fixture.items(bucketId = -11L)
+            var requestedBucket: Long? = null
+            ViewerSourceLoader.factoryForTesting = {
+                ViewerSourceLoader(
+                    loadAlbum = { bucket, requestedSort -> requestedBucket = bucket; MediaCatalog.sort(items, requestedSort) },
+                    loadFolder = { _, _ -> error("folder enumeration must not run for search results") },
+                )
+            }
+            val start = items.first { it.displayName == "beach-2.png" }
+            val sort = MediaSort(MediaSortField.NAME, ascending = true)
+            val request = ImageViewerLaunchRequest.gallery(ViewerSource.request(start), ViewerSourceSpec.Search("BEACH", MediaCatalog.ALL_BUCKETS, sort, start.id))
+            ActivityScenario.launchActivityForResult<ImageViewerActivity>(ImageViewerContract.viewerIntent(context, request)).use { scenario ->
+                awaitSource(scenario) { it.kind == ViewerSourceKind.MEDIA_ALBUM && it.pages.size == 2 }
+                assertEquals(MediaCatalog.ALL_BUCKETS, requestedBucket)
+                awaitPage(scenario, index = 1, title = "beach-2.png")
+            }
+        } finally {
+            fixture.close()
+        }
+    }
+
     @Test
     fun singleSourceHasOnePageAndNoStrip() {
         val fixture = HostFixture(context, listOf("solo.png" to Color.MAGENTA))

@@ -23,6 +23,7 @@
     <string name="action_restore">استعادة</string>
     <string name="action_resume_animation">متابعة الحركة</string>
     <string name="action_rotate_clockwise">تدوير 90° باتجاه عقارب الساعة</string>
+    <string name="action_search">بحث</string>
     <string name="action_share">مشاركة</string>
     <string name="action_show_image_details">عرض التفاصيل</string>
     <string name="action_undo">تراجع</string>
@@ -221,6 +222,13 @@
     <string name="rename_extension_warning">يتغير الامتداد, لذا قد لا تتمكن بعض التطبيقات من فتح الملف</string>
     <string name="rename_label">اسم الملف</string>
     <string name="rename_title">إعادة التسمية</string>
+    <string name="search_clear">مسح</string>
+    <string name="search_hint_album">البحث في هذا الألبوم</string>
+    <string name="search_hint_global">البحث في الألبومات والصور</string>
+    <string name="search_no_results">لا توجد نتائج مطابقة</string>
+    <string name="search_prompt">اكتب جزءا من اسم ألبوم أو اسم ملف, وعند كتابة عدة كلمات يجب أن تتطابق كلها.</string>
+    <string name="search_section_albums">الألبومات</string>
+    <string name="search_section_images">الصور</string>
     <string name="selection_exit">إنهاء التحديد</string>
     <string name="selection_invert">عكس التحديد</string>
     <string name="selection_select_all">تحديد الكل</string>

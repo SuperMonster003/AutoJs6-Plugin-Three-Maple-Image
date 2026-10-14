@@ -23,6 +23,7 @@
     <string name="action_restore">Restore</string>
     <string name="action_resume_animation">Resume animation</string>
     <string name="action_rotate_clockwise">Rotate 90° clockwise</string>
+    <string name="action_search">Search</string>
     <string name="action_share">Share</string>
     <string name="action_show_image_details">Show details</string>
     <string name="action_undo">Undo</string>
@@ -221,6 +222,13 @@
     <string name="rename_extension_warning">The extension changes, so some apps may no longer open the file</string>
     <string name="rename_label">File name</string>
     <string name="rename_title">Rename</string>
+    <string name="search_clear">Clear</string>
+    <string name="search_hint_album">Search this album</string>
+    <string name="search_hint_global">Search albums and images</string>
+    <string name="search_no_results">Nothing matches</string>
+    <string name="search_prompt">Type part of an album name or a file name; several words must all match.</string>
+    <string name="search_section_albums">Albums</string>
+    <string name="search_section_images">Images</string>
     <string name="selection_exit">Exit selection</string>
     <string name="selection_invert">Invert selection</string>
     <string name="selection_select_all">Select all</string>

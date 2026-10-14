@@ -161,7 +161,7 @@ class ImageViewerActivity : ConfiguredActivity() {
                 operations.Dialogs()
             }
         }
-        if (launchRequest.source is ViewerSourceSpec.MediaAlbum) {
+        if (launchRequest.source is ViewerSourceSpec.MediaAlbum || launchRequest.source is ViewerSourceSpec.Search) {
             scope.launch {
                 FavoritesRepository(this@ImageViewerActivity).observeIds().collect { ids ->
                     favoriteIds = ids
@@ -339,6 +339,11 @@ class ImageViewerActivity : ConfiguredActivity() {
             get() = when (val spec = launchRequest.source) {
                 is ViewerSourceSpec.AuthorizedFolder -> AlbumKind.FOLDER
                 is ViewerSourceSpec.HiddenFolder -> AlbumKind.HIDDEN
+                is ViewerSourceSpec.Search -> when (spec.bucketId) {
+                    MediaCatalog.ALL_BUCKETS -> AlbumKind.ALL
+                    MediaCatalog.FAVORITES -> AlbumKind.FAVORITES
+                    else -> AlbumKind.MEDIA
+                }
                 is ViewerSourceSpec.MediaAlbum -> when (spec.bucketId) {
                     MediaCatalog.ALL_BUCKETS -> AlbumKind.ALL
                     MediaCatalog.FAVORITES -> AlbumKind.FAVORITES
@@ -349,10 +354,15 @@ class ImageViewerActivity : ConfiguredActivity() {
 
         override val openAlbum: AlbumSummary?
             get() {
-                val spec = launchRequest.source as? ViewerSourceSpec.MediaAlbum ?: return null
+                val bucketId = when (val spec = launchRequest.source) {
+                    is ViewerSourceSpec.MediaAlbum -> spec.bucketId
+                    is ViewerSourceSpec.Search -> spec.bucketId
+                    else -> return null
+                }
                 if (albumKind != AlbumKind.MEDIA) return null
                 val path = source?.items?.getOrNull(currentIndex)?.relativePath.orEmpty()
-                return AlbumSummary(AlbumKind.MEDIA, spec.bucketId, "", -1, null, path)
+                val item = source?.items?.getOrNull(currentIndex)
+                return AlbumSummary(AlbumKind.MEDIA, bucketId, "", -1, null, path, volume = item?.volume ?: MediaCatalog.PRIMARY_VOLUME)
             }
 
         override val favoriteIds: Set<Long> get() = this@ImageViewerActivity.favoriteIds
@@ -409,7 +419,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         // A hidden folder is browse and share only.
         if (spec is ViewerSourceSpec.HiddenFolder) return null
         val item = source?.items?.getOrNull(currentIndex) ?: return null
-        val library = spec is ViewerSourceSpec.MediaAlbum
+        val library = spec is ViewerSourceSpec.MediaAlbum || spec is ViewerSourceSpec.Search
         return ViewerManagement(favorite = if (library) item.id in favoriteIds else null, canMoveCopy = library)
     }
 

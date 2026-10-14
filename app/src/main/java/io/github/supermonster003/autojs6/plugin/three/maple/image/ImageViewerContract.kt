@@ -103,6 +103,9 @@ internal object ImageViewerContract {
     private const val SOURCE_BUCKET_ID = "bucketId"
     private const val SOURCE_TREE_URI = "treeUri"
     private const val SOURCE_KIND_HIDDEN = "hidden"
+    private const val SOURCE_KIND_SEARCH = "search"
+    private const val SOURCE_QUERY = "query"
+    private const val MAX_QUERY_LENGTH = 200
     private const val SOURCE_RELATIVE_PATH = "relativePath"
     private const val SOURCE_SORT_FIELD = "sortField"
     private const val SOURCE_SORT_ASCENDING = "sortAscending"
@@ -238,6 +241,11 @@ internal object ImageViewerContract {
                     ?: return null
                 ViewerSourceSpec.AuthorizedFolder(treeUri, sort, startItemId)
             }
+            SOURCE_KIND_SEARCH -> {
+                if (!bundle.containsKey(SOURCE_BUCKET_ID)) return null
+                val query = bundle.getString(SOURCE_QUERY)?.takeIf { it.isNotBlank() && it.length <= MAX_QUERY_LENGTH && it.none(Char::isISOControl) } ?: return null
+                ViewerSourceSpec.Search(query, bundle.getLong(SOURCE_BUCKET_ID), sort, startItemId)
+            }
             SOURCE_KIND_HIDDEN -> {
                 val relativePath = bundle.getString(SOURCE_RELATIVE_PATH)?.takeIf(::isSafeRelativeFolder) ?: return null
                 ViewerSourceSpec.HiddenFolder(relativePath, sort, startItemId)
@@ -301,6 +309,11 @@ internal object ImageViewerContract {
                         is ViewerSourceSpec.HiddenFolder -> {
                             putString(SOURCE_KIND, SOURCE_KIND_HIDDEN)
                             putString(SOURCE_RELATIVE_PATH, spec.relativePath)
+                        }
+                        is ViewerSourceSpec.Search -> {
+                            putString(SOURCE_KIND, SOURCE_KIND_SEARCH)
+                            putLong(SOURCE_BUCKET_ID, spec.bucketId)
+                            putString(SOURCE_QUERY, spec.query)
                         }
                     }
                 },

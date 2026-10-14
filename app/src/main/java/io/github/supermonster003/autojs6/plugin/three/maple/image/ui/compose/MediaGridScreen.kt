@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
@@ -90,6 +91,8 @@ internal class MediaGridCallbacks(
     val onInvertSelection: () -> Unit = {},
     /** A hidden album (ROADMAP 7.4): removes its `.nomedia` file; null for every other album. */
     val onUnhide: (() -> Unit)? = null,
+    /** Search inside the album by file name (ROADMAP 7.5); an empty query shows the whole album again. */
+    val onQuery: (String) -> Unit = {},
 )
 
 /**
@@ -126,7 +129,13 @@ internal fun MediaGridScreen(
     var menuOpen by remember { mutableStateOf(false) }
     val album = state.album
     val selecting = state.selecting
+    var searchOpen by rememberSaveable { mutableStateOf(state.query.isNotEmpty()) }
+    val closeSearch = {
+        searchOpen = false
+        callbacks.onQuery("")
+    }
     BackHandler(enabled = selecting, onBack = callbacks.onClearSelection)
+    BackHandler(enabled = searchOpen && !selecting, onBack = closeSearch)
     val title = if (selecting) {
         pluralStringResource(R.plurals.gallery_selected_count, state.selection.size, state.selection.size)
     } else {
@@ -143,7 +152,12 @@ internal fun MediaGridScreen(
     MapleScreen(
         title = title,
         subtitle = countText,
-        onBack = if (selecting) callbacks.onClearSelection else callbacks.onBack,
+        titleContent = if (searchOpen && !selecting) ({ MapleSearchField(state.query, callbacks.onQuery, stringResource(R.string.search_hint_album)) }) else null,
+        onBack = when {
+            selecting -> callbacks.onClearSelection
+            searchOpen -> closeSearch
+            else -> callbacks.onBack
+        },
         navigationIcon = if (selecting) painterResource(R.drawable.ic_close_24) else null,
         navigationContentDescription = if (selecting) stringResource(R.string.selection_exit) else null,
         actions = {
@@ -161,7 +175,16 @@ internal fun MediaGridScreen(
                         modifier = Modifier.testTag("maple.selection.invert"),
                     )
                 }
+            } else if (searchOpen) {
+                if (state.query.isNotEmpty()) {
+                    IconButton(onClick = { callbacks.onQuery("") }, modifier = Modifier.testTag("maple.search.clear")) {
+                        Icon(painterResource(R.drawable.ic_close_24), contentDescription = stringResource(R.string.search_clear))
+                    }
+                }
             } else {
+                IconButton(onClick = { searchOpen = true }, modifier = Modifier.testTag("maple.media.search")) {
+                    Icon(painterResource(R.drawable.ic_search_24), contentDescription = stringResource(R.string.action_search))
+                }
                 IconButton(onClick = { sortOpen = true }, modifier = Modifier.testTag("maple.media.sort")) {
                     Icon(painterResource(R.drawable.ic_swap_vert_24), contentDescription = stringResource(R.string.gallery_sort))
                 }
@@ -210,7 +233,7 @@ internal fun MediaGridScreen(
             }
             if (state.items.isEmpty()) {
                 MapleEmptyState(
-                    title = stringResource(R.string.gallery_empty_album_title),
+                    title = stringResource(if (state.query.isNotBlank()) R.string.search_no_results else R.string.gallery_empty_album_title),
                     icon = painterResource(R.drawable.ic_image_24),
                     modifier = Modifier.testTag("maple.media.empty"),
                 )

@@ -30,6 +30,8 @@ internal fun MapleScreen(
     actions: @Composable RowScope.() -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     snackbarHostState: SnackbarHostState? = null,
+    /** Replaces the title text in the top bar (a search field). */
+    titleContent: (@Composable () -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
@@ -44,6 +46,7 @@ internal fun MapleScreen(
                 navigationContentDescription = navigationContentDescription ?: stringResource(R.string.standalone_navigation_back),
                 onNavigationClick = onBack,
                 actions = actions,
+                titleContent = titleContent,
             )
         },
         bottomBar = bottomBar,
