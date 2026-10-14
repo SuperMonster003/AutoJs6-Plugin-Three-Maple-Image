@@ -157,6 +157,9 @@
     <string name="host_directory_empty">此文件夹中没有图片</string>
     <string name="host_directory_folder">文件夹</string>
     <string name="host_directory_limit">仅列出前 %1$d 项</string>
+    <string name="host_trash_failed">无法把图片移入 AutoJs6 回收站</string>
+    <string name="host_trash_moved">已移入 AutoJs6 回收站</string>
+    <string name="host_trash_moved_last">已移入 AutoJs6 回收站, 可在 AutoJs6 的回收站页面恢复</string>
     <string name="image_content_description">图像预览</string>
     <string name="image_editor_brightness">亮度</string>
     <string name="image_editor_brush">画笔</string>

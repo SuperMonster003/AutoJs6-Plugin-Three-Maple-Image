@@ -92,10 +92,12 @@ internal object HostSessionImageRegistry {
 
     private val sessions = ConcurrentHashMap<String, Session>()
 
-    fun register(request: ImageViewerLaunchRequest): String {
-        val hostSession = requireNotNull(request.hostSession)
-        val targetId = requireNotNull(request.hostTargetId)
-        val routes = request.pages.mapIndexedNotNull { index, viewerPage ->
+    fun register(request: ImageViewerLaunchRequest): String =
+        register(requireNotNull(request.hostSession), requireNotNull(request.hostTargetId), request.pages)
+
+    /** Routes for the [pages] read through the session (non-empty relative paths); at least one is required. */
+    fun register(hostSession: IExplorerActionHostSession, targetId: String, pages: List<ImageViewerPage>): String {
+        val routes = pages.mapIndexedNotNull { index, viewerPage ->
             val relativePath = viewerPage.hostRelativePath?.takeIf { it.isNotEmpty() }
                 ?: return@mapIndexedNotNull null
             require(ImageViewerContract.isSafeRelativePath(relativePath))

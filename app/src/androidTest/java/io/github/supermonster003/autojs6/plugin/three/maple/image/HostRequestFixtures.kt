@@ -195,6 +195,13 @@ internal object HostRequestFixtures {
         return envelope(activity.name, context, actionId, uri, mimeTypeOf(file), file.name, file.length(), parentUri, target, session)
     }
 
+    /** "View images" (the selection toolbar action) on [files] of one directory, every file a request target. */
+    fun selectionIntent(context: Context, files: List<File>, session: IExplorerActionHostSession?): Intent =
+        convertIntent(context, files, session).apply {
+            setClassName(context, ExplorerActionActivity::class.java.name)
+            putExtra(ExplorerActionIntentExtras.ACTION_ID, ThreeMapleImagePlugin.MULTIPLE_ACTION_ID)
+        }
+
     private fun mimeTypeOf(file: File): String = when (file.extension.lowercase()) {
         "jpg", "jpeg" -> "image/jpeg"
         "webp" -> "image/webp"

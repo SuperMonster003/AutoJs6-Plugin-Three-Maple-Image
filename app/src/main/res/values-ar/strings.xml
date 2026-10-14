@@ -157,6 +157,9 @@
     <string name="host_directory_empty">لا توجد صور في هذا المجلد</string>
     <string name="host_directory_folder">مجلد</string>
     <string name="host_directory_limit">يُعرض أول %1$d عنصرًا فقط</string>
+    <string name="host_trash_failed">تعذر نقل الصورة إلى سلة المحذوفات في AutoJs6</string>
+    <string name="host_trash_moved">تم النقل إلى سلة المحذوفات في AutoJs6</string>
+    <string name="host_trash_moved_last">تم النقل إلى سلة المحذوفات في AutoJs6, ويمكنك استعادتها من صفحة سلة المحذوفات</string>
     <string name="image_content_description">معاينة الصورة</string>
     <string name="image_editor_brightness">السطوع</string>
     <string name="image_editor_brush">فرشاة</string>

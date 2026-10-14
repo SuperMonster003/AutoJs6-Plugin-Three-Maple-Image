@@ -157,6 +157,9 @@
     <string name="host_directory_empty">No images in this folder</string>
     <string name="host_directory_folder">Folder</string>
     <string name="host_directory_limit">Only the first %1$d entries are listed</string>
+    <string name="host_trash_failed">The image could not be moved to the AutoJs6 Trash</string>
+    <string name="host_trash_moved">Moved to the AutoJs6 Trash</string>
+    <string name="host_trash_moved_last">Moved to the AutoJs6 Trash. You can restore it from the Trash page of AutoJs6</string>
     <string name="image_content_description">Image preview</string>
     <string name="image_editor_brightness">Brightness</string>
     <string name="image_editor_brush">Brush</string>

@@ -157,6 +157,9 @@
     <string name="host_directory_empty">No hay imágenes en esta carpeta</string>
     <string name="host_directory_folder">Carpeta</string>
     <string name="host_directory_limit">Solo se muestran las primeras %1$d entradas</string>
+    <string name="host_trash_failed">No se pudo mover la imagen a la Papelera de AutoJs6</string>
+    <string name="host_trash_moved">Movida a la Papelera de AutoJs6</string>
+    <string name="host_trash_moved_last">Movida a la Papelera de AutoJs6. Puedes restaurarla desde la página Papelera de AutoJs6</string>
     <string name="image_content_description">Vista previa de imagen</string>
     <string name="image_editor_brightness">Brillo</string>
     <string name="image_editor_brush">Pincel</string>

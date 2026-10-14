@@ -157,6 +157,9 @@
     <string name="host_directory_empty">このフォルダーに画像はありません</string>
     <string name="host_directory_folder">フォルダー</string>
     <string name="host_directory_limit">先頭の %1$d 項目のみ表示しています</string>
+    <string name="host_trash_failed">画像を AutoJs6 のゴミ箱に移動できませんでした</string>
+    <string name="host_trash_moved">AutoJs6 のゴミ箱に移動しました</string>
+    <string name="host_trash_moved_last">AutoJs6 のゴミ箱に移動しました. AutoJs6 のゴミ箱ページから元に戻せます</string>
     <string name="image_content_description">画像プレビュー</string>
     <string name="image_editor_brightness">明るさ</string>
     <string name="image_editor_brush">ブラシ</string>

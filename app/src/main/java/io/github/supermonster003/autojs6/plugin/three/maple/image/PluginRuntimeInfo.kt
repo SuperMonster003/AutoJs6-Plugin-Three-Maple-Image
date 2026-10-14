@@ -87,12 +87,17 @@ internal fun imageViewerActionCatalog(): Bundle {
         placement = ExplorerActionValues.PLACEMENT_PRIMARY,
     ).apply {
         putBoolean(ExplorerActionCatalogKeys.READ_SIBLINGS, true)
+        // v24: the opened image (a request target) may be moved to the host Trash; its siblings may not.
+        putBoolean(ExplorerActionCatalogKeys.TARGET_TRASH, true)
     }
     val multipleAction = imageViewerAction(
         id = ThreeMapleImagePlugin.MULTIPLE_ACTION_ID,
         cardinality = ExplorerActionValues.CARDINALITY_MULTIPLE,
         placement = ExplorerActionValues.PLACEMENT_SELECTION_TOOLBAR,
-    )
+    ).apply {
+        // v24: every selected image is a request target the viewer may move to the host Trash.
+        putBoolean(ExplorerActionCatalogKeys.TARGET_TRASH, true)
+    }
     return Bundle().apply {
         putInt(ExplorerActionCatalogKeys.PROTOCOL_VERSION, ThreeMapleImagePlugin.PROTOCOL_VERSION)
         putParcelableArrayList(

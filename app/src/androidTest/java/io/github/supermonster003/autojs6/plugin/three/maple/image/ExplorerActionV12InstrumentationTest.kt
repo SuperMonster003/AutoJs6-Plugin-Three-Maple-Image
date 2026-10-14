@@ -169,7 +169,7 @@ class ExplorerActionV12InstrumentationTest {
         val wrongFirstSize = validSelectionIntent().apply {
             putExtra(ExplorerActionIntentExtras.SIZE, 9_999L)
         }
-        val unexpectedSingleSession = validSelectionIntent(
+        val singleWithSession = validSelectionIntent(
             session = FakeHostSession(),
             targets = listOf(
                 ExplorerTargetSpec("target-10", TARGET_URI, "photo10.png", "image/png"),
@@ -216,11 +216,12 @@ class ExplorerActionV12InstrumentationTest {
             reorderedClip,
             duplicateId,
             wrongFirstSize,
-            unexpectedSingleSession,
             nestedTarget,
             unsupportedTarget,
             tooManyTargets,
         ).forEach { intent -> assertNull(ImageRequestPolicy.resolveExplorer(intent)) }
+        // Since protocol v24 a one-image selection carries a session (its action declares `targetTrash`).
+        assertNotNull(ImageRequestPolicy.resolveExplorer(singleWithSession)?.hostSession)
     }
 
     @Test

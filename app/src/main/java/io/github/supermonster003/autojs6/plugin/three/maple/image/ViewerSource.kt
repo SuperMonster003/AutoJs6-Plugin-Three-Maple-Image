@@ -85,8 +85,12 @@ internal class ViewerSource(
     companion object {
         fun fromRequest(request: ImageViewerLaunchRequest): ViewerSource = ViewerSource(
             kind = when {
-                request.hostSession != null ->
-                    if (request.pages.any { it.hostRelativePath == "" }) ViewerSourceKind.HOST_SIBLINGS else ViewerSourceKind.HOST_DIRECTORY
+                request.hostSession != null -> when {
+                    request.pages.any { it.hostRelativePath == "" } -> ViewerSourceKind.HOST_SIBLINGS
+                    request.pages.all { it.hostRelativePath == null } ->
+                        if (request.pages.size > 1) ViewerSourceKind.HOST_SELECTION else ViewerSourceKind.SINGLE
+                    else -> ViewerSourceKind.HOST_DIRECTORY
+                }
                 request.source is ViewerSourceSpec.MediaAlbum || request.source is ViewerSourceSpec.Search -> ViewerSourceKind.MEDIA_ALBUM
                 request.source is ViewerSourceSpec.AuthorizedFolder -> ViewerSourceKind.AUTHORIZED_FOLDER
                 request.source is ViewerSourceSpec.HiddenFolder -> ViewerSourceKind.HIDDEN_FOLDER

@@ -206,8 +206,14 @@ internal object ImageRequestPolicy {
             }
             IExplorerActionHostSession.Stub.asInterface(binder) ?: return null
         } else {
-            if (sessionBundle != null) return null
-            null
+            // A one-image selection needs no session; hosts give one anyway to actions that declare `targetTrash`.
+            sessionBundle?.let { bundle ->
+                val binder = bundle.getBinder(ExplorerActionHostSessionKeys.BINDER) ?: return null
+                if (runCatching { binder.interfaceDescriptor }.getOrNull() != IExplorerActionHostSession.DESCRIPTOR) {
+                    return null
+                }
+                IExplorerActionHostSession.Stub.asInterface(binder) ?: return null
+            }
         }
 
         return ExplorerImageRequest(

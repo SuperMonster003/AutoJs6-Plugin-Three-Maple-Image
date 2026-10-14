@@ -84,6 +84,8 @@ class ImageViewerActivity : ConfiguredActivity() {
     private var editBusy = false
     private var rotationGestureEnabled = true
     private var rotationHintDismissed = false
+    private var hostTrashBusy = false
+    private val hostTrashedTargetIds = linkedSetOf<String>()
     private var rotationSaveEnabled = true
     private var rotationSaveBusy = false
     private val rotationWritable = mutableMapOf<String, Boolean>()
@@ -102,15 +104,12 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        launchRequest = ImageViewerContract.resolve(intent) ?: run {
+        launchRequest = ImageViewerContract.resolve(intent)?.withoutTrashedTargets(savedInstanceState) ?: run {
             ImageViewerContract.closeAttachedHostSession(intent)
             finish()
             return
         }
-        hostImageSessionToken = launchRequest.hostSession?.let {
-            runCatching { HostSessionImageRegistry.register(launchRequest) }.getOrNull()
-        }
-        if (launchRequest.hostSession != null && hostImageSessionToken == null) {
+        if (launchRequest.hostSession != null && !registerHostRoutes(launchRequest.pages)) {
             closeHostSession()
             finish()
             return
@@ -147,7 +146,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             onSaveRotation = ::saveRotation,
             onDismissRotationHint = ::dismissRotationHint,
             onToggleFavorite = operations::favorite,
-            onDelete = operations::delete,
+            onDelete = ::deleteCurrent,
             onRename = operations::rename,
             onMove = operations::move,
             onCopy = operations::copy,
@@ -183,6 +182,36 @@ class ImageViewerActivity : ConfiguredActivity() {
             val resolved = ViewerSourceLoader.create(this@ImageViewerActivity).load(launchRequest)
             if (!isFinishing && !isDestroyed) installSource(resolved)
         }
+    }
+
+    /** Request targets moved to the host Trash before a recreation stay away; null when no page is left (ROADMAP 7.2). */
+    private fun ImageViewerLaunchRequest.withoutTrashedTargets(savedInstanceState: Bundle?): ImageViewerLaunchRequest? {
+        val trashed = savedInstanceState?.getStringArrayList(STATE_HOST_TRASHED_TARGETS).orEmpty()
+        if (hostSession == null || trashed.isEmpty()) return this
+        hostTrashedTargetIds += trashed
+        val kept = pages.filterNot { it.hostTargetId in hostTrashedTargetIds }
+        if (kept.isEmpty()) return null
+        val start = pages.subList(0, startIndex).count { it.hostTargetId !in hostTrashedTargetIds }
+        return copy(pages = kept, startIndex = start.coerceAtMost(kept.lastIndex))
+    }
+
+    /**
+     * Gives the pages read through the host session (siblings, directory entries) their provider URIs; true when that
+     * worked or no page needs one. A changed page list gets a new token: Glide caches by URI, so a `token/index` must
+     * never name another image.
+     */
+    private fun registerHostRoutes(pages: List<ImageViewerPage>): Boolean {
+        HostSessionImageRegistry.unregister(hostImageSessionToken)
+        hostImageSessionToken = null
+        if (pages.all { it.hostRelativePath.isNullOrEmpty() }) return true
+        hostImageSessionToken = runCatching {
+            HostSessionImageRegistry.register(
+                requireNotNull(launchRequest.hostSession),
+                requireNotNull(launchRequest.hostTargetId),
+                pages,
+            )
+        }.getOrNull()
+        return hostImageSessionToken != null
     }
 
     private fun readRestoredState(savedInstanceState: Bundle?) {
@@ -259,6 +288,9 @@ class ImageViewerActivity : ConfiguredActivity() {
             outState.putInt(STATE_EXPANDED_DETAILS_INDEX, currentIndex)
         }
         outState.putBoolean(STATE_CONTROLS_VISIBLE, uiState.controlsVisible)
+        if (hostTrashedTargetIds.isNotEmpty()) {
+            outState.putStringArrayList(STATE_HOST_TRASHED_TARGETS, ArrayList(hostTrashedTargetIds))
+        }
         super.onSaveInstanceState(outState)
     }
 
@@ -434,6 +466,71 @@ class ImageViewerActivity : ConfiguredActivity() {
         }
     }
 
+    /** A request target of the file manager, which delete moves to the host Trash (ROADMAP 7.2, v24). */
+    private fun hostDeletable(host: ViewerPageHost?): Boolean =
+        launchRequest.hostSession != null && host?.page?.hostTargetId != null && !hostTrashBusy
+
+    private fun deleteCurrent() {
+        if (hostDeletable(currentHost())) deleteHostTarget() else operations.delete()
+    }
+
+    /**
+     * Moves the current request target to the host Trash and drops its page; the snackbar's undo puts the file and
+     * the page back. Deleting the last page closes the viewer (the host Trash page restores it then).
+     */
+    private fun deleteHostTarget() {
+        val session = launchRequest.hostSession ?: return
+        val current = source ?: return
+        val index = currentIndex.takeIf { it in current.pages.indices } ?: return
+        val page = current.pages[index]
+        val targetId = page.hostTargetId ?: return
+        hostTrashBusy = true
+        syncCurrentPage(pageChanged = false)
+        scope.launch {
+            val batchId = withContext(Dispatchers.IO) { HostTargetTrash.move(session, targetId) }
+            hostTrashBusy = false
+            if (batchId == null) {
+                operations.message(getString(R.string.host_trash_failed))
+                syncCurrentPage(pageChanged = false)
+                return@launch
+            }
+            hostTrashedTargetIds += targetId
+            val remaining = current.pages.filterIndexed { i, _ -> i != index }
+            if (remaining.isEmpty()) {
+                Toast.makeText(this@ImageViewerActivity, R.string.host_trash_moved_last, Toast.LENGTH_LONG).show()
+                finish()
+                return@launch
+            }
+            installHostPages(current, remaining, index.coerceAtMost(remaining.lastIndex))
+            operations.undoable(
+                getString(R.string.host_trash_moved),
+                undo = { withContext(Dispatchers.IO) { HostTargetTrash.undo(session, batchId) } },
+                afterUndo = {
+                    hostTrashedTargetIds -= targetId
+                    val now = source ?: return@undoable
+                    val back = now.pages.toMutableList().apply { add(index.coerceAtMost(size), page) }
+                    installHostPages(now, back, index.coerceAtMost(back.lastIndex))
+                },
+            )
+        }
+    }
+
+    private fun installHostPages(from: ViewerSource, pages: List<ImageViewerPage>, startIndex: Int) {
+        registerHostRoutes(pages)
+        currentIndex = -1
+        restoredIndex = -1
+        installSource(
+            ViewerSource(
+                kind = from.kind,
+                pages = pages,
+                startIndex = startIndex,
+                hostSession = from.hostSession,
+                hostTargetId = from.hostTargetId,
+                editable = from.editable,
+            ),
+        )
+    }
+
     /** Management controls of the current page: gallery sources only (ROADMAP 7.0). */
     private fun managementState(): ViewerManagement? {
         val spec = launchRequest.source ?: return null
@@ -599,6 +696,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             rotationSaveAvailable = rotationHintText(host) != null && rotationSavable(host),
             rotationSaveBusy = rotationSaveBusy,
             management = managementState(),
+            hostDelete = hostDeletable(host),
         )
     }
 
@@ -1168,6 +1266,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         const val STATE_ROTATION_INDEX = "rotationIndex"
         const val STATE_ROTATION_QUARTER_TURNS = "rotationQuarterTurns"
         const val STATE_EXPANDED_DETAILS_INDEX = "expandedDetailsIndex"
+        const val STATE_HOST_TRASHED_TARGETS = "hostTrashedTargets"
         const val STATE_CONTROLS_VISIBLE = "controlsVisible"
         const val ZOOM_INDICATOR_DURATION_MILLIS = 900L
         const val BYTES_PER_PIXEL = 4L

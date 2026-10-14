@@ -157,6 +157,9 @@
     <string name="host_directory_empty">Aucune image dans ce dossier</string>
     <string name="host_directory_folder">Dossier</string>
     <string name="host_directory_limit">Seules les %1$d premières entrées sont affichées</string>
+    <string name="host_trash_failed">Impossible de déplacer l\'image dans la Corbeille d\'AutoJs6</string>
+    <string name="host_trash_moved">Déplacée dans la Corbeille d\'AutoJs6</string>
+    <string name="host_trash_moved_last">Déplacée dans la Corbeille d\'AutoJs6. Vous pouvez la restaurer depuis la page Corbeille d\'AutoJs6</string>
     <string name="image_content_description">Aperçu de l\'image</string>
     <string name="image_editor_brightness">Luminosité</string>
     <string name="image_editor_brush">Pinceau</string>

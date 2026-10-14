@@ -85,7 +85,13 @@ class ExplorerActionActivity : Activity() {
         val selected = request.targets.map { target ->
             ImageContentValidator.validateExplorer(contentResolver, target.image) ?: return null
         }
-        return ImageViewerLaunchRequest.explicitSelection(selected)
+        val session = request.hostSession ?: return ImageViewerLaunchRequest.explicitSelection(selected)
+        // Every page is a request target, so each may be moved to the host Trash (ROADMAP 7.2, v24).
+        return ImageViewerLaunchRequest(
+            pages = selected.mapIndexed { index, image -> ImageViewerPage(image, hostTargetId = request.targets[index].id) },
+            hostSession = session,
+            hostTargetId = request.targets.first().id,
+        )
     }
 
     private fun buildSiblingViewerRequest(
@@ -94,13 +100,19 @@ class ExplorerActionActivity : Activity() {
         val target = request.targets.single()
         val selected = ImageContentValidator.validateExplorer(contentResolver, target.image)
             ?: return null
-        val gallery = runCatching { ExplorerSiblingImageClient.discover(request) }.getOrNull()
-            ?: return ImageViewerLaunchRequest.single(selected)
-        if (gallery.pages.size <= 1) return ImageViewerLaunchRequest.single(selected)
+        val session = requireNotNull(request.hostSession)
+        // Without siblings the viewer still keeps the session: the selected image is a request target it may delete.
+        val alone = ImageViewerLaunchRequest(
+            pages = listOf(ImageViewerPage(selected, hostTargetId = target.id)),
+            hostSession = session,
+            hostTargetId = target.id,
+        )
+        val gallery = runCatching { ExplorerSiblingImageClient.discover(request) }.getOrNull() ?: return alone
+        if (gallery.pages.size <= 1) return alone
 
         val pages = gallery.pages.mapIndexed { index, page ->
             if (index == gallery.startIndex) {
-                ImageViewerPage(image = selected, hostRelativePath = "")
+                ImageViewerPage(image = selected, hostRelativePath = "", hostTargetId = target.id)
             } else {
                 ImageViewerPage(
                     image = ImageViewerRequest(
@@ -116,7 +128,7 @@ class ExplorerActionActivity : Activity() {
         return ImageViewerLaunchRequest(
             pages = pages,
             startIndex = gallery.startIndex,
-            hostSession = requireNotNull(request.hostSession),
+            hostSession = session,
             hostTargetId = target.id,
         )
     }

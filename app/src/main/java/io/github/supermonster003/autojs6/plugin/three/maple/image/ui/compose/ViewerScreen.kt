@@ -86,6 +86,8 @@ internal data class ViewerUiState(
     val rotationSaveBusy: Boolean = false,
     /** Gallery sources only (ROADMAP 7.0): favorite, delete and the file operations; null for host and single sources. */
     val management: ViewerManagement? = null,
+    /** The page is a request target of the file manager: delete moves it to the host Trash (ROADMAP 7.2, v24). */
+    val hostDelete: Boolean = false,
 )
 
 /**
@@ -313,8 +315,8 @@ internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks
                                 onClick = callbacks.onShare,
                                 testTag = "maple.viewer.share",
                             ),
-                            // Gallery pages trade "open with" (now in the menu) for delete (ROADMAP 7.0).
-                            if (state.management != null) {
+                            // Gallery pages and host request targets trade "open with" (now in the menu) for delete.
+                            if (state.management != null || state.hostDelete) {
                                 MapleAction(
                                     icon = painterResource(R.drawable.ic_delete_24),
                                     label = stringResource(R.string.action_delete),
@@ -451,6 +453,14 @@ private fun ViewerTopBar(state: ViewerUiState, callbacks: ViewerCallbacks) {
                 Icon(painter = painterResource(R.drawable.ic_more_vert_24), contentDescription = stringResource(R.string.action_more))
             }
             DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                if (management == null && state.hostDelete) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.action_open_external)) },
+                        enabled = state.canForward,
+                        onClick = { menuOpen = false; callbacks.onOpenWith() },
+                        modifier = Modifier.testTag("maple.viewer.menu.openWith"),
+                    )
+                }
                 if (management != null) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.action_open_external)) },

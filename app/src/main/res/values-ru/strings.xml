@@ -157,6 +157,9 @@
     <string name="host_directory_empty">В этой папке нет изображений</string>
     <string name="host_directory_folder">Папка</string>
     <string name="host_directory_limit">Показаны только первые %1$d записей</string>
+    <string name="host_trash_failed">Не удалось переместить изображение в корзину AutoJs6</string>
+    <string name="host_trash_moved">Перемещено в корзину AutoJs6</string>
+    <string name="host_trash_moved_last">Перемещено в корзину AutoJs6. Восстановить можно на странице корзины AutoJs6</string>
     <string name="image_content_description">Предпросмотр изображения</string>
     <string name="image_editor_brightness">Яркость</string>
     <string name="image_editor_brush">Кисть</string>

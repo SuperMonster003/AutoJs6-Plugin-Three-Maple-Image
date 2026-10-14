@@ -207,6 +207,15 @@ internal class GalleryOperations(
     /** Shows [message] in the snackbar. */
     fun message(message: String) = notify(message)
 
+    /** Shows [message] with "Undo"; [undo] answers whether it worked, [afterUndo] runs after it did. */
+    fun undoable(message: String, undo: suspend () -> Boolean, afterUndo: () -> Unit = {}) {
+        var undone = false
+        notify(message, undo = {
+            undone = undo()
+            if (undone) WriteOutcome(succeeded = 1) else WriteOutcome(failed = 1)
+        }, afterUndo = { if (undone) afterUndo() })
+    }
+
     /** What the bar offers for [state]'s album: authorized folders only share, delete, rename and show details. */
     fun actionsFor(state: MediaGridUiState): MediaSelectionActions {
         val album = state.album ?: return MediaSelectionActions()

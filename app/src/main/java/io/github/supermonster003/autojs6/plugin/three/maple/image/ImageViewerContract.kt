@@ -14,6 +14,11 @@ import org.autojs.plugin.explorer.api.IExplorerActionHostSession
 internal data class ImageViewerPage(
     val image: ImageViewerRequest,
     val hostRelativePath: String? = null,
+    /**
+     * The host request target this page shows (ROADMAP 7.2, protocol v24); only such pages may be moved to the host
+     * Trash. Siblings read through the session are never request targets.
+     */
+    val hostTargetId: String? = null,
 )
 
 internal data class ImageViewerLaunchRequest(
@@ -40,9 +45,13 @@ internal data class ImageViewerLaunchRequest(
             require(pages.size == 1)
         }
         if (hostSession == null) {
-            require(pages.all { it.hostRelativePath == null })
+            require(pages.all { it.hostRelativePath == null && it.hostTargetId == null })
         } else {
-            require(pages.all { it.hostRelativePath != null })
+            // A page is a session sibling (relative path), the selected image ("") or a request target shown by its
+            // own URI (no relative path, with its target ID). Siblings are never targets.
+            require(pages.all { it.hostRelativePath != null || it.hostTargetId != null })
+            require(pages.all { it.hostRelativePath.isNullOrEmpty() || it.hostTargetId == null })
+            require(pages.mapNotNull { it.hostTargetId }.let { ids -> ids.size == ids.toSet().size })
             // The host single-image entry carries the selected image as a direct URI page; the directory browser
             // (nested relative paths) has no such page.
             val selectedPages = pages.count { it.hostRelativePath == "" }
@@ -112,6 +121,7 @@ internal object ImageViewerContract {
     private const val SOURCE_START_ITEM_ID = "startItemId"
     private const val HOST_TARGET_ID = "targetId"
     private const val HOST_RELATIVE_PATHS = "relativePaths"
+    private const val HOST_PAGE_TARGET_IDS = "pageTargetIds"
     private const val HOST_OWNS_SESSION = "ownsSession"
     private const val MAX_RELATIVE_PATH_DEPTH = 64
 
@@ -147,10 +157,12 @@ internal object ImageViewerContract {
         val hostSession: IExplorerActionHostSession?
         val hostTargetId: String?
         val hostRelativePaths: List<String?>
+        val hostPageTargetIds: List<String?>
         if (hostBundle == null) {
             hostSession = null
             hostTargetId = null
             hostRelativePaths = List(count) { null }
+            hostPageTargetIds = List(count) { null }
         } else {
             val binder = hostBundle.getBinder(ExplorerActionHostSessionKeys.BINDER) ?: return null
             if (runCatching { binder.interfaceDescriptor }.getOrNull() != IExplorerActionHostSession.DESCRIPTOR) {
@@ -161,6 +173,10 @@ internal object ImageViewerContract {
             hostRelativePaths = hostBundle.getStringArrayList(HOST_RELATIVE_PATHS)
                 ?.takeIf { it.size == count }
                 ?: return null
+            hostPageTargetIds = hostBundle.getStringArrayList(HOST_PAGE_TARGET_IDS)
+                ?.takeIf { it.size == count }
+                ?.map { id -> id?.let { validateOpaqueId(it) ?: return null } }
+                ?: List(count) { null }
         }
 
         val sourceBundle = intent.parcelableBundleExtra(EXTRA_SOURCE)
@@ -175,10 +191,12 @@ internal object ImageViewerContract {
             val uri = item.uri ?: return null
             if (!item.isExactUri(uri)) return null
             val relativePath = hostRelativePaths[index]
+            val pageTargetId = hostPageTargetIds[index]
             when {
-                hostSession == null -> if (!isPlainContentUri(uri) || relativePath != null) return null
+                hostSession == null -> if (!isPlainContentUri(uri) || relativePath != null || pageTargetId != null) return null
+                relativePath == null -> if (!isPlainContentUri(uri) || pageTargetId == null) return null
                 relativePath == "" -> if (!isPlainContentUri(uri) || index != startIndex) return null
-                relativePath?.let(::isSafeRelativePath) != true -> return null
+                !isSafeRelativePath(relativePath) || pageTargetId != null -> return null
                 !isHostImageUri(uri, index) -> return null
             }
             val displayName = ImageRequestPolicy.validateDisplayName(displayNames[index]) ?: return null
@@ -190,6 +208,7 @@ internal object ImageViewerContract {
             ImageViewerPage(
                 image = ImageViewerRequest(uri, displayName, declaredSize, mimeType),
                 hostRelativePath = relativePath,
+                hostTargetId = pageTargetId,
             )
         }
         if (pages.map { it.image.targetUri }.toSet().size != pages.size) return null
@@ -326,10 +345,8 @@ internal object ImageViewerContract {
                     putBinder(ExplorerActionHostSessionKeys.BINDER, session.asBinder())
                     putString(HOST_TARGET_ID, requireNotNull(request.hostTargetId))
                     putBoolean(HOST_OWNS_SESSION, request.ownsHostSession)
-                    putStringArrayList(
-                        HOST_RELATIVE_PATHS,
-                        ArrayList(request.pages.map { requireNotNull(it.hostRelativePath) }),
-                    )
+                    putStringArrayList(HOST_RELATIVE_PATHS, ArrayList(request.pages.map { it.hostRelativePath }))
+                    putStringArrayList(HOST_PAGE_TARGET_IDS, ArrayList(request.pages.map { it.hostTargetId }))
                 },
             )
         }

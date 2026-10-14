@@ -157,6 +157,9 @@
     <string name="host_directory_empty">이 폴더에 이미지가 없습니다</string>
     <string name="host_directory_folder">폴더</string>
     <string name="host_directory_limit">처음 %1$d개 항목만 표시합니다</string>
+    <string name="host_trash_failed">이미지를 AutoJs6 휴지통으로 이동할 수 없습니다</string>
+    <string name="host_trash_moved">AutoJs6 휴지통으로 이동했습니다</string>
+    <string name="host_trash_moved_last">AutoJs6 휴지통으로 이동했습니다. AutoJs6 휴지통 화면에서 복원할 수 있습니다</string>
     <string name="image_content_description">이미지 미리 보기</string>
     <string name="image_editor_brightness">밝기</string>
     <string name="image_editor_brush">브러시</string>
