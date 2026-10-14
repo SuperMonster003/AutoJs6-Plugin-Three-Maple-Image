@@ -190,9 +190,14 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         }
     }
 
+    /**
+     * The folder marks are read after the last suspension and callers publish the result without suspending again, so
+     * a summary worked out before the marks first loaded cannot land after the one that used them.
+     */
     private suspend fun favoritesAlbum(): AlbumSummary? {
         if (!_albums.value.canReadMediaStore) return null
-        val items = marks.visible(runCatching { favorites.resolve(media.loadAll()) }.getOrDefault(emptyList()))
+        val resolved = runCatching { favorites.resolve(media.loadAll()) }.getOrDefault(emptyList())
+        val items = marks.visible(resolved)
         if (items.isEmpty()) return null
         return AlbumSummary(
             kind = AlbumKind.FAVORITES,
@@ -207,8 +212,10 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     /** Favorites in [sort] order; the default sort keeps "most recently added first". */
     private suspend fun favoriteItems(sort: MediaSort): List<MediaItem> {
         favoriteOrder?.let { (cachedSort, items) -> if (cachedSort == sort) return items }
-        // Resolved against the whole library (a rebind must see every image), then without the excluded folders.
-        val resolved = marks.visible(runCatching { favorites.resolve(media.loadAll()) }.getOrDefault(emptyList()))
+        // Resolved against the whole library (a rebind must see every image), then without the excluded folders (read
+        // after the suspension, see favoritesAlbum).
+        val all = runCatching { favorites.resolve(media.loadAll()) }.getOrDefault(emptyList())
+        val resolved = marks.visible(all)
         val ordered = if (sort == MediaSort.DEFAULT) resolved else withContext(Dispatchers.Default) { MediaCatalog.sort(resolved, sort) }
         favoriteOrder = sort to ordered
         return ordered
