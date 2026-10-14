@@ -49,6 +49,8 @@ internal fun SettingsScreen(
     onLauncherIcon: () -> Unit,
     viewerRotationGesture: Boolean,
     onViewerRotationGesture: (Boolean) -> Unit,
+    viewerRotationSave: Boolean,
+    onViewerRotationSave: (Boolean) -> Unit,
     recycleBinEnabled: Boolean,
     onRecycleBinEnabled: (Boolean) -> Unit,
     /** Null hides the row (before Android 11). */
@@ -99,6 +101,14 @@ internal fun SettingsScreen(
                 checked = viewerRotationGesture,
                 onToggle = onViewerRotationGesture,
                 modifier = Modifier.testTag("maple.settings.viewerRotation"),
+            )
+            MapleSwitchRow(
+                title = stringResource(R.string.viewer_rotation_save_title),
+                summary = stringResource(R.string.viewer_rotation_save_summary),
+                iconResource = R.drawable.ic_save_24,
+                checked = viewerRotationSave,
+                onToggle = onViewerRotationSave,
+                modifier = Modifier.testTag("maple.settings.viewerRotationSave"),
             )
             MapleSectionHeader(stringResource(R.string.standalone_settings_section_storage))
             MapleSettingsRow(

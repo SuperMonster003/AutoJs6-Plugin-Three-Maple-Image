@@ -84,6 +84,10 @@ class ImageViewerActivity : ConfiguredActivity() {
     private var editBusy = false
     private var rotationGestureEnabled = true
     private var rotationHintDismissed = false
+    private var rotationSaveEnabled = true
+    private var rotationSaveBusy = false
+    private val rotationWritable = mutableMapOf<String, Boolean>()
+    private val rotationChecks = mutableSetOf<String>()
     private val editHandoff = StandaloneEditHandoff(
         activity = this,
         onBusy = { busy -> editBusy = busy },
@@ -120,7 +124,10 @@ class ImageViewerActivity : ConfiguredActivity() {
             ),
         )
         readRestoredState(savedInstanceState)
-        rotationGestureEnabled = ApplicationSettingsStore(this).load().viewerRotationGesture
+        ApplicationSettingsStore(this).load().let { settings ->
+            rotationGestureEnabled = settings.viewerRotationGesture
+            rotationSaveEnabled = settings.viewerRotationSave
+        }
         operations = GalleryOperations(this, viewerTarget)
         val callbacks = ViewerCallbacks(
             onBack = ::finish,
@@ -137,6 +144,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             onPageChanged = ::onPagerPageChanged,
             onSelectPage = ::jumpToPage,
             onUndoRotation = { currentHost()?.view?.undoRotation() },
+            onSaveRotation = ::saveRotation,
             onDismissRotationHint = ::dismissRotationHint,
             onToggleFavorite = operations::favorite,
             onDelete = operations::delete,
@@ -588,6 +596,8 @@ class ImageViewerActivity : ConfiguredActivity() {
             canEdit = canForward && source.editable,
             animation = host?.animation?.playback ?: ImageAnimationPlayback.UNAVAILABLE,
             rotationHint = rotationHintText(host),
+            rotationSaveAvailable = rotationHintText(host) != null && rotationSavable(host),
+            rotationSaveBusy = rotationSaveBusy,
             management = managementState(),
         )
     }
@@ -599,8 +609,77 @@ class ImageViewerActivity : ConfiguredActivity() {
         return getString(R.string.viewer_rotation_hint, ImageRotationState.degrees(turns))
     }
 
+    /**
+     * Whether the current page's rotation can be saved (ROADMAP 8.2, T15): the setting is on, the source lets the
+     * image be edited (gallery or a shared file; never the file manager's read-only view), the format can carry it
+     * and the app can write the file. The write check runs once per image, in the background.
+     */
+    private fun rotationSavable(host: ViewerPageHost?): Boolean {
+        val page = host?.page?.image ?: return false
+        if (!rotationSaveEnabled || !launchRequest.editable || RotationSave.kind(page.mimeType) == null) return false
+        val key = page.targetUri.toString()
+        rotationWritable[key]?.let { return it }
+        if (rotationChecks.add(key)) {
+            scope.launch {
+                val writable = withContext(Dispatchers.IO) {
+                    runCatching {
+                        StandaloneOverwrite.isOverwritable(this@ImageViewerActivity, StandaloneDocument(page.targetUri, page.displayName, page.mimeType, page.declaredSize))
+                    }.getOrDefault(false)
+                }
+                rotationWritable[key] = writable
+                syncRotationHint()
+            }
+        }
+        return false
+    }
+
+    /** Writes the current page's rotation into the image through the overwrite path (backup and undo included). */
+    private fun saveRotation() {
+        val host = currentHost() ?: return
+        val page = host.page.image
+        val turns = host.view.currentRotationQuarterTurns
+        val kind = RotationSave.kind(page.mimeType) ?: return
+        if (turns == ImageRotationState.ORIGINAL_QUARTER_TURNS || rotationSaveBusy) return
+        rotationSaveBusy = true
+        syncRotationHint()
+        scope.launch {
+            try {
+                if (kind == RotationSave.Kind.LOSSY_REENCODE && !operations.confirm(
+                        getString(R.string.viewer_rotation_reencode_title),
+                        getString(R.string.viewer_rotation_reencode_message),
+                        getString(R.string.text_save),
+                    )
+                ) {
+                    return@launch
+                }
+                val output = java.io.File(cacheDir, "rotation-save/${java.util.UUID.randomUUID()}.bin")
+                try {
+                    val rendered = withContext(Dispatchers.IO) {
+                        output.parentFile?.mkdirs()
+                        runCatching { RotationSave.render(contentResolver, page.targetUri, page.mimeType, turns, output, cacheDir) }
+                    }
+                    rendered.exceptionOrNull()?.let { error ->
+                        operations.message(getString(if (error is RotationSave.TooLargeException) R.string.viewer_rotation_too_large else R.string.overwrite_failed))
+                        return@launch
+                    }
+                    operations.overwriteOriginal(page.targetUri, output, getString(R.string.viewer_rotation_saved))
+                } finally {
+                    withContext(Dispatchers.IO) { output.delete() }
+                }
+            } finally {
+                rotationSaveBusy = false
+                syncRotationHint()
+            }
+        }
+    }
+
     private fun syncRotationHint() {
-        uiState = uiState.copy(rotationHint = rotationHintText(currentHost()))
+        val host = currentHost()
+        uiState = uiState.copy(
+            rotationHint = rotationHintText(host),
+            rotationSaveAvailable = rotationHintText(host) != null && rotationSavable(host),
+            rotationSaveBusy = rotationSaveBusy,
+        )
     }
 
     private fun dismissRotationHint() {

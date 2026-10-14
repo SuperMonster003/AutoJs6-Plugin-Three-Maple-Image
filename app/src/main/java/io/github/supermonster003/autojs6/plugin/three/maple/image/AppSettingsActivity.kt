@@ -41,6 +41,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
     private var dialog by mutableStateOf<SettingsDialog?>(null)
     private var launcherIconSummary by mutableStateOf("")
     private var viewerRotationGesture by mutableStateOf(true)
+    private var viewerRotationSave by mutableStateOf(true)
     private var recycleBinEnabled by mutableStateOf(true)
     private var syncSystemFavorites by mutableStateOf(false)
 
@@ -49,6 +50,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         settingsStore = ApplicationSettingsStore(applicationContext)
         settings = settingsStore.load()
         viewerRotationGesture = settings.viewerRotationGesture
+        viewerRotationSave = settings.viewerRotationSave
         recycleBinEnabled = settings.recycleBinEnabled
         syncSystemFavorites = settings.syncSystemFavorites
         hostResult = AutoJs6HostSettingsClient.query(this)
@@ -69,6 +71,8 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     onLauncherIcon = { open(SettingsDialog.LauncherIcon) },
                     viewerRotationGesture = viewerRotationGesture,
                     onViewerRotationGesture = ::updateViewerRotationGesture,
+                    viewerRotationSave = viewerRotationSave,
+                    onViewerRotationSave = ::updateViewerRotationSave,
                     recycleBinEnabled = recycleBinEnabled,
                     onRecycleBinEnabled = ::updateRecycleBinEnabled,
                     syncSystemFavorites = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) syncSystemFavorites else null,
@@ -88,6 +92,12 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         viewerRotationGesture = enabled
         settings = settings.copy(viewerRotationGesture = enabled)
         settingsStore.saveViewerRotationGesture(enabled)
+    }
+
+    private fun updateViewerRotationSave(enabled: Boolean) {
+        viewerRotationSave = enabled
+        settings = settings.copy(viewerRotationSave = enabled)
+        settingsStore.saveViewerRotationSave(enabled)
     }
 
     private fun updateRecycleBinEnabled(enabled: Boolean) {

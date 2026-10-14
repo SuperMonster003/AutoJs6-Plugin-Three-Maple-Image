@@ -440,7 +440,13 @@
     <string name="theme_picker_preview">プレビュー</string>
     <string name="viewer_rotation_gesture_summary">ビューアーで 2 本指で画像を回転し, 指を離すと最も近い 90 度に合わせます</string>
     <string name="viewer_rotation_gesture_title">2 本指で回転</string>
-    <string name="viewer_rotation_hint">%1$d° 回転しました (表示のみ). 回転の保存は今後のバージョンで提供します.</string>
+    <string name="viewer_rotation_hint">%1$d° 回転しました</string>
+    <string name="viewer_rotation_reencode_message">WebP 画像の回転は再圧縮でしか保存できず, 画質がわずかに下がることがあります. 保存直後に元に戻せます.</string>
+    <string name="viewer_rotation_reencode_title">再エンコードして回転を保存しますか?</string>
+    <string name="viewer_rotation_save_summary">画像を回転したあと, その回転を画像に保存できます (JPEG は劣化なし)</string>
+    <string name="viewer_rotation_save_title">回転後に保存を提案</string>
+    <string name="viewer_rotation_saved">回転を保存しました</string>
+    <string name="viewer_rotation_too_large">この画像は大きすぎて, この端末では回転を保存できません</string>
     <string name="viewer_thumbnail_description">%2$d ページ中 %1$d ページ目</string>
     <string name="zoom_indicator">%1$s倍</string>
 </resources>

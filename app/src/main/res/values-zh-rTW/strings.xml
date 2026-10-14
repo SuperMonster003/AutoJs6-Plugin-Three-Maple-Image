@@ -440,7 +440,13 @@
     <string name="theme_picker_preview">預覽</string>
     <string name="viewer_rotation_gesture_summary">在檢視器中用雙指旋轉圖片, 放開後吸附到最近的 90 度</string>
     <string name="viewer_rotation_gesture_title">雙指旋轉</string>
-    <string name="viewer_rotation_hint">已旋轉 %1$d°, 僅用於檢視. 儲存旋轉將在後續版本提供.</string>
+    <string name="viewer_rotation_hint">已旋轉 %1$d°</string>
+    <string name="viewer_rotation_reencode_message">WebP 圖片只能重新壓縮來儲存旋轉, 畫質可能略有下降. 儲存後可以立即復原.</string>
+    <string name="viewer_rotation_reencode_title">重新編碼以儲存旋轉?</string>
+    <string name="viewer_rotation_save_summary">旋轉圖片後可以把旋轉儲存到圖片中 (JPEG 無損)</string>
+    <string name="viewer_rotation_save_title">旋轉後提供儲存</string>
+    <string name="viewer_rotation_saved">已儲存旋轉</string>
+    <string name="viewer_rotation_too_large">圖片太大, 無法在此裝置上儲存旋轉</string>
     <string name="viewer_thumbnail_description">第 %1$d 頁, 共 %2$d 頁</string>
     <string name="zoom_indicator">%1$s 倍</string>
 </resources>

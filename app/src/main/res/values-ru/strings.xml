@@ -440,7 +440,13 @@
     <string name="theme_picker_preview">Предпросмотр</string>
     <string name="viewer_rotation_gesture_summary">Поворачивайте изображение двумя пальцами в просмотре; после отпускания оно выравнивается по ближайшим 90 градусам</string>
     <string name="viewer_rotation_gesture_title">Поворот двумя пальцами</string>
-    <string name="viewer_rotation_hint">Повернуто на %1$d° только для просмотра. Сохранение поворота появится в следующей версии.</string>
+    <string name="viewer_rotation_hint">Повёрнуто на %1$d°</string>
+    <string name="viewer_rotation_reencode_message">Поворот WebP можно сохранить только повторным сжатием, качество может немного снизиться. Сразу после сохранения можно отменить.</string>
+    <string name="viewer_rotation_reencode_title">Сохранить поворот повторным кодированием?</string>
+    <string name="viewer_rotation_save_summary">После поворота изображения можно сохранить поворот в нём (JPEG без потери качества)</string>
+    <string name="viewer_rotation_save_title">Предлагать сохранить поворот</string>
+    <string name="viewer_rotation_saved">Поворот сохранён</string>
+    <string name="viewer_rotation_too_large">Изображение слишком большое, чтобы сохранить поворот на этом устройстве</string>
     <string name="viewer_thumbnail_description">Страница %1$d из %2$d</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

@@ -81,6 +81,9 @@ internal data class ViewerUiState(
     val zoomIndicatorText: String? = null,
     /** "Rotated for viewing only" bar above the strip while the current page carries a user rotation. */
     val rotationHint: String? = null,
+    /** The hint bar offers "Save": the rotation can be written into the image (ROADMAP 8.2, T15). */
+    val rotationSaveAvailable: Boolean = false,
+    val rotationSaveBusy: Boolean = false,
     /** Gallery sources only (ROADMAP 7.0): favorite, delete and the file operations; null for host and single sources. */
     val management: ViewerManagement? = null,
 )
@@ -108,6 +111,7 @@ internal class ViewerCallbacks(
     /** A thumbnail was tapped. */
     val onSelectPage: (Int) -> Unit,
     val onUndoRotation: () -> Unit,
+    val onSaveRotation: () -> Unit,
     val onDismissRotationHint: () -> Unit,
     val onToggleFavorite: () -> Unit = {},
     val onDelete: () -> Unit = {},
@@ -229,6 +233,15 @@ internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks
                                 modifier = Modifier.testTag("maple.viewer.rotationHint.undo"),
                             ) {
                                 Text(stringResource(R.string.text_undo), color = canvas.accentOnScrim)
+                            }
+                            if (state.rotationSaveAvailable) {
+                                TextButton(
+                                    onClick = callbacks.onSaveRotation,
+                                    enabled = !state.rotationSaveBusy,
+                                    modifier = Modifier.testTag("maple.viewer.rotationHint.save"),
+                                ) {
+                                    Text(stringResource(R.string.text_save), color = canvas.accentOnScrim)
+                                }
                             }
                             IconButton(
                                 onClick = callbacks.onDismissRotationHint,

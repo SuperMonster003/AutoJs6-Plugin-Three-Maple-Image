@@ -440,7 +440,13 @@
     <string name="theme_picker_preview">Vista previa</string>
     <string name="viewer_rotation_gesture_summary">Gira la imagen con dos dedos en el visor; al soltar se ajusta al cuarto de vuelta más cercano</string>
     <string name="viewer_rotation_gesture_title">Rotación con dos dedos</string>
-    <string name="viewer_rotation_hint">Girada %1$d° solo para ver. Guardar la rotación llegará en una versión posterior.</string>
+    <string name="viewer_rotation_hint">Girada %1$d°</string>
+    <string name="viewer_rotation_reencode_message">Una imagen WebP solo se puede girar comprimiéndola de nuevo, lo que puede reducir algo la calidad. Puedes deshacerlo justo después de guardar.</string>
+    <string name="viewer_rotation_reencode_title">Guardar la rotación codificando de nuevo?</string>
+    <string name="viewer_rotation_save_summary">Tras girar una imagen puedes guardar la rotación en ella (JPEG sin pérdida de calidad)</string>
+    <string name="viewer_rotation_save_title">Ofrecer guardar las rotaciones</string>
+    <string name="viewer_rotation_saved">Rotación guardada</string>
+    <string name="viewer_rotation_too_large">Esta imagen es demasiado grande para guardar su rotación en este dispositivo</string>
     <string name="viewer_thumbnail_description">Página %1$d de %2$d</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

@@ -37,6 +37,8 @@ internal data class ApplicationSettings(
     val language: AppLanguage = AppLanguage.FOLLOW_AUTOJS6,
     /** Two-finger rotation in the viewer (ROADMAP D8); display-only, so it does not touch the appearance revision. */
     val viewerRotationGesture: Boolean = true,
+    /** After a rotation the viewer offers to save it into the image (ROADMAP 8.2, T15); on by default. */
+    val viewerRotationSave: Boolean = true,
     /** Deletes go to the recycle bin first (ROADMAP 7.2, on by default); off deletes for good after a confirmation. */
     val recycleBinEnabled: Boolean = true,
     /** Android 11+: favorites are also marked in the media library (ROADMAP 7.4, off by default). */
@@ -165,6 +167,7 @@ internal class ApplicationSettingsStore(context: Context) {
             AppLanguage.FOLLOW_AUTOJS6,
         ),
         viewerRotationGesture = preferences.getBoolean(KEY_VIEWER_ROTATION_GESTURE, true),
+        viewerRotationSave = preferences.getBoolean(KEY_VIEWER_ROTATION_SAVE, true),
         recycleBinEnabled = preferences.getBoolean(KEY_RECYCLE_BIN_ENABLED, true),
         syncSystemFavorites = preferences.getBoolean(KEY_SYNC_SYSTEM_FAVORITES, false),
     )
@@ -179,6 +182,7 @@ internal class ApplicationSettingsStore(context: Context) {
             .putString(KEY_DARK_MODE, settings.darkMode.name)
             .putString(KEY_LANGUAGE, settings.language.name)
             .putBoolean(KEY_VIEWER_ROTATION_GESTURE, settings.viewerRotationGesture)
+            .putBoolean(KEY_VIEWER_ROTATION_SAVE, settings.viewerRotationSave)
             .putBoolean(KEY_RECYCLE_BIN_ENABLED, settings.recycleBinEnabled)
             .putBoolean(KEY_SYNC_SYSTEM_FAVORITES, settings.syncSystemFavorites)
             .putLong(KEY_REVISION, revision() + 1L)
@@ -188,6 +192,10 @@ internal class ApplicationSettingsStore(context: Context) {
     /** Viewer gestures do not change appearance, so they skip the revision that recreates open activities. */
     fun saveViewerRotationGesture(enabled: Boolean) {
         preferences.edit().putBoolean(KEY_VIEWER_ROTATION_GESTURE, enabled).apply()
+    }
+
+    fun saveViewerRotationSave(enabled: Boolean) {
+        preferences.edit().putBoolean(KEY_VIEWER_ROTATION_SAVE, enabled).apply()
     }
 
     /** Like the rotation gesture, the recycle bin switch does not change appearance. */
@@ -208,6 +216,7 @@ internal class ApplicationSettingsStore(context: Context) {
         const val KEY_DARK_MODE = "dark-mode"
         const val KEY_LANGUAGE = "language"
         const val KEY_VIEWER_ROTATION_GESTURE = "viewer-rotation-gesture"
+        const val KEY_VIEWER_ROTATION_SAVE = "viewer-rotation-save"
         const val KEY_RECYCLE_BIN_ENABLED = "recycle-bin-enabled"
         const val KEY_SYNC_SYSTEM_FAVORITES = "sync-system-favorites"
         const val KEY_REVISION = "revision"

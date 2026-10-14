@@ -440,7 +440,13 @@
     <string name="theme_picker_preview">Aperçu</string>
     <string name="viewer_rotation_gesture_summary">Faites pivoter l\'image à deux doigts dans la visionneuse; elle s\'aligne sur le quart de tour le plus proche</string>
     <string name="viewer_rotation_gesture_title">Rotation à deux doigts</string>
-    <string name="viewer_rotation_hint">Pivotée de %1$d° pour l\'affichage seulement. L\'enregistrement de la rotation arrivera dans une version ultérieure.</string>
+    <string name="viewer_rotation_hint">Pivotée de %1$d°</string>
+    <string name="viewer_rotation_reencode_message">Une image WebP ne peut être pivotée qu\'en la recompressant, ce qui peut réduire un peu la qualité. Vous pouvez annuler juste après l\'enregistrement.</string>
+    <string name="viewer_rotation_reencode_title">Enregistrer la rotation en réencodant ?</string>
+    <string name="viewer_rotation_save_summary">Après avoir pivoté une image, vous pouvez y enregistrer la rotation (JPEG sans perte)</string>
+    <string name="viewer_rotation_save_title">Proposer d\'enregistrer les rotations</string>
+    <string name="viewer_rotation_saved">Rotation enregistrée</string>
+    <string name="viewer_rotation_too_large">Cette image est trop grande pour enregistrer sa rotation sur cet appareil</string>
     <string name="viewer_thumbnail_description">Page %1$d sur %2$d</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

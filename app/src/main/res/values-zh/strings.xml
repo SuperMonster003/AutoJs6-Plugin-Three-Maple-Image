@@ -440,7 +440,13 @@
     <string name="theme_picker_preview">预览</string>
     <string name="viewer_rotation_gesture_summary">在查看器中用双指旋转图像, 松手后吸附到最近的 90 度</string>
     <string name="viewer_rotation_gesture_title">双指旋转</string>
-    <string name="viewer_rotation_hint">已旋转 %1$d°, 仅用于查看. 保存旋转将在后续版本提供.</string>
+    <string name="viewer_rotation_hint">已旋转 %1$d°</string>
+    <string name="viewer_rotation_reencode_message">WebP 图片只能重新压缩来保存旋转, 画质可能略有下降. 保存后可以立即撤销.</string>
+    <string name="viewer_rotation_reencode_title">重新编码以保存旋转?</string>
+    <string name="viewer_rotation_save_summary">旋转图片后可以把旋转保存到图片中 (JPEG 无损)</string>
+    <string name="viewer_rotation_save_title">旋转后提供保存</string>
+    <string name="viewer_rotation_saved">已保存旋转</string>
+    <string name="viewer_rotation_too_large">图片太大, 无法在此设备上保存旋转</string>
     <string name="viewer_thumbnail_description">第 %1$d 页, 共 %2$d 页</string>
     <string name="zoom_indicator">%1$s 倍</string>
 </resources>

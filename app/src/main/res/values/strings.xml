@@ -440,7 +440,13 @@
     <string name="theme_picker_preview">Preview</string>
     <string name="viewer_rotation_gesture_summary">Rotate the image with two fingers in the viewer; it snaps to the nearest quarter turn</string>
     <string name="viewer_rotation_gesture_title">Two-finger rotation</string>
-    <string name="viewer_rotation_hint">Rotated %1$d° for viewing only. Saving the rotation will come in a later version.</string>
+    <string name="viewer_rotation_hint">Rotated %1$d°</string>
+    <string name="viewer_rotation_reencode_message">A WebP image can only be rotated by compressing it again, which may lose a little quality. You can undo it right after saving.</string>
+    <string name="viewer_rotation_reencode_title">Save the rotation by encoding again?</string>
+    <string name="viewer_rotation_save_summary">After rotating an image you can save the rotation into it (JPEG without quality loss)</string>
+    <string name="viewer_rotation_save_title">Offer to save rotations</string>
+    <string name="viewer_rotation_saved">Rotation saved</string>
+    <string name="viewer_rotation_too_large">This image is too large to save its rotation on this device</string>
     <string name="viewer_thumbnail_description">Page %1$d of %2$d</string>
     <string name="zoom_indicator">%1$sx</string>
 </resources>

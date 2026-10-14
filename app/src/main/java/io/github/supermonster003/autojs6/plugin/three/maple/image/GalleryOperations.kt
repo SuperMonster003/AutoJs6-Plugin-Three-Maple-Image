@@ -84,8 +84,8 @@ internal sealed interface GalleryDialog {
     /** Rename an album folder (ROADMAP 7.4); [imagesOnly]: no folder rename, its images move to the new name. */
     data class RenameAlbum(val album: AlbumSummary, val imagesOnly: Boolean) : GalleryDialog
 
-    /** No room to back up the original: overwrite it anyway, without undo (ROADMAP 8.2)? */
-    data class ConfirmOverwriteWithoutUndo(val answer: CompletableDeferred<Boolean>) : GalleryDialog
+    /** A yes / no question a suspended operation waits for (ROADMAP 8.2: overwrite without undo, encode again). */
+    data class Confirm(val title: String, val message: String, val confirmText: String, val answer: CompletableDeferred<Boolean>) : GalleryDialog
 
     /** Delete whole albums (ROADMAP 7.4): their [items] go to the recycle bin, or for good when it is off. */
     data class ConfirmDeleteAlbums(val albumCount: Int, val items: List<MediaItem>, val forGood: Boolean) : GalleryDialog
@@ -168,7 +168,7 @@ internal class GalleryOperations(
      * snackbar can undo it; without room for that copy the user confirms an overwrite that cannot be undone. False
      * when nothing was written (refused, cancelled or failed): the caller keeps the edit and saves it as a new file.
      */
-    suspend fun overwriteOriginal(original: Uri, output: File): Boolean {
+    suspend fun overwriteOriginal(original: Uri, output: File, savedMessage: String = activity.getString(R.string.overwrite_saved)): Boolean {
         val undoable = withContext(Dispatchers.IO) { overwriteBackup.store(activity.contentResolver, original) }
         if (!undoable && !confirmOverwriteWithoutUndo()) return false
         val outcome = coordinator.overwrite(original) { output.inputStream() }
@@ -179,7 +179,7 @@ internal class GalleryOperations(
         }
         target.afterWrite()
         notify(
-            activity.getString(R.string.overwrite_saved),
+            savedMessage,
             undo = if (undoable) ({ undoOverwrite(original) }) else null,
             afterUndo = { target.afterWrite() },
         )
@@ -191,11 +191,21 @@ internal class GalleryOperations(
         return coordinator.overwrite(original) { overwriteBackup.open() }.also { if (it.succeeded == 1) overwriteBackup.clear() }
     }
 
-    private suspend fun confirmOverwriteWithoutUndo(): Boolean {
+    private suspend fun confirmOverwriteWithoutUndo(): Boolean = confirm(
+        activity.getString(R.string.overwrite_without_undo_title),
+        activity.getString(R.string.overwrite_without_undo_message),
+        activity.getString(R.string.overwrite_confirm),
+    )
+
+    /** Shows a yes / no dialog and waits for the answer (dismissing it is no). */
+    suspend fun confirm(title: String, message: String, confirmText: String): Boolean {
         val answer = CompletableDeferred<Boolean>()
-        show(GalleryDialog.ConfirmOverwriteWithoutUndo(answer))
+        show(GalleryDialog.Confirm(title, message, confirmText, answer))
         return answer.await()
     }
+
+    /** Shows [message] in the snackbar. */
+    fun message(message: String) = notify(message)
 
     /** What the bar offers for [state]'s album: authorized folders only share, delete, rename and show details. */
     fun actionsFor(state: MediaGridUiState): MediaSelectionActions {
@@ -786,10 +796,10 @@ internal class GalleryOperations(
                     runHide(current.albums)
                 },
             )
-            is GalleryDialog.ConfirmOverwriteWithoutUndo -> ConfirmDialog(
-                title = stringResource(R.string.overwrite_without_undo_title),
-                message = stringResource(R.string.overwrite_without_undo_message),
-                confirmText = stringResource(R.string.overwrite_confirm),
+            is GalleryDialog.Confirm -> ConfirmDialog(
+                title = current.title,
+                message = current.message,
+                confirmText = current.confirmText,
                 onDismiss = {
                     show(null)
                     current.answer.complete(false)
