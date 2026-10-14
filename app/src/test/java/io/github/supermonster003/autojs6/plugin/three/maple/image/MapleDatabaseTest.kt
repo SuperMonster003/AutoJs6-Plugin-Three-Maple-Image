@@ -73,6 +73,19 @@ class MapleDatabaseTest {
     }
 
     @Test
+    fun folderMarksAreOnePerFolderAndKind() = runBlocking {
+        val dao = database.folderMarks()
+        val card = AlbumPath("1EFF-E702", "Pictures/Trips/")
+        dao.upsert(listOf(FolderMarkPolicy.entity(card, FolderMark.PINNED, 1), FolderMarkPolicy.entity(card, FolderMark.EXCLUDED, 2)))
+        dao.upsert(listOf(FolderMarkPolicy.entity(AlbumPath("1eff-e702", "Pictures/Trips/"), FolderMark.PINNED, 3)))
+        assertEquals(listOf("pinned" to 3L, "excluded" to 2L), dao.all().map { it.mark to it.markedAtMillis })
+        val state = FolderMarkState.of(dao.observeAll().first())
+        assertTrue(state.isPinned(card) && state.isExcluded(card))
+        dao.delete("1eff-e702", "Pictures/Trips/", FolderMark.EXCLUDED.key)
+        assertEquals(listOf("pinned"), dao.all().map { it.mark })
+    }
+
+    @Test
     fun theFingerprintIgnoresPathAndName() {
         val item = MediaItem(
             id = 1, displayName = "a.jpg", mimeType = "image/jpeg", sizeBytes = 1234, width = 40, height = 30,

@@ -1,6 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
@@ -46,6 +47,18 @@ internal data class RecycleBinEntity(
     @ColumnInfo(name = "deleted_at_millis") val deletedAtMillis: Long,
 )
 
+/**
+ * A mark the user put on an album folder (ROADMAP 7.4): excluded from the gallery, pinned to the top of the album
+ * grid, or hidden with a `.nomedia` file. [volume] and [relativePath] form [MediaCatalog.folderKey].
+ */
+@Entity(tableName = "folder_marks", primaryKeys = ["volume", "relative_path", "mark"])
+internal data class FolderMarkEntity(
+    @ColumnInfo(name = "volume") val volume: String,
+    @ColumnInfo(name = "relative_path") val relativePath: String,
+    @ColumnInfo(name = "mark") val mark: String,
+    @ColumnInfo(name = "marked_at_millis") val markedAtMillis: Long,
+)
+
 @Dao
 internal interface FavoriteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -79,10 +92,31 @@ internal interface RecycleBinDao {
     suspend fun delete(ids: List<Long>)
 }
 
-@Database(entities = [FavoriteEntity::class, RecycleBinEntity::class], version = 1, exportSchema = true)
+@Dao
+internal interface FolderMarkDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(marks: List<FolderMarkEntity>)
+
+    @Query("DELETE FROM folder_marks WHERE volume = :volume AND relative_path = :relativePath AND mark = :mark")
+    suspend fun delete(volume: String, relativePath: String, mark: String)
+
+    @Query("SELECT * FROM folder_marks ORDER BY marked_at_millis DESC")
+    suspend fun all(): List<FolderMarkEntity>
+
+    @Query("SELECT * FROM folder_marks ORDER BY marked_at_millis DESC")
+    fun observeAll(): Flow<List<FolderMarkEntity>>
+}
+
+@Database(
+    entities = [FavoriteEntity::class, RecycleBinEntity::class, FolderMarkEntity::class],
+    version = 2,
+    exportSchema = true,
+    autoMigrations = [AutoMigration(from = 1, to = 2)],
+)
 internal abstract class MapleDatabase : RoomDatabase() {
     abstract fun favorites(): FavoriteDao
     abstract fun recycleBin(): RecycleBinDao
+    abstract fun folderMarks(): FolderMarkDao
 
     companion object {
         private const val NAME = "maple.db"

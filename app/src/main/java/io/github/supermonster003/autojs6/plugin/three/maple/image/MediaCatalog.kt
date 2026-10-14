@@ -77,6 +77,11 @@ internal object MediaCatalog {
     /** MediaStore names storage cards by their lower-case file system id; compare without case. */
     fun sameVolume(a: String, b: String): Boolean = (isPrimaryVolume(a) && isPrimaryVolume(b)) || a.equals(b, ignoreCase = true)
 
+    fun normalizedVolume(volume: String): String = if (isPrimaryVolume(volume)) PRIMARY_VOLUME else volume.lowercase()
+
+    /** One string per album folder (volume and relative path), for sets of marked folders (ROADMAP 7.4). */
+    fun folderKey(path: AlbumPath): String = normalizedVolume(path.volume) + "|" + path.relativePath
+
     /** Supported formats only (ROADMAP D2); zero-byte rows are placeholders MediaStore has not finished writing. */
     fun isCataloged(item: MediaItem, supports: (String, String) -> Boolean): Boolean =
         item.sizeBytes > 0L && supports(item.displayName, item.mimeType)
