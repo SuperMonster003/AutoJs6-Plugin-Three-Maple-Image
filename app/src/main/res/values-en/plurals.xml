@@ -20,6 +20,14 @@
         <item quantity="one">%1$d album unpinned</item>
         <item quantity="other">%1$d albums unpinned</item>
     </plurals>
+    <plurals name="batch_converted_count">
+        <item quantity="one">Converted %1$d image</item>
+        <item quantity="other">Converted %1$d images</item>
+    </plurals>
+    <plurals name="batch_not_converted_count">
+        <item quantity="one">%1$d image was not converted</item>
+        <item quantity="other">%1$d images were not converted</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="one">%1$d image with the same name is already there</item>
         <item quantity="other">%1$d images with the same names are already there</item>

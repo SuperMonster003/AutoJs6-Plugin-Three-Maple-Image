@@ -15,6 +15,12 @@
     <plurals name="albums_unpinned_count">
         <item quantity="other">%1$d 個のアルバムの固定を解除しました</item>
     </plurals>
+    <plurals name="batch_converted_count">
+        <item quantity="other">%1$d 枚の画像を変換しました</item>
+    </plurals>
+    <plurals name="batch_not_converted_count">
+        <item quantity="other">%1$d 枚の画像を変換できませんでした</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="other">同じ名前の画像が %1$d 枚あります</item>
     </plurals>

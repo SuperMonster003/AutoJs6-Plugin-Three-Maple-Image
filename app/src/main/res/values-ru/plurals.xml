@@ -30,6 +30,18 @@
         <item quantity="many">Откреплено %1$d альбомов</item>
         <item quantity="other">Откреплено %1$d альбома</item>
     </plurals>
+    <plurals name="batch_converted_count">
+        <item quantity="one">Преобразовано %1$d изображение</item>
+        <item quantity="few">Преобразовано %1$d изображения</item>
+        <item quantity="many">Преобразовано %1$d изображений</item>
+        <item quantity="other">Преобразовано %1$d изображения</item>
+    </plurals>
+    <plurals name="batch_not_converted_count">
+        <item quantity="one">%1$d изображение не преобразовано</item>
+        <item quantity="few">%1$d изображения не преобразованы</item>
+        <item quantity="many">%1$d изображений не преобразовано</item>
+        <item quantity="other">%1$d изображения не преобразованы</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="one">Там уже есть %1$d изображение с таким же именем</item>
         <item quantity="few">Там уже есть %1$d изображения с такими же именами</item>

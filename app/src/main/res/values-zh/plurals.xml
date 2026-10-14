@@ -15,6 +15,12 @@
     <plurals name="albums_unpinned_count">
         <item quantity="other">已取消置顶 %1$d 个相册</item>
     </plurals>
+    <plurals name="batch_converted_count">
+        <item quantity="other">已转换 %1$d 张图片</item>
+    </plurals>
+    <plurals name="batch_not_converted_count">
+        <item quantity="other">%1$d 张图片未转换</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="other">目标相册已有 %1$d 张同名图片</item>
     </plurals>

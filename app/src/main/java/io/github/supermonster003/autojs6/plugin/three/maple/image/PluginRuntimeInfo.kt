@@ -31,6 +31,17 @@ internal object ThreeMapleImagePlugin {
         "io.github.supermonster003.autojs6.plugin.three.maple.image.ExplorerDirectoryActivity"
     const val BROWSE_DIRECTORY_PRIORITY = 90
 
+    /**
+     * ROADMAP 7.6: selection toolbar action that converts every selected image into a new file next to it. The
+     * outputs are host transactions published together (v15 output batch), so a failure leaves no new file.
+     */
+    const val CONVERT_IMAGES_ACTION_ID = "convert-images"
+    const val CONVERT_IMAGES_LABEL_RESOURCE_NAME = "action_convert_images"
+    const val CONVERT_IMAGES_LABEL_FALLBACK = "Convert images"
+    const val CONVERT_IMAGES_ACTIVITY_CLASS_NAME =
+        "io.github.supermonster003.autojs6.plugin.three.maple.image.HostBatchConverterActivity"
+    const val CONVERT_IMAGES_PRIORITY = 90
+
     val MIME_TYPES = emptyArray<String>()
     val EXTENSIONS = ImageFormatSupport.explorerExtensions.toTypedArray()
 }
@@ -79,7 +90,7 @@ internal fun imageViewerActionCatalog(): Bundle {
         putInt(ExplorerActionCatalogKeys.PROTOCOL_VERSION, ThreeMapleImagePlugin.PROTOCOL_VERSION)
         putParcelableArrayList(
             ExplorerActionCatalogKeys.ACTIONS,
-            arrayListOf(singleAction, multipleAction, browseDirectoryAction()),
+            arrayListOf(singleAction, multipleAction, browseDirectoryAction(), convertImagesAction()),
         )
     }
 }
@@ -97,6 +108,21 @@ private fun browseDirectoryAction(): Bundle = Bundle().apply {
     putInt(ExplorerActionCatalogKeys.PLACEMENT, ExplorerActionValues.PLACEMENT_OVERFLOW)
     putStringArrayList(ExplorerActionCatalogKeys.MIME_TYPES, arrayListOf())
     putStringArrayList(ExplorerActionCatalogKeys.EXTENSIONS, arrayListOf())
+}
+
+/** Multi-target selection toolbar action that may create new files next to its targets (ROADMAP 7.6). */
+private fun convertImagesAction(): Bundle = Bundle().apply {
+    putString(ExplorerActionCatalogKeys.ID, ThreeMapleImagePlugin.CONVERT_IMAGES_ACTION_ID)
+    putString(ExplorerActionCatalogKeys.LABEL_RESOURCE_NAME, ThreeMapleImagePlugin.CONVERT_IMAGES_LABEL_RESOURCE_NAME)
+    putString(ExplorerActionCatalogKeys.LABEL_FALLBACK, ThreeMapleImagePlugin.CONVERT_IMAGES_LABEL_FALLBACK)
+    putString(ExplorerActionCatalogKeys.ACTIVITY_CLASS_NAME, ThreeMapleImagePlugin.CONVERT_IMAGES_ACTIVITY_CLASS_NAME)
+    putInt(ExplorerActionCatalogKeys.PRIORITY, ThreeMapleImagePlugin.CONVERT_IMAGES_PRIORITY)
+    putInt(ExplorerActionCatalogKeys.TARGET_KIND, ExplorerActionValues.TARGET_FILE)
+    putInt(ExplorerActionCatalogKeys.CARDINALITY, ExplorerActionValues.CARDINALITY_MULTIPLE)
+    putInt(ExplorerActionCatalogKeys.ACCESS_MODE, ExplorerActionValues.ACCESS_CREATE_IN_PARENT)
+    putInt(ExplorerActionCatalogKeys.PLACEMENT, ExplorerActionValues.PLACEMENT_SELECTION_TOOLBAR)
+    putStringArrayList(ExplorerActionCatalogKeys.MIME_TYPES, ArrayList(ThreeMapleImagePlugin.MIME_TYPES.asList()))
+    putStringArrayList(ExplorerActionCatalogKeys.EXTENSIONS, ArrayList(ThreeMapleImagePlugin.EXTENSIONS.asList()))
 }
 
 private fun imageViewerAction(

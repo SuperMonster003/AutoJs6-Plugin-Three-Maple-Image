@@ -37,7 +37,22 @@ class ExplorerActionServiceInstrumentationTest {
         val actions = requireNotNull(
             catalog.getParcelableArrayList<android.os.Bundle>(ExplorerActionCatalogKeys.ACTIONS),
         )
-        assertEquals(3, actions.size)
+        assertEquals(4, actions.size)
+        val convertAction = requireNotNull(
+            actions.singleOrNull { action ->
+                action.getString(ExplorerActionCatalogKeys.ID) == ThreeMapleImagePlugin.CONVERT_IMAGES_ACTION_ID
+            },
+        )
+        // ROADMAP 7.6: a multi-target selection toolbar action that may create files next to its targets.
+        assertEquals(ExplorerActionValues.TARGET_FILE, convertAction.getInt(ExplorerActionCatalogKeys.TARGET_KIND))
+        assertEquals(ExplorerActionValues.CARDINALITY_MULTIPLE, convertAction.getInt(ExplorerActionCatalogKeys.CARDINALITY))
+        assertEquals(ExplorerActionValues.ACCESS_CREATE_IN_PARENT, convertAction.getInt(ExplorerActionCatalogKeys.ACCESS_MODE))
+        assertEquals(ExplorerActionValues.PLACEMENT_SELECTION_TOOLBAR, convertAction.getInt(ExplorerActionCatalogKeys.PLACEMENT))
+        assertEquals(
+            ThreeMapleImagePlugin.CONVERT_IMAGES_ACTIVITY_CLASS_NAME,
+            convertAction.getString(ExplorerActionCatalogKeys.ACTIVITY_CLASS_NAME),
+        )
+        assertFalse(convertAction.containsKey(ExplorerActionCatalogKeys.OUTPUT_MODE))
         val directoryAction = requireNotNull(
             actions.singleOrNull { action ->
                 action.getString(ExplorerActionCatalogKeys.ID) == ThreeMapleImagePlugin.BROWSE_DIRECTORY_ACTION_ID
@@ -106,6 +121,10 @@ class ExplorerActionServiceInstrumentationTest {
         assertEquals(
             singleAction.getStringArrayList(ExplorerActionCatalogKeys.EXTENSIONS),
             multipleAction.getStringArrayList(ExplorerActionCatalogKeys.EXTENSIONS),
+        )
+        assertEquals(
+            singleAction.getStringArrayList(ExplorerActionCatalogKeys.EXTENSIONS),
+            convertAction.getStringArrayList(ExplorerActionCatalogKeys.EXTENSIONS),
         )
     }
 }

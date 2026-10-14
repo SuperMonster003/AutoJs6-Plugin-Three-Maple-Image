@@ -101,7 +101,8 @@ internal object ImageBitmapIO {
     fun isWithinConversionMemoryBudget(info: SourceInfo, targetSize: ImagePixelSize): Boolean =
         selectSampleSize(info, targetSize) != null
 
-    private fun decodeForConversion(
+    /** [decodeForConversion] for a source already [inspect]ed (a batch reads each image's bounds and EXIF once). */
+    fun decodeForConversion(
         resolver: ContentResolver,
         uri: Uri,
         targetSize: ImagePixelSize,
@@ -149,6 +150,18 @@ internal object ImageBitmapIO {
         options: ImageConversionOptions,
         maxOutputBytes: Long,
         temporaryDirectory: File? = null,
+    ): ImageOutputWriteResult = writeOutput(bitmap, options, maxOutputBytes, temporaryDirectory) {
+        resolver.openFileDescriptor(outputUri, ImageToolsPlugin.OUTPUT_OPEN_MODE)
+            ?: throw IOException("Unable to open host output transaction")
+    }
+
+    /** [writeOutput] into the descriptor [openOutput] returns; it is opened once, after any staging, and closed here. */
+    fun writeOutput(
+        bitmap: Bitmap,
+        options: ImageConversionOptions,
+        maxOutputBytes: Long,
+        temporaryDirectory: File?,
+        openOutput: () -> ParcelFileDescriptor,
     ): ImageOutputWriteResult {
         validateOutput(bitmap, options, maxOutputBytes)
         val targetFileSizeResult = options.targetFileSizeBytes?.let {
@@ -170,9 +183,7 @@ internal object ImageBitmapIO {
                     temporaryDirectory = requireTemporaryDirectory(temporaryDirectory),
                 )
             }
-            val descriptor = resolver.openFileDescriptor(outputUri, ImageToolsPlugin.OUTPUT_OPEN_MODE)
-                ?: throw IOException("Unable to open host output transaction")
-            val encodedBytes = ParcelFileDescriptor.AutoCloseOutputStream(descriptor).use { output ->
+            val encodedBytes = ParcelFileDescriptor.AutoCloseOutputStream(openOutput()).use { output ->
                 stagedFile?.let { file -> copyStagedOutput(file, output, maxOutputBytes) }
                     ?: encodePreparedOutput(
                         encodedBitmap,

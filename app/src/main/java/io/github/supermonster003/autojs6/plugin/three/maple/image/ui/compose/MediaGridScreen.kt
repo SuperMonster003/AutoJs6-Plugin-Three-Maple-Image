@@ -108,6 +108,8 @@ internal class MediaSelectionActions(
     val onCopy: (() -> Unit)? = null,
     val onRename: (() -> Unit)? = null,
     val onDetails: (() -> Unit)? = null,
+    /** Batch conversion of the selection (ROADMAP 7.6). */
+    val onConvert: (() -> Unit)? = null,
     /** Every selected image is a favorite already: the favorite action removes them instead. */
     val favorited: Boolean = false,
 )
@@ -400,7 +402,7 @@ private fun SelectionBar(selectionCount: Int, actions: MediaSelectionActions) {
         actions.onMove?.let { add(MapleAction(move, moveLabel, it, testTag = "maple.selection.move")) }
         actions.onDelete?.let { add(MapleAction(delete, deleteLabel, it, testTag = "maple.selection.delete")) }
     }
-    val hasMore = actions.onCopy != null || actions.onRename != null || actions.onDetails != null
+    val hasMore = actions.onCopy != null || actions.onRename != null || actions.onConvert != null || actions.onDetails != null
     val all = if (hasMore) direct + MapleAction(more, moreLabel, { moreOpen = true }, testTag = "maple.selection.barMore") else direct
     if (all.isEmpty()) return
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -422,6 +424,14 @@ private fun SelectionBar(selectionCount: Int, actions: MediaSelectionActions) {
                         enabled = selectionCount == 1,
                         onClick = { moreOpen = false; rename() },
                         modifier = Modifier.testTag("maple.selection.rename"),
+                    )
+                }
+                actions.onConvert?.let { convert ->
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.action_convert)) },
+                        leadingIcon = { Icon(painterResource(R.drawable.ic_transform_24), contentDescription = null) },
+                        onClick = { moreOpen = false; convert() },
+                        modifier = Modifier.testTag("maple.selection.convert"),
                     )
                 }
                 actions.onDetails?.let { details ->

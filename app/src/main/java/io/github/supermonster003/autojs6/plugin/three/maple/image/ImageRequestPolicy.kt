@@ -51,6 +51,8 @@ internal data class ExplorerDirectoryRequest(
 internal enum class ExplorerImageRequestMode {
     SINGLE_WITH_SIBLINGS,
     EXPLICIT_SELECTION,
+    /** "Convert images" (ROADMAP 7.6): the selection plus a session that may create files next to it. */
+    BATCH_CONVERT,
 }
 
 internal data class ExternalImageSeed(
@@ -123,6 +125,7 @@ internal object ImageRequestPolicy {
         val mode = when (intent.getStringExtra(ExplorerActionIntentExtras.ACTION_ID)) {
             ThreeMapleImagePlugin.ACTION_ID -> ExplorerImageRequestMode.SINGLE_WITH_SIBLINGS
             ThreeMapleImagePlugin.MULTIPLE_ACTION_ID -> ExplorerImageRequestMode.EXPLICIT_SELECTION
+            ThreeMapleImagePlugin.CONVERT_IMAGES_ACTION_ID -> ExplorerImageRequestMode.BATCH_CONVERT
             else -> return null
         }
         if (
@@ -185,7 +188,7 @@ internal object ImageRequestPolicy {
         }
         val sessionBundle = intent.parcelableBundleExtra(ExplorerActionIntentExtras.HOST_SESSION)
         val requiresHostSession =
-            mode == ExplorerImageRequestMode.SINGLE_WITH_SIBLINGS || parsedTargets.size > 1
+            mode != ExplorerImageRequestMode.EXPLICIT_SELECTION || parsedTargets.size > 1
         val hostSession = if (requiresHostSession) {
             val binder = sessionBundle?.getBinder(ExplorerActionHostSessionKeys.BINDER) ?: return null
             if (runCatching { binder.interfaceDescriptor }.getOrNull() != IExplorerActionHostSession.DESCRIPTOR) {

@@ -40,6 +40,22 @@
         <item quantity="many">تم إلغاء تثبيت %1$d ألبوما</item>
         <item quantity="other">تم إلغاء تثبيت %1$d ألبوم</item>
     </plurals>
+    <plurals name="batch_converted_count">
+        <item quantity="zero">تم تحويل %1$d صورة</item>
+        <item quantity="one">تم تحويل صورة واحدة (%1$d)</item>
+        <item quantity="two">تم تحويل صورتين (%1$d)</item>
+        <item quantity="few">تم تحويل %1$d صور</item>
+        <item quantity="many">تم تحويل %1$d صورة</item>
+        <item quantity="other">تم تحويل %1$d صورة</item>
+    </plurals>
+    <plurals name="batch_not_converted_count">
+        <item quantity="zero">لم تحول %1$d صورة</item>
+        <item quantity="one">لم تحول صورة واحدة (%1$d)</item>
+        <item quantity="two">لم تحول صورتان (%1$d)</item>
+        <item quantity="few">لم تحول %1$d صور</item>
+        <item quantity="many">لم تحول %1$d صورة</item>
+        <item quantity="other">لم تحول %1$d صورة</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="zero">توجد %1$d صورة بالأسماء نفسها</item>
         <item quantity="one">توجد صورة واحدة (%1$d) بالاسم نفسه</item>

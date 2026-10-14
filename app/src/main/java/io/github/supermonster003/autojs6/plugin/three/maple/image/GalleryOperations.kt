@@ -18,6 +18,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -28,8 +30,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumSelectionActions
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.BatchFailuresDialog
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.BatchProgressDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ConflictDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleSettingsDefaults
@@ -79,6 +84,9 @@ internal sealed interface GalleryDialog {
 
     /** Delete whole albums (ROADMAP 7.4): their [items] go to the recycle bin, or for good when it is off. */
     data class ConfirmDeleteAlbums(val albumCount: Int, val items: List<MediaItem>, val forGood: Boolean) : GalleryDialog
+
+    /** The images the last batch conversion could not convert (ROADMAP 7.6), with "Retry". */
+    data class BatchFailures(val failures: List<BatchFailureEntry>) : GalleryDialog
 }
 
 internal enum class DeleteReason {
@@ -118,6 +126,9 @@ internal interface OperationTarget {
 
     /** Every image of a media library album. */
     suspend fun albumItems(album: AlbumSummary): List<MediaItem> = emptyList()
+
+    /** Shows the batch conversion settings for the images [BatchConversionViewModel.prepare] received (ROADMAP 7.6). */
+    fun openBatchConversion() {}
 }
 
 /**
@@ -144,6 +155,7 @@ internal class GalleryOperations(
     private var renameBusy by mutableStateOf(false)
     private var progressDone by mutableIntStateOf(0)
     private var progressTotal by mutableIntStateOf(0)
+    private val batch by lazy { ViewModelProvider(activity)[BatchConversionViewModel::class.java] }
 
     /** What the bar offers for [state]'s album: authorized folders only share, delete, rename and show details. */
     fun actionsFor(state: MediaGridUiState): MediaSelectionActions {
@@ -159,6 +171,7 @@ internal class GalleryOperations(
             onCopy = if (library) ::copy else null,
             onRename = ::rename,
             onDetails = ::details,
+            onConvert = if (library) ::convert else null,
             favorited = library && state.selection.isNotEmpty() && state.favoriteIds.containsAll(state.selection),
         )
     }
@@ -584,6 +597,79 @@ internal class GalleryOperations(
         if (message.isNotEmpty()) notify(message, if (copy) null else outcome.undo, afterUndo = ::refreshAll)
     }
 
+    // ---- batch conversion (ROADMAP 7.6) ----
+
+    /** Opens the batch conversion settings for the selection. */
+    fun convert() = launch {
+        val items = target.items()
+        if (items.isEmpty()) return@launch
+        batch.prepare(items)
+        target.openBatchConversion()
+    }
+
+    /** "Start" on the settings page: Android 7-9 may ask for the write permission first, then the batch runs. */
+    fun startBatch() {
+        activity.lifecycleScope.launch {
+            if (!coordinator.prepareCreate()) {
+                explainRefusedPermission()
+                return@launch
+            }
+            if (batch.start()) target.clearSelection()
+        }
+    }
+
+    private fun retryBatch(failures: List<BatchFailureEntry>) {
+        show(null)
+        batch.prepare(failures.map { it.item })
+        startBatch()
+    }
+
+    /** The finished batch: how many images were converted, how many not (with "View"), and whether it was cancelled. */
+    private fun reportBatch(result: BatchProgress) {
+        refreshAll()
+        val message = buildString {
+            if (result.succeeded > 0) append(quantity(R.plurals.batch_converted_count, result.succeeded))
+            if (result.failures.isNotEmpty()) {
+                if (isNotEmpty()) append(". ")
+                append(quantity(R.plurals.batch_not_converted_count, result.failures.size))
+            }
+            if (result.cancelled && result.done < result.total) {
+                if (isNotEmpty()) append(". ")
+                append(activity.getString(R.string.batch_cancelled_rest))
+            }
+        }
+        if (message.isEmpty()) return
+        snackbarJob?.cancel()
+        snackbarJob = activity.lifecycleScope.launch {
+            val failures = result.failures
+            val outcome = snackbar.showSnackbar(
+                message = message,
+                actionLabel = if (failures.isNotEmpty()) activity.getString(R.string.batch_view_failures) else null,
+                withDismissAction = failures.isEmpty(),
+                duration = if (failures.isNotEmpty()) SnackbarDuration.Long else SnackbarDuration.Short,
+            )
+            if (outcome == SnackbarResult.ActionPerformed && failures.isNotEmpty()) show(GalleryDialog.BatchFailures(failures))
+        }
+    }
+
+    @Composable
+    private fun BatchStatus() {
+        val progress by batch.progress.collectAsState()
+        val current = progress ?: return
+        if (current.running) {
+            BatchProgressDialog(
+                done = current.done,
+                total = current.total,
+                failed = current.failures.size,
+                cancelling = current.cancelling,
+                onCancel = batch::cancel,
+            )
+        }
+        LaunchedEffect(current.runId, current.running) {
+            if (!current.running) batch.takeFinished()?.let(::reportBatch)
+        }
+    }
+
     // ---- recycle bin page (ROADMAP 7.2) ----
 
     fun restoreFromBin() = launch {
@@ -746,8 +832,14 @@ internal class GalleryOperations(
                 total = progressTotal,
                 onCancel = current.control::cancel,
             )
+            is GalleryDialog.BatchFailures -> BatchFailuresDialog(
+                entries = current.failures.map { it.item.displayName to it.failure },
+                onRetry = { retryBatch(current.failures) },
+                onDismiss = { show(null) },
+            )
             null -> Unit
         }
+        BatchStatus()
     }
 
     companion object {

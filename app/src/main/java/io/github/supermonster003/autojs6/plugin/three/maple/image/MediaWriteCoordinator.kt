@@ -352,6 +352,12 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         return if (granted) WriteOutcome(succeeded = uris.size) else WriteOutcome(cancelled = true)
     }
 
+    /**
+     * Before a batch that only creates new images (batch conversion): Android 7-9 asks for the storage write
+     * permission when it is missing. False when it was refused ([consumeWritePermissionRefused] is then set).
+     */
+    suspend fun prepareCreate(): Boolean = routeForIds(MediaWriteOperation.COPY, emptyList()) != null
+
     // ---- routes ----
 
     /** The route for a batch, asking for the legacy write permission first when the policy needs it; null = refused. */
@@ -663,13 +669,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         return owned && rows == ids.toSet().size
     }
 
-    /** Display names already in [path] (case-insensitive comparisons are done by the callers). */
-    private suspend fun namesIn(path: AlbumPath, excludeId: Long?): List<String> {
-        val names = media.loadFolder(path).filter { it.id != excludeId }.mapTo(ArrayList()) { it.displayName }
-        // Files the media library does not list still block a name (the internal storage is the one the app can list).
-        if (path.isPrimary) withContext(Dispatchers.IO) { File(externalRoot(), path.relativePath).list() }?.let { names += it }
-        return names
-    }
+    private suspend fun namesIn(path: AlbumPath, excludeId: Long?): List<String> = namesIn(media, path, excludeId)
 
     @Suppress("DEPRECATION")
     private fun filePathOf(uri: Uri): String? = runCatching {
@@ -694,6 +694,15 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
     companion object {
         fun canManageMedia(context: Context): Boolean =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && MediaStore.canManageMedia(context)
+
+        /** Display names already in [path] (case-insensitive comparisons are done by the callers). */
+        suspend fun namesIn(media: MediaStoreRepository, path: AlbumPath, excludeId: Long? = null): List<String> {
+            val names = media.loadFolder(path).filter { it.id != excludeId }.mapTo(ArrayList()) { it.displayName }
+            // Files the media library does not list still block a name (the internal storage is the one the app can list).
+            @Suppress("DEPRECATION")
+            if (path.isPrimary) withContext(Dispatchers.IO) { File(Environment.getExternalStorageDirectory(), path.relativePath).list() }?.let { names += it }
+            return names
+        }
 
         internal fun copyFile(source: File, target: File): Boolean = runCatching {
             source.inputStream().use { input -> target.outputStream().use { output -> input.copyTo(output) } }

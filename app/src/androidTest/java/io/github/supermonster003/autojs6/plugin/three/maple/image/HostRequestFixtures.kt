@@ -134,6 +134,53 @@ internal object HostRequestFixtures {
         )
     }
 
+    /**
+     * "Convert images" (ROADMAP 7.6) on [files], which must share one directory under the plugin's FileProvider
+     * root (`cache/standalone-images/`) so the targets are readable direct children of the parent URI.
+     */
+    fun convertIntent(context: Context, files: List<File>, session: IExplorerActionHostSession?): Intent {
+        require(files.isNotEmpty() && files.map { it.parentFile }.distinct().size == 1)
+        val uris = files.map { androidx.core.content.FileProvider.getUriForFile(context, context.packageName + ".standalone-images", it) }
+        val first = uris.first()
+        val parentUri = first.buildUpon().path(first.pathSegments.dropLast(1).joinToString("/", prefix = "/")).build()
+        val targets = files.mapIndexed { index, file ->
+            Bundle().apply {
+                putString(ExplorerActionTargetKeys.ID, "target-$index")
+                putParcelable(ExplorerActionTargetKeys.URI, uris[index])
+                putString(ExplorerActionTargetKeys.DISPLAY_NAME, file.name)
+                putInt(ExplorerActionTargetKeys.KIND, ExplorerActionValues.TARGET_FILE)
+                putString(ExplorerActionTargetKeys.MIME_TYPE, mimeTypeOf(file))
+                putLong(ExplorerActionTargetKeys.SIZE, file.length())
+                putLong(ExplorerActionTargetKeys.LAST_MODIFIED, file.lastModified())
+            }
+        }
+        return Intent(ExplorerActionPluginActions.EXECUTE).apply {
+            setClassName(context, HostBatchConverterActivity::class.java.name)
+            setDataAndType(first, if (files.size == 1) mimeTypeOf(files.first()) else "*/*")
+            clipData = ClipData.newRawUri(files.first().name, first).apply { uris.drop(1).forEach { addItem(ClipData.Item(it)) } }
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
+            putExtra(ExplorerActionIntentExtras.ACTION_ID, ThreeMapleImagePlugin.CONVERT_IMAGES_ACTION_ID)
+            putExtra(ExplorerActionIntentExtras.PROTOCOL_VERSION, ThreeMapleImagePlugin.PROTOCOL_VERSION)
+            putExtra(ExplorerActionIntentExtras.REQUEST_ID, UUID.randomUUID().toString())
+            putExtra(ExplorerActionIntentExtras.DISPLAY_NAME, files.first().name)
+            putExtra(ExplorerActionIntentExtras.SIZE, files.first().length())
+            putExtra(ExplorerActionIntentExtras.PARENT_URI, parentUri)
+            putExtra(ExplorerActionIntentExtras.PARENT_DISPLAY_PATH, "/images")
+            putExtra(ExplorerActionIntentExtras.HOST_VERSION_CODE, ThreeMapleImagePlugin.REQUIRED_HOST_VERSION)
+            putExtra(ExplorerActionIntentExtras.SOURCE_SURFACE, ExplorerActionIntentValues.SOURCE_SURFACE_MAIN)
+            putParcelableArrayListExtra(ExplorerActionIntentExtras.TARGETS, ArrayList(targets))
+            session?.let {
+                putExtra(ExplorerActionIntentExtras.HOST_SESSION, Bundle().apply { putBinder(ExplorerActionHostSessionKeys.BINDER, it.asBinder()) })
+            }
+        }
+    }
+
+    private fun mimeTypeOf(file: File): String = when (file.extension.lowercase()) {
+        "jpg", "jpeg" -> "image/jpeg"
+        "webp" -> "image/webp"
+        else -> "image/png"
+    }
+
     private fun envelope(
         activity: String,
         context: Context,

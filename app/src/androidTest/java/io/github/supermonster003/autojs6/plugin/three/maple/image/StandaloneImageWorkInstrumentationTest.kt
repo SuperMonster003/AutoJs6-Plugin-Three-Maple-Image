@@ -21,9 +21,9 @@ class StandaloneImageWorkInstrumentationTest {
     @Test fun mergedCatalogKeepsAllActionsAndOutputContracts() {
         @Suppress("DEPRECATION")
         val actions = requireNotNull(threeMapleImageActionCatalog().getParcelableArrayList<android.os.Bundle>(ExplorerActionCatalogKeys.ACTIONS))
-        // The four merged actions plus the read-only "View as album" directory action (ROADMAP 6.4).
+        // The four merged actions, the read-only "View as album" directory action (ROADMAP 6.4) and "Convert images" (ROADMAP 7.6).
         assertEquals(
-            setOf("view-image", "view-images", "browse-directory", "edit-image", "convert-image"),
+            setOf("view-image", "view-images", "browse-directory", "convert-images", "edit-image", "convert-image"),
             actions.map { it.getString(ExplorerActionCatalogKeys.ID) }.toSet(),
         )
         for (action in actions.filter { it.getString(ExplorerActionCatalogKeys.ID) in setOf("edit-image", "convert-image") }) {

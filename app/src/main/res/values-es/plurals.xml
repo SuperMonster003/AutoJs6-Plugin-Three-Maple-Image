@@ -25,6 +25,16 @@
         <item quantity="many">%1$d álbumes desfijados</item>
         <item quantity="other">%1$d álbumes desfijados</item>
     </plurals>
+    <plurals name="batch_converted_count">
+        <item quantity="one">%1$d imagen convertida</item>
+        <item quantity="many">%1$d imágenes convertidas</item>
+        <item quantity="other">%1$d imágenes convertidas</item>
+    </plurals>
+    <plurals name="batch_not_converted_count">
+        <item quantity="one">%1$d imagen no se convirtió</item>
+        <item quantity="many">%1$d imágenes no se convirtieron</item>
+        <item quantity="other">%1$d imágenes no se convirtieron</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="one">Ya existe %1$d imagen con el mismo nombre</item>
         <item quantity="many">Ya existen %1$d imágenes con los mismos nombres</item>

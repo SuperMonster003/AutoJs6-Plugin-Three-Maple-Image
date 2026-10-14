@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -18,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumGridCallbacks
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumGridScreen
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.BatchConvertScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaGridCallbacks
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.RecycleBinCallbacks
@@ -36,6 +38,7 @@ class HomeActivity : ConfiguredActivity() {
     private lateinit var operations: GalleryOperations
     private val gallery by viewModels<GalleryViewModel>()
     private val recycleBin by viewModels<RecycleBinViewModel>()
+    private val batch by viewModels<BatchConversionViewModel>()
     private val requestPhotoAccess = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
         permissionGate.recordResult(grants)
         updatePhotoAccess()
@@ -161,6 +164,23 @@ class HomeActivity : ConfiguredActivity() {
                         )
                         operations.Dialogs()
                     }
+                    composable(ROUTE_BATCH_CONVERT) {
+                        val pending by batch.pending.collectAsState()
+                        val settings by batch.settings.collectAsState()
+                        // Restored after the process was gone: nothing is waiting any more.
+                        LaunchedEffect(Unit) { if (batch.pending.value.isEmpty()) controller.popBackStack() }
+                        BatchConvertScreen(
+                            count = pending.size,
+                            settings = settings,
+                            note = stringResource(R.string.batch_convert_note_gallery),
+                            onChange = batch::update,
+                            onStart = {
+                                controller.popBackStack()
+                                operations.startBatch()
+                            },
+                            onBack = { controller.popBackStack() },
+                        )
+                    }
                     composable(ROUTE_RECYCLE_BIN) {
                         val bin by recycleBin.state.collectAsState()
                         LaunchedEffect(Unit) { recycleBin.load() }
@@ -193,6 +213,10 @@ class HomeActivity : ConfiguredActivity() {
 
     /** The media grid selection as the operations see it. */
     private val galleryTarget = object : OperationTarget {
+        override fun openBatchConversion() {
+            navigate?.invoke(ROUTE_BATCH_CONVERT)
+        }
+
         override suspend fun items(): List<MediaItem> = gallery.selectedItems()
         override val albumKind: AlbumKind? get() = gallery.grid.value.album?.kind
         override val openAlbum: AlbumSummary? get() = gallery.grid.value.album
@@ -321,5 +345,6 @@ class HomeActivity : ConfiguredActivity() {
         const val ROUTE_ALBUMS = "albums"
         const val ROUTE_ALBUM = "album/{kind}/{id}"
         const val ROUTE_RECYCLE_BIN = "recycle-bin"
+        const val ROUTE_BATCH_CONVERT = "batch-convert"
     }
 }
