@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.TimeZone
+import kotlin.random.Random
 
 internal enum class AlbumKind {
     MEDIA,
@@ -37,6 +39,9 @@ internal data class AlbumSummary(
     val volume: String = MediaCatalog.PRIMARY_VOLUME,
     /** Shown in the top section of the album grid (ROADMAP 7.4). */
     val pinned: Boolean = false,
+    /** Latest change and latest capture of the album's images, for the album grid sort (ROADMAP 7.5). */
+    val latestModifiedSeconds: Long = 0L,
+    val latestTakenMillis: Long = 0L,
 ) {
     /** The folder of a media library album (volume and relative path). */
     val path: AlbumPath get() = AlbumPath(volume, subtitle)
@@ -80,6 +85,11 @@ internal data class MediaGridUiState(
     val selection: Set<Long> = emptySet(),
     /** Media ids of the favorites; the selection bar shows "remove from favorites" when it covers the selection. */
     val favoriteIds: Set<Long> = emptySet(),
+    /** Date sections (ROADMAP 7.5): with a grouping the whole album is loaded and [groups] index its [items]. */
+    val grouping: MediaGrouping = MediaGrouping.NONE,
+    val groups: List<MediaGroup> = emptyList(),
+    /** The open album keeps a sort of its own (the sort dialog's "this album only"). */
+    val ownSort: Boolean = false,
 ) {
     val selecting: Boolean get() = selection.isNotEmpty()
 }
@@ -106,7 +116,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     private var marks: FolderMarkState = FolderMarkState.NONE
     private var favoriteIds: Set<Long> = emptySet()
     private var favoriteOrder: Pair<MediaSort, List<MediaItem>>? = null
-    private val _albums = MutableStateFlow(GalleryUiState())
+    private val _albums = MutableStateFlow(GalleryUiState(albumSort = preferences.albumSort))
     private val _grid = MutableStateFlow(MediaGridUiState(columns = preferences.mediaColumns))
     private var access: MediaPermissionResolution? = null
     private var gridJob: Job? = null
@@ -208,6 +218,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun setAlbumSort(sort: MediaSort) {
+        preferences.albumSort = sort
         _albums.update { state -> state.copy(albumSort = sort, albums = arrangeAlbums(state.albums, sort)) }
     }
 
@@ -257,6 +268,8 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                     AlbumKind.MEDIA, bucket.id, name, bucket.count, bucket.cover.contentUri, bucket.relativePath,
                     volume = bucket.volume,
                     pinned = marks.isPinned(path),
+                    latestModifiedSeconds = bucket.latestModifiedSeconds,
+                    latestTakenMillis = bucket.cover.effectiveTakenMillis,
                 )
             }
             val folders = folderRepository.list().map { folder ->
@@ -348,11 +361,9 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
 
     fun openAlbum(album: AlbumSummary, keepSort: Boolean = false) {
         gridJob?.cancel()
-        val sort = if (keepSort && _grid.value.album?.id == album.id) {
-            _grid.value.sort
-        } else {
-            preferences.sortFor(album.kind, album.id) ?: preferences.defaultSort
-        }
+        val kept = keepSort && _grid.value.album?.id == album.id
+        val sort = if (kept) _grid.value.sort else withSeed(preferences.sortFor(album.kind, album.id) ?: preferences.defaultSort)
+        val grouping = if (kept) _grid.value.grouping else preferences.groupingFor(album.kind, album.id) ?: preferences.defaultGrouping
         val current = _grid.value
         val sameAlbum = current.album?.id == album.id && current.album.kind == album.kind
         _grid.value = MediaGridUiState(
@@ -361,6 +372,9 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             items = if (sameAlbum && sort == current.sort) current.items else emptyList(),
             loading = true,
             sort = sort,
+            grouping = grouping,
+            groups = if (sameAlbum && sort == current.sort && grouping == current.grouping) current.groups else emptyList(),
+            ownSort = preferences.hasOwnSort(album.kind, album.id),
             columns = preferences.mediaColumns,
             refreshing = current.refreshing && sameAlbum,
             selection = if (sameAlbum) current.selection else emptySet(),
@@ -371,14 +385,25 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     }
 
     /** Remembered per album and as the default for albums without a memory (ROADMAP 6.2 sort memory). */
-    fun setGridSort(sort: MediaSort) {
+    /**
+     * The sort dialog of a media grid (ROADMAP 7.5): [thisAlbumOnly] keeps the choice for the open album, otherwise
+     * it becomes the default for every album without a choice of its own. A random order gets a fresh shuffle.
+     */
+    fun setGridSort(sort: MediaSort, grouping: MediaGrouping = _grid.value.grouping, thisAlbumOnly: Boolean = true) {
         val album = _grid.value.album
-        if (album != null) preferences.rememberSort(album.kind, album.id, sort)
-        if (_grid.value.sort == sort) return
+        if (album != null) preferences.applySort(album.kind, album.id, sort.copy(seed = 0L), grouping, thisAlbumOnly)
+        val current = _grid.value
+        _grid.update { it.copy(ownSort = thisAlbumOnly) }
+        if (current.sort.copy(seed = 0L) == sort.copy(seed = 0L) && sort.field != MediaSortField.RANDOM && current.grouping == grouping) return
         gridJob?.cancel()
-        _grid.update { it.copy(sort = sort, items = emptyList(), loading = true, endReached = false) }
+        _grid.update { it.copy(sort = withSeed(sort), grouping = grouping, items = emptyList(), groups = emptyList(), loading = true, endReached = false) }
         loadPage(reset = true)
     }
+
+    /** Whether the open album keeps a sort of its own (the dialog's "this album only"). */
+    fun openAlbumHasOwnSort(): Boolean = _grid.value.album?.let { preferences.hasOwnSort(it.kind, it.id) } ?: false
+
+    private fun withSeed(sort: MediaSort): MediaSort = if (sort.field == MediaSortField.RANDOM) sort.copy(seed = Random.nextLong()) else sort
 
     /** Media grid columns (3..6), from the menu or a pinch; persisted for every album. */
     fun setColumns(columns: Int) {
@@ -522,6 +547,18 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             if (reset) _grid.update { if (it.loading) it else it.copy(loading = true) }
             val offset = if (reset) 0 else _grid.value.items.size
             val sort = _grid.value.sort
+            val grouping = _grid.value.grouping
+            if (grouping != MediaGrouping.NONE && MediaCatalog.groupable(sort)) {
+                // Sections need the whole album: it is loaded at once (MediaStore albums come from the shared scan).
+                if (!reset) return@launch
+                val (all, folderLimit) = wholeAlbum(album, sort)
+                val groups = withContext(Dispatchers.Default) { MediaCatalog.groups(all, sort, grouping, TimeZone.getDefault()) }
+                _grid.update { state ->
+                    if (state.album?.id != album.id) return@update state
+                    state.copy(items = all, groups = groups, loading = false, refreshing = false, endReached = true, limit = folderLimit)
+                }
+                return@launch
+            }
             val page: List<MediaItem>
             var limit = DocumentTreeLimit.NONE
             if (album.kind == AlbumKind.FAVORITES || album.kind == AlbumKind.HIDDEN) {
@@ -540,6 +577,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                 if (state.album?.id != album.id) return@update state
                 state.copy(
                     items = if (reset) page else state.items + page,
+                    groups = emptyList(),
                     loading = false,
                     refreshing = false,
                     endReached = page.size < PAGE_SIZE,
@@ -549,6 +587,17 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         }
         gridJob = job
         return job
+    }
+
+    /** Every image of [album] in [sort] order, and the folder walk limit of an authorized folder. */
+    private suspend fun wholeAlbum(album: AlbumSummary, sort: MediaSort): Pair<List<MediaItem>, DocumentTreeLimit> = when (album.kind) {
+        AlbumKind.FAVORITES -> favoriteItems(sort) to DocumentTreeLimit.NONE
+        AlbumKind.HIDDEN -> folderOrdered(hiddenItems[album.id].orEmpty(), sort) to DocumentTreeLimit.NONE
+        AlbumKind.FOLDER -> {
+            val cached = album.folder?.let { runCatching { folderRepository.enumerateCached(it) }.getOrNull() } ?: (emptyList<MediaItem>() to DocumentTreeLimit.NONE)
+            folderOrdered(cached.first, sort) to cached.second
+        }
+        AlbumKind.MEDIA, AlbumKind.ALL -> runCatching { media.loadBucketAll(album.id, sort, marks) }.getOrDefault(emptyList()) to DocumentTreeLimit.NONE
     }
 
     /** Folder pages are slices of one sorted copy (an authorized folder may hold up to 20000 images). */
@@ -565,9 +614,10 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
 
     private fun sortAlbums(albums: List<AlbumSummary>, sort: MediaSort): List<AlbumSummary> {
         val primary: Comparator<AlbumSummary> = when (sort.field) {
-            MediaSortField.NAME -> Comparator { a, b -> ImageSiblingDiscoveryPolicy.compareNaturally(a.name, b.name) }
+            MediaSortField.NAME, MediaSortField.RANDOM -> Comparator { a, b -> ImageSiblingDiscoveryPolicy.compareNaturally(a.name, b.name) }
             MediaSortField.SIZE -> compareBy { it.count }
-            MediaSortField.DATE_MODIFIED, MediaSortField.DATE_TAKEN -> return albums // bucket order from the repository is newest first
+            MediaSortField.DATE_MODIFIED -> compareBy { it.latestModifiedSeconds }
+            MediaSortField.DATE_TAKEN -> compareBy { it.latestTakenMillis }
         }
         val combined = primary.thenBy { it.id }
         return albums.sortedWith(if (sort.ascending) combined else combined.reversed())

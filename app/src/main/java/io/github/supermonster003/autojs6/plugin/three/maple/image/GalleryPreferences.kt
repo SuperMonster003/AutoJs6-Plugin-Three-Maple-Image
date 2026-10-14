@@ -28,12 +28,36 @@ internal class GalleryPreferences(private val preferences: SharedPreferences) {
 
     fun sortFor(kind: AlbumKind, id: Long): MediaSort? = decodeSort(preferences.getString(sortKey(kind, id), null))
 
-    fun rememberSort(kind: AlbumKind, id: Long, sort: MediaSort) {
-        preferences.edit()
-            .putString(sortKey(kind, id), encodeSort(sort))
-            .putString(KEY_DEFAULT_SORT, encodeSort(sort))
-            .apply()
+    /** Grouping used by media grids without a memory of their own (ROADMAP 7.5). */
+    var defaultGrouping: MediaGrouping
+        get() = decodeGrouping(preferences.getString(KEY_DEFAULT_GROUPING, null)) ?: MediaGrouping.NONE
+        set(value) = preferences.edit().putString(KEY_DEFAULT_GROUPING, value.name).apply()
+
+    fun groupingFor(kind: AlbumKind, id: Long): MediaGrouping? = decodeGrouping(preferences.getString(groupingKey(kind, id), null))
+
+    /**
+     * The sort dialog (ROADMAP 7.5): "this album only" keeps [sort] and [grouping] for that album; otherwise they
+     * become the default for every album without a choice of its own, and this album drops its own.
+     */
+    fun applySort(kind: AlbumKind, id: Long, sort: MediaSort, grouping: MediaGrouping, thisAlbumOnly: Boolean) {
+        val edit = preferences.edit()
+        if (thisAlbumOnly) {
+            edit.putString(sortKey(kind, id), encodeSort(sort)).putString(groupingKey(kind, id), grouping.name)
+        } else {
+            edit.remove(sortKey(kind, id)).remove(groupingKey(kind, id))
+                .putString(KEY_DEFAULT_SORT, encodeSort(sort))
+                .putString(KEY_DEFAULT_GROUPING, grouping.name)
+        }
+        edit.apply()
     }
+
+    /** Whether [kind] / [id] keeps a sort of its own ("this album only" was ticked). */
+    fun hasOwnSort(kind: AlbumKind, id: Long): Boolean = preferences.contains(sortKey(kind, id))
+
+    /** The album grid order. */
+    var albumSort: MediaSort
+        get() = decodeSort(preferences.getString(KEY_ALBUM_SORT, null)) ?: MediaSort.DEFAULT
+        set(value) = preferences.edit().putString(KEY_ALBUM_SORT, encodeSort(value)).apply()
 
     /** Move / copy targets (`Pictures/Trips/` on a volume) used lately, newest first (ROADMAP 7.3 album picker). */
     val recentTargets: List<AlbumPath>
@@ -67,6 +91,12 @@ internal class GalleryPreferences(private val preferences: SharedPreferences) {
 
         private const val VOLUME_SEPARATOR = "::"
         private const val KEY_SHOW_HIDDEN = "show_hidden_folders"
+        private const val KEY_DEFAULT_GROUPING = "default_grouping"
+        private const val KEY_ALBUM_SORT = "album_sort"
+
+        fun decodeGrouping(value: String?): MediaGrouping? = MediaGrouping.entries.firstOrNull { it.name == value }
+
+        private fun groupingKey(kind: AlbumKind, id: Long): String = "grouping." + kind.name.lowercase() + "." + id
 
         fun clampColumns(value: Int): Int = value.coerceIn(MIN_COLUMNS, MAX_COLUMNS)
 

@@ -2,6 +2,7 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
@@ -9,10 +10,12 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -55,10 +58,15 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.DocumentTreeLi
 import io.github.supermonster003.autojs6.plugin.three.maple.image.DocumentTreeWalker
 import io.github.supermonster003.autojs6.plugin.three.maple.image.GalleryPreferences
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaGridUiState
+import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaGroup
+import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaGroupLayout
+import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaGrouping
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaItem
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaSort
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
 import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -68,7 +76,8 @@ internal class MediaGridCallbacks(
     val onBack: () -> Unit,
     val onOpen: (MediaItem) -> Unit,
     val onLoadMore: () -> Unit,
-    val onSort: (MediaSort) -> Unit,
+    /** The sort dialog's choice: order, date grouping and "this album only" (ROADMAP 7.5). */
+    val onSort: (MediaSort, MediaGrouping, Boolean) -> Unit,
     val onRevealed: () -> Unit,
     val onColumns: (Int) -> Unit,
     val onRefresh: () -> Unit,
@@ -156,7 +165,19 @@ internal fun MediaGridScreen(
                 IconButton(onClick = { sortOpen = true }, modifier = Modifier.testTag("maple.media.sort")) {
                     Icon(painterResource(R.drawable.ic_swap_vert_24), contentDescription = stringResource(R.string.gallery_sort))
                 }
-                SortMenu(expanded = sortOpen, sort = state.sort, dateFields = true, onDismiss = { sortOpen = false }, onSelect = callbacks.onSort)
+                if (sortOpen) {
+                    SortDialog(
+                        fields = mediaSortFields,
+                        sort = state.sort,
+                        grouping = state.grouping,
+                        thisAlbumOnly = state.ownSort,
+                        onDismiss = { sortOpen = false },
+                        onConfirm = { sort, grouping, thisAlbumOnly ->
+                            sortOpen = false
+                            callbacks.onSort(sort, grouping, thisAlbumOnly)
+                        },
+                    )
+                }
                 IconButton(onClick = { menuOpen = true }, modifier = Modifier.testTag("maple.media.more")) {
                     Icon(painterResource(R.drawable.ic_more_vert_24), contentDescription = stringResource(R.string.action_more))
                 }
@@ -219,6 +240,7 @@ internal fun MediaGridScreen(
                     .testTag("maple.media.refresh"),
             ) {
                 val gridState = rememberLazyGridState()
+                val layout = remember(state.groups, state.items.size) { MediaGroupLayout(state.groups, state.items.size) }
                 LaunchedEffect(gridState, state.items.size, state.endReached) {
                     snapshotFlow { gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1 }
                         .distinctUntilChanged()
@@ -227,8 +249,9 @@ internal fun MediaGridScreen(
                 }
                 LaunchedEffect(state.reveal, state.items.size) {
                     val target = state.reveal ?: return@LaunchedEffect
-                    val index = state.items.indexOfFirst { it.id == target }
-                    if (index < 0) return@LaunchedEffect
+                    val itemIndex = state.items.indexOfFirst { it.id == target }
+                    if (itemIndex < 0) return@LaunchedEffect
+                    val index = layout.gridIndex(itemIndex)
                     val visible = gridState.layoutInfo.visibleItemsInfo
                     val shown = visible.isNotEmpty() && index >= visible.first().index && index <= visible.last().index
                     if (!shown) gridState.scrollToItem(index)
@@ -271,7 +294,7 @@ internal fun MediaGridScreen(
                         )
                         .testTag("maple.media.grid"),
                 ) {
-                    items(state.items, key = { it.id }, contentType = { MEDIA_CELL }) { item ->
+                    val cell: @Composable (MediaItem) -> Unit = { item ->
                         // A remembered Uri keeps the cell skippable when a page is appended (a fresh Uri instance
                         // would recompose every visible cell).
                         val model = remember(item.contentUri) { Uri.parse(item.contentUri) }
@@ -290,13 +313,36 @@ internal fun MediaGridScreen(
                             modifier = Modifier.testTag("maple.media.item.${item.id}"),
                         )
                     }
+                    if (state.groups.isEmpty()) {
+                        items(state.items, key = { it.id }, contentType = { MEDIA_CELL }) { item -> cell(item) }
+                    } else {
+                        // Date sections (ROADMAP 7.5): a full-width header before each group's items.
+                        for (group in state.groups) {
+                            item(key = groupKey(group), span = { GridItemSpan(maxLineSpan) }, contentType = GROUP_HEADER) {
+                                GroupHeader(group, Modifier.testTag("maple.media.group.${groupKey(group)}"))
+                            }
+                            items(group.count, key = { state.items[group.start + it].id }, contentType = { MEDIA_CELL }) { offset ->
+                                cell(state.items[group.start + offset])
+                            }
+                        }
+                    }
+                }
+                if (state.groups.isNotEmpty()) {
+                    // The section of the first visible row stays on top while scrolling (a sticky header).
+                    val firstVisible by remember { derivedStateOf { gridState.firstVisibleItemIndex } }
+                    layout.groupAt(firstVisible)?.let { group ->
+                        GroupHeader(group, Modifier.align(Alignment.TopCenter).testTag("maple.media.stickyGroup"))
+                    }
                 }
                 val locale = LocalConfiguration.current.locales[0]
                 val dateFormat = remember(locale) { DateFormat.getDateInstance(DateFormat.MEDIUM, locale) }
                 MapleFastScroller(
                     gridState = gridState,
-                    itemCount = state.items.size,
-                    label = { index -> state.items.getOrNull(index)?.let { item -> dateFormat.format(Date(item.effectiveTakenMillis)) } },
+                    itemCount = layout.gridCount,
+                    label = { index ->
+                        val item = layout.itemIndex(index)?.let(state.items::getOrNull) ?: layout.groupAt(index)?.let { state.items.getOrNull(it.start) }
+                        item?.let { dateFormat.format(Date(it.effectiveTakenMillis)) }
+                    },
                 )
                 if (state.loading) {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).testTag("maple.media.progress"))
@@ -370,6 +416,37 @@ private fun SelectionBar(selectionCount: Int, actions: MediaSelectionActions) {
 
 private const val LOAD_MORE_THRESHOLD = 72
 private const val MEDIA_CELL = "media"
+private const val GROUP_HEADER = "group"
+
+private fun groupKey(group: MediaGroup): String = "group.${group.year}.${group.month}.${group.day}"
+
+/** "Wednesday, October 14, 2026" / "October 2026" in the user's locale, with the section's image count. */
+@Composable
+private fun GroupHeader(group: MediaGroup, modifier: Modifier = Modifier) {
+    val locale = LocalConfiguration.current.locales[0]
+    val label = remember(group.year, group.month, group.day, locale) {
+        val calendar = Calendar.getInstance().apply {
+            clear()
+            set(group.year, group.month - 1, if (group.day == 0) 1 else group.day)
+        }
+        val skeleton = if (group.day == 0) "yMMMM" else "yMMMdEEE"
+        SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(locale, skeleton), locale).format(calendar.time)
+    }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = MapleSettingsDefaults.horizontalPadding, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+        Text(
+            pluralStringResource(R.plurals.gallery_image_count, group.count, group.count),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
 private const val PINCH_IN_STEP = 1.3f
 private const val PINCH_OUT_STEP = 0.77f
 private val AUTO_SCROLL_EDGE = 64.dp

@@ -1,7 +1,9 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -27,22 +29,40 @@ class GalleryPreferencesTest {
     }
 
     @Test
-    fun sortMemoryIsPerAlbumAndFeedsTheDefault() {
+    fun thisAlbumOnlyKeepsTheSortForOneAlbumOtherwiseItIsTheDefault() {
         assertEquals(MediaSort.DEFAULT, preferences.defaultSort)
+        assertEquals(MediaGrouping.NONE, preferences.defaultGrouping)
         assertNull(preferences.sortFor(AlbumKind.MEDIA, 42L))
 
         val byName = MediaSort(MediaSortField.NAME, ascending = true)
-        preferences.rememberSort(AlbumKind.MEDIA, 42L, byName)
+        preferences.applySort(AlbumKind.MEDIA, 42L, byName, MediaGrouping.NONE, thisAlbumOnly = true)
         assertEquals(byName, preferences.sortFor(AlbumKind.MEDIA, 42L))
-        assertEquals(byName, preferences.defaultSort)
+        assertEquals(MediaGrouping.NONE, preferences.groupingFor(AlbumKind.MEDIA, 42L))
+        assertTrue(preferences.hasOwnSort(AlbumKind.MEDIA, 42L))
+        assertEquals("the default stays", MediaSort.DEFAULT, preferences.defaultSort)
         assertNull("another album keeps no memory", preferences.sortFor(AlbumKind.MEDIA, 43L))
         assertNull("kinds do not share keys", preferences.sortFor(AlbumKind.FOLDER, 42L))
 
-        val bySize = MediaSort(MediaSortField.SIZE, ascending = false)
-        preferences.rememberSort(AlbumKind.ALL, MediaCatalog.ALL_BUCKETS, bySize)
-        assertEquals(bySize, preferences.sortFor(AlbumKind.ALL, MediaCatalog.ALL_BUCKETS))
-        assertEquals(bySize, preferences.defaultSort)
-        assertEquals(byName, preferences.sortFor(AlbumKind.MEDIA, 42L))
+        val byMonth = MediaSort(MediaSortField.DATE_TAKEN, ascending = false)
+        preferences.applySort(AlbumKind.ALL, MediaCatalog.ALL_BUCKETS, byMonth, MediaGrouping.MONTH, thisAlbumOnly = false)
+        assertEquals(byMonth, preferences.defaultSort)
+        assertEquals(MediaGrouping.MONTH, preferences.defaultGrouping)
+        assertFalse(preferences.hasOwnSort(AlbumKind.ALL, MediaCatalog.ALL_BUCKETS))
+        assertEquals("an album with its own choice keeps it", byName, preferences.sortFor(AlbumKind.MEDIA, 42L))
+
+        // Unticking "this album only" drops the album's own choice; it follows the default again.
+        preferences.applySort(AlbumKind.MEDIA, 42L, byMonth, MediaGrouping.DAY, thisAlbumOnly = false)
+        assertNull(preferences.sortFor(AlbumKind.MEDIA, 42L))
+        assertNull(preferences.groupingFor(AlbumKind.MEDIA, 42L))
+        assertEquals(MediaGrouping.DAY, preferences.defaultGrouping)
+    }
+
+    @Test
+    fun theAlbumGridSortIsRemembered() {
+        assertEquals(MediaSort.DEFAULT, preferences.albumSort)
+        preferences.albumSort = MediaSort(MediaSortField.SIZE, ascending = true)
+        assertEquals(MediaSort(MediaSortField.SIZE, ascending = true), GalleryPreferences(RuntimeEnvironment.getApplication()).albumSort)
+        assertNull(GalleryPreferences.decodeGrouping("WEEK"))
     }
 
     @Test

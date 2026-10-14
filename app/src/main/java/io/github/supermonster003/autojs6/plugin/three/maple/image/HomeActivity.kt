@@ -132,7 +132,7 @@ class HomeActivity : ConfiguredActivity() {
                                 },
                                 onOpen = ::openImage,
                                 onLoadMore = gallery::loadMore,
-                                onSort = gallery::setGridSort,
+                                onSort = { sort, grouping, thisAlbumOnly -> gallery.setGridSort(sort, grouping, thisAlbumOnly) },
                                 onRevealed = gallery::clearReveal,
                                 onColumns = gallery::setColumns,
                                 onRefresh = gallery::refreshGrid,

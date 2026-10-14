@@ -53,7 +53,7 @@ class MediaGridSelectionTest {
             onBack = {},
             onOpen = { opened = it.id },
             onLoadMore = {},
-            onSort = {},
+            onSort = { _, _, _ -> },
             onRevealed = {},
             onColumns = {},
             onRefresh = {},
@@ -126,7 +126,7 @@ class MediaGridSelectionTest {
             MapleTheme(palette = testPalette()) {
                 MediaGridScreen(
                     state = state,
-                    callbacks = MediaGridCallbacks(onBack = {}, onOpen = {}, onLoadMore = {}, onSort = {}, onRevealed = {}, onColumns = {}, onRefresh = {}),
+                    callbacks = MediaGridCallbacks(onBack = {}, onOpen = {}, onLoadMore = {}, onSort = { _, _, _ -> }, onRevealed = {}, onColumns = {}, onRefresh = {}),
                     selectionActions = MediaSelectionActions(onRename = {}),
                 )
             }

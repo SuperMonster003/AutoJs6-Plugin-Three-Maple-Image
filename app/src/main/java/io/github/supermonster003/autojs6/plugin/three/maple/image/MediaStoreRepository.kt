@@ -90,7 +90,7 @@ internal class MediaStoreRepository(
     ): List<MediaItem> {
         // Excluded folders leave "all images" (ROADMAP 7.4); filtering provider pages would shift the offsets, so
         // that view pages through a filtered copy of the full scan instead.
-        if (sort.field == MediaSortField.NAME || excludes(bucketId, marks)) {
+        if (sort.field == MediaSortField.NAME || sort.field == MediaSortField.RANDOM || excludes(bucketId, marks)) {
             val album = ordered(bucketId, sort, marks)
             return album.subList(offset.coerceAtMost(album.size), (offset + limit).coerceAtMost(album.size))
         }
@@ -132,7 +132,7 @@ internal class MediaStoreRepository(
 
     /** Every image of one album in the requested order; the viewer pages through this list (ROADMAP 6.3). */
     suspend fun loadBucketAll(bucketId: Long, sort: MediaSort = MediaSort.DEFAULT, marks: FolderMarkState = FolderMarkState.NONE): List<MediaItem> {
-        if (sort.field == MediaSortField.NAME || excludes(bucketId, marks)) return ordered(bucketId, sort, marks)
+        if (sort.field == MediaSortField.NAME || sort.field == MediaSortField.RANDOM || excludes(bucketId, marks)) return ordered(bucketId, sort, marks)
         // The shared full scan is already in the default order (the provider query below would return the same rows).
         if (sort == MediaSort.DEFAULT) sharedAll?.let { all ->
             return if (bucketId == MediaCatalog.ALL_BUCKETS) all else withContext(Dispatchers.Default) { all.filter { it.bucketId == bucketId } }
@@ -286,6 +286,8 @@ internal class MediaStoreRepository(
             MediaSortField.DATE_MODIFIED -> MediaStore.Images.Media.DATE_MODIFIED
             MediaSortField.DATE_TAKEN -> MediaStore.Images.Media.DATE_TAKEN
             MediaSortField.SIZE -> MediaStore.Images.Media.SIZE
+            // Random orders are shuffled in memory; a provider query never asks for one.
+            MediaSortField.RANDOM -> MediaStore.Images.Media.DATE_MODIFIED
         }
         val direction = if (sort.ascending) "ASC" else "DESC"
         return "$column $direction, ${MediaStore.Images.Media._ID} $direction"

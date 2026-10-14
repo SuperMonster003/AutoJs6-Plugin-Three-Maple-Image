@@ -6,6 +6,7 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -38,6 +39,7 @@ class GalleryPreferencesInstrumentationTest {
     private var originalRequested = false
     private var originalColumns = GalleryPreferences.DEFAULT_COLUMNS
     private var originalDefaultSort = MediaSort.DEFAULT
+    private var originalDefaultGrouping = MediaGrouping.NONE
 
     @Before
     fun rememberState() {
@@ -45,6 +47,7 @@ class GalleryPreferencesInstrumentationTest {
         record.markRequested()
         originalColumns = preferences.mediaColumns
         originalDefaultSort = preferences.defaultSort
+        originalDefaultGrouping = preferences.defaultGrouping
     }
 
     @After
@@ -52,6 +55,57 @@ class GalleryPreferencesInstrumentationTest {
         if (!originalRequested) record.reset()
         preferences.mediaColumns = originalColumns
         preferences.defaultSort = originalDefaultSort
+        preferences.defaultGrouping = originalDefaultGrouping
+    }
+
+    @Test
+    fun aDayGroupingForThisAlbumShowsDateSections() {
+        val folder = "MapleGroupTest-" + UUID.randomUUID().toString().take(8)
+        val inserted = listOf(Color.RED, Color.GREEN, Color.BLUE).mapIndexed { index, color ->
+            MediaStoreTestImages.insert(context, folder, "group-${index + 1}.png", color)
+        }
+        try {
+            val ids = inserted.map { ContentUris.parseId(it) }.toSet()
+            val bucketId = runBlocking { MediaStoreRepository(context).also { it.invalidate() }.loadAll() }.first { it.id in ids }.bucketId
+            ActivityScenario.launch(HomeActivity::class.java).use { scenario ->
+                val albumTag = "maple.gallery.album.media.$bucketId"
+                compose.waitUntil(TIMEOUT_MILLIS) { compose.onAllNodes(hasTestTag("maple.gallery.grid")).fetchSemanticsNodes().isNotEmpty() }
+                compose.onNodeWithTag("maple.gallery.grid").performScrollToNode(hasTestTag(albumTag))
+                compose.onNodeWithTag(albumTag).performClick()
+                compose.waitUntil(TIMEOUT_MILLIS) { compose.onAllNodes(hasTestTag("maple.media.grid")).fetchSemanticsNodes().isNotEmpty() }
+
+                compose.onNodeWithTag("maple.media.sort").performClick()
+                compose.onNodeWithTag("maple.sort.date_taken").performScrollTo().performClick()
+                compose.onNodeWithTag("maple.sort.descending").performScrollTo().performClick()
+                compose.onNodeWithTag("maple.group.day").performScrollTo().performClick()
+                compose.onNodeWithTag("maple.sort.thisAlbumOnly").performScrollTo().performClick()
+                compose.onNodeWithTag("maple.dialog.confirm").performClick()
+                compose.waitUntil(TIMEOUT_MILLIS) {
+                    var groups: List<MediaGroup> = emptyList()
+                    scenario.onActivity { activity -> groups = activity.galleryForTesting.grid.value.groups }
+                    groups.sumOf { it.count } == ids.size
+                }
+                compose.waitUntil(TIMEOUT_MILLIS) { compose.onAllNodes(hasTestTag("maple.media.stickyGroup")).fetchSemanticsNodes().isNotEmpty() }
+                assertEquals(MediaGrouping.DAY, preferences.groupingFor(AlbumKind.MEDIA, bucketId))
+                assertEquals(MediaSort(MediaSortField.DATE_TAKEN, ascending = false), preferences.sortFor(AlbumKind.MEDIA, bucketId))
+                assertEquals("the default stays", originalDefaultGrouping, preferences.defaultGrouping)
+
+                // A random order cannot group: the grid goes back to plain pages.
+                compose.onNodeWithTag("maple.media.sort").performClick()
+                compose.onNodeWithTag("maple.sort.random").performScrollTo().performClick()
+                compose.onNodeWithTag("maple.dialog.confirm").performClick()
+                compose.waitUntil(TIMEOUT_MILLIS) {
+                    var plain = false
+                    scenario.onActivity { activity ->
+                        val grid = activity.galleryForTesting.grid.value
+                        plain = grid.sort.field == MediaSortField.RANDOM && grid.groups.isEmpty() && grid.items.size == ids.size
+                    }
+                    plain
+                }
+            }
+        } finally {
+            MediaStoreTestImages.cleanUp(context, inserted, folder)
+        }
     }
 
     @Test
@@ -86,18 +140,18 @@ class GalleryPreferencesInstrumentationTest {
                 }
                 assertEquals(3, preferences.mediaColumns)
 
-                // Name ascending is remembered for this album and becomes the default.
+                // Name ascending without "this album only" becomes the default (ROADMAP 7.5 sort dialog).
                 compose.onNodeWithTag("maple.media.sort").performClick()
-                compose.onNodeWithTag("maple.sort.name").performClick()
-                compose.onNodeWithTag("maple.media.sort").performClick()
-                compose.onNodeWithTag("maple.sort.direction").performClick()
+                compose.onNodeWithTag("maple.sort.name").performScrollTo().performClick()
+                compose.onNodeWithTag("maple.sort.ascending").performScrollTo().performClick()
+                compose.onNodeWithTag("maple.dialog.confirm").performClick()
                 val byName = MediaSort(MediaSortField.NAME, ascending = true)
                 compose.waitUntil(TIMEOUT_MILLIS) {
                     var sort = MediaSort.DEFAULT
                     scenario.onActivity { activity -> sort = activity.galleryForTesting.grid.value.sort }
                     sort == byName
                 }
-                assertEquals(byName, preferences.sortFor(AlbumKind.MEDIA, bucketId))
+                assertEquals(null, preferences.sortFor(AlbumKind.MEDIA, bucketId))
                 assertEquals(byName, preferences.defaultSort)
 
                 // Recreation (rotation) keeps the media grid route, its sort and its column count.

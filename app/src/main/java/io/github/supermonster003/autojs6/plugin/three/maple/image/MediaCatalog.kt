@@ -1,5 +1,9 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
+import java.util.Calendar
+import java.util.TimeZone
+import kotlin.random.Random
+
 /** One MediaStore image row as the gallery keeps it in memory (ROADMAP T6). */
 internal data class MediaItem(
     val id: Long,
@@ -49,11 +53,65 @@ internal data class MediaBucket(
     val volume: String = MediaCatalog.PRIMARY_VOLUME,
 )
 
-internal enum class MediaSortField { NAME, DATE_MODIFIED, DATE_TAKEN, SIZE }
+internal enum class MediaSortField { NAME, DATE_MODIFIED, DATE_TAKEN, SIZE, RANDOM }
 
-internal data class MediaSort(val field: MediaSortField = MediaSortField.DATE_MODIFIED, val ascending: Boolean = false) {
+/** [seed] shuffles a [MediaSortField.RANDOM] order; it is picked when an album opens and never stored. */
+internal data class MediaSort(val field: MediaSortField = MediaSortField.DATE_MODIFIED, val ascending: Boolean = false, val seed: Long = 0L) {
     companion object {
         val DEFAULT = MediaSort()
+    }
+}
+
+/** Date sections of a media grid (ROADMAP 7.5); they follow the date the album is sorted by. */
+internal enum class MediaGrouping { NONE, DAY, MONTH }
+
+/** One section of a sorted album: [start] and [count] index its items; [day] is 0 for a month section. */
+internal data class MediaGroup(val year: Int, val month: Int, val day: Int, val start: Int, val count: Int)
+
+/**
+ * Positions of a media grid with section headers (ROADMAP 7.5): each group adds one full-width header before its
+ * items. Without groups grid positions and item indices are the same.
+ */
+internal class MediaGroupLayout(private val groups: List<MediaGroup>, private val itemCount: Int) {
+    /** Grid position of each group's header. */
+    private val headers: IntArray = IntArray(groups.size).also { positions ->
+        groups.forEachIndexed { index, group -> positions[index] = group.start + index }
+    }
+
+    val gridCount: Int get() = itemCount + groups.size
+
+    /** The group that holds item [itemIndex] (binary search over the group starts). */
+    private fun groupOfItem(itemIndex: Int): Int {
+        var low = 0
+        var high = groups.size - 1
+        while (low < high) {
+            val mid = (low + high + 1) / 2
+            if (groups[mid].start <= itemIndex) low = mid else high = mid - 1
+        }
+        return low
+    }
+
+    fun gridIndex(itemIndex: Int): Int = if (groups.isEmpty()) itemIndex else itemIndex + groupOfItem(itemIndex) + 1
+
+    private fun groupIndexAt(gridIndex: Int): Int {
+        var low = 0
+        var high = groups.size - 1
+        while (low < high) {
+            val mid = (low + high + 1) / 2
+            if (headers[mid] <= gridIndex) low = mid else high = mid - 1
+        }
+        return low
+    }
+
+    /** The group shown at grid position [gridIndex] (its header or one of its items); null without groups. */
+    fun groupAt(gridIndex: Int): MediaGroup? = if (groups.isEmpty()) null else groups[groupIndexAt(gridIndex)]
+
+    /** The item at grid position [gridIndex], or null for a header. */
+    fun itemIndex(gridIndex: Int): Int? {
+        if (groups.isEmpty()) return gridIndex
+        val index = groupIndexAt(gridIndex)
+        val header = headers[index]
+        return if (gridIndex == header) null else groups[index].start + (gridIndex - header - 1)
     }
 }
 
@@ -95,6 +153,8 @@ internal object MediaCatalog {
             MediaSortField.DATE_MODIFIED -> compareBy { it.dateModifiedSeconds }
             MediaSortField.DATE_TAKEN -> compareBy { it.effectiveTakenMillis }
             MediaSortField.SIZE -> compareBy { it.sizeBytes }
+            // Random orders come from [sort]; the id keeps a comparator total for callers that ask anyway.
+            MediaSortField.RANDOM -> compareBy { it.id }
         }
         // The id breaks ties in the same direction as the field, exactly like the provider's "<column> DESC, _id DESC",
         // so in-memory and provider-side pages never disagree on boundaries.
@@ -102,7 +162,40 @@ internal object MediaCatalog {
         return if (sort.ascending) combined else combined.reversed()
     }
 
-    fun sort(items: List<MediaItem>, sort: MediaSort): List<MediaItem> = items.sortedWith(comparator(sort))
+    fun sort(items: List<MediaItem>, sort: MediaSort): List<MediaItem> =
+        if (sort.field == MediaSortField.RANDOM) items.sortedBy { it.id }.shuffled(Random(sort.seed)) else items.sortedWith(comparator(sort))
+
+    /** Grouping only follows a date order (by date taken or date modified). */
+    fun groupable(sort: MediaSort): Boolean = sort.field == MediaSortField.DATE_TAKEN || sort.field == MediaSortField.DATE_MODIFIED
+
+    /**
+     * The day or month sections of [items], which are in [sort] order; consecutive items of one calendar day /
+     * month in [zone] form a section. Empty for [MediaGrouping.NONE] or an order that is not by date.
+     */
+    fun groups(items: List<MediaItem>, sort: MediaSort, grouping: MediaGrouping, zone: TimeZone): List<MediaGroup> {
+        if (grouping == MediaGrouping.NONE || !groupable(sort) || items.isEmpty()) return emptyList()
+        val calendar = Calendar.getInstance(zone)
+        val groups = ArrayList<MediaGroup>()
+        var year = -1
+        var month = -1
+        var day = -1
+        var start = 0
+        items.forEachIndexed { index, item ->
+            calendar.timeInMillis = if (sort.field == MediaSortField.DATE_TAKEN) item.effectiveTakenMillis else item.dateModifiedSeconds * 1000L
+            val y = calendar.get(Calendar.YEAR)
+            val m = calendar.get(Calendar.MONTH) + 1
+            val d = if (grouping == MediaGrouping.DAY) calendar.get(Calendar.DAY_OF_MONTH) else 0
+            if (y != year || m != month || d != day) {
+                if (index > 0) groups += MediaGroup(year, month, day, start, index - start)
+                year = y
+                month = m
+                day = d
+                start = index
+            }
+        }
+        groups += MediaGroup(year, month, day, start, items.size - start)
+        return groups
+    }
 
     private val coverOrder: Comparator<MediaItem> =
         compareBy<MediaItem> { it.effectiveTakenMillis }.thenBy { it.dateModifiedSeconds }.thenBy { it.id }
@@ -131,6 +224,7 @@ internal object MediaCatalog {
             MediaSortField.DATE_MODIFIED -> compareBy { it.latestModifiedSeconds }
             MediaSortField.DATE_TAKEN -> compareBy { it.cover.effectiveTakenMillis }
             MediaSortField.SIZE -> compareBy { it.count }
+            MediaSortField.RANDOM -> Comparator { a, b -> ImageSiblingDiscoveryPolicy.compareNaturally(a.name, b.name) }
         }
         val directed = if (sort.ascending) primary else primary.reversed()
         return buckets.sortedWith(

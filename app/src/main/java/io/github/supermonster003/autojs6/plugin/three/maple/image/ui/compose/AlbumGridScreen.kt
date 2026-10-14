@@ -46,7 +46,6 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.GalleryUiState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaAccessState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaPermissionAction
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaSort
-import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaSortField
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
 
 internal class AlbumGridCallbacks(
@@ -116,7 +115,19 @@ internal fun AlbumGridScreen(
             IconButton(onClick = { sortOpen = true }, modifier = Modifier.testTag("maple.gallery.sort")) {
                 Icon(painterResource(R.drawable.ic_swap_vert_24), contentDescription = stringResource(R.string.gallery_sort))
             }
-            SortMenu(expanded = sortOpen, sort = state.albumSort, dateFields = false, onDismiss = { sortOpen = false }, onSelect = callbacks.onAlbumSort)
+            if (sortOpen) {
+                SortDialog(
+                    fields = albumSortFields,
+                    sort = state.albumSort,
+                    grouping = null,
+                    thisAlbumOnly = null,
+                    onDismiss = { sortOpen = false },
+                    onConfirm = { sort, _, _ ->
+                        sortOpen = false
+                        callbacks.onAlbumSort(sort)
+                    },
+                )
+            }
             IconButton(onClick = { menuOpen = true }, modifier = Modifier.testTag("maple.gallery.more")) {
                 Icon(painterResource(R.drawable.ic_more_vert_24), contentDescription = stringResource(R.string.action_more))
             }
@@ -350,33 +361,5 @@ private fun AlbumSelectionBar(selectionCount: Int, actions: AlbumSelectionAction
         }
     }
     if (all.isNotEmpty()) MapleBottomActionBar(actions = all, navigationBarInset = true)
-}
-
-/** Sort menu shared by the album list and the media grid: fields with a check mark, then the direction. */
-@Composable
-internal fun SortMenu(expanded: Boolean, sort: MediaSort, dateFields: Boolean, onDismiss: () -> Unit, onSelect: (MediaSort) -> Unit) {
-    DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
-        val fields = buildList {
-            add(MediaSortField.NAME to R.string.gallery_sort_name)
-            if (dateFields) {
-                add(MediaSortField.DATE_MODIFIED to R.string.gallery_sort_date_modified)
-                add(MediaSortField.DATE_TAKEN to R.string.gallery_sort_date_taken)
-            }
-            add(MediaSortField.SIZE to R.string.gallery_sort_size)
-        }
-        for ((field, label) in fields) {
-            DropdownMenuItem(
-                text = { Text(stringResource(label)) },
-                trailingIcon = if (sort.field == field) ({ Icon(painterResource(R.drawable.ic_check_24), contentDescription = null) }) else null,
-                onClick = { onDismiss(); onSelect(sort.copy(field = field)) },
-                modifier = Modifier.testTag("maple.sort.${field.name.lowercase()}"),
-            )
-        }
-        DropdownMenuItem(
-            text = { Text(stringResource(if (sort.ascending) R.string.gallery_sort_descending else R.string.gallery_sort_ascending)) },
-            onClick = { onDismiss(); onSelect(sort.copy(ascending = !sort.ascending)) },
-            modifier = Modifier.testTag("maple.sort.direction"),
-        )
-    }
 }
 

@@ -72,7 +72,8 @@ class MediaCatalogTest {
     @Test
     fun everySortFieldOrdersBothWaysWithStableTieBreakers() {
         val cataloged = MediaCatalog.filter(library(), supports)
-        for (field in MediaSortField.entries) {
+        // A random order has no direction; MediaGroupingTest covers it.
+        for (field in MediaSortField.entries - MediaSortField.RANDOM) {
             for (ascending in listOf(true, false)) {
                 val sorted = MediaCatalog.sort(cataloged, MediaSort(field, ascending))
                 assertEquals(cataloged.size, sorted.size)
@@ -81,6 +82,7 @@ class MediaCatalogTest {
                     MediaSortField.DATE_MODIFIED -> { it -> it.dateModifiedSeconds }
                     MediaSortField.DATE_TAKEN -> { it -> it.effectiveTakenMillis }
                     MediaSortField.SIZE -> { it -> it.sizeBytes }
+                    MediaSortField.RANDOM -> { it -> it.id }
                 }
                 if (field != MediaSortField.NAME) {
                     assertTrue("$field asc=$ascending", sorted.zipWithNext().all { (a, b) -> if (ascending) keys(a) <= keys(b) else keys(a) >= keys(b) })
