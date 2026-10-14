@@ -165,6 +165,7 @@
     <string name="image_editor_brush_mosaic">Mosaic</string>
     <string name="image_editor_brush_pen">Pen</string>
     <string name="image_editor_brush_width">Brush width</string>
+    <string name="image_editor_color_picked">Drawing color: %1$s</string>
     <string name="image_editor_compare">Hold to show the original</string>
     <string name="image_editor_contrast">Contrast</string>
     <string name="image_editor_crop">Crop</string>

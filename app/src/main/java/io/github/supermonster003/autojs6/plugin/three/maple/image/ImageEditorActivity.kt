@@ -108,6 +108,9 @@ open class ImageEditorActivity : ConfiguredActivity() {
     /** The image as edited so far (test hook). */
     internal val editedBitmapForTesting: Bitmap? get() = bitmap
 
+    /** The color of brush and shapes (test hook). */
+    internal val drawingColorForTesting: Int get() = brushColor
+
     /** The canvas (test hook). */
     internal val editingViewForTesting: ImageEditingView get() = editor
 
@@ -135,6 +138,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
             shapeKindLabels = ShapeKind.entries.map { getString(shapeLabel(it)) },
         )
         editor.onShapesChanged = { ui = ui.copy(shapeSelected = editor.hasSelectedShape()) }
+        editor.onColorPicked = ::onColorPicked
         renderBrushToolControls()
         val callbacks = EditorCallbacks(
             onBack = ::requestExit,
@@ -540,6 +544,13 @@ open class ImageEditorActivity : ConfiguredActivity() {
         }
         finishActiveToolUi()
         commitOperation { ImageEditingEngine.applyBrush(it, strokes) }
+    }
+
+    /** A long press on the canvas picked [color] (ROADMAP 8.1, T16): it becomes the drawing color of brush and shapes. */
+    private fun onColorPicked(color: Int) {
+        applyBrushColor(color)
+        val hex = String.format(java.util.Locale.ROOT, "#%06X", color and 0xFFFFFF)
+        Toast.makeText(this, getString(R.string.image_editor_color_picked, hex), Toast.LENGTH_SHORT).show()
     }
 
     /** Brush and shapes share one color (ROADMAP 8.1). */

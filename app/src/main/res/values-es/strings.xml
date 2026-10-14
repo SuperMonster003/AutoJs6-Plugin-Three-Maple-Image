@@ -165,6 +165,7 @@
     <string name="image_editor_brush_mosaic">Mosaico</string>
     <string name="image_editor_brush_pen">Lápiz</string>
     <string name="image_editor_brush_width">Grosor del pincel</string>
+    <string name="image_editor_color_picked">Color de dibujo: %1$s</string>
     <string name="image_editor_compare">Mantén pulsado para ver el original</string>
     <string name="image_editor_contrast">Contraste</string>
     <string name="image_editor_crop">Recortar</string>

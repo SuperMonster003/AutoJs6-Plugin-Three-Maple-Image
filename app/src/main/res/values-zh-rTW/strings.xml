@@ -165,6 +165,7 @@
     <string name="image_editor_brush_mosaic">馬賽克</string>
     <string name="image_editor_brush_pen">畫筆</string>
     <string name="image_editor_brush_width">畫筆寬度</string>
+    <string name="image_editor_color_picked">繪製顏色: %1$s</string>
     <string name="image_editor_compare">按住顯示原圖</string>
     <string name="image_editor_contrast">對比度</string>
     <string name="image_editor_crop">裁切</string>

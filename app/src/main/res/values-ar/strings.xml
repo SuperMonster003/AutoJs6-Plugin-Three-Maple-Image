@@ -165,6 +165,7 @@
     <string name="image_editor_brush_mosaic">فسيفساء</string>
     <string name="image_editor_brush_pen">قلم</string>
     <string name="image_editor_brush_width">عرض الفرشاة</string>
+    <string name="image_editor_color_picked">لون الرسم: %1$s</string>
     <string name="image_editor_compare">اضغط مطولا لعرض الصورة الأصلية</string>
     <string name="image_editor_contrast">التباين</string>
     <string name="image_editor_crop">اقتصاص</string>

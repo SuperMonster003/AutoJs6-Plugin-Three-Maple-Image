@@ -11,7 +11,10 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.util.TypedValue
+import android.graphics.Path
 import android.view.GestureDetector
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.graphics.withClip
@@ -19,6 +22,7 @@ import androidx.core.graphics.withRotation
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
@@ -60,13 +64,14 @@ internal class ImageEditingView @JvmOverloads constructor(
         val filled: Boolean,
     )
 
-    private enum class Mode(val hasToolGesture: Boolean) {
-        NORMAL(false),
-        ROTATION(false),
-        CROP(true),
-        BRUSH(true),
-        TEXT(true),
-        SHAPES(true),
+    /** [allowsColorPick]: a long press picks a color (ROADMAP 8.1, T16) where a drawing color is in use or no tool is. */
+    private enum class Mode(val hasToolGesture: Boolean, val allowsColorPick: Boolean) {
+        NORMAL(false, true),
+        ROTATION(false, false),
+        CROP(true, false),
+        BRUSH(true, true),
+        TEXT(true, false),
+        SHAPES(true, true),
     }
 
     private enum class ShapeDrag { NONE, CREATE, MOVE, HANDLE }
@@ -148,7 +153,35 @@ internal class ImageEditingView @JvmOverloads constructor(
             invalidate()
             return true
         }
+
+        override fun onLongPress(e: MotionEvent) {
+            startColorPick(e.x, e.y)
+        }
     })
+
+    /**
+     * Color picking (ROADMAP 8.1, T16): after a long press a magnifier follows the finger and letting go picks the
+     * pixel under it. The view position goes back to the bitmap through the same viewport as every tool, so the
+     * picked color is the bitmap pixel at any zoom and pan.
+     */
+    private var picking = false
+    private var pickViewX = 0f
+    private var pickViewY = 0f
+    private val magnifierPaint = Paint().apply { isFilterBitmap = false }
+    private val magnifierPath = Path()
+    private val magnifierSource = Rect()
+    private val magnifierTarget = RectF()
+    private val magnifierTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        textAlign = Paint.Align.CENTER
+        textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, resources.displayMetrics)
+    }
+
+    /** Receives the picked color (opaque) when the finger is lifted. */
+    var onColorPicked: ((Int) -> Unit)? = null
+
+    /** The color under the finger while picking, or null (test hook). */
+    fun pickingColor(): Int? = if (picking) colorUnderPick() else null
 
     /** Current zoom, 1 = fitted (test hook). */
     val zoom: Float get() = viewport.zoom
@@ -379,6 +412,7 @@ internal class ImageEditingView @JvmOverloads constructor(
 
     fun clearToolState() {
         mode = Mode.NORMAL
+        picking = false
         bitmapPaint.colorFilter = null
         previewBitmap = null
         rotationPreviewDegrees = 0f
@@ -409,6 +443,11 @@ internal class ImageEditingView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        // Compose does not clip interop views to their bounds: a zoomed image would cover the bars around the canvas.
+        canvas.withClip(0f, 0f, width.toFloat(), height.toFloat()) { drawContent(this) }
+    }
+
+    private fun drawContent(canvas: Canvas) {
         val source = bitmap ?: return
         if (imageRect.isEmpty) updateImageRect()
         compareImage?.takeUnless { it.bitmap.isRecycled }?.let { compare ->
@@ -429,11 +468,14 @@ internal class ImageEditingView @JvmOverloads constructor(
             Mode.SHAPES -> drawShapes(canvas)
             Mode.NORMAL -> Unit
         }
+        if (picking) drawMagnifier(canvas)
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (bitmap == null || compareImage != null) return false
+        if (!mode.hasToolGesture || mode.allowsColorPick) tapDetector.onTouchEvent(event)
+        if (picking) return handlePickTouch(event)
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> viewportGesture = !mode.hasToolGesture
             MotionEvent.ACTION_POINTER_DOWN -> if (!viewportGesture) {
@@ -442,7 +484,6 @@ internal class ImageEditingView @JvmOverloads constructor(
                 parent?.requestDisallowInterceptTouchEvent(true)
             }
         }
-        if (!mode.hasToolGesture) tapDetector.onTouchEvent(event)
         if (viewportGesture) return handleViewportTouch(event)
         when (mode) {
             Mode.CROP -> handleCropTouch(event)
@@ -454,6 +495,104 @@ internal class ImageEditingView @JvmOverloads constructor(
         // Keep the gesture even when the tool ignores its first finger, so that a second finger can still zoom.
         return true
     }
+
+    private fun startColorPick(x: Float, y: Float) {
+        if (!mode.allowsColorPick || compareImage != null || bitmap == null || !imageRect.contains(x, y)) return
+        // The stroke dot or shape the first finger began is not wanted any more.
+        cancelToolGesture()
+        picking = true
+        pickViewX = x
+        pickViewY = y
+        parent?.requestDisallowInterceptTouchEvent(true)
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        invalidate()
+    }
+
+    private fun handlePickTouch(event: MotionEvent): Boolean {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_MOVE -> {
+                // Inside the image and on screen, even while the finger strays.
+                pickViewX = event.x.coerceIn(max(imageRect.left, 0f), min(imageRect.right, width.toFloat()) - 0.5f)
+                pickViewY = event.y.coerceIn(max(imageRect.top, 0f), min(imageRect.bottom, height.toFloat()) - 0.5f)
+                invalidate()
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                val color = if (event.actionMasked == MotionEvent.ACTION_UP) colorUnderPick() else null
+                picking = false
+                viewportGesture = false
+                parent?.requestDisallowInterceptTouchEvent(false)
+                invalidate()
+                if (event.actionMasked == MotionEvent.ACTION_UP) performClick()
+                color?.let { onColorPicked?.invoke(it) }
+            }
+        }
+        return true
+    }
+
+    private fun pickedPixel(): Pair<Int, Int>? {
+        val source = bitmap ?: return null
+        val x = floor(viewport.toImageX(pickViewX)).toInt().coerceIn(0, source.width - 1)
+        val y = floor(viewport.toImageY(pickViewY)).toInt().coerceIn(0, source.height - 1)
+        return x to y
+    }
+
+    private fun colorUnderPick(): Int? {
+        val source = bitmap?.takeUnless(Bitmap::isRecycled) ?: return null
+        val (x, y) = pickedPixel() ?: return null
+        return source.getPixel(x, y) or OPAQUE
+    }
+
+    /** A round loupe above the finger (below it near the top): the pixels around the picked one, unsmoothed. */
+    private fun drawMagnifier(canvas: Canvas) {
+        val source = bitmap?.takeUnless(Bitmap::isRecycled) ?: return
+        val (pixelX, pixelY) = pickedPixel() ?: return
+        val color = source.getPixel(pixelX, pixelY) or OPAQUE
+        val radius = dp(MAGNIFIER_RADIUS_DP)
+        val gap = dp(MAGNIFIER_GAP_DP)
+        val centerX = pickViewX.coerceIn(radius, max(radius, width - radius))
+        var centerY = pickViewY - gap - radius
+        if (centerY - radius < 0f) centerY = pickViewY + gap + radius
+        val cell = radius * 2f / MAGNIFIER_PIXELS
+        val half = MAGNIFIER_PIXELS / 2
+        // Only the part of the 11 x 11 window that lies inside the bitmap is drawn; the rest stays dark.
+        magnifierSource.set(
+            max(0, pixelX - half),
+            max(0, pixelY - half),
+            min(source.width, pixelX + half + 1),
+            min(source.height, pixelY + half + 1),
+        )
+        val left = centerX - radius + (magnifierSource.left - (pixelX - half)) * cell
+        val top = centerY - radius + (magnifierSource.top - (pixelY - half)) * cell
+        magnifierTarget.set(left, top, left + magnifierSource.width() * cell, top + magnifierSource.height() * cell)
+        magnifierPath.reset()
+        magnifierPath.addCircle(centerX, centerY, radius, Path.Direction.CW)
+        canvas.withClip(magnifierPath) {
+            drawColor(MAGNIFIER_BACKGROUND)
+            drawBitmap(source, magnifierSource, magnifierTarget, magnifierPaint)
+            overlayPaint.style = Paint.Style.STROKE
+            overlayPaint.strokeWidth = dp(1.5f)
+            overlayPaint.color = if (luminance(color) > 0.5f) Color.BLACK else Color.WHITE
+            drawRect(centerX - cell / 2f, centerY - cell / 2f, centerX + cell / 2f, centerY + cell / 2f, overlayPaint)
+        }
+        overlayPaint.style = Paint.Style.STROKE
+        overlayPaint.strokeWidth = dp(6f)
+        overlayPaint.color = color
+        canvas.drawCircle(centerX, centerY, radius, overlayPaint)
+        overlayPaint.strokeWidth = dp(1f)
+        overlayPaint.color = Color.WHITE
+        canvas.drawCircle(centerX, centerY, radius + dp(3f), overlayPaint)
+        val label = String.format(java.util.Locale.ROOT, "#%06X", color and 0xFFFFFF)
+        val labelY = centerY + radius + dp(10f)
+        val labelWidth = magnifierTextPaint.measureText(label) + dp(16f)
+        val labelHeight = magnifierTextPaint.textSize + dp(8f)
+        overlayPaint.style = Paint.Style.FILL
+        overlayPaint.color = MAGNIFIER_BACKGROUND
+        canvas.drawRoundRect(centerX - labelWidth / 2f, labelY, centerX + labelWidth / 2f, labelY + labelHeight, labelHeight / 2f, labelHeight / 2f, overlayPaint)
+        canvas.drawText(label, centerX, labelY + labelHeight / 2f - (magnifierTextPaint.ascent() + magnifierTextPaint.descent()) / 2f, magnifierTextPaint)
+    }
+
+    private fun luminance(color: Int): Float =
+        (0.2126f * Color.red(color) + 0.7152f * Color.green(color) + 0.0722f * Color.blue(color)) / 255f
 
     /** Pans by the movement of the fingers' center and zooms by the change of their spread around it. */
     private fun handleViewportTouch(event: MotionEvent): Boolean {
@@ -968,6 +1107,11 @@ internal class ImageEditingView @JvmOverloads constructor(
         const val SHAPE_HANDLE_RADIUS_DP = 7f
         const val MIN_SHAPE_SCREEN_SIZE_DP = 12f
         const val SHAPE_HANDLE_OUTLINE = 0xFF202020.toInt()
+        const val MAGNIFIER_RADIUS_DP = 56f
+        const val MAGNIFIER_GAP_DP = 40f
+        const val MAGNIFIER_PIXELS = 11
+        const val MAGNIFIER_BACKGROUND = 0xE0202020.toInt()
+        const val OPAQUE = 0xFF000000.toInt()
 
         /** Fingers this close (mean distance from their center) only pan: their ratio would jump. */
         const val MIN_PINCH_SPAN_DP = 8f

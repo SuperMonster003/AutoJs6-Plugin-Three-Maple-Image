@@ -165,6 +165,7 @@
     <string name="image_editor_brush_mosaic">马赛克</string>
     <string name="image_editor_brush_pen">画笔</string>
     <string name="image_editor_brush_width">画笔宽度</string>
+    <string name="image_editor_color_picked">绘制颜色: %1$s</string>
     <string name="image_editor_compare">按住显示原图</string>
     <string name="image_editor_contrast">对比度</string>
     <string name="image_editor_crop">裁剪</string>
