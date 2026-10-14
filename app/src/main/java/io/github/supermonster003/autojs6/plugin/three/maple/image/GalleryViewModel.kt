@@ -1,6 +1,8 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.app.Application
+import android.os.SystemClock
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -481,14 +483,24 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         }
         searchJob = viewModelScope.launch {
             delay(SEARCH_DEBOUNCE_MILLIS)
+            val started = SystemClock.elapsedRealtime()
             _search.update { it.copy(searching = true) }
             val terms = MediaSearch.terms(query)
             val albumList = _albums.value.albums + _albums.value.folders
             val library = runCatching { media.loadAll() }.getOrDefault(emptyList())
+            val scanned = SystemClock.elapsedRealtime()
             val (albums, items) = withContext(Dispatchers.Default) {
                 albumList.filter { MediaSearch.matches(it.name, terms) } to MediaSearch.items(marks.visible(library), query)
             }
             _search.update { if (it.query == query) it.copy(albums = albums, items = items, searching = false) else it }
+            if (Log.isLoggable(SEARCH_LOG_TAG, Log.DEBUG)) {
+                val published = SystemClock.elapsedRealtime()
+                Log.d(
+                    SEARCH_LOG_TAG,
+                    "search over ${library.size} images: wait for scan ${scanned - started} ms, " +
+                        "filter ${published - scanned} ms, ${albums.size} albums and ${items.size} images, published at $published",
+                )
+            }
         }
     }
 
@@ -708,6 +720,9 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         const val PAGE_SIZE = 360
         /** Typing pauses this long before a search runs (ROADMAP 7.5). */
         const val SEARCH_DEBOUNCE_MILLIS = 250L
+
+        /** Search timings are logged only after `adb shell setprop log.tag.MapleSearch DEBUG`. */
+        const val SEARCH_LOG_TAG = "MapleSearch"
         private const val GRANT_SETTLE_MILLIS = 800L
         private const val MAX_REVEAL_PAGES = 100
     }

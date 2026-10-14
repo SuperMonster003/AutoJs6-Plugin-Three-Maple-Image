@@ -1,6 +1,8 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 
 import android.net.Uri
+import android.os.SystemClock
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import io.github.supermonster003.autojs6.plugin.three.maple.image.AlbumSummary
+import io.github.supermonster003.autojs6.plugin.three.maple.image.GalleryViewModel
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaItem
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaSearch
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
@@ -90,6 +94,12 @@ internal fun SearchResults(
     modifier: Modifier = Modifier,
 ) {
     val empty = search.albums.isEmpty() && search.items.isEmpty()
+    if (!empty && Log.isLoggable(GalleryViewModel.SEARCH_LOG_TAG, Log.DEBUG)) {
+        LaunchedEffect(search.albums, search.items) {
+            withFrameNanos { }
+            Log.d(GalleryViewModel.SEARCH_LOG_TAG, "results drawn at ${SystemClock.elapsedRealtime()}")
+        }
+    }
     when {
         MediaSearch.terms(search.query).isEmpty() -> Text(
             text = stringResource(R.string.search_prompt),

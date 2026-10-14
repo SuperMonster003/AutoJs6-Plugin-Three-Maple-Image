@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -37,6 +39,7 @@ internal class MediaStoreRepository(
 
     @Volatile
     private var cachedAll: List<MediaItem>? = null
+    private val scanLock = Mutex()
 
     /** The last name-ordered album, so name pages are slices instead of a fresh sort of the album per page. */
     @Volatile
@@ -57,18 +60,20 @@ internal class MediaStoreRepository(
      * viewer opened from the grid), so a large library is not queried twice.
      */
     suspend fun loadAll(): List<MediaItem> {
-        cachedAll?.let { return it }
-        sharedAll?.let { shared ->
-            cachedAll = shared
-            return shared
+        cachedScan()?.let { return it }
+        // The album list, a search and a viewer may ask at once (for example a search typed while the first album list
+        // still loads); they share one scan instead of each querying every row.
+        return scanLock.withLock {
+            cachedScan() ?: withContext(Dispatchers.IO) {
+                MediaCatalog.filter(query(selection = null, selectionArgs = null, sort = MediaSort.DEFAULT, limit = null, offset = 0), supports)
+            }.also { cataloged ->
+                cachedAll = cataloged
+                if (observers.get() > 0) sharedAll = cataloged
+            }
         }
-        val cataloged = withContext(Dispatchers.IO) {
-            MediaCatalog.filter(query(selection = null, selectionArgs = null, sort = MediaSort.DEFAULT, limit = null, offset = 0), supports)
-        }
-        cachedAll = cataloged
-        if (observers.get() > 0) sharedAll = cataloged
-        return cataloged
     }
+
+    private fun cachedScan(): List<MediaItem>? = cachedAll ?: sharedAll?.also { shared -> cachedAll = shared }
 
     /** Aggregation runs off the main thread: a library of tens of thousands of images takes a noticeable while. */
     suspend fun loadBuckets(): List<MediaBucket> {
