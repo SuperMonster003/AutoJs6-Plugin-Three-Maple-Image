@@ -25,6 +25,11 @@ internal sealed interface OutputCommitState {
     data class Failed(val error: Throwable?, val alreadyClaimed: Boolean = false) : OutputCommitState
 }
 
+/** The host replaced the original and can put it back once (ROADMAP 8.2, protocol v18). */
+internal data class ReplacementUndo(val historyId: String, val state: ReplacementUndoState = ReplacementUndoState.AVAILABLE)
+
+internal enum class ReplacementUndoState { AVAILABLE, RUNNING, RESTORED, FAILED }
+
 internal data class ImageEditorScreenState(
     val loading: Boolean = true,
     val loadFailed: Boolean = false,
@@ -37,6 +42,7 @@ internal data class ImageEditorScreenState(
     val currentStateId: Long = 0L,
     val savedStateId: Long = 0L,
     val output: OutputCommitState = OutputCommitState.Idle,
+    val replacementUndo: ReplacementUndo? = null,
 )
 
 internal class ImageEditorViewModel(application: Application) : AndroidViewModel(application) {
@@ -54,6 +60,7 @@ internal class ImageEditorViewModel(application: Application) : AndroidViewModel
     private var savedStateId = INITIAL_STATE_ID
     private var stateIdCounter = INITIAL_STATE_ID
     private var activeJob: Job? = null
+    private var replacementUndo: ReplacementUndo? = null
 
     val state: StateFlow<ImageEditorScreenState> = _state.asStateFlow()
     val operationErrors: SharedFlow<Unit> = _operationErrors.asSharedFlow()
@@ -202,14 +209,28 @@ internal class ImageEditorViewModel(application: Application) : AndroidViewModel
         activeJob = viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    ImageBitmapIO.writeOutput(
-                        resolver = getApplication<Application>().contentResolver,
-                        outputUri = activeRequest.outputUri,
-                        bitmap = currentBitmap,
-                        options = conversionOptions,
-                        maxOutputBytes = activeRequest.maxOutputBytes,
-                        temporaryDirectory = getApplication<Application>().cacheDir,
-                    )
+                    val host = activeRequest.hostOutput
+                    if (host != null) {
+                        val format = conversionOptions.format
+                        val published = host.publish(
+                            displayName = EditorSavePolicy.outputFileName(activeRequest.displayName, format, activeRequest.outputNameSuffix, saveOptions.overwrite),
+                            mimeType = format.mimeType,
+                            expectedSize = ImagePixelSize(currentBitmap.width, currentBitmap.height),
+                            overwrite = saveOptions.overwrite,
+                        ) { open ->
+                            ImageBitmapIO.writeOutput(currentBitmap, conversionOptions, activeRequest.maxOutputBytes, getApplication<Application>().cacheDir, open)
+                        }
+                        replacementUndo = published.replacementHistoryId?.let(::ReplacementUndo)
+                    } else {
+                        ImageBitmapIO.writeOutput(
+                            resolver = getApplication<Application>().contentResolver,
+                            outputUri = requireNotNull(activeRequest.outputUri),
+                            bitmap = currentBitmap,
+                            options = conversionOptions,
+                            maxOutputBytes = activeRequest.maxOutputBytes,
+                            temporaryDirectory = getApplication<Application>().cacheDir,
+                        )
+                    }
                 }
                 check(outputGuard.succeed())
                 savedStateId = currentStateId
@@ -248,7 +269,21 @@ internal class ImageEditorViewModel(application: Application) : AndroidViewModel
             currentStateId = currentStateId,
             savedStateId = savedStateId,
             output = output,
+            replacementUndo = replacementUndo,
         )
+    }
+
+    /** Puts the overwritten original back through the host (once); the state reports how it went. */
+    fun undoReplacement() {
+        val undo = replacementUndo?.takeIf { it.state == ReplacementUndoState.AVAILABLE } ?: return
+        val host = request?.hostOutput ?: return
+        replacementUndo = undo.copy(state = ReplacementUndoState.RUNNING)
+        publish()
+        viewModelScope.launch {
+            val restored = withContext(Dispatchers.IO) { runCatching { host.undo(undo.historyId) }.getOrDefault(false) }
+            replacementUndo = undo.copy(state = if (restored) ReplacementUndoState.RESTORED else ReplacementUndoState.FAILED)
+            publish()
+        }
     }
 
     override fun onCleared() {
@@ -473,14 +508,29 @@ internal class ImageConverterViewModel(application: Application) : AndroidViewMo
         bitmap: Bitmap,
         options: ImageConversionOptions,
     ): ImageOutputWriteResult = withContext(Dispatchers.IO) {
-        ImageBitmapIO.writeOutput(
-            resolver = getApplication<Application>().contentResolver,
-            outputUri = activeRequest.outputUri,
-            bitmap = bitmap,
-            options = options,
-            maxOutputBytes = activeRequest.maxOutputBytes,
-            temporaryDirectory = getApplication<Application>().cacheDir,
-        )
+        val host = activeRequest.hostOutput
+        if (host != null) {
+            // The converter always makes a new file next to the original (its overwrite option follows in 8.3).
+            var written: ImageOutputWriteResult? = null
+            host.publish(
+                displayName = EditorSavePolicy.outputFileName(activeRequest.displayName, options.format, activeRequest.outputNameSuffix, overwrite = false),
+                mimeType = options.format.mimeType,
+                expectedSize = options.targetSize,
+                overwrite = false,
+            ) { open ->
+                written = ImageBitmapIO.writeOutput(bitmap, options, activeRequest.maxOutputBytes, getApplication<Application>().cacheDir, open)
+            }
+            requireNotNull(written)
+        } else {
+            ImageBitmapIO.writeOutput(
+                resolver = getApplication<Application>().contentResolver,
+                outputUri = requireNotNull(activeRequest.outputUri),
+                bitmap = bitmap,
+                options = options,
+                maxOutputBytes = activeRequest.maxOutputBytes,
+                temporaryDirectory = getApplication<Application>().cacheDir,
+            )
+        }
     }
 
     override fun onCleared() {

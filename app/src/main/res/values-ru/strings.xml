@@ -259,7 +259,9 @@
     <string name="metadata_unavailable">Сведения об изображении недоступны</string>
     <string name="overwrite_confirm">Перезаписать</string>
     <string name="overwrite_failed">Не удалось перезаписать оригинал. Сохраните результат как новый файл</string>
+    <string name="overwrite_restored">Оригинал восстановлен</string>
     <string name="overwrite_saved">Оригинал перезаписан</string>
+    <string name="overwrite_undo_failed">Не удалось восстановить оригинал: файл за это время изменился</string>
     <string name="overwrite_without_undo_message">Нет места для копии оригинала, поэтому перезапись нельзя будет отменить.</string>
     <string name="overwrite_without_undo_title">Перезаписать без отмены?</string>
     <string name="page_counter">%1$d / %2$d</string>

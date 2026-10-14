@@ -259,7 +259,9 @@
     <string name="metadata_unavailable">معلومات الصورة غير متاحة</string>
     <string name="overwrite_confirm">استبدال</string>
     <string name="overwrite_failed">تعذر استبدال الصورة الأصلية. احفظ التعديل كملف جديد بدلا من ذلك</string>
+    <string name="overwrite_restored">تمت استعادة الصورة الأصلية</string>
     <string name="overwrite_saved">تم استبدال الصورة الأصلية</string>
+    <string name="overwrite_undo_failed">تعذرت استعادة الصورة الأصلية: تغيّر الملف في هذه الأثناء</string>
     <string name="overwrite_without_undo_message">لا توجد مساحة للاحتفاظ بنسخة من الصورة الأصلية, لذا لا يمكن التراجع عن هذا الاستبدال.</string>
     <string name="overwrite_without_undo_title">الاستبدال دون تراجع؟</string>
     <string name="page_counter">%1$d / %2$d</string>

@@ -259,7 +259,9 @@
     <string name="metadata_unavailable">画像情報を利用できません</string>
     <string name="overwrite_confirm">上書き</string>
     <string name="overwrite_failed">元の画像に上書きできませんでした. 新しいファイルとして保存してください</string>
+    <string name="overwrite_restored">元の画像に戻しました</string>
     <string name="overwrite_saved">元の画像に上書きしました</string>
+    <string name="overwrite_undo_failed">元の画像に戻せませんでした. その間にファイルが変更されています</string>
     <string name="overwrite_without_undo_message">元の画像のコピーを残す空き容量がないため, この上書きは元に戻せません.</string>
     <string name="overwrite_without_undo_title">元に戻せません. 上書きしますか?</string>
     <string name="page_counter">%1$d / %2$d</string>

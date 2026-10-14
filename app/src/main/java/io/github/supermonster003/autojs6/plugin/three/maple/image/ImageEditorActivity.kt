@@ -88,6 +88,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
 
     /** The last save replaces the original (ROADMAP 8.2); the standalone caller writes it back. */
     private var savedWithOverwrite = false
+    private var replacementUndoTimeout: Job? = null
     private var busy = false
     private var currentStateId = INITIAL_STATE_ID
     private var savedStateId = INITIAL_STATE_ID
@@ -148,6 +149,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
             onSave = ::save,
             onUndo = ::undo,
             onRedo = ::redo,
+            onUndoReplacement = { model.undoReplacement() },
             onCompare = ::onCompare,
             onRestoreOriginal = ::restoreOriginal,
             onReleaseHistory = ::showReleaseHistory,
@@ -201,8 +203,37 @@ open class ImageEditorActivity : ConfiguredActivity() {
         super.onSaveInstanceState(outState)
     }
 
+    /**
+     * The overwrite bar (ROADMAP 8.2): "Original overwritten" with "Undo" for [REPLACEMENT_UNDO_WINDOW_MILLIS],
+     * then the editor closes; after an undo it closes with what the host reported.
+     */
+    private fun renderReplacementUndo(undo: ReplacementUndo) {
+        when (undo.state) {
+            ReplacementUndoState.AVAILABLE -> {
+                if (ui.replacementUndo) return
+                ui = ui.copy(replacementUndo = true, replacementUndoBusy = false)
+                replacementUndoTimeout?.cancel()
+                replacementUndoTimeout = lifecycleScope.launch {
+                    delay(REPLACEMENT_UNDO_WINDOW_MILLIS)
+                    if (!isFinishing) finish()
+                }
+            }
+            ReplacementUndoState.RUNNING -> {
+                replacementUndoTimeout?.cancel()
+                ui = ui.copy(replacementUndoBusy = true)
+            }
+            ReplacementUndoState.RESTORED, ReplacementUndoState.FAILED -> {
+                replacementUndoTimeout?.cancel()
+                toast(if (undo.state == ReplacementUndoState.RESTORED) R.string.overwrite_restored else R.string.overwrite_undo_failed)
+                if (!isFinishing) finish()
+            }
+        }
+    }
+
     override fun onDestroy() {
         if (isChangingConfigurations && ::editor.isInitialized) model.uiState = captureUiState()
+        // The request-scoped host session ends with the editor (the host also closes it when the plugin dies).
+        if (isFinishing) request?.hostOutput?.close()
         textDialog = null
         saveDialog = null
         colorDialog = null
@@ -311,7 +342,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
         }
         when (val output = state.output) {
             OutputCommitState.Idle, OutputCommitState.Running -> Unit
-            OutputCommitState.Succeeded -> handleTerminalResult(success = true)
+            OutputCommitState.Succeeded -> handleTerminalResult(success = true, replacementUndo = state.replacementUndo)
             is OutputCommitState.Failed -> handleTerminalResult(success = false, output.error)
         }
         refreshActions(state)
@@ -337,7 +368,11 @@ open class ImageEditorActivity : ConfiguredActivity() {
         ui = ui.copy(comparing = compare != null)
     }
 
-    private fun handleTerminalResult(success: Boolean, error: Throwable? = null) {
+    private fun handleTerminalResult(success: Boolean, error: Throwable? = null, replacementUndo: ReplacementUndo? = null) {
+        if (replacementUndo != null && terminalResultHandled) {
+            renderReplacementUndo(replacementUndo)
+            return
+        }
         if (terminalResultHandled || isFinishing || isDestroyed) return
         terminalResultHandled = true
         if (success) {
@@ -349,6 +384,11 @@ open class ImageEditorActivity : ConfiguredActivity() {
                     activeRequest.transactionId,
                 ).apply { if (savedWithOverwrite) putExtra(StandaloneImageWork.EXTRA_OVERWRITE, true) },
             )
+            if (replacementUndo != null) {
+                // The host replaced the original: offer its one-step undo for a moment before leaving.
+                renderReplacementUndo(replacementUndo)
+                return
+            }
             toast(R.string.text_done)
         } else {
             toast(
@@ -1088,6 +1128,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
         private const val LOOK_TAB_FILTER = 0
         private const val LOOK_TAB_ADJUST = 1
         private const val LOOK_PREVIEW_DEBOUNCE_MILLIS = 40L
+        private const val REPLACEMENT_UNDO_WINDOW_MILLIS = 8_000L
         private const val MIN_PREVIEW_PIXELS = 360L * 480L
         private const val MAX_PREVIEW_PIXELS = 700_000L
         private const val FILTER_THUMBNAIL_DP = 64

@@ -259,7 +259,9 @@
     <string name="metadata_unavailable">La información de la imagen no está disponible</string>
     <string name="overwrite_confirm">Sobrescribir</string>
     <string name="overwrite_failed">No se pudo sobrescribir el original. Guarda la edición como un archivo nuevo</string>
+    <string name="overwrite_restored">Original restaurado</string>
     <string name="overwrite_saved">Original sobrescrito</string>
+    <string name="overwrite_undo_failed">No se pudo restaurar el original: el archivo cambió mientras tanto</string>
     <string name="overwrite_without_undo_message">No hay espacio para guardar una copia del original, así que no se podrá deshacer.</string>
     <string name="overwrite_without_undo_title">Sobrescribir sin poder deshacer?</string>
     <string name="page_counter">%1$d / %2$d</string>

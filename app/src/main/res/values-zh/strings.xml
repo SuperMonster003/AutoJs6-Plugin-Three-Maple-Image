@@ -259,7 +259,9 @@
     <string name="metadata_unavailable">图像信息不可用</string>
     <string name="overwrite_confirm">覆盖</string>
     <string name="overwrite_failed">无法覆盖原图, 请把编辑结果另存为新文件</string>
+    <string name="overwrite_restored">已恢复原图</string>
     <string name="overwrite_saved">已覆盖原图</string>
+    <string name="overwrite_undo_failed">无法恢复原图: 文件已被其他操作改动</string>
     <string name="overwrite_without_undo_message">没有空间保留原图的副本, 这次覆盖将无法撤销.</string>
     <string name="overwrite_without_undo_title">覆盖后无法撤销, 继续吗?</string>
     <string name="page_counter">%1$d / %2$d</string>

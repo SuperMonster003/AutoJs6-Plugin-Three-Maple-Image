@@ -175,6 +175,26 @@ internal object HostRequestFixtures {
         }
     }
 
+    /**
+     * "Edit image" or "Convert image" on [file] as a managed target (ROADMAP 8.2): readable through the plugin's own
+     * FileProvider, written through [session].
+     */
+    fun toolIntent(context: Context, file: File, session: IExplorerActionHostSession, actionId: String): Intent {
+        val uri = androidx.core.content.FileProvider.getUriForFile(context, context.packageName + ".standalone-images", file)
+        val parentUri = uri.buildUpon().path(uri.pathSegments.dropLast(1).joinToString("/", prefix = "/")).build()
+        val target = Bundle().apply {
+            putString(ExplorerActionTargetKeys.ID, "tool-target")
+            putParcelable(ExplorerActionTargetKeys.URI, uri)
+            putString(ExplorerActionTargetKeys.DISPLAY_NAME, file.name)
+            putInt(ExplorerActionTargetKeys.KIND, ExplorerActionValues.TARGET_FILE)
+            putString(ExplorerActionTargetKeys.MIME_TYPE, mimeTypeOf(file))
+            putLong(ExplorerActionTargetKeys.SIZE, file.length())
+            putLong(ExplorerActionTargetKeys.LAST_MODIFIED, file.lastModified())
+        }
+        val activity = if (actionId == ImageToolsPlugin.EDIT_ACTION_ID) ImageEditorActivity::class.java else ImageConverterActivity::class.java
+        return envelope(activity.name, context, actionId, uri, mimeTypeOf(file), file.name, file.length(), parentUri, target, session)
+    }
+
     private fun mimeTypeOf(file: File): String = when (file.extension.lowercase()) {
         "jpg", "jpeg" -> "image/jpeg"
         "webp" -> "image/webp"

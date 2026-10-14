@@ -124,6 +124,8 @@ open class ImageConverterActivity : ConfiguredActivity() {
     }
 
     override fun onDestroy() {
+        // The request-scoped host session ends with the converter.
+        if (isFinishing) request?.hostOutput?.close()
         form?.let { model.draft = it.snapshot() }
         super.onDestroy()
     }

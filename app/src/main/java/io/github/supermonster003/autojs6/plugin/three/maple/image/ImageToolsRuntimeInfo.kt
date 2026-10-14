@@ -60,7 +60,6 @@ internal fun imageToolsActionCatalog(): Bundle {
         labelFallback: String,
         activityClassName: String,
         priority: Int,
-        outputSuffix: String,
     ) = Bundle().apply {
         putString(ExplorerActionCatalogKeys.ID, id)
         putString(ExplorerActionCatalogKeys.LABEL_RESOURCE_NAME, labelResourceName)
@@ -69,7 +68,9 @@ internal fun imageToolsActionCatalog(): Bundle {
         putInt(ExplorerActionCatalogKeys.PRIORITY, priority)
         putInt(ExplorerActionCatalogKeys.CARDINALITY, ExplorerActionValues.CARDINALITY_SINGLE)
         putInt(ExplorerActionCatalogKeys.TARGET_KIND, ExplorerActionValues.TARGET_FILE)
-        putInt(ExplorerActionCatalogKeys.ACCESS_MODE, ExplorerActionValues.ACCESS_READ_ONLY)
+        // ROADMAP 8.2: the tools write through the host session, as a new sibling or over the target itself; a
+        // managed target has no output declaration (the host owns neither the name nor the format any more).
+        putInt(ExplorerActionCatalogKeys.ACCESS_MODE, ExplorerActionValues.ACCESS_MANAGE_TARGET)
         putInt(ExplorerActionCatalogKeys.PLACEMENT, ExplorerActionValues.PLACEMENT_OVERFLOW)
         putStringArrayList(
             ExplorerActionCatalogKeys.MIME_TYPES,
@@ -79,13 +80,6 @@ internal fun imageToolsActionCatalog(): Bundle {
             ExplorerActionCatalogKeys.EXTENSIONS,
             ArrayList(ImageToolsPlugin.INPUT_EXTENSIONS.asList()),
         )
-        putInt(ExplorerActionCatalogKeys.OUTPUT_MODE, ExplorerActionValues.OUTPUT_CREATE_SIBLING)
-        putStringArrayList(
-            ExplorerActionCatalogKeys.OUTPUT_MIME_TYPES,
-            ArrayList(ImageToolsPlugin.OUTPUT_MIME_TYPES.asList()),
-        )
-        putString(ExplorerActionCatalogKeys.OUTPUT_NAME_SUFFIX, outputSuffix)
-        putLong(ExplorerActionCatalogKeys.MAX_OUTPUT_BYTES, ImageToolsPlugin.MAX_OUTPUT_BYTES)
     }
 
     return Bundle().apply {
@@ -99,7 +93,6 @@ internal fun imageToolsActionCatalog(): Bundle {
                     labelFallback = "Edit image",
                     activityClassName = "${ImageToolsPlugin.PACKAGE_NAME}.ImageEditorActivity",
                     priority = 110,
-                    outputSuffix = "edited",
                 ),
                 action(
                     id = ImageToolsPlugin.CONVERT_ACTION_ID,
@@ -107,7 +100,6 @@ internal fun imageToolsActionCatalog(): Bundle {
                     labelFallback = "Convert image",
                     activityClassName = "${ImageToolsPlugin.PACKAGE_NAME}.ImageConverterActivity",
                     priority = 100,
-                    outputSuffix = "converted",
                 ),
             ),
         )

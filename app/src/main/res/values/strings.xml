@@ -259,7 +259,9 @@
     <string name="metadata_unavailable">Image information is unavailable</string>
     <string name="overwrite_confirm">Overwrite</string>
     <string name="overwrite_failed">The original could not be overwritten. Save the edit as a new file instead</string>
+    <string name="overwrite_restored">Original restored</string>
     <string name="overwrite_saved">Original overwritten</string>
+    <string name="overwrite_undo_failed">The original could not be restored: the file changed in the meantime</string>
     <string name="overwrite_without_undo_message">There is no room to keep a copy of the original, so this overwrite cannot be undone.</string>
     <string name="overwrite_without_undo_title">Overwrite without undo?</string>
     <string name="page_counter">%1$d / %2$d</string>

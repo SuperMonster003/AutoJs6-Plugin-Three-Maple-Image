@@ -16,7 +16,8 @@ import java.util.UUID
 internal data class ImageToolsRequest(
     val actionId: String,
     val inputUri: Uri,
-    val outputUri: Uri,
+    /** A plugin-owned file (standalone) or a host-owned output transaction; null when [hostOutput] writes. */
+    val outputUri: Uri?,
     val transactionId: String,
     val displayName: String,
     val declaredSize: Long,
@@ -26,12 +27,15 @@ internal data class ImageToolsRequest(
     val outputNameSuffix: String,
     /** The original may be replaced (ROADMAP 8.2): the save dialog then offers "Overwrite the original". */
     val canOverwrite: Boolean = false,
+    /** The host session of a "manage target" request (ROADMAP 8.2), which writes instead of [outputUri]. */
+    val hostOutput: HostToolOutput? = null,
 )
 
 /** Strictly validates the v3 read-only input and host-owned output transaction. */
 internal object ImageToolsRequestPolicy {
 
     fun resolve(context: Context, intent: Intent?, expectedActionId: String): ImageToolsRequest? {
+        if (intent?.hasExtra(ExplorerActionIntentExtras.HOST_SESSION) == true) return resolveManagedTarget(intent, expectedActionId)
         return try {
             intent ?: return null
             if (expectedActionId !in SUPPORTED_ACTION_IDS) return null
@@ -197,6 +201,37 @@ internal object ImageToolsRequestPolicy {
     private const val GENERIC_BINARY_MIME = "application/octet-stream"
     private const val GLOBAL_WILDCARD_MIME = "*/*"
     internal const val MAX_INPUT_BYTES = 256L * 1024L * 1024L
+
+    /**
+     * A "manage target" request (protocol v9 / v18, ROADMAP 8.2): one image target read through its grant, and the
+     * host session that writes a new sibling or replaces the target. Parsed by the same strict rules as the viewer's
+     * requests.
+     */
+    private fun resolveManagedTarget(intent: Intent, expectedActionId: String): ImageToolsRequest? = runCatching {
+        val expectedMode = when (expectedActionId) {
+            ImageToolsPlugin.EDIT_ACTION_ID -> ExplorerImageRequestMode.EDIT_TOOL
+            ImageToolsPlugin.CONVERT_ACTION_ID -> ExplorerImageRequestMode.CONVERT_TOOL
+            else -> return null
+        }
+        val explorer = ImageRequestPolicy.resolveExplorer(intent)?.takeIf { it.mode == expectedMode } ?: return null
+        val session = explorer.hostSession ?: return null
+        val target = explorer.targets.singleOrNull() ?: return null
+        if (target.image.declaredSize > MAX_INPUT_BYTES) return null
+        ImageToolsRequest(
+            actionId = expectedActionId,
+            inputUri = target.image.targetUri,
+            outputUri = null,
+            transactionId = explorer.requestId,
+            displayName = target.image.displayName,
+            declaredSize = target.image.declaredSize,
+            declaredMimeType = target.image.mimeType,
+            allowedOutputMimeTypes = ImageToolsPlugin.OUTPUT_MIME_TYPES.toSet(),
+            maxOutputBytes = ImageToolsPlugin.MAX_OUTPUT_BYTES,
+            outputNameSuffix = if (expectedActionId == ImageToolsPlugin.EDIT_ACTION_ID) "edited" else "converted",
+            canOverwrite = expectedActionId == ImageToolsPlugin.EDIT_ACTION_ID,
+            hostOutput = HostToolOutput(session, target.id),
+        )
+    }.getOrNull()
     private const val FORBIDDEN_INTENT_GRANTS =
         Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
             Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION or

@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -119,6 +120,9 @@ internal data class EditorUiModel(
     val shapeWidthProgress: Int = 6,
     /** A shape is selected, so it can be deleted (and color, width and fill change it). */
     val shapeSelected: Boolean = false,
+    /** The host overwrote the original; the bar offers its undo until the editor closes (ROADMAP 8.2). */
+    val replacementUndo: Boolean = false,
+    val replacementUndoBusy: Boolean = false,
 )
 
 internal class EditorCallbacks(
@@ -128,6 +132,7 @@ internal class EditorCallbacks(
     val onRedo: () -> Unit,
     /** True while the compare button is held (or switched on through accessibility), false when it is let go. */
     val onCompare: (Boolean) -> Unit,
+    val onUndoReplacement: () -> Unit,
     val onRestoreOriginal: () -> Unit,
     val onReleaseHistory: () -> Unit,
     val onGroup: (EditorGroup) -> Unit,
@@ -199,6 +204,30 @@ internal fun EditorScreen(
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                         .testTag("maple.editor.originalLabel"),
                 )
+            }
+            if (model.replacementUndo) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .background(canvas.scrimStrong, RoundedCornerShape(12.dp))
+                        .padding(start = 16.dp, end = 8.dp)
+                        .testTag("maple.editor.replacementUndo"),
+                ) {
+                    Text(
+                        text = stringResource(R.string.overwrite_saved),
+                        color = canvas.onScrim,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f),
+                    )
+                    androidx.compose.material3.TextButton(
+                        onClick = callbacks.onUndoReplacement,
+                        enabled = !model.replacementUndoBusy,
+                        modifier = Modifier.defaultMinSize(minHeight = 48.dp).testTag("maple.editor.replacementUndo.action"),
+                    ) { Text(stringResource(R.string.action_undo), color = canvas.accentOnScrim) }
+                }
             }
             if (model.loadFailed) {
                 Text(

@@ -15,7 +15,11 @@ internal object ThreeMapleImagePlugin {
     const val ACTION_ID = "view-image"
     const val MULTIPLE_ACTION_ID = "view-images"
     const val VARIANT = "default"
-    const val PROTOCOL_VERSION = 12
+    /**
+     * v18: edit and convert manage their target (v9) to overwrite it, with the host's one-step undo (v18); the
+     * host behaves the same as at v12 for everything else this plugin declares.
+     */
+    const val PROTOCOL_VERSION = 18
     const val REQUIRED_HOST_VERSION = 5276L
     const val LABEL_RESOURCE_NAME = "action_view_image"
     const val LABEL_FALLBACK = "View image"

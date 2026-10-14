@@ -71,8 +71,11 @@ class ExplorerActionActivity : Activity() {
         return when (request.mode) {
             ExplorerImageRequestMode.SINGLE_WITH_SIBLINGS -> buildSiblingViewerRequest(request)
             ExplorerImageRequestMode.EXPLICIT_SELECTION -> buildSelectionViewerRequest(request)
-            // A conversion request belongs to HostBatchConverterActivity, never to the viewer.
-            ExplorerImageRequestMode.BATCH_CONVERT -> null
+            // Conversion and tool requests belong to their own Activities, never to the viewer.
+            ExplorerImageRequestMode.BATCH_CONVERT,
+            ExplorerImageRequestMode.EDIT_TOOL,
+            ExplorerImageRequestMode.CONVERT_TOOL,
+            -> null
         }
     }
 

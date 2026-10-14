@@ -49,6 +49,12 @@ internal data class ExplorerDirectoryRequest(
 )
 
 internal enum class ExplorerImageRequestMode {
+    /** "Edit image" on one target, written through the host session (ROADMAP 8.2). */
+    EDIT_TOOL,
+
+    /** "Convert image" on one target, written through the host session (ROADMAP 8.2). */
+    CONVERT_TOOL,
+
     SINGLE_WITH_SIBLINGS,
     EXPLICIT_SELECTION,
     /** "Convert images" (ROADMAP 7.6): the selection plus a session that may create files next to it. */
@@ -126,6 +132,8 @@ internal object ImageRequestPolicy {
             ThreeMapleImagePlugin.ACTION_ID -> ExplorerImageRequestMode.SINGLE_WITH_SIBLINGS
             ThreeMapleImagePlugin.MULTIPLE_ACTION_ID -> ExplorerImageRequestMode.EXPLICIT_SELECTION
             ThreeMapleImagePlugin.CONVERT_IMAGES_ACTION_ID -> ExplorerImageRequestMode.BATCH_CONVERT
+            ImageToolsPlugin.EDIT_ACTION_ID -> ExplorerImageRequestMode.EDIT_TOOL
+            ImageToolsPlugin.CONVERT_ACTION_ID -> ExplorerImageRequestMode.CONVERT_TOOL
             else -> return null
         }
         if (
@@ -154,7 +162,9 @@ internal object ImageRequestPolicy {
         val targets = intent.parcelableBundleArrayListExtra(ExplorerActionIntentExtras.TARGETS)
             ?.takeIf { it.size in 1..ExplorerActionProtocol.MAX_TARGETS_PER_REQUEST }
             ?: return null
-        if (mode == ExplorerImageRequestMode.SINGLE_WITH_SIBLINGS && targets.size != 1) return null
+        val singleTarget = mode == ExplorerImageRequestMode.SINGLE_WITH_SIBLINGS ||
+            mode == ExplorerImageRequestMode.EDIT_TOOL || mode == ExplorerImageRequestMode.CONVERT_TOOL
+        if (singleTarget && targets.size != 1) return null
         val clipData = intent.clipData ?: return null
         if (clipData.itemCount != targets.size) return null
         val parsedTargets = targets.mapIndexed { index, targetBundle ->

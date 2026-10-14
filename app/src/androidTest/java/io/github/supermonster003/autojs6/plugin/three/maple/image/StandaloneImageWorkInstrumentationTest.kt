@@ -28,8 +28,10 @@ class StandaloneImageWorkInstrumentationTest {
         )
         for (action in actions.filter { it.getString(ExplorerActionCatalogKeys.ID) in setOf("edit-image", "convert-image") }) {
             assertEquals(ExplorerActionValues.CARDINALITY_SINGLE, action.getInt(ExplorerActionCatalogKeys.CARDINALITY))
-            assertEquals(ExplorerActionValues.OUTPUT_CREATE_SIBLING, action.getInt(ExplorerActionCatalogKeys.OUTPUT_MODE))
-            assertEquals(ExplorerActionValues.ACCESS_READ_ONLY, action.getInt(ExplorerActionCatalogKeys.ACCESS_MODE))
+            // ROADMAP 8.2: the tools manage their target through the host session, so they declare no output.
+            assertEquals(ExplorerActionValues.OUTPUT_NONE, action.getInt(ExplorerActionCatalogKeys.OUTPUT_MODE, ExplorerActionValues.OUTPUT_NONE))
+            assertEquals(ExplorerActionValues.ACCESS_MANAGE_TARGET, action.getInt(ExplorerActionCatalogKeys.ACCESS_MODE))
+            assertEquals(ExplorerActionValues.PLACEMENT_OVERFLOW, action.getInt(ExplorerActionCatalogKeys.PLACEMENT))
         }
     }
 

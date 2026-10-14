@@ -259,7 +259,9 @@
     <string name="metadata_unavailable">Les informations de l\'image ne sont pas disponibles</string>
     <string name="overwrite_confirm">Remplacer</string>
     <string name="overwrite_failed">Impossible de remplacer l\'original. Enregistrez la modification dans un nouveau fichier</string>
+    <string name="overwrite_restored">Original restauré</string>
     <string name="overwrite_saved">Original remplacé</string>
+    <string name="overwrite_undo_failed">Impossible de restaurer l\'original: le fichier a changé entre-temps</string>
     <string name="overwrite_without_undo_message">Il n\'y a pas assez de place pour garder une copie de l\'original, ce remplacement ne pourra pas être annulé.</string>
     <string name="overwrite_without_undo_title">Remplacer sans pouvoir annuler ?</string>
     <string name="page_counter">%1$d / %2$d</string>
