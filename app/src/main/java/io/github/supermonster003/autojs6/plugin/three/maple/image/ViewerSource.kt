@@ -20,6 +20,8 @@ internal enum class ViewerSourceKind {
     MEDIA_ALBUM,
     /** An authorized SAF folder of the standalone gallery, enumerated inside the viewer. */
     AUTHORIZED_FOLDER,
+    /** A folder hidden with `.nomedia` (ROADMAP 7.4), read from the file system; browse and share only. */
+    HIDDEN_FOLDER,
 }
 
 /**
@@ -38,6 +40,13 @@ internal sealed interface ViewerSourceSpec {
 
     data class AuthorizedFolder(
         val treeUri: String,
+        override val sort: MediaSort,
+        override val startItemId: Long,
+    ) : ViewerSourceSpec
+
+    /** A hidden folder of the internal storage, by its relative path (`Pictures/Private/`). */
+    data class HiddenFolder(
+        val relativePath: String,
         override val sort: MediaSort,
         override val startItemId: Long,
     ) : ViewerSourceSpec
@@ -69,6 +78,7 @@ internal class ViewerSource(
                     if (request.pages.any { it.hostRelativePath == "" }) ViewerSourceKind.HOST_SIBLINGS else ViewerSourceKind.HOST_DIRECTORY
                 request.source is ViewerSourceSpec.MediaAlbum -> ViewerSourceKind.MEDIA_ALBUM
                 request.source is ViewerSourceSpec.AuthorizedFolder -> ViewerSourceKind.AUTHORIZED_FOLDER
+                request.source is ViewerSourceSpec.HiddenFolder -> ViewerSourceKind.HIDDEN_FOLDER
                 request.pages.size > 1 -> ViewerSourceKind.HOST_SELECTION
                 else -> ViewerSourceKind.SINGLE
             },
@@ -107,6 +117,7 @@ internal class ViewerSource(
 internal class ViewerSourceLoader(
     private val loadAlbum: suspend (bucketId: Long, sort: MediaSort) -> List<MediaItem>,
     private val loadFolder: suspend (treeUri: String, sort: MediaSort) -> List<MediaItem>,
+    private val loadHidden: suspend (relativePath: String, sort: MediaSort) -> List<MediaItem> = { _, _ -> emptyList() },
 ) {
     constructor(context: Context) : this(
         loadAlbum = { bucketId, sort ->
@@ -126,6 +137,9 @@ internal class ViewerSourceLoader(
             val folder = repository.list().firstOrNull { it.treeUri == treeUri && it.available }
             if (folder == null) emptyList() else MediaCatalog.sort(repository.enumerateCached(folder).first, sort)
         },
+        loadHidden = { relativePath, sort ->
+            MediaCatalog.sort(HiddenFolders(context).folder(relativePath)?.items.orEmpty(), sort)
+        },
     )
 
     /** The album behind [spec] again, after a write in the viewer (ROADMAP 7.0); empty when it cannot be read. */
@@ -133,6 +147,7 @@ internal class ViewerSourceLoader(
         when (spec) {
             is ViewerSourceSpec.MediaAlbum -> loadAlbum(spec.bucketId, spec.sort)
             is ViewerSourceSpec.AuthorizedFolder -> loadFolder(spec.treeUri, spec.sort)
+            is ViewerSourceSpec.HiddenFolder -> loadHidden(spec.relativePath, spec.sort)
         }
     } catch (cancelled: CancellationException) {
         throw cancelled
@@ -146,6 +161,7 @@ internal class ViewerSourceLoader(
             when (spec) {
                 is ViewerSourceSpec.MediaAlbum -> loadAlbum(spec.bucketId, spec.sort)
                 is ViewerSourceSpec.AuthorizedFolder -> loadFolder(spec.treeUri, spec.sort)
+                is ViewerSourceSpec.HiddenFolder -> loadHidden(spec.relativePath, spec.sort)
             }
         } catch (cancelled: CancellationException) {
             throw cancelled
@@ -155,6 +171,7 @@ internal class ViewerSourceLoader(
         val kind = when (spec) {
             is ViewerSourceSpec.MediaAlbum -> ViewerSourceKind.MEDIA_ALBUM
             is ViewerSourceSpec.AuthorizedFolder -> ViewerSourceKind.AUTHORIZED_FOLDER
+            is ViewerSourceSpec.HiddenFolder -> ViewerSourceKind.HIDDEN_FOLDER
         }
         return ViewerSource.fromItems(kind, items, spec.startItemId, request.startPage, request.editable)
     }

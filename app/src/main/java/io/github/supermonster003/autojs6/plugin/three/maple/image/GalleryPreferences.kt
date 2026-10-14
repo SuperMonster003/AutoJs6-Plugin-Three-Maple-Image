@@ -12,6 +12,11 @@ internal class GalleryPreferences(private val preferences: SharedPreferences) {
 
     constructor(context: Context) : this(context.applicationContext.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE))
 
+    /** Settings > Hidden folders: list the `.nomedia` folders at the end of the album grid (ROADMAP 7.4). */
+    var showHiddenFolders: Boolean
+        get() = preferences.getBoolean(KEY_SHOW_HIDDEN, false)
+        set(value) = preferences.edit().putBoolean(KEY_SHOW_HIDDEN, value).apply()
+
     var mediaColumns: Int
         get() = clampColumns(preferences.getInt(KEY_COLUMNS, DEFAULT_COLUMNS))
         set(value) = preferences.edit().putInt(KEY_COLUMNS, clampColumns(value)).apply()
@@ -61,6 +66,7 @@ internal class GalleryPreferences(private val preferences: SharedPreferences) {
         }
 
         private const val VOLUME_SEPARATOR = "::"
+        private const val KEY_SHOW_HIDDEN = "show_hidden_folders"
 
         fun clampColumns(value: Int): Int = value.coerceIn(MIN_COLUMNS, MAX_COLUMNS)
 

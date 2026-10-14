@@ -184,6 +184,63 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         return move(items, target, NameConflictChoice.SKIP)
     }
 
+    /**
+     * Hides album folders of the internal storage with a `.nomedia` file (ROADMAP 7.4): the media library then
+     * stops listing their images, here and in other galleries; the files stay. The undo removes the file again.
+     */
+    suspend fun hideFolders(paths: List<AlbumPath>): WriteOutcome {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && routeForIds(MediaWriteOperation.MOVE, emptyList()) == null) return WriteOutcome(cancelled = true)
+        val writable = paths.filter { it.isPrimary }
+        val changed = ArrayList<AlbumPath>()
+        val files = ArrayList<String>()
+        withContext(Dispatchers.IO) {
+            for (path in writable) {
+                val directory = HiddenFolders.directory(path)
+                val marker = File(directory, HiddenFolders.NOMEDIA)
+                if (marker.exists() || runCatching { marker.createNewFile() }.getOrDefault(false)) {
+                    changed += path
+                    // Android 9 and older re-classify the folder when the marker itself is scanned.
+                    files += marker.absolutePath
+                    files += folderFiles(directory)
+                }
+            }
+        }
+        scan(files)
+        return WriteOutcome(
+            succeeded = changed.size,
+            failed = paths.size - changed.size,
+            undo = if (changed.isEmpty()) null else ({ showFolders(changed) }),
+        )
+    }
+
+    /** Removes the `.nomedia` file of hidden folders, so the media library lists their images again. */
+    suspend fun showFolders(paths: List<AlbumPath>): WriteOutcome {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && routeForIds(MediaWriteOperation.MOVE, emptyList()) == null) return WriteOutcome(cancelled = true)
+        val changed = ArrayList<AlbumPath>()
+        val files = ArrayList<String>()
+        withContext(Dispatchers.IO) {
+            for (path in paths.filter { it.isPrimary }) {
+                val directory = HiddenFolders.directory(path)
+                val marker = File(directory, HiddenFolders.NOMEDIA)
+                if (!marker.exists() || marker.delete()) {
+                    changed += path
+                    files += marker.absolutePath
+                    files += folderFiles(directory)
+                }
+            }
+        }
+        scan(files)
+        return WriteOutcome(
+            succeeded = changed.size,
+            failed = paths.size - changed.size,
+            undo = if (changed.isEmpty()) null else ({ hideFolders(changed) }),
+        )
+    }
+
+    /** The files of one folder (not its subfolders), which a scan re-classifies after a `.nomedia` change. */
+    private fun folderFiles(directory: File): List<String> =
+        directory.listFiles().orEmpty().filter { it.isFile && it.name != HiddenFolders.NOMEDIA }.map { it.absolutePath }
+
     /** After a folder rename: the media library forgets the old paths and lists the files under the new ones. */
     private suspend fun rescanRenamed(from: File, to: File) {
         val moved = withContext(Dispatchers.IO) { to.walkTopDown().filter { it.isFile }.toList() }

@@ -27,6 +27,7 @@
     <string name="action_show_image_details">عرض التفاصيل</string>
     <string name="action_undo">تراجع</string>
     <string name="action_unfavorite">إزالة من المفضلة</string>
+    <string name="action_unhide">إظهار مجددا</string>
     <string name="action_unpin">إلغاء التثبيت</string>
     <string name="action_view_image">عرض الصورة</string>
     <string name="apk_info_format">التنسيق</string>
@@ -115,6 +116,18 @@
     <string name="gallery_sort_descending">تنازلي</string>
     <string name="gallery_sort_name">الاسم</string>
     <string name="gallery_sort_size">الحجم</string>
+    <string name="hidden_folders_empty">لا توجد مجلدات مخفية</string>
+    <string name="hidden_folders_open_settings">فتح اذن التخزين</string>
+    <string name="hidden_folders_row_summary">ألبومات مخفية بملف .nomedia</string>
+    <string name="hidden_folders_show">إظهار في الألبومات</string>
+    <string name="hidden_folders_show_summary">إظهار المجلدات المخفية في آخر قائمة الألبومات للتصفح والمشاركة فقط</string>
+    <string name="hidden_folders_summary">تحتوي هذه المجلدات على ملف .nomedia, لذلك لا يعرض هذا المعرض ولا غيره صورها, وتبقى الملفات على الجهاز. تظهر هنا المجلدات التي أخفيتها هنا والمجلدات المخفية الموجودة في DCIM و Pictures.</string>
+    <string name="hidden_folders_title">المجلدات المخفية</string>
+    <string name="hidden_folders_unavailable">تتم قراءة المجلدات المخفية وتعديلها مباشرة على الجهاز: في Android 11 وما بعده فعل الوصول الى كل الملفات أولا.</string>
+    <string name="hide_card_unsupported">لا يمكن إخفاء الألبومات الموجودة على بطاقة الذاكرة</string>
+    <string name="hide_confirm_message">سيوضع ملف .nomedia في كل مجلد: لن يعرض هذا المعرض ولا غيره صوره, ولن يحذف أي شيء. تعرضها الإعدادات > المجلدات المخفية ويمكن إظهارها مجددا من هناك.</string>
+    <string name="hide_needs_access_message">الإخفاء يكتب ملف .nomedia في مجلد الألبوم, ولذلك يلزم الوصول الى كل الملفات. فعله من الإعدادات > اذن التخزين.</string>
+    <string name="hide_needs_access_title">يلزم الوصول الى كل الملفات</string>
     <string name="host_directory_empty">لا توجد صور في هذا المجلد</string>
     <string name="host_directory_folder">مجلد</string>
     <string name="host_directory_limit">يُعرض أول %1$d عنصرًا فقط</string>

@@ -27,6 +27,7 @@
     <string name="action_show_image_details">詳細を表示</string>
     <string name="action_undo">元に戻す</string>
     <string name="action_unfavorite">お気に入り解除</string>
+    <string name="action_unhide">再表示</string>
     <string name="action_unpin">固定を解除</string>
     <string name="action_view_image">画像を表示</string>
     <string name="apk_info_format">形式</string>
@@ -115,6 +116,18 @@
     <string name="gallery_sort_descending">降順</string>
     <string name="gallery_sort_name">名前</string>
     <string name="gallery_sort_size">サイズ</string>
+    <string name="hidden_folders_empty">非表示のフォルダーはありません</string>
+    <string name="hidden_folders_open_settings">ストレージ権限を開く</string>
+    <string name="hidden_folders_row_summary">.nomedia で非表示にしたアルバム</string>
+    <string name="hidden_folders_show">アルバムに表示</string>
+    <string name="hidden_folders_show_summary">非表示のフォルダーをアルバム一覧の最後に表示します (閲覧と共有のみ)</string>
+    <string name="hidden_folders_summary">これらのフォルダーには .nomedia ファイルがあるため, このギャラリーでも他のギャラリーでも画像は表示されません. ファイルは端末に残ります. ここで非表示にしたフォルダーと, DCIM と Pictures で見つかった非表示フォルダーを表示します.</string>
+    <string name="hidden_folders_title">非表示のフォルダー</string>
+    <string name="hidden_folders_unavailable">非表示のフォルダーは端末上のファイルを直接読み書きします. Android 11 以降では先に すべてのファイルへのアクセス をオンにしてください.</string>
+    <string name="hide_card_unsupported">SD カード上のアルバムは非表示にできません</string>
+    <string name="hide_confirm_message">各フォルダーに .nomedia ファイルを置きます. このギャラリーでも他のギャラリーでも画像が表示されなくなりますが, ファイルは削除されません. 設定 > 非表示のフォルダー で確認や再表示ができます.</string>
+    <string name="hide_needs_access_message">非表示にするにはアルバムのフォルダーに .nomedia ファイルを書き込むため, すべてのファイルへのアクセス が必要です. 設定 > ストレージ権限 でオンにしてください.</string>
+    <string name="hide_needs_access_title">すべてのファイルへのアクセスが必要です</string>
     <string name="host_directory_empty">このフォルダーに画像はありません</string>
     <string name="host_directory_folder">フォルダー</string>
     <string name="host_directory_limit">先頭の %1$d 項目のみ表示しています</string>

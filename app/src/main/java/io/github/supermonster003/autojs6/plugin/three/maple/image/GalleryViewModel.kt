@@ -20,6 +20,8 @@ internal enum class AlbumKind {
     ALL,
     /** The "Favorites" virtual album, first in the album grid when it has images (ROADMAP 7.4). */
     FAVORITES,
+    /** A folder hidden with `.nomedia`, read from the file system; browse and share only (ROADMAP 7.4). */
+    HIDDEN,
 }
 
 /** One entry of the album grid: a MediaStore bucket or an authorized folder (design draft 8.1). */
@@ -51,6 +53,8 @@ internal data class GalleryUiState(
     val failed: Boolean = false,
     /** A user-initiated reload (pull to refresh) is in flight while the current albums stay on screen. */
     val refreshing: Boolean = false,
+    /** Folders hidden with `.nomedia`, listed after the others when Settings > Hidden folders shows them. */
+    val hidden: List<AlbumSummary> = emptyList(),
     /** Bucket ids of the media library albums selected on the album grid (ROADMAP 7.4); kept across rotation. */
     val albumSelection: Set<Long> = emptySet(),
 ) {
@@ -92,6 +96,11 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     private val preferences = GalleryPreferences(application)
     private val favorites = FavoritesRepository(application)
     private val folderMarks = FolderMarksRepository(application)
+    private val hiddenFolders = HiddenFolders(application)
+    private var hiddenItems: Map<Long, List<MediaItem>> = emptyMap()
+
+    /** What the hidden section was built for; a change (settings, access) rebuilds it on return. */
+    private var hiddenShown: Boolean? = null
 
     /** Excluded and pinned folders (ROADMAP 7.4), read before each album list is built. */
     private var marks: FolderMarkState = FolderMarkState.NONE
@@ -263,6 +272,20 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                     folder = folder,
                 )
             }
+            val showHidden = preferences.showHiddenFolders && hiddenFolders.available()
+            hiddenShown = showHidden
+            val hidden = if (showHidden) runCatching { hiddenFolders.list() }.getOrDefault(emptyList()) else emptyList()
+            hiddenItems = hidden.associate { it.id to it.items }
+            val hiddenAlbums = hidden.map { folder ->
+                AlbumSummary(
+                    kind = AlbumKind.HIDDEN,
+                    id = folder.id,
+                    name = folder.name.ifEmpty { rootName },
+                    count = folder.items.size,
+                    coverUri = folder.items.maxByOrNull { it.dateModifiedSeconds }?.contentUri,
+                    subtitle = folder.path.relativePath,
+                )
+            }
             favoriteOrder = null
             val favoritesSummary = favoritesAlbum()
             _albums.update { state ->
@@ -271,6 +294,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                     refreshing = false,
                     albums = arrangeAlbums(albums, state.albumSort),
                     folders = folders,
+                    hidden = hiddenAlbums,
                     favorites = favoritesSummary,
                     // A selected album that went away (deleted, excluded, moved out) leaves the selection.
                     albumSelection = state.albumSelection.filterTo(LinkedHashSet()) { id -> albums.any { it.id == id } },
@@ -299,6 +323,13 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         AlbumKind.FOLDER -> _albums.value.folders.firstOrNull { it.id == id }
         AlbumKind.ALL -> allImagesAlbum()
         AlbumKind.FAVORITES -> _albums.value.favorites
+        AlbumKind.HIDDEN -> _albums.value.hidden.firstOrNull { it.id == id }
+    }
+
+    /** Back on the home screen: the hidden section follows Settings > Hidden folders and the storage access. */
+    fun refreshHiddenIfChanged() {
+        val shown = preferences.showHiddenFolders && hiddenFolders.available()
+        if (hiddenShown != null && hiddenShown != shown) reload()
     }
 
     /** The flat view over every bucket ("show all folder contents"); null without photo access. */
@@ -467,6 +498,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         val album = state.album ?: return emptyList()
         if (state.endReached) return state.items
         if (album.kind == AlbumKind.FAVORITES) return favoriteItems(state.sort)
+        if (album.kind == AlbumKind.HIDDEN) return folderOrdered(hiddenItems[album.id].orEmpty(), state.sort)
         return if (album.kind != AlbumKind.FOLDER) {
             runCatching { media.loadBucketAll(album.id, state.sort, marks) }.getOrDefault(state.items)
         } else {
@@ -492,8 +524,8 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             val sort = _grid.value.sort
             val page: List<MediaItem>
             var limit = DocumentTreeLimit.NONE
-            if (album.kind == AlbumKind.FAVORITES) {
-                val ordered = favoriteItems(sort)
+            if (album.kind == AlbumKind.FAVORITES || album.kind == AlbumKind.HIDDEN) {
+                val ordered = if (album.kind == AlbumKind.HIDDEN) folderOrdered(hiddenItems[album.id].orEmpty(), sort) else favoriteItems(sort)
                 page = ordered.subList(offset.coerceAtMost(ordered.size), (offset + PAGE_SIZE).coerceAtMost(ordered.size))
             } else if (album.kind != AlbumKind.FOLDER) {
                 page = runCatching { media.loadBucket(album.id, sort, PAGE_SIZE, offset, marks) }.getOrDefault(emptyList())

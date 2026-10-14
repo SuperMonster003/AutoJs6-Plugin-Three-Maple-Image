@@ -338,6 +338,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         override val albumKind: AlbumKind?
             get() = when (val spec = launchRequest.source) {
                 is ViewerSourceSpec.AuthorizedFolder -> AlbumKind.FOLDER
+                is ViewerSourceSpec.HiddenFolder -> AlbumKind.HIDDEN
                 is ViewerSourceSpec.MediaAlbum -> when (spec.bucketId) {
                     MediaCatalog.ALL_BUCKETS -> AlbumKind.ALL
                     MediaCatalog.FAVORITES -> AlbumKind.FAVORITES
@@ -405,6 +406,8 @@ class ImageViewerActivity : ConfiguredActivity() {
     /** Management controls of the current page: gallery sources only (ROADMAP 7.0). */
     private fun managementState(): ViewerManagement? {
         val spec = launchRequest.source ?: return null
+        // A hidden folder is browse and share only.
+        if (spec is ViewerSourceSpec.HiddenFolder) return null
         val item = source?.items?.getOrNull(currentIndex) ?: return null
         val library = spec is ViewerSourceSpec.MediaAlbum
         return ViewerManagement(favorite = if (library) item.id in favoriteIds else null, canMoveCopy = library)

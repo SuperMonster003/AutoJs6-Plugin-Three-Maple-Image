@@ -6,11 +6,23 @@
         <item quantity="many">Исключено %1$d альбомов</item>
         <item quantity="other">Исключено %1$d альбома</item>
     </plurals>
+    <plurals name="albums_hidden_count">
+        <item quantity="one">Скрыт %1$d альбом</item>
+        <item quantity="few">Скрыто %1$d альбома</item>
+        <item quantity="many">Скрыто %1$d альбомов</item>
+        <item quantity="other">Скрыто %1$d альбома</item>
+    </plurals>
     <plurals name="albums_pinned_count">
         <item quantity="one">Закреплён %1$d альбом</item>
         <item quantity="few">Закреплено %1$d альбома</item>
         <item quantity="many">Закреплено %1$d альбомов</item>
         <item quantity="other">Закреплено %1$d альбома</item>
+    </plurals>
+    <plurals name="albums_unhidden_count">
+        <item quantity="one">Снова показан %1$d альбом</item>
+        <item quantity="few">Снова показано %1$d альбома</item>
+        <item quantity="many">Снова показано %1$d альбомов</item>
+        <item quantity="other">Снова показано %1$d альбома</item>
     </plurals>
     <plurals name="albums_unpinned_count">
         <item quantity="one">Откреплён %1$d альбом</item>
@@ -107,6 +119,12 @@
         <item quantity="few">%1$d изображения перемещены в корзину</item>
         <item quantity="many">%1$d изображений перемещено в корзину</item>
         <item quantity="other">%1$d изображения перемещены в корзину</item>
+    </plurals>
+    <plurals name="hide_confirm_title">
+        <item quantity="one">Скрыть %1$d альбом?</item>
+        <item quantity="few">Скрыть %1$d альбома?</item>
+        <item quantity="many">Скрыть %1$d альбомов?</item>
+        <item quantity="other">Скрыть %1$d альбома?</item>
     </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="one">%1$d день</item>

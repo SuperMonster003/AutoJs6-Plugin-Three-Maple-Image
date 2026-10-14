@@ -8,6 +8,14 @@
         <item quantity="many">تم استبعاد %1$d ألبوما</item>
         <item quantity="other">تم استبعاد %1$d ألبوم</item>
     </plurals>
+    <plurals name="albums_hidden_count">
+        <item quantity="zero">تم إخفاء %1$d ألبوم</item>
+        <item quantity="one">تم إخفاء ألبوم واحد (%1$d)</item>
+        <item quantity="two">تم إخفاء ألبومين (%1$d)</item>
+        <item quantity="few">تم إخفاء %1$d ألبومات</item>
+        <item quantity="many">تم إخفاء %1$d ألبوما</item>
+        <item quantity="other">تم إخفاء %1$d ألبوم</item>
+    </plurals>
     <plurals name="albums_pinned_count">
         <item quantity="zero">تم تثبيت %1$d ألبوم</item>
         <item quantity="one">تم تثبيت ألبوم واحد (%1$d)</item>
@@ -15,6 +23,14 @@
         <item quantity="few">تم تثبيت %1$d ألبومات</item>
         <item quantity="many">تم تثبيت %1$d ألبوما</item>
         <item quantity="other">تم تثبيت %1$d ألبوم</item>
+    </plurals>
+    <plurals name="albums_unhidden_count">
+        <item quantity="zero">تم إظهار %1$d ألبوم مجددا</item>
+        <item quantity="one">تم إظهار ألبوم واحد (%1$d) مجددا</item>
+        <item quantity="two">تم إظهار ألبومين (%1$d) مجددا</item>
+        <item quantity="few">تم إظهار %1$d ألبومات مجددا</item>
+        <item quantity="many">تم إظهار %1$d ألبوما مجددا</item>
+        <item quantity="other">تم إظهار %1$d ألبوم مجددا</item>
     </plurals>
     <plurals name="albums_unpinned_count">
         <item quantity="zero">تم إلغاء تثبيت %1$d ألبوم</item>
@@ -143,6 +159,14 @@
         <item quantity="few">تم نقل %1$d صور إلى سلة المحذوفات</item>
         <item quantity="many">تم نقل %1$d صورة إلى سلة المحذوفات</item>
         <item quantity="other">تم نقل %1$d صورة إلى سلة المحذوفات</item>
+    </plurals>
+    <plurals name="hide_confirm_title">
+        <item quantity="zero">إخفاء %1$d ألبوم?</item>
+        <item quantity="one">إخفاء ألبوم واحد (%1$d)?</item>
+        <item quantity="two">إخفاء ألبومين (%1$d)?</item>
+        <item quantity="few">إخفاء %1$d ألبومات?</item>
+        <item quantity="many">إخفاء %1$d ألبوما?</item>
+        <item quantity="other">إخفاء %1$d ألبوم?</item>
     </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="zero">%1$d يوم</item>

@@ -27,6 +27,7 @@
     <string name="action_show_image_details">显示详情</string>
     <string name="action_undo">撤销</string>
     <string name="action_unfavorite">取消收藏</string>
+    <string name="action_unhide">取消隐藏</string>
     <string name="action_unpin">取消置顶</string>
     <string name="action_view_image">查看图像</string>
     <string name="apk_info_format">格式</string>
@@ -115,6 +116,18 @@
     <string name="gallery_sort_descending">降序</string>
     <string name="gallery_sort_name">名称</string>
     <string name="gallery_sort_size">大小</string>
+    <string name="hidden_folders_empty">没有隐藏的文件夹</string>
+    <string name="hidden_folders_open_settings">打开存储权限</string>
+    <string name="hidden_folders_row_summary">用 .nomedia 隐藏的相册</string>
+    <string name="hidden_folders_show">在相册中显示</string>
+    <string name="hidden_folders_show_summary">在相册列表末尾显示隐藏的文件夹, 可以浏览和分享</string>
+    <string name="hidden_folders_summary">这些文件夹中有 .nomedia 文件, 本图库和其他图库都不显示其中的图片, 文件仍在设备上. 这里列出在本应用中隐藏的文件夹, 以及在 DCIM 和 Pictures 中找到的隐藏文件夹.</string>
+    <string name="hidden_folders_title">隐藏的文件夹</string>
+    <string name="hidden_folders_unavailable">隐藏的文件夹要直接读写设备上的文件: Android 11 及以上请先开启 所有文件访问.</string>
+    <string name="hide_card_unsupported">存储卡上的相册不能隐藏</string>
+    <string name="hide_confirm_message">会在每个文件夹中放入 .nomedia 文件: 本图库和其他图库都不再显示其中的图片, 不会删除任何文件. 之后可在 设置 > 隐藏的文件夹 中查看或取消隐藏.</string>
+    <string name="hide_needs_access_message">隐藏相册要在文件夹中写入 .nomedia 文件, 需要 所有文件访问. 请在 设置 > 存储权限 中开启.</string>
+    <string name="hide_needs_access_title">需要所有文件访问</string>
     <string name="host_directory_empty">此文件夹中没有图片</string>
     <string name="host_directory_folder">文件夹</string>
     <string name="host_directory_limit">仅列出前 %1$d 项</string>

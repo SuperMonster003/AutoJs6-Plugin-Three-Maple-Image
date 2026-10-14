@@ -68,6 +68,12 @@ internal sealed interface GalleryDialog {
 
     data class Progress(val copy: Boolean, val control: WriteControl) : GalleryDialog
 
+    /** Hide albums with `.nomedia` (ROADMAP 7.4), after saying what that means for other apps. */
+    data class ConfirmHide(val albums: List<AlbumSummary>) : GalleryDialog
+
+    /** Hiding needs file system access that is not granted yet; the dialog leads to Settings > Storage permission. */
+    data object HideNeedsAccess : GalleryDialog
+
     /** Rename an album folder (ROADMAP 7.4); [imagesOnly]: no folder rename, its images move to the new name. */
     data class RenameAlbum(val album: AlbumSummary, val imagesOnly: Boolean) : GalleryDialog
 
@@ -142,6 +148,8 @@ internal class GalleryOperations(
     /** What the bar offers for [state]'s album: authorized folders only share, delete, rename and show details. */
     fun actionsFor(state: MediaGridUiState): MediaSelectionActions {
         val album = state.album ?: return MediaSelectionActions()
+        // A hidden folder is read from disk for browsing: share and details only.
+        if (album.kind == AlbumKind.HIDDEN) return MediaSelectionActions(onShare = ::share, onDetails = ::details)
         val library = album.kind != AlbumKind.FOLDER
         return MediaSelectionActions(
             onShare = ::share,
@@ -331,10 +339,58 @@ internal class GalleryOperations(
         return AlbumSelectionActions(
             onPin = ::pinAlbums,
             onExclude = ::excludeAlbums,
+            onHide = ::hideAlbums,
             onDelete = ::deleteAlbums,
             onRename = ::renameAlbum,
             allPinned = selected.isNotEmpty() && selected.all { it.pinned },
         )
+    }
+
+    /** Hides the selected albums of the internal storage with `.nomedia`, once the user agreed. */
+    fun hideAlbums() = launch {
+        val albums = target.selectedAlbums()
+        if (albums.isEmpty()) return@launch
+        when {
+            albums.any { !it.path.isPrimary } -> notify(activity.getString(R.string.hide_card_unsupported))
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager() -> show(GalleryDialog.HideNeedsAccess)
+            else -> show(GalleryDialog.ConfirmHide(albums))
+        }
+    }
+
+    private fun runHide(albums: List<AlbumSummary>) = launch {
+        val paths = albums.map { it.path }
+        val outcome = coordinator.hideFolders(paths)
+        if (outcome.cancelled) {
+            explainRefusedPermission()
+            return@launch
+        }
+        folderMarks.mark(paths, FolderMark.HIDDEN)
+        target.clearAlbumSelection()
+        finishWrite()
+        val undo = outcome.undo
+        val undoAll: (suspend () -> WriteOutcome)? = if (undo == null) {
+            null
+        } else {
+            suspend {
+                folderMarks.unmark(paths, FolderMark.HIDDEN)
+                undo()
+            }
+        }
+        notify(summary(R.plurals.albums_hidden_count, outcome), undoAll, afterUndo = ::refreshAll)
+    }
+
+    /** "Show again" from a hidden album's grid: removes its `.nomedia`, then [leave] closes the grid. */
+    fun unhideAlbum(album: AlbumSummary, leave: () -> Unit) = launch {
+        val path = album.path
+        val outcome = coordinator.showFolders(listOf(path))
+        if (outcome.cancelled) {
+            explainRefusedPermission()
+            return@launch
+        }
+        folderMarks.unmark(listOf(path), FolderMark.HIDDEN)
+        finishWrite()
+        leave()
+        notify(summary(R.plurals.albums_unhidden_count, outcome))
     }
 
     /** Asks for the new name of the one selected album. */
@@ -592,6 +648,26 @@ internal class GalleryOperations(
                 onConfirm = {
                     show(null)
                     deleteForGood(current.items, current.reason)
+                },
+            )
+            is GalleryDialog.ConfirmHide -> ConfirmDialog(
+                title = pluralStringResource(R.plurals.hide_confirm_title, current.albums.size, current.albums.size),
+                message = stringResource(R.string.hide_confirm_message),
+                confirmText = stringResource(R.string.action_hide),
+                onDismiss = { show(null) },
+                onConfirm = {
+                    show(null)
+                    runHide(current.albums)
+                },
+            )
+            GalleryDialog.HideNeedsAccess -> ConfirmDialog(
+                title = stringResource(R.string.hide_needs_access_title),
+                message = stringResource(R.string.hide_needs_access_message),
+                confirmText = stringResource(R.string.hidden_folders_open_settings),
+                onDismiss = { show(null) },
+                onConfirm = {
+                    show(null)
+                    runCatching { activity.startActivity(StoragePermissionActivity.intent(activity)) }
                 },
             )
             is GalleryDialog.RenameAlbum -> RenameAlbumDialog(

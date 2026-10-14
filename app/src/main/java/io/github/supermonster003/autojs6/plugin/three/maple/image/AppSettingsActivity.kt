@@ -75,6 +75,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     onSyncSystemFavorites = ::updateSyncSystemFavorites,
                     onStoragePermission = { startActivity(StoragePermissionActivity.intent(this)) },
                     onExcludedFolders = { startActivity(ExcludedFoldersActivity.intent(this)) },
+                    onHiddenFolders = { startActivity(HiddenFoldersActivity.intent(this)) },
                     onReleaseHistory = { startActivity(Intent(this, ReleaseHistoryActivity::class.java)) },
                     onAbout = { startActivity(Intent(this, AboutActivity::class.java)) },
                 )

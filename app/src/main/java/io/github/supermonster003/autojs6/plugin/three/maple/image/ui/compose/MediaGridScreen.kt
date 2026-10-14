@@ -79,6 +79,8 @@ internal class MediaGridCallbacks(
     val onClearSelection: () -> Unit = {},
     val onSelectAll: () -> Unit = {},
     val onInvertSelection: () -> Unit = {},
+    /** A hidden album (ROADMAP 7.4): removes its `.nomedia` file; null for every other album. */
+    val onUnhide: (() -> Unit)? = null,
 )
 
 /**
@@ -159,6 +161,13 @@ internal fun MediaGridScreen(
                     Icon(painterResource(R.drawable.ic_more_vert_24), contentDescription = stringResource(R.string.action_more))
                 }
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                    callbacks.onUnhide?.let { unhide ->
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.action_unhide)) },
+                            onClick = { menuOpen = false; unhide() },
+                            modifier = Modifier.testTag("maple.media.unhide"),
+                        )
+                    }
                     for (columns in GalleryPreferences.MIN_COLUMNS..GalleryPreferences.MAX_COLUMNS) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.gallery_columns_value, columns)) },

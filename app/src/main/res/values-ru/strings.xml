@@ -27,6 +27,7 @@
     <string name="action_show_image_details">Показать сведения</string>
     <string name="action_undo">Отменить</string>
     <string name="action_unfavorite">Из избранного</string>
+    <string name="action_unhide">Показать снова</string>
     <string name="action_unpin">Открепить</string>
     <string name="action_view_image">Просмотреть изображение</string>
     <string name="apk_info_format">Формат</string>
@@ -115,6 +116,18 @@
     <string name="gallery_sort_descending">По убыванию</string>
     <string name="gallery_sort_name">Имя</string>
     <string name="gallery_sort_size">Размер</string>
+    <string name="hidden_folders_empty">Нет скрытых папок</string>
+    <string name="hidden_folders_open_settings">Открыть разрешение хранилища</string>
+    <string name="hidden_folders_row_summary">Альбомы, скрытые с помощью .nomedia</string>
+    <string name="hidden_folders_show">Показывать в альбомах</string>
+    <string name="hidden_folders_show_summary">Показывать скрытые папки в конце списка альбомов, только для просмотра и отправки</string>
+    <string name="hidden_folders_summary">В этих папках есть файл .nomedia, поэтому ни эта, ни другие галереи не показывают их изображения; файлы остаются на устройстве. Здесь показаны папки, скрытые в этом приложении, и скрытые папки, найденные в DCIM и Pictures.</string>
+    <string name="hidden_folders_title">Скрытые папки</string>
+    <string name="hidden_folders_unavailable">Скрытые папки читаются и изменяются прямо на устройстве: в Android 11 и новее сначала включите доступ ко всем файлам.</string>
+    <string name="hide_card_unsupported">Альбомы на карте памяти нельзя скрыть</string>
+    <string name="hide_confirm_message">В каждую папку будет добавлен файл .nomedia: ни эта, ни другие галереи больше не покажут её изображения, ничего не удаляется. Список и возврат: Настройки > Скрытые папки.</string>
+    <string name="hide_needs_access_message">Чтобы скрыть альбом, в его папку записывается файл .nomedia, для этого нужен доступ ко всем файлам. Включите его в Настройки > Разрешение хранилища.</string>
+    <string name="hide_needs_access_title">Нужен доступ ко всем файлам</string>
     <string name="host_directory_empty">В этой папке нет изображений</string>
     <string name="host_directory_folder">Папка</string>
     <string name="host_directory_limit">Показаны только первые %1$d записей</string>

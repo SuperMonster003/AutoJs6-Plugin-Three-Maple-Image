@@ -142,6 +142,34 @@ class ViewerSourceInstrumentationTest {
     }
 
     /** A single URI stays a one-page viewer without a strip. */
+    /** A hidden folder (ROADMAP 7.4) survives the intent round trip and pages without management actions. */
+    @Test
+    fun hiddenFolderSourceUsesTheFileEnumerationWithoutManagement() {
+        val fixture = HostFixture(context, listOf("alpha.png" to Color.RED, "beta.png" to Color.GREEN, "gamma.png" to Color.BLUE))
+        try {
+            val items = fixture.items(bucketId = -9L)
+            val sort = MediaSort(MediaSortField.NAME, ascending = true)
+            var requestedPath: String? = null
+            ViewerSourceLoader.factoryForTesting = {
+                ViewerSourceLoader(
+                    loadAlbum = { _, _ -> error("album enumeration must not run for a hidden folder") },
+                    loadFolder = { _, _ -> error("folder enumeration must not run for a hidden folder") },
+                    loadHidden = { path, requestedSort -> requestedPath = path; MediaCatalog.sort(items, requestedSort) },
+                )
+            }
+            val start = items[1]
+            val request = ImageViewerLaunchRequest.gallery(ViewerSource.request(start), ViewerSourceSpec.HiddenFolder("Pictures/Private/", sort, start.id))
+            ActivityScenario.launchActivityForResult<ImageViewerActivity>(ImageViewerContract.viewerIntent(context, request)).use { scenario ->
+                awaitSource(scenario) { it.kind == ViewerSourceKind.HIDDEN_FOLDER && it.pages.size == 3 }
+                assertEquals("Pictures/Private/", requestedPath)
+                awaitPage(scenario, index = 1, title = "beta.png")
+                scenario.onActivity { activity -> assertEquals(null, activity.viewerStateForTesting.management) }
+            }
+        } finally {
+            fixture.close()
+        }
+    }
+
     @Test
     fun singleSourceHasOnePageAndNoStrip() {
         val fixture = HostFixture(context, listOf("solo.png" to Color.MAGENTA))

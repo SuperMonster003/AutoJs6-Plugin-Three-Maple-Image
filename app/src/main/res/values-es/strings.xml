@@ -27,6 +27,7 @@
     <string name="action_show_image_details">Mostrar detalles</string>
     <string name="action_undo">Deshacer</string>
     <string name="action_unfavorite">Quitar de favoritos</string>
+    <string name="action_unhide">Mostrar de nuevo</string>
     <string name="action_unpin">Dejar de fijar</string>
     <string name="action_view_image">Ver imagen</string>
     <string name="apk_info_format">Formato</string>
@@ -115,6 +116,18 @@
     <string name="gallery_sort_descending">Descendente</string>
     <string name="gallery_sort_name">Nombre</string>
     <string name="gallery_sort_size">Tamaño</string>
+    <string name="hidden_folders_empty">No hay carpetas ocultas</string>
+    <string name="hidden_folders_open_settings">Abrir permiso de almacenamiento</string>
+    <string name="hidden_folders_row_summary">Álbumes ocultos con .nomedia</string>
+    <string name="hidden_folders_show">Mostrar en álbumes</string>
+    <string name="hidden_folders_show_summary">Mostrar las carpetas ocultas al final de la lista de álbumes, solo para ver y compartir</string>
+    <string name="hidden_folders_summary">Estas carpetas tienen un archivo .nomedia, así que ni esta galería ni otras muestran sus imágenes; los archivos siguen en el dispositivo. Se listan las carpetas ocultadas aquí y las carpetas ocultas encontradas en DCIM y Pictures.</string>
+    <string name="hidden_folders_title">Carpetas ocultas</string>
+    <string name="hidden_folders_unavailable">Las carpetas ocultas se leen y modifican directamente en el dispositivo: en Android 11 y posteriores active antes el acceso a todos los archivos.</string>
+    <string name="hide_card_unsupported">Los álbumes de una tarjeta de memoria no se pueden ocultar</string>
+    <string name="hide_confirm_message">Se coloca un archivo .nomedia en cada carpeta: ni esta galería ni otras mostrarán sus imágenes, y no se elimina nada. Ajustes > Carpetas ocultas las lista y las vuelve a mostrar.</string>
+    <string name="hide_needs_access_message">Para ocultar se escribe un archivo .nomedia en la carpeta del álbum, lo que requiere acceso a todos los archivos. Actívelo en Ajustes > Permiso de almacenamiento.</string>
+    <string name="hide_needs_access_title">Se necesita acceso a todos los archivos</string>
     <string name="host_directory_empty">No hay imágenes en esta carpeta</string>
     <string name="host_directory_folder">Carpeta</string>
     <string name="host_directory_limit">Solo se muestran las primeras %1$d entradas</string>

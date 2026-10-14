@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hidden folders (ROADMAP 7.4) live on the internal storage; the provider is not exported and grants per URI. -->
+<paths><external-path name="storage" path="." /></paths>

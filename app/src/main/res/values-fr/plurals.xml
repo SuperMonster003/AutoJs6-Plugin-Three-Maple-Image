@@ -5,10 +5,20 @@
         <item quantity="many">%1$d albums exclus</item>
         <item quantity="other">%1$d albums exclus</item>
     </plurals>
+    <plurals name="albums_hidden_count">
+        <item quantity="one">%1$d album masqué</item>
+        <item quantity="many">%1$d albums masqués</item>
+        <item quantity="other">%1$d albums masqués</item>
+    </plurals>
     <plurals name="albums_pinned_count">
         <item quantity="one">%1$d album épinglé</item>
         <item quantity="many">%1$d albums épinglés</item>
         <item quantity="other">%1$d albums épinglés</item>
+    </plurals>
+    <plurals name="albums_unhidden_count">
+        <item quantity="one">%1$d album de nouveau affiché</item>
+        <item quantity="many">%1$d albums de nouveau affichés</item>
+        <item quantity="other">%1$d albums de nouveau affichés</item>
     </plurals>
     <plurals name="albums_unpinned_count">
         <item quantity="one">%1$d album désépinglé</item>
@@ -89,6 +99,11 @@
         <item quantity="one">%1$d image déplacée dans la corbeille</item>
         <item quantity="many">%1$d images déplacées dans la corbeille</item>
         <item quantity="other">%1$d images déplacées dans la corbeille</item>
+    </plurals>
+    <plurals name="hide_confirm_title">
+        <item quantity="one">Masquer %1$d album?</item>
+        <item quantity="many">Masquer %1$d albums?</item>
+        <item quantity="other">Masquer %1$d albums?</item>
     </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="one">%1$d jour</item>

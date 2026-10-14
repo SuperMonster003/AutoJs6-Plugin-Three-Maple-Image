@@ -4,9 +4,17 @@
         <item quantity="one">%1$d album excluded</item>
         <item quantity="other">%1$d albums excluded</item>
     </plurals>
+    <plurals name="albums_hidden_count">
+        <item quantity="one">%1$d album hidden</item>
+        <item quantity="other">%1$d albums hidden</item>
+    </plurals>
     <plurals name="albums_pinned_count">
         <item quantity="one">%1$d album pinned</item>
         <item quantity="other">%1$d albums pinned</item>
+    </plurals>
+    <plurals name="albums_unhidden_count">
+        <item quantity="one">%1$d album shown again</item>
+        <item quantity="other">%1$d albums shown again</item>
     </plurals>
     <plurals name="albums_unpinned_count">
         <item quantity="one">%1$d album unpinned</item>
@@ -71,6 +79,10 @@
     <plurals name="gallery_trashed_count">
         <item quantity="one">%1$d image moved to the recycle bin</item>
         <item quantity="other">%1$d images moved to the recycle bin</item>
+    </plurals>
+    <plurals name="hide_confirm_title">
+        <item quantity="one">Hide %1$d album?</item>
+        <item quantity="other">Hide %1$d albums?</item>
     </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="one">%1$d day</item>

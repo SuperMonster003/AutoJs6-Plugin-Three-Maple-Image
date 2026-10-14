@@ -27,6 +27,7 @@
     <string name="action_show_image_details">세부 정보 보기</string>
     <string name="action_undo">실행 취소</string>
     <string name="action_unfavorite">즐겨찾기 해제</string>
+    <string name="action_unhide">다시 표시</string>
     <string name="action_unpin">고정 해제</string>
     <string name="action_view_image">이미지 보기</string>
     <string name="apk_info_format">형식</string>
@@ -115,6 +116,18 @@
     <string name="gallery_sort_descending">내림차순</string>
     <string name="gallery_sort_name">이름</string>
     <string name="gallery_sort_size">크기</string>
+    <string name="hidden_folders_empty">숨긴 폴더가 없습니다</string>
+    <string name="hidden_folders_open_settings">저장공간 권한 열기</string>
+    <string name="hidden_folders_row_summary">.nomedia로 숨긴 앨범</string>
+    <string name="hidden_folders_show">앨범에 표시</string>
+    <string name="hidden_folders_show_summary">숨긴 폴더를 앨범 목록 끝에 표시합니다 (보기와 공유만 가능)</string>
+    <string name="hidden_folders_summary">이 폴더에는 .nomedia 파일이 있어 이 갤러리와 다른 갤러리 모두 이미지를 표시하지 않습니다. 파일은 기기에 그대로 있습니다. 여기서 숨긴 폴더와 DCIM, Pictures에서 찾은 숨긴 폴더가 표시됩니다.</string>
+    <string name="hidden_folders_title">숨긴 폴더</string>
+    <string name="hidden_folders_unavailable">숨긴 폴더는 기기의 파일을 직접 읽고 씁니다. Android 11 이상에서는 먼저 모든 파일 접근을 켜세요.</string>
+    <string name="hide_card_unsupported">메모리 카드의 앨범은 숨길 수 없습니다</string>
+    <string name="hide_confirm_message">각 폴더에 .nomedia 파일을 넣습니다. 이 갤러리와 다른 갤러리 모두 이미지를 더 이상 표시하지 않으며 파일은 삭제되지 않습니다. 설정 > 숨긴 폴더에서 확인하거나 다시 표시할 수 있습니다.</string>
+    <string name="hide_needs_access_message">숨기려면 앨범 폴더에 .nomedia 파일을 써야 하므로 모든 파일 접근이 필요합니다. 설정 > 저장공간 권한에서 켜세요.</string>
+    <string name="hide_needs_access_title">모든 파일 접근 필요</string>
     <string name="host_directory_empty">이 폴더에 이미지가 없습니다</string>
     <string name="host_directory_folder">폴더</string>
     <string name="host_directory_limit">처음 %1$d개 항목만 표시합니다</string>

@@ -261,6 +261,14 @@ private fun AlbumGrid(
                 AlbumCell(album, state, callbacks, Modifier.padding(cellPadding(index)))
             }
         }
+        if (state.hidden.isNotEmpty()) {
+            item(key = "header.hidden", span = { GridItemSpan(maxLineSpan) }) {
+                MapleSectionHeader(stringResource(R.string.hidden_folders_title))
+            }
+            itemsIndexed(state.hidden, key = { _, album -> "hidden.${album.id}" }) { index, album ->
+                AlbumCell(album, state, callbacks, Modifier.padding(cellPadding(index)))
+            }
+        }
         if (showTools) {
             item(key = "header.tools", span = { GridItemSpan(maxLineSpan) }) {
                 MapleSectionHeader(stringResource(R.string.gallery_section_tools))
@@ -315,6 +323,7 @@ private fun AlbumCell(album: AlbumSummary, state: GalleryUiState, callbacks: Alb
         badge = when (album.kind) {
             AlbumKind.FOLDER -> painterResource(R.drawable.ic_folder_24)
             AlbumKind.FAVORITES -> painterResource(R.drawable.ic_favorite_24)
+            AlbumKind.HIDDEN -> painterResource(R.drawable.ic_visibility_off_24)
             else -> if (album.pinned) painterResource(R.drawable.ic_push_pin_24) else null
         },
         enabled = album.available && (!selecting || selectable),

@@ -3,8 +3,14 @@
     <plurals name="albums_excluded_count">
         <item quantity="other">已排除 %1$d 个相册</item>
     </plurals>
+    <plurals name="albums_hidden_count">
+        <item quantity="other">已隐藏 %1$d 个相册</item>
+    </plurals>
     <plurals name="albums_pinned_count">
         <item quantity="other">已置顶 %1$d 个相册</item>
+    </plurals>
+    <plurals name="albums_unhidden_count">
+        <item quantity="other">已取消隐藏 %1$d 个相册</item>
     </plurals>
     <plurals name="albums_unpinned_count">
         <item quantity="other">已取消置顶 %1$d 个相册</item>
@@ -53,6 +59,9 @@
     </plurals>
     <plurals name="gallery_trashed_count">
         <item quantity="other">已将 %1$d 张图片移到回收站</item>
+    </plurals>
+    <plurals name="hide_confirm_title">
+        <item quantity="other">隐藏 %1$d 个相册?</item>
     </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="other">%1$d 天</item>

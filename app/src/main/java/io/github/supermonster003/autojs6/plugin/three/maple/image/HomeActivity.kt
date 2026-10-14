@@ -143,6 +143,9 @@ class HomeActivity : ConfiguredActivity() {
                                 onClearSelection = gallery::clearSelection,
                                 onSelectAll = gallery::selectAll,
                                 onInvertSelection = gallery::invertSelection,
+                                onUnhide = grid.album?.takeIf { it.kind == AlbumKind.HIDDEN }?.let { hidden ->
+                                    { operations.unhideAlbum(hidden) { controller.popBackStack() } }
+                                },
                             ),
                             selectionActions = operations.actionsFor(grid),
                             snackbarHostState = operations.snackbar,
@@ -196,6 +199,7 @@ class HomeActivity : ConfiguredActivity() {
     override fun onStart() {
         super.onStart()
         gallery.setVisible(true)
+        gallery.refreshHiddenIfChanged()
     }
 
     override fun onStop() {
@@ -253,6 +257,7 @@ class HomeActivity : ConfiguredActivity() {
             album.kind == AlbumKind.MEDIA || album.kind == AlbumKind.ALL || album.kind == AlbumKind.FAVORITES ->
                 ViewerSourceSpec.MediaAlbum(album.id, grid.sort, item.id)
             album.folder != null -> ViewerSourceSpec.AuthorizedFolder(album.folder.treeUri, grid.sort, item.id)
+            album.kind == AlbumKind.HIDDEN -> ViewerSourceSpec.HiddenFolder(album.subtitle, grid.sort, item.id)
             else -> null
         }
         val request = if (spec == null) {

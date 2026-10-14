@@ -3,8 +3,14 @@
     <plurals name="albums_excluded_count">
         <item quantity="other">앨범 %1$d개를 제외했습니다</item>
     </plurals>
+    <plurals name="albums_hidden_count">
+        <item quantity="other">앨범 %1$d개를 숨겼습니다</item>
+    </plurals>
     <plurals name="albums_pinned_count">
         <item quantity="other">앨범 %1$d개를 고정했습니다</item>
+    </plurals>
+    <plurals name="albums_unhidden_count">
+        <item quantity="other">앨범 %1$d개를 다시 표시했습니다</item>
     </plurals>
     <plurals name="albums_unpinned_count">
         <item quantity="other">앨범 %1$d개의 고정을 해제했습니다</item>
@@ -53,6 +59,9 @@
     </plurals>
     <plurals name="gallery_trashed_count">
         <item quantity="other">이미지 %1$d개를 휴지통으로 이동했습니다</item>
+    </plurals>
+    <plurals name="hide_confirm_title">
+        <item quantity="other">앨범 %1$d개를 숨길까요?</item>
     </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="other">%1$d일</item>

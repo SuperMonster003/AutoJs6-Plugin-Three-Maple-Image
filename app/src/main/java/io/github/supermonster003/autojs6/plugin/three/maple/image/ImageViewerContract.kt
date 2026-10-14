@@ -102,6 +102,8 @@ internal object ImageViewerContract {
     private const val SOURCE_KIND_FOLDER = "folder"
     private const val SOURCE_BUCKET_ID = "bucketId"
     private const val SOURCE_TREE_URI = "treeUri"
+    private const val SOURCE_KIND_HIDDEN = "hidden"
+    private const val SOURCE_RELATIVE_PATH = "relativePath"
     private const val SOURCE_SORT_FIELD = "sortField"
     private const val SOURCE_SORT_ASCENDING = "sortAscending"
     private const val SOURCE_START_ITEM_ID = "startItemId"
@@ -236,6 +238,10 @@ internal object ImageViewerContract {
                     ?: return null
                 ViewerSourceSpec.AuthorizedFolder(treeUri, sort, startItemId)
             }
+            SOURCE_KIND_HIDDEN -> {
+                val relativePath = bundle.getString(SOURCE_RELATIVE_PATH)?.takeIf(::isSafeRelativeFolder) ?: return null
+                ViewerSourceSpec.HiddenFolder(relativePath, sort, startItemId)
+            }
             else -> null
         }
     }
@@ -292,6 +298,10 @@ internal object ImageViewerContract {
                             putString(SOURCE_KIND, SOURCE_KIND_FOLDER)
                             putString(SOURCE_TREE_URI, spec.treeUri)
                         }
+                        is ViewerSourceSpec.HiddenFolder -> {
+                            putString(SOURCE_KIND, SOURCE_KIND_HIDDEN)
+                            putString(SOURCE_RELATIVE_PATH, spec.relativePath)
+                        }
                     }
                 },
             )
@@ -328,6 +338,13 @@ internal object ImageViewerContract {
         uri.scheme == HOST_IMAGE_SCHEME && uri.authority == HOST_IMAGE_AUTHORITY &&
             uri.pathSegments == listOf(expectedIndex.toString()) &&
             uri.userInfo == null && uri.port == -1 && uri.query == null && uri.fragment == null
+
+    /** `Pictures/Private/`: relative, slash-terminated, no empty, `.` or `..` segment. */
+    private fun isSafeRelativeFolder(value: String): Boolean {
+        if (!value.endsWith('/') || value.startsWith('/')) return false
+        val segments = value.dropLast(1).split('/')
+        return segments.none { it.isEmpty() || it == "." || it == ".." || it.any { ch -> ch.isISOControl() } }
+    }
 
     private fun isPlainContentUri(uri: Uri): Boolean {
         if (!uri.isHierarchical || uri.scheme != ContentResolver.SCHEME_CONTENT) return false

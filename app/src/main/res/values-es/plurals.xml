@@ -5,10 +5,20 @@
         <item quantity="many">%1$d álbumes excluidos</item>
         <item quantity="other">%1$d álbumes excluidos</item>
     </plurals>
+    <plurals name="albums_hidden_count">
+        <item quantity="one">%1$d álbum ocultado</item>
+        <item quantity="many">%1$d álbumes ocultados</item>
+        <item quantity="other">%1$d álbumes ocultados</item>
+    </plurals>
     <plurals name="albums_pinned_count">
         <item quantity="one">%1$d álbum fijado</item>
         <item quantity="many">%1$d álbumes fijados</item>
         <item quantity="other">%1$d álbumes fijados</item>
+    </plurals>
+    <plurals name="albums_unhidden_count">
+        <item quantity="one">%1$d álbum visible de nuevo</item>
+        <item quantity="many">%1$d álbumes visibles de nuevo</item>
+        <item quantity="other">%1$d álbumes visibles de nuevo</item>
     </plurals>
     <plurals name="albums_unpinned_count">
         <item quantity="one">%1$d álbum desfijado</item>
@@ -89,6 +99,11 @@
         <item quantity="one">%1$d imagen movida a la papelera</item>
         <item quantity="many">%1$d imágenes movidas a la papelera</item>
         <item quantity="other">%1$d imágenes movidas a la papelera</item>
+    </plurals>
+    <plurals name="hide_confirm_title">
+        <item quantity="one">Ocultar %1$d álbum?</item>
+        <item quantity="many">Ocultar %1$d álbumes?</item>
+        <item quantity="other">Ocultar %1$d álbumes?</item>
     </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="one">%1$d día</item>

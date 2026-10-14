@@ -27,6 +27,7 @@
     <string name="action_show_image_details">Afficher les détails</string>
     <string name="action_undo">Annuler</string>
     <string name="action_unfavorite">Retirer des favoris</string>
+    <string name="action_unhide">Afficher à nouveau</string>
     <string name="action_unpin">Désépingler</string>
     <string name="action_view_image">Afficher l\'image</string>
     <string name="apk_info_format">Format</string>
@@ -115,6 +116,18 @@
     <string name="gallery_sort_descending">Décroissant</string>
     <string name="gallery_sort_name">Nom</string>
     <string name="gallery_sort_size">Taille</string>
+    <string name="hidden_folders_empty">Aucun dossier masqué</string>
+    <string name="hidden_folders_open_settings">Ouvrir l\'autorisation de stockage</string>
+    <string name="hidden_folders_row_summary">Albums masqués avec .nomedia</string>
+    <string name="hidden_folders_show">Afficher dans les albums</string>
+    <string name="hidden_folders_show_summary">Afficher les dossiers masqués à la fin de la liste des albums, pour les parcourir et les partager</string>
+    <string name="hidden_folders_summary">Ces dossiers contiennent un fichier .nomedia: ni cette galerie ni les autres n\'affichent leurs images, et les fichiers restent sur l\'appareil. Sont listés les dossiers masqués ici et les dossiers masqués trouvés dans DCIM et Pictures.</string>
+    <string name="hidden_folders_title">Dossiers masqués</string>
+    <string name="hidden_folders_unavailable">Les dossiers masqués sont lus et modifiés directement sur l\'appareil: sur Android 11 et versions ultérieures, activez d\'abord l\'accès à tous les fichiers.</string>
+    <string name="hide_card_unsupported">Les albums d\'une carte mémoire ne peuvent pas être masqués</string>
+    <string name="hide_confirm_message">Un fichier .nomedia est placé dans chaque dossier: ni cette galerie ni les autres n\'afficheront ses images, et rien n\'est supprimé. Paramètres > Dossiers masqués les liste et les affiche à nouveau.</string>
+    <string name="hide_needs_access_message">Masquer écrit un fichier .nomedia dans le dossier de l\'album, ce qui demande l\'accès à tous les fichiers. Activez-le dans Paramètres > Autorisation de stockage.</string>
+    <string name="hide_needs_access_title">Accès à tous les fichiers requis</string>
     <string name="host_directory_empty">Aucune image dans ce dossier</string>
     <string name="host_directory_folder">Dossier</string>
     <string name="host_directory_limit">Seules les %1$d premières entrées sont affichées</string>
