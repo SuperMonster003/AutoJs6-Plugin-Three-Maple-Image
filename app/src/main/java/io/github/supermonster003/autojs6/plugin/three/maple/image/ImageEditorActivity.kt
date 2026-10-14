@@ -3,6 +3,7 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.ColorMatrix
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -19,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,6 +29,7 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.Edi
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorColorDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorColorDialogState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorDialogDefaults
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorGroup
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorSaveDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorSaveDialogState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorScreen
@@ -36,7 +39,11 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.Edi
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.parseEditorColor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.min
 
 /**
@@ -55,7 +62,17 @@ open class ImageEditorActivity : ConfiguredActivity() {
     private var request: ImageToolsRequest? = null
     private var bitmap: Bitmap? = null
     private var toolState = EditorToolState.NORMAL
-    private var activeAdjustment: ImageEditingEngine.Adjustment? = null
+    private var look = EditorLook()
+    private var lookTab = LOOK_TAB_FILTER
+    private var lookAdjustment = LookAdjustment.BRIGHTNESS
+
+    /** Downscaled copy of the image the look preview renders from, made when the look panel opens. */
+    private var lookPreviewSource: Bitmap? = null
+    private var lookPreviewJob: Job? = null
+
+    /** The image the filter thumbnails were made from (they are rebuilt when it changes). */
+    private var thumbnailOwner: Bitmap? = null
+    private var thumbnailJob: Job? = null
     private var rotationDegrees = 0
     private var brushColor = Color.RED
     private var selectedBrushTool = BrushTool.PEN
@@ -83,6 +100,9 @@ open class ImageEditorActivity : ConfiguredActivity() {
 
     internal open fun resolveRequest(): ImageToolsRequest? = ImageToolsRequestPolicy.resolve(this, intent, ImageToolsPlugin.EDIT_ACTION_ID)
 
+    /** The image as edited so far (test hook). */
+    internal val editedBitmapForTesting: Bitmap? get() = bitmap
+
     override val usesDarkSystemBars: Boolean get() = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,6 +122,8 @@ open class ImageEditorActivity : ConfiguredActivity() {
             title = request!!.displayName,
             cropPresetLabels = CropAspectRatioPreset.entries.map(::cropAspectRatioLabel),
             brushToolLabels = BrushTool.entries.map(::brushToolLabel),
+            filterLabels = FilterPreset.entries.map { getString(filterLabel(it)) },
+            adjustmentLabels = LookAdjustment.entries.map { getString(adjustmentTitle(it)) },
         )
         renderBrushToolControls()
         val callbacks = EditorCallbacks(
@@ -111,14 +133,22 @@ open class ImageEditorActivity : ConfiguredActivity() {
             onRedo = ::redo,
             onRestoreOriginal = ::restoreOriginal,
             onReleaseHistory = ::showReleaseHistory,
-            onGroup = { group -> ui = ui.copy(group = group) },
+            onGroup = { group ->
+                ui = ui.copy(group = group)
+                if (group == EditorGroup.FILTER) ensureFilterThumbnails()
+            },
             onCrop = ::beginCrop,
             onRotateLeft = { commitOperation { ImageEditingEngine.transform(it, rotation = -90f) } },
             onRotateRight = { commitOperation { ImageEditingEngine.transform(it, rotation = 90f) } },
             onRotateFine = ::beginFineRotation,
             onFlipHorizontal = { commitOperation { ImageEditingEngine.transform(it, flipX = true) } },
             onFlipVertical = { commitOperation { ImageEditingEngine.transform(it, flipY = true) } },
-            onAdjustment = ::beginAdjustment,
+            onAdjustment = { adjustment -> beginLook(LOOK_TAB_ADJUST, adjustment = adjustment) },
+            onFilterTool = { index -> beginLook(LOOK_TAB_FILTER, filter = FilterPreset.entries[index]) },
+            onLookTab = ::onLookTab,
+            onFilter = { index -> onFilter(FilterPreset.entries[index]) },
+            onFilterIntensity = ::onFilterIntensity,
+            onLookAdjustment = { index -> onLookAdjustment(LookAdjustment.entries[index]) },
             onBrush = ::beginBrush,
             onText = { showTextDialog() },
             onAdjustmentValue = ::onAdjustmentValue,
@@ -157,6 +187,9 @@ open class ImageEditorActivity : ConfiguredActivity() {
         textDialog = null
         saveDialog = null
         colorDialog = null
+        lookPreviewJob?.cancel()
+        thumbnailJob?.cancel()
+        lookPreviewSource = null
         if (::editor.isInitialized) editor.setBitmap(null)
         bitmap = null
         super.onDestroy()
@@ -246,6 +279,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
             bitmap = state.bitmap
             editor.setBitmap(state.bitmap)
             ui = ui.copy(ready = state.bitmap != null)
+            if (ui.group == EditorGroup.FILTER) ensureFilterThumbnails()
             if (state.bitmap != null && !uiStateRestored) restoreUiState(model.uiState)
         }
         when (val output = state.output) {
@@ -294,29 +328,122 @@ open class ImageEditorActivity : ConfiguredActivity() {
 
     // region Tools
 
-    private fun beginAdjustment(adjustment: ImageEditingEngine.Adjustment) {
+    /**
+     * Opens the look panel (ROADMAP 8.1) on [tab]; a [filter] or an [adjustment] picked from the tool strips starts
+     * selected. Filter and adjustments are previewed together and committed as one history step.
+     */
+    private fun beginLook(tab: Int, filter: FilterPreset? = null, adjustment: LookAdjustment? = null) {
+        val current = bitmap ?: return
         if (!canStartTool()) return
-        toolState = EditorToolState.ADJUSTMENT
-        activeAdjustment = adjustment
-        ui = ui.copy(adjustmentTitle = getString(adjustmentTitle(adjustment)), adjustmentValue = 0)
+        toolState = EditorToolState.LOOK
+        look = EditorLook(filter = filter ?: FilterPreset.NONE)
+        lookTab = tab
+        adjustment?.let { lookAdjustment = it }
+        startLookPreview(current)
+        ensureFilterThumbnails()
+        renderLook()
         refreshActions()
     }
 
-    private fun onAdjustmentValue(value: Int) {
-        if (toolState != EditorToolState.ADJUSTMENT) return
-        ui = ui.copy(adjustmentValue = value)
-        activeAdjustment?.let { editor.setPreviewColorMatrix(ImageEditingEngine.colorMatrix(it, value)) }
+    private fun onLookTab(tab: Int) {
+        if (toolState != EditorToolState.LOOK) return
+        lookTab = tab.coerceIn(LOOK_TAB_FILTER, LOOK_TAB_ADJUST)
+        renderLook()
     }
 
-    private fun applyAdjustment() {
-        val adjustment = activeAdjustment ?: return
-        val value = ui.adjustmentValue
-        if (value == 0) {
+    private fun onFilter(filter: FilterPreset) {
+        if (toolState != EditorToolState.LOOK) return
+        look = look.copy(filter = filter, intensity = if (filter == look.filter) look.intensity else FilterPreset.DEFAULT_INTENSITY)
+        renderLook()
+    }
+
+    private fun onFilterIntensity(value: Int) {
+        if (toolState != EditorToolState.LOOK) return
+        look = look.copy(intensity = value.coerceIn(0, 100))
+        renderLook()
+    }
+
+    private fun onLookAdjustment(adjustment: LookAdjustment) {
+        if (toolState != EditorToolState.LOOK) return
+        lookAdjustment = adjustment
+        renderLook()
+    }
+
+    private fun onAdjustmentValue(value: Int) {
+        if (toolState != EditorToolState.LOOK) return
+        look = look.with(lookAdjustment, value)
+        renderLook()
+    }
+
+    private fun renderLook() {
+        ui = ui.copy(
+            lookTab = lookTab,
+            filterIndex = look.filter.ordinal,
+            filterIntensity = look.intensity,
+            lookAdjustmentIndex = lookAdjustment.ordinal,
+            adjustmentTitle = getString(adjustmentTitle(lookAdjustment)),
+            adjustmentValue = look.value(lookAdjustment),
+            adjustmentRange = lookAdjustment.range,
+        )
+        updateLookPreview()
+    }
+
+    private fun startLookPreview(source: Bitmap) {
+        lookPreviewJob?.cancel()
+        lookPreviewSource = null
+        val pixels = maxOf(editor.width.toLong() * editor.height, MIN_PREVIEW_PIXELS).coerceAtMost(MAX_PREVIEW_PIXELS)
+        lookPreviewJob = lifecycleScope.launch {
+            val scaled = withContext(Dispatchers.Default) { ImageEditingEngine.downscale(source, pixels) }
+            if (toolState == EditorToolState.LOOK && bitmap === source) {
+                lookPreviewSource = scaled
+                updateLookPreview()
+            }
+        }
+    }
+
+    /**
+     * The color matrix shows at once on the full image; a look that needs a pixel pass (tone curve, sharpening,
+     * vignette) is rendered on the downscaled copy in the background, the newest settings winning.
+     */
+    private fun updateLookPreview() {
+        if (toolState != EditorToolState.LOOK) return
+        val current = look
+        editor.setPreviewColorMatrix(ColorMatrix(current.colorMatrix()))
+        if (!current.needsPixelPass) {
+            lookPreviewJob?.takeIf { lookPreviewSource != null }?.cancel()
+            editor.setPreviewBitmap(null)
+            return
+        }
+        val source = lookPreviewSource ?: return
+        lookPreviewJob?.cancel()
+        lookPreviewJob = lifecycleScope.launch {
+            delay(LOOK_PREVIEW_DEBOUNCE_MILLIS)
+            val rendered = withContext(Dispatchers.Default) { ImageEditingEngine.applyLook(source, current) }
+            if (toolState == EditorToolState.LOOK && look == current) editor.setPreviewBitmap(rendered)
+        }
+    }
+
+    private fun applyLook() {
+        val pending = look
+        if (pending.isIdentity) {
             cancelActiveTool()
             return
         }
         finishActiveToolUi()
-        commitOperation { ImageEditingEngine.applyAdjustment(it, adjustment, value) }
+        commitOperation { ImageEditingEngine.applyLook(it, pending) }
+    }
+
+    /** Filter thumbnails of the current image for the filter strip, made in the background once per image. */
+    private fun ensureFilterThumbnails() {
+        val current = bitmap ?: return
+        if (thumbnailOwner === current && ui.filterThumbnails.isNotEmpty()) return
+        thumbnailOwner = current
+        thumbnailJob?.cancel()
+        val size = dp(FILTER_THUMBNAIL_DP).toInt().coerceAtLeast(1)
+        thumbnailJob = lifecycleScope.launch {
+            val thumbnails = withContext(Dispatchers.Default) { ImageEditingEngine.filterThumbnails(current, size).map { it.asImageBitmap() } }
+            if (bitmap === current) ui = ui.copy(filterThumbnails = thumbnails)
+        }
     }
 
     private fun beginFineRotation() {
@@ -478,7 +605,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
 
     private fun confirmActiveTool() {
         when (toolState) {
-            EditorToolState.ADJUSTMENT -> applyAdjustment()
+            EditorToolState.LOOK -> applyLook()
             EditorToolState.ROTATION -> applyFineRotation()
             EditorToolState.BRUSH -> applyBrush()
             EditorToolState.CROP, EditorToolState.TEXT -> applyInteractiveTool()
@@ -510,7 +637,9 @@ open class ImageEditorActivity : ConfiguredActivity() {
 
     private fun finishActiveToolUi() {
         editor.clearToolState()
-        activeAdjustment = null
+        lookPreviewJob?.cancel()
+        lookPreviewSource = null
+        look = EditorLook()
         rotationDegrees = 0
         toolState = EditorToolState.NORMAL
         ui = ui.copy(toolState = EditorToolState.NORMAL)
@@ -668,8 +797,9 @@ open class ImageEditorActivity : ConfiguredActivity() {
 
     private fun captureUiState(): EditorUiState = EditorUiState(
         toolState = toolState,
-        activeAdjustment = activeAdjustment,
-        adjustmentProgress = ui.adjustmentValue + ADJUSTMENT_CENTER,
+        look = look,
+        lookTab = lookTab,
+        lookAdjustment = lookAdjustment,
         rotationDegrees = rotationDegrees,
         brushColor = brushColor,
         brushTool = selectedBrushTool,
@@ -696,7 +826,9 @@ open class ImageEditorActivity : ConfiguredActivity() {
     private fun restoreUiState(state: EditorUiState) {
         uiStateRestored = true
         toolState = state.toolState
-        activeAdjustment = state.activeAdjustment
+        look = state.look
+        lookTab = state.lookTab
+        lookAdjustment = state.lookAdjustment
         rotationDegrees = state.rotationDegrees.coerceIn(-ROTATION_CENTER, ROTATION_CENTER)
         brushColor = state.brushColor
         selectedBrushTool = state.brushTool
@@ -709,17 +841,15 @@ open class ImageEditorActivity : ConfiguredActivity() {
             group = state.group,
             rotationDegrees = rotationDegrees,
             cropPresetIndex = cropAspectRatioPreset.ordinal,
-            adjustmentValue = (state.adjustmentProgress - ADJUSTMENT_CENTER).coerceIn(-ADJUSTMENT_CENTER, ADJUSTMENT_CENTER),
         )
         renderBrushToolControls()
         editor.restoreCanvasState(state.canvasState)
         when (state.toolState) {
             EditorToolState.NORMAL -> Unit
-            EditorToolState.ADJUSTMENT -> {
-                ui = ui.copy(adjustmentTitle = getString(adjustmentTitle(state.activeAdjustment)))
-                state.activeAdjustment?.let {
-                    editor.setPreviewColorMatrix(ImageEditingEngine.colorMatrix(it, ui.adjustmentValue))
-                }
+            EditorToolState.LOOK -> bitmap?.let { current ->
+                startLookPreview(current)
+                ensureFilterThumbnails()
+                renderLook()
             }
             EditorToolState.ROTATION -> Unit
             EditorToolState.CROP -> ui = ui.copy(interactionHelp = getString(R.string.image_editor_crop_help))
@@ -752,12 +882,35 @@ open class ImageEditorActivity : ConfiguredActivity() {
         if (state.exitConfirmationVisible) showExitConfirmation()
     }
 
-    private fun adjustmentTitle(adjustment: ImageEditingEngine.Adjustment?): Int = when (adjustment) {
-        ImageEditingEngine.Adjustment.BRIGHTNESS -> R.string.image_editor_brightness
-        ImageEditingEngine.Adjustment.CONTRAST -> R.string.image_editor_contrast
-        ImageEditingEngine.Adjustment.SATURATION -> R.string.image_editor_saturation
-        ImageEditingEngine.Adjustment.TEMPERATURE -> R.string.image_editor_temperature
-        null -> R.string.text_edit
+    private fun adjustmentTitle(adjustment: LookAdjustment): Int = when (adjustment) {
+        LookAdjustment.BRIGHTNESS -> R.string.image_editor_brightness
+        LookAdjustment.CONTRAST -> R.string.image_editor_contrast
+        LookAdjustment.SATURATION -> R.string.image_editor_saturation
+        LookAdjustment.TEMPERATURE -> R.string.image_editor_temperature
+        LookAdjustment.EXPOSURE -> R.string.image_editor_exposure
+        LookAdjustment.HUE -> R.string.image_editor_hue
+        LookAdjustment.HIGHLIGHTS -> R.string.image_editor_highlights
+        LookAdjustment.SHADOWS -> R.string.image_editor_shadows
+        LookAdjustment.SHARPEN -> R.string.image_editor_sharpen
+        LookAdjustment.VIGNETTE -> R.string.image_editor_vignette
+    }
+
+    private fun filterLabel(filter: FilterPreset): Int = when (filter) {
+        FilterPreset.NONE -> R.string.image_editor_filter_none
+        FilterPreset.MONO -> R.string.image_editor_filter_mono
+        FilterPreset.NOIR -> R.string.image_editor_filter_noir
+        FilterPreset.SEPIA -> R.string.image_editor_filter_sepia
+        FilterPreset.VINTAGE -> R.string.image_editor_filter_vintage
+        FilterPreset.COOL -> R.string.image_editor_filter_cool
+        FilterPreset.WARM -> R.string.image_editor_filter_warm
+        FilterPreset.FILM -> R.string.image_editor_filter_film
+        FilterPreset.FADE -> R.string.image_editor_filter_fade
+        FilterPreset.HIGH_CONTRAST -> R.string.image_editor_filter_high_contrast
+        FilterPreset.SOFT -> R.string.image_editor_filter_soft
+        FilterPreset.VIVID -> R.string.image_editor_filter_vivid
+        FilterPreset.MATTE -> R.string.image_editor_filter_matte
+        FilterPreset.CHROME -> R.string.image_editor_filter_chrome
+        FilterPreset.INVERT -> R.string.image_editor_filter_invert
     }
 
     private fun cropAspectRatioLabel(preset: CropAspectRatioPreset): String = when (preset) {
@@ -786,7 +939,12 @@ open class ImageEditorActivity : ConfiguredActivity() {
 
     companion object {
         private const val INITIAL_STATE_ID = 0L
-        private const val ADJUSTMENT_CENTER = 100
+        private const val LOOK_TAB_FILTER = 0
+        private const val LOOK_TAB_ADJUST = 1
+        private const val LOOK_PREVIEW_DEBOUNCE_MILLIS = 40L
+        private const val MIN_PREVIEW_PIXELS = 360L * 480L
+        private const val MAX_PREVIEW_PIXELS = 700_000L
+        private const val FILTER_THUMBNAIL_DP = 64
         private const val ROTATION_CENTER = 45
         private const val BRUSH_WIDTH_MAX = 46
         private const val MOSAIC_STRENGTH_MAX = 28

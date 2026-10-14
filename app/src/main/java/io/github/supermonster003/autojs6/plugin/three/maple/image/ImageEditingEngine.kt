@@ -11,16 +11,8 @@ import android.graphics.RectF
 import androidx.core.graphics.withRotation
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
-import kotlin.math.max
 
 internal object ImageEditingEngine {
-
-    enum class Adjustment {
-        BRIGHTNESS,
-        CONTRAST,
-        SATURATION,
-        TEMPERATURE,
-    }
 
     data class Point(val x: Float, val y: Float)
 
@@ -112,59 +104,73 @@ internal object ImageEditingEngine {
         return Bitmap.createBitmap(source, safe.left, safe.top, safe.width(), safe.height())
     }
 
-    fun colorMatrix(adjustment: Adjustment, value: Int): ColorMatrix {
-        val normalized = value.coerceIn(-100, 100) / 100f
-        return when (adjustment) {
-            Adjustment.BRIGHTNESS -> {
-                val offset = normalized * 255f
-                ColorMatrix(
-                    floatArrayOf(
-                        1f, 0f, 0f, 0f, offset,
-                        0f, 1f, 0f, 0f, offset,
-                        0f, 0f, 1f, 0f, offset,
-                        0f, 0f, 0f, 1f, 0f,
-                    ),
-                )
-            }
-            Adjustment.CONTRAST -> {
-                val scale = max(0.05f, 1f + normalized)
-                val offset = 128f * (1f - scale)
-                ColorMatrix(
-                    floatArrayOf(
-                        scale, 0f, 0f, 0f, offset,
-                        0f, scale, 0f, 0f, offset,
-                        0f, 0f, scale, 0f, offset,
-                        0f, 0f, 0f, 1f, 0f,
-                    ),
-                )
-            }
-            Adjustment.SATURATION -> ColorMatrix().apply {
-                setSaturation((1f + normalized).coerceAtLeast(0f))
-            }
-            Adjustment.TEMPERATURE -> {
-                val red = 1f + normalized * 0.35f
-                val green = 1f + normalized * 0.08f
-                val blue = 1f - normalized * 0.35f
-                ColorMatrix().apply { setScale(red, green, blue, 1f) }
-            }
-        }
-    }
-
-    fun applyAdjustment(source: Bitmap, adjustment: Adjustment, value: Int): Bitmap {
+    /**
+     * Applies an [EditorLook] (ROADMAP 8.1): a color-matrix-only look draws once through a color filter; a look
+     * with a tone curve, sharpening or vignette goes through [LookPixelPass] in bands of rows, so even a 20 MP image
+     * needs only a few megabytes of pixel buffers on top of the two bitmaps.
+     */
+    fun applyLook(source: Bitmap, look: EditorLook): Bitmap {
         val target = blankBitmapLike(source, source.width, source.height)
         return try {
-            Canvas(target).drawBitmap(
-                source,
-                0f,
-                0f,
-                Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG).apply {
-                    colorFilter = ColorMatrixColorFilter(colorMatrix(adjustment, value))
-                },
-            )
+            if (!look.needsPixelPass) {
+                Canvas(target).drawBitmap(
+                    source,
+                    0f,
+                    0f,
+                    Paint(Paint.FILTER_BITMAP_FLAG).apply { colorFilter = ColorMatrixColorFilter(ColorMatrix(look.colorMatrix())) },
+                )
+            } else {
+                val width = source.width
+                val height = source.height
+                val pass = LookPixelPass(look, width, height)
+                val bandRows = (LOOK_BAND_PIXELS / width).coerceIn(1, height)
+                val input = IntArray((bandRows + 2 * pass.halo) * width)
+                val output = IntArray(bandRows * width)
+                var top = 0
+                while (top < height) {
+                    val bottom = minOf(height, top + bandRows)
+                    val inputTop = maxOf(0, top - pass.halo)
+                    val inputBottom = minOf(height, bottom + pass.halo)
+                    val inputPixels = (inputBottom - inputTop) * width
+                    val band = if (inputPixels == input.size) input else IntArray(inputPixels)
+                    source.getPixels(band, 0, width, 0, inputTop, width, inputBottom - inputTop)
+                    val out = if ((bottom - top) * width == output.size) output else IntArray((bottom - top) * width)
+                    pass.process(band, inputTop, top, bottom, out)
+                    target.setPixels(out, 0, width, 0, top, width, bottom - top)
+                    top = bottom
+                }
+            }
             target
         } catch (error: Throwable) {
             target.recycle()
             throw error
+        }
+    }
+
+    /** [source] scaled down to at most [maxPixels] (never up), for previews; the source itself when it is small. */
+    fun downscale(source: Bitmap, maxPixels: Long): Bitmap {
+        val pixels = source.width.toLong() * source.height
+        if (pixels <= maxPixels) return source
+        val factor = kotlin.math.sqrt(maxPixels.toDouble() / pixels)
+        val width = (source.width * factor).toInt().coerceAtLeast(1)
+        val height = (source.height * factor).toInt().coerceAtLeast(1)
+        return Bitmap.createScaledBitmap(source, width, height, true)
+    }
+
+    /** One [size] x [size] center-cropped thumbnail of [source] per [FilterPreset], in enum order. */
+    fun filterThumbnails(source: Bitmap, size: Int): List<Bitmap> {
+        val side = minOf(source.width, source.height)
+        val crop = Rect((source.width - side) / 2, (source.height - side) / 2, (source.width + side) / 2, (source.height + side) / 2)
+        val destination = RectF(0f, 0f, size.toFloat(), size.toFloat())
+        return FilterPreset.entries.map { preset ->
+            Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888).also { thumbnail ->
+                Canvas(thumbnail).drawBitmap(
+                    source,
+                    crop,
+                    destination,
+                    Paint(Paint.FILTER_BITMAP_FLAG).apply { colorFilter = ColorMatrixColorFilter(ColorMatrix(preset.matrix)) },
+                )
+            }
         }
     }
 
@@ -216,4 +222,7 @@ internal object ImageEditingEngine {
         }
 
     private const val MIN_CROP_SIZE = 1
+
+    /** About 1 MP per band of rows (4 MB of input plus 4 MB of output pixels). */
+    private const val LOOK_BAND_PIXELS = 1_048_576
 }

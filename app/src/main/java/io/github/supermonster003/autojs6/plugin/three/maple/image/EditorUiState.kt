@@ -4,7 +4,8 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.Edi
 
 internal enum class EditorToolState {
     NORMAL,
-    ADJUSTMENT,
+    /** The look panel (ROADMAP 8.1): filter and adjustments, previewed together. */
+    LOOK,
     ROTATION,
     CROP,
     BRUSH,
@@ -71,8 +72,9 @@ internal data class BrushWidthMemory(
 
 internal data class EditorUiState(
     val toolState: EditorToolState = EditorToolState.NORMAL,
-    val activeAdjustment: ImageEditingEngine.Adjustment? = null,
-    val adjustmentProgress: Int = 100,
+    val look: EditorLook = EditorLook(),
+    val lookTab: Int = 0,
+    val lookAdjustment: LookAdjustment = LookAdjustment.BRIGHTNESS,
     val rotationDegrees: Int = 0,
     val brushColor: Int = android.graphics.Color.RED,
     val brushTool: BrushTool = BrushTool.PEN,

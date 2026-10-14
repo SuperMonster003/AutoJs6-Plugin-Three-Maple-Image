@@ -202,7 +202,22 @@ internal fun MapleSegmented(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     tagPrefix: String = "maple.segment",
+    /** On the dark editor canvas: light labels, the accent for the selected segment (like [MapleChipRow]). */
+    onDark: Boolean = false,
 ) {
+    val canvas = MapleTheme.canvas
+    val colors = if (onDark) {
+        SegmentedButtonDefaults.colors(
+            activeContainerColor = canvas.accentOnScrim.copy(alpha = 0.16f),
+            activeContentColor = canvas.accentOnScrim,
+            activeBorderColor = canvas.onScrimMuted,
+            inactiveContainerColor = Color.Transparent,
+            inactiveContentColor = canvas.onScrim,
+            inactiveBorderColor = canvas.onScrimMuted,
+        )
+    } else {
+        SegmentedButtonDefaults.colors()
+    }
     SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
         options.forEachIndexed { index, label ->
             SegmentedButton(
@@ -210,6 +225,7 @@ internal fun MapleSegmented(
                 onClick = { onSelect(index) },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
                 enabled = enabled,
+                colors = colors,
                 modifier = Modifier.testTag("$tagPrefix.$index"),
             ) { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) }
         }

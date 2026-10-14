@@ -56,6 +56,7 @@ internal class ImageEditingView @JvmOverloads constructor(
     )
 
     private val bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+    private val plainBitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
     private val overlayPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val imageRect = RectF()
     private val cropRect = RectF()
@@ -77,6 +78,9 @@ internal class ImageEditingView @JvmOverloads constructor(
     private var mosaicBitmapCache: MosaicBitmapCache? = null
     private var textSpec: ImageEditingEngine.TextSpec? = null
 
+    /** A downscaled render of the look being previewed (ROADMAP 8.1), drawn instead of [bitmap] while set. */
+    private var previewBitmap: Bitmap? = null
+
     fun setBitmap(value: Bitmap?) {
         bitmap = value
         clearToolState()
@@ -86,6 +90,15 @@ internal class ImageEditingView @JvmOverloads constructor(
 
     fun setPreviewColorMatrix(matrix: ColorMatrix?) {
         bitmapPaint.colorFilter = matrix?.let(::ColorMatrixColorFilter)
+        invalidate()
+    }
+
+    /**
+     * Shows [value] (a render of the whole image at a smaller size) in place of the image, without the color matrix
+     * preview; null shows the image again. The caller owns the bitmap and recycles it after replacing it.
+     */
+    fun setPreviewBitmap(value: Bitmap?) {
+        previewBitmap = value
         invalidate()
     }
 
@@ -239,6 +252,7 @@ internal class ImageEditingView @JvmOverloads constructor(
     fun clearToolState() {
         mode = Mode.NORMAL
         bitmapPaint.colorFilter = null
+        previewBitmap = null
         rotationPreviewDegrees = 0f
         cropHandle = null
         cropAspectRatioPreset = CropAspectRatioPreset.FREE
@@ -263,10 +277,11 @@ internal class ImageEditingView @JvmOverloads constructor(
         super.onDraw(canvas)
         val source = bitmap ?: return
         if (imageRect.isEmpty) updateImageRect()
-        if (mode == Mode.ROTATION) {
-            drawRotationPreview(canvas, source)
-        } else {
-            canvas.drawBitmap(source, null, imageRect, bitmapPaint)
+        val preview = previewBitmap?.takeUnless(Bitmap::isRecycled)
+        when {
+            mode == Mode.ROTATION -> drawRotationPreview(canvas, source)
+            preview != null -> canvas.drawBitmap(preview, null, imageRect, plainBitmapPaint)
+            else -> canvas.drawBitmap(source, null, imageRect, bitmapPaint)
         }
         when (mode) {
             Mode.ROTATION -> Unit

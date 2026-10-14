@@ -1,9 +1,19 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +34,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,18 +45,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import io.github.supermonster003.autojs6.plugin.three.maple.image.EditorToolState
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageEditingEngine
+import io.github.supermonster003.autojs6.plugin.three.maple.image.LookAdjustment
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageEditingView
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
 
-/** First-level tool groups of the editor (design draft 7.5). */
-internal enum class EditorGroup { TRANSFORM, ADJUST, DRAW, TEXT }
+/** First-level tool groups of the editor (design draft 7.5; filters added in ROADMAP 8.1). */
+internal enum class EditorGroup { TRANSFORM, ADJUST, FILTER, DRAW, TEXT }
 
 internal object EditorScreenDefaults {
     val ADJUSTMENT_RANGE = -100..100
     val ROTATION_RANGE = -45..45
     const val BRUSH_WIDTH_MAX = 46
     const val MOSAIC_STRENGTH_MAX = 28
+    val FILTER_THUMBNAIL = 56.dp
+    val FILTER_ITEM_WIDTH = 64.dp
 }
 
 /** Everything the editor chrome renders; the Activity keeps the tool state machine and mutates this holder. */
@@ -59,6 +75,16 @@ internal data class EditorUiModel(
     val group: EditorGroup = EditorGroup.TRANSFORM,
     val adjustmentTitle: String = "",
     val adjustmentValue: Int = 0,
+    val adjustmentRange: IntRange = EditorScreenDefaults.ADJUSTMENT_RANGE,
+    val adjustmentLabels: List<String> = emptyList(),
+    val lookAdjustmentIndex: Int = 0,
+    /** 0 = filter tab, 1 = adjust tab of the look panel. */
+    val lookTab: Int = 0,
+    val filterLabels: List<String> = emptyList(),
+    /** One thumbnail per filter (empty while they are being made). */
+    val filterThumbnails: List<ImageBitmap> = emptyList(),
+    val filterIndex: Int = 0,
+    val filterIntensity: Int = 100,
     val rotationDegrees: Int = 0,
     val cropPresetIndex: Int = 0,
     val cropPresetLabels: List<String> = emptyList(),
@@ -87,7 +113,12 @@ internal class EditorCallbacks(
     val onRotateFine: () -> Unit,
     val onFlipHorizontal: () -> Unit,
     val onFlipVertical: () -> Unit,
-    val onAdjustment: (ImageEditingEngine.Adjustment) -> Unit,
+    val onAdjustment: (LookAdjustment) -> Unit,
+    val onFilterTool: (Int) -> Unit,
+    val onLookTab: (Int) -> Unit,
+    val onFilter: (Int) -> Unit,
+    val onFilterIntensity: (Int) -> Unit,
+    val onLookAdjustment: (Int) -> Unit,
     val onBrush: () -> Unit,
     val onText: () -> Unit,
     val onAdjustmentValue: (Int) -> Unit,
@@ -141,22 +172,13 @@ internal fun EditorScreen(
                     SecondaryTools(model, callbacks)
                     PrimaryGroups(model, callbacks)
                 }
-                EditorToolState.ADJUSTMENT -> MapleParameterPanel(
+                EditorToolState.LOOK -> MapleParameterPanel(
                     onCancel = callbacks.onCancelTool,
                     onConfirm = callbacks.onConfirmTool,
                     cancelText = stringResource(R.string.dialog_button_cancel),
                     confirmText = stringResource(R.string.dialog_button_confirm),
                 ) {
-                    val value = model.adjustmentValue
-                    MapleSliderRow(
-                        title = model.adjustmentTitle,
-                        value = value,
-                        range = EditorScreenDefaults.ADJUSTMENT_RANGE,
-                        onValueChange = callbacks.onAdjustmentValue,
-                        valueText = if (value > 0) "+$value" else value.toString(),
-                        centered = true,
-                        modifier = Modifier.testTag("maple.editor.adjustment"),
-                    )
+                    LookPanel(model, callbacks)
                 }
                 EditorToolState.ROTATION -> MapleParameterPanel(
                     onCancel = callbacks.onCancelTool,
@@ -203,7 +225,7 @@ internal fun EditorScreen(
                     cancelText = stringResource(R.string.dialog_button_cancel),
                     confirmText = stringResource(R.string.dialog_button_confirm),
                 ) {
-                    MapleSegmented(options = model.brushToolLabels, selectedIndex = model.brushToolIndex, onSelect = callbacks.onBrushTool)
+                    MapleSegmented(options = model.brushToolLabels, selectedIndex = model.brushToolIndex, onSelect = callbacks.onBrushTool, onDark = true)
                     if (model.brushColorVisible) {
                         MapleColorButton(
                             color = model.brushColor,
@@ -234,6 +256,95 @@ internal fun EditorScreen(
         }
     }
     dialogs()
+}
+
+/**
+ * Look panel (ROADMAP 8.1): the filter tab (thumbnail strip and intensity) and the adjust tab (one chip per
+ * adjustment and its slider) share one pending look, so a filter and adjustments are previewed and applied together.
+ */
+@Composable
+private fun LookPanel(model: EditorUiModel, callbacks: EditorCallbacks) {
+    MapleSegmented(
+        options = listOf(stringResource(R.string.image_editor_group_filter), stringResource(R.string.image_editor_group_adjust)),
+        selectedIndex = model.lookTab,
+        onSelect = callbacks.onLookTab,
+        tagPrefix = "maple.editor.lookTab",
+        onDark = true,
+    )
+    Spacer(Modifier.height(4.dp))
+    if (model.lookTab == 0) {
+        FilterStrip(model, selectedIndex = model.filterIndex, onSelect = callbacks.onFilter)
+        if (model.filterIndex > 0) {
+            MapleSliderRow(
+                title = stringResource(R.string.image_editor_filter_intensity),
+                value = model.filterIntensity,
+                range = 0..100,
+                onValueChange = callbacks.onFilterIntensity,
+                modifier = Modifier.testTag("maple.editor.filterIntensity"),
+            )
+        }
+    } else {
+        MapleChipRow(
+            options = model.adjustmentLabels,
+            selectedIndex = model.lookAdjustmentIndex,
+            onSelect = callbacks.onLookAdjustment,
+            modifier = Modifier.testTag("maple.editor.adjustments"),
+        )
+        val value = model.adjustmentValue
+        val centered = model.adjustmentRange.first < 0
+        MapleSliderRow(
+            title = model.adjustmentTitle,
+            value = value,
+            range = model.adjustmentRange,
+            onValueChange = callbacks.onAdjustmentValue,
+            valueText = if (centered && value > 0) "+$value" else value.toString(),
+            centered = centered,
+            modifier = Modifier.testTag("maple.editor.adjustment"),
+        )
+    }
+}
+
+/** Filter thumbnails with their names; [selectedIndex] -1 marks none (the filter group's tool strip). */
+@Composable
+private fun FilterStrip(model: EditorUiModel, selectedIndex: Int, onSelect: (Int) -> Unit, enabled: Boolean = true) {
+    val canvas = MapleTheme.canvas
+    LazyRow(
+        modifier = Modifier.fillMaxWidth().testTag("maple.editor.filters"),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp),
+    ) {
+        itemsIndexed(model.filterLabels) { index, label ->
+            val selected = index == selectedIndex
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .width(EditorScreenDefaults.FILTER_ITEM_WIDTH)
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(enabled = enabled) { onSelect(index) }
+                    .padding(vertical = 4.dp)
+                    .testTag("maple.editor.filter.$index"),
+            ) {
+                val thumbnail = model.filterThumbnails.getOrNull(index)
+                val frame = Modifier
+                    .size(EditorScreenDefaults.FILTER_THUMBNAIL)
+                    .clip(RoundedCornerShape(6.dp))
+                    .border(2.dp, if (selected) canvas.accentOnScrim else canvas.onScrim.copy(alpha = 0f), RoundedCornerShape(6.dp))
+                if (thumbnail != null) {
+                    Image(bitmap = thumbnail, contentDescription = null, contentScale = ContentScale.Crop, modifier = frame)
+                } else {
+                    Box(modifier = frame.background(canvas.onScrim.copy(alpha = 0.12f)))
+                }
+                Text(
+                    text = label,
+                    color = if (selected) canvas.accentOnScrim else canvas.onScrim,
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -304,11 +415,21 @@ private fun SecondaryTools(model: EditorUiModel, callbacks: EditorCallbacks) {
             MapleTool("flipVertical", painterResource(R.drawable.ic_flip_vertical_24), stringResource(R.string.image_editor_flip_vertical), callbacks.onFlipVertical),
         )
         EditorGroup.ADJUST -> listOf(
-            MapleTool("brightness", painterResource(R.drawable.ic_brightness_24), stringResource(R.string.image_editor_brightness), onClick = { callbacks.onAdjustment(ImageEditingEngine.Adjustment.BRIGHTNESS) }),
-            MapleTool("contrast", painterResource(R.drawable.ic_contrast_24), stringResource(R.string.image_editor_contrast), onClick = { callbacks.onAdjustment(ImageEditingEngine.Adjustment.CONTRAST) }),
-            MapleTool("saturation", painterResource(R.drawable.ic_saturation_24), stringResource(R.string.image_editor_saturation), onClick = { callbacks.onAdjustment(ImageEditingEngine.Adjustment.SATURATION) }),
-            MapleTool("temperature", painterResource(R.drawable.ic_temperature_24), stringResource(R.string.image_editor_temperature), onClick = { callbacks.onAdjustment(ImageEditingEngine.Adjustment.TEMPERATURE) }),
+            MapleTool("brightness", painterResource(R.drawable.ic_brightness_24), stringResource(R.string.image_editor_brightness), onClick = { callbacks.onAdjustment(LookAdjustment.BRIGHTNESS) }),
+            MapleTool("contrast", painterResource(R.drawable.ic_contrast_24), stringResource(R.string.image_editor_contrast), onClick = { callbacks.onAdjustment(LookAdjustment.CONTRAST) }),
+            MapleTool("saturation", painterResource(R.drawable.ic_saturation_24), stringResource(R.string.image_editor_saturation), onClick = { callbacks.onAdjustment(LookAdjustment.SATURATION) }),
+            MapleTool("temperature", painterResource(R.drawable.ic_temperature_24), stringResource(R.string.image_editor_temperature), onClick = { callbacks.onAdjustment(LookAdjustment.TEMPERATURE) }),
+            MapleTool("exposure", painterResource(R.drawable.ic_exposure_24), stringResource(R.string.image_editor_exposure), onClick = { callbacks.onAdjustment(LookAdjustment.EXPOSURE) }),
+            MapleTool("hue", painterResource(R.drawable.ic_palette_24), stringResource(R.string.image_editor_hue), onClick = { callbacks.onAdjustment(LookAdjustment.HUE) }),
+            MapleTool("highlights", painterResource(R.drawable.ic_highlights_24), stringResource(R.string.image_editor_highlights), onClick = { callbacks.onAdjustment(LookAdjustment.HIGHLIGHTS) }),
+            MapleTool("shadows", painterResource(R.drawable.ic_shadows_24), stringResource(R.string.image_editor_shadows), onClick = { callbacks.onAdjustment(LookAdjustment.SHADOWS) }),
+            MapleTool("sharpen", painterResource(R.drawable.ic_sharpen_24), stringResource(R.string.image_editor_sharpen), onClick = { callbacks.onAdjustment(LookAdjustment.SHARPEN) }),
+            MapleTool("vignette", painterResource(R.drawable.ic_vignette_24), stringResource(R.string.image_editor_vignette), onClick = { callbacks.onAdjustment(LookAdjustment.VIGNETTE) }),
         )
+        EditorGroup.FILTER -> {
+            FilterStrip(model, selectedIndex = -1, onSelect = callbacks.onFilterTool, enabled = enabled)
+            return
+        }
         EditorGroup.DRAW -> listOf(
             MapleTool("brush", painterResource(R.drawable.ic_brush_24), stringResource(R.string.image_editor_brush), callbacks.onBrush),
         )
@@ -324,6 +445,7 @@ private fun PrimaryGroups(model: EditorUiModel, callbacks: EditorCallbacks) {
     val groups = listOf(
         MapleTool("group.transform", painterResource(R.drawable.ic_transform_24), stringResource(R.string.image_editor_group_transform), { callbacks.onGroup(EditorGroup.TRANSFORM) }, selected = model.group == EditorGroup.TRANSFORM),
         MapleTool("group.adjust", painterResource(R.drawable.ic_tune_24), stringResource(R.string.image_editor_group_adjust), { callbacks.onGroup(EditorGroup.ADJUST) }, selected = model.group == EditorGroup.ADJUST),
+        MapleTool("group.filter", painterResource(R.drawable.ic_filter_24), stringResource(R.string.image_editor_group_filter), { callbacks.onGroup(EditorGroup.FILTER) }, selected = model.group == EditorGroup.FILTER),
         MapleTool("group.draw", painterResource(R.drawable.ic_brush_24), stringResource(R.string.image_editor_group_draw), { callbacks.onGroup(EditorGroup.DRAW) }, selected = model.group == EditorGroup.DRAW),
         MapleTool("group.text", painterResource(R.drawable.ic_text_24), stringResource(R.string.image_editor_text), { callbacks.onGroup(EditorGroup.TEXT) }, selected = model.group == EditorGroup.TEXT),
     )
