@@ -338,6 +338,9 @@ internal data class ImageConverterScreenState(
     val outputError: Throwable? = null,
     val outputAlreadyClaimed: Boolean = false,
     val targetFileSizeResult: ImageTargetFileSizeResult? = null,
+    /** The conversion was written over the original (ROADMAP 8.3). */
+    val overwritten: Boolean = false,
+    val replacementUndo: ReplacementUndo? = null,
 )
 
 internal class ImageConverterViewModel(application: Application) : AndroidViewModel(application) {
@@ -348,6 +351,8 @@ internal class ImageConverterViewModel(application: Application) : AndroidViewMo
     private var request: ImageToolsRequest? = null
     private var conversionJob: Job? = null
     private var pendingTargetOutput: PendingTargetOutput? = null
+    private var requestedOverwrite = false
+    private var replacementUndo: ReplacementUndo? = null
 
     val state: StateFlow<ImageConverterScreenState> = _state.asStateFlow()
     var draft: ConversionDialogDraft? = null
@@ -377,9 +382,11 @@ internal class ImageConverterViewModel(application: Application) : AndroidViewMo
         }
     }
 
-    fun convert(options: ImageConversionOptions) {
+    /** [overwrite]: replace the original (only when the request allows it; the format is the original's). */
+    fun convert(options: ImageConversionOptions, overwrite: Boolean = false) {
         val activeRequest = request ?: return
         if (_state.value.stage != ConverterStage.READY) return
+        requestedOverwrite = overwrite && activeRequest.canOverwrite
         _state.value = _state.value.copy(
             stage = ConverterStage.CONVERTING,
             outputError = null,
@@ -428,6 +435,8 @@ internal class ImageConverterViewModel(application: Application) : AndroidViewMo
                     targetFileSizeResult = targetFileSizeResult?.copy(
                         encodedBytes = writeResult.encodedBytes,
                     ),
+                    overwritten = requestedOverwrite,
+                    replacementUndo = replacementUndo,
                 )
             } catch (cancelled: CancellationException) {
                 if (outputGuard.currentState == SingleUseOutputCommitGuard.State.RUNNING) outputGuard.fail()
@@ -461,6 +470,8 @@ internal class ImageConverterViewModel(application: Application) : AndroidViewMo
                     targetFileSizeResult = pending.targetFileSizeResult.copy(
                         encodedBytes = writeResult.encodedBytes,
                     ),
+                    overwritten = requestedOverwrite,
+                    replacementUndo = replacementUndo,
                 )
             } catch (cancelled: CancellationException) {
                 if (outputGuard.currentState == SingleUseOutputCommitGuard.State.RUNNING) outputGuard.fail()
@@ -510,16 +521,16 @@ internal class ImageConverterViewModel(application: Application) : AndroidViewMo
     ): ImageOutputWriteResult = withContext(Dispatchers.IO) {
         val host = activeRequest.hostOutput
         if (host != null) {
-            // The converter always makes a new file next to the original (its overwrite option follows in 8.3).
             var written: ImageOutputWriteResult? = null
-            host.publish(
-                displayName = EditorSavePolicy.outputFileName(activeRequest.displayName, options.format, activeRequest.outputNameSuffix, overwrite = false),
+            val published = host.publish(
+                displayName = EditorSavePolicy.outputFileName(activeRequest.displayName, options.format, activeRequest.outputNameSuffix, requestedOverwrite),
                 mimeType = options.format.mimeType,
                 expectedSize = options.targetSize,
-                overwrite = false,
+                overwrite = requestedOverwrite,
             ) { open ->
                 written = ImageBitmapIO.writeOutput(bitmap, options, activeRequest.maxOutputBytes, getApplication<Application>().cacheDir, open)
             }
+            replacementUndo = published.replacementHistoryId?.let(::ReplacementUndo)
             requireNotNull(written)
         } else {
             ImageBitmapIO.writeOutput(
@@ -530,6 +541,19 @@ internal class ImageConverterViewModel(application: Application) : AndroidViewMo
                 maxOutputBytes = activeRequest.maxOutputBytes,
                 temporaryDirectory = getApplication<Application>().cacheDir,
             )
+        }
+    }
+
+    /** Puts the overwritten original back through the host (once); the state reports how it went. */
+    fun undoReplacement() {
+        val undo = _state.value.replacementUndo?.takeIf { it.state == ReplacementUndoState.AVAILABLE } ?: return
+        val host = request?.hostOutput ?: return
+        replacementUndo = undo.copy(state = ReplacementUndoState.RUNNING)
+        _state.value = _state.value.copy(replacementUndo = replacementUndo)
+        viewModelScope.launch {
+            val restored = withContext(Dispatchers.IO) { runCatching { host.undo(undo.historyId) }.getOrDefault(false) }
+            replacementUndo = undo.copy(state = if (restored) ReplacementUndoState.RESTORED else ReplacementUndoState.FAILED)
+            _state.value = _state.value.copy(replacementUndo = replacementUndo)
         }
     }
 
@@ -561,6 +585,10 @@ internal data class ConversionDialogDraft(
     val targetFileSizeKibibytes: String = ImageTargetFileSizePolicy.DEFAULT_TARGET_KIBIBYTES.toString(),
     val longEdge: String = ImageConversionSizing.DEFAULT_LONG_EDGE.toString(),
     val preserveExifMetadata: Boolean = false,
+    /** Replace the original (ROADMAP 8.3); never remembered beyond the open converter. */
+    val overwrite: Boolean = false,
+    /** The user switched "keep EXIF" themselves: overwriting no longer switches it along. */
+    val preserveExifTouched: Boolean = false,
 )
 
 private const val LOG_TAG = "ImageToolsViewModel"

@@ -289,7 +289,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 8.3 转换器重做
 
-- [ ] (插件) 转换器界面按新设计重做 (与批量转换共用表单组件), 预估区与输出后缀预览保留; 新增 "覆盖原图" 选项 (同 8.2 路径). 验收: 现有转换 JVM 用例通过; 配置变更保留草稿与执行中任务.
+- [x] (插件) 转换器界面按新设计重做 (与批量转换共用表单组件), 预估区与输出后缀预览保留; 新增 "覆盖原图" 选项 (同 8.2 路径). 验收: 现有转换 JVM 用例通过; 配置变更保留草稿与执行中任务. 完成 (2026-10-15): 转换器与批量转换的表单改为同一套组件 (`ConversionFormSections.kt`: 格式, 质量, 无损 WebP, 调整尺寸及各模式输入, 表单级错误, JPEG 背景, EXIF, 覆盖原图; 测试标签按前缀 `maple.converter` / `maple.batch`, 原标签不变), 转换器保留目标文件大小, 批量保留旋转. 底部预估区保留, 文件名一行改为与编辑器相同的预览 ("新文件: photo_converted.jpg" / "将替换: photo.jpg"), 不再用 "宿主使用安全后缀发布" 的说明 (两条旧字符串已删). 新增 "覆盖原图": 宿主入口 (会话替换, 8 秒撤销条) 与首页 "转换图片" (覆盖 + 备份 + 提示条撤销) 都提供, 打开后格式锁定为原图格式 (`ConverterFormEvaluator.overwriteFormat`), "保留安全的 EXIF" 在用户没动过时随之打开. 测试: `ConverterFormEvaluatorTest` 11 例 (新增: 覆盖锁定原格式, 无权限 / GIF / 原格式不允许时不提供), `ConverterRecreationInstrumentationTest` 2 例 (重建后草稿保留: 格式, 百分比, 预估分辨率; 转换中重建后仍完成并把结果交给新页面), `HostToolOverwriteInstrumentationTest` 新增转换器覆盖 + 撤销 (共 5 例), 既有 `ImageConverterComposeInstrumentationTest` 与批量转换用例在 AVD API 33 通过.
 
 ### 8.4 协议升级
 

@@ -399,14 +399,12 @@
     <string name="text_image_conversion_custom_size">사용자 지정</string>
     <string name="text_image_conversion_estimated_size">예상 파일 크기: ~%1$s</string>
     <string name="text_image_conversion_estimated_size_unavailable">예상 파일 크기: -</string>
-    <string name="text_image_conversion_filename_strategy">호스트가 안전한 접미사를 사용해 새 형제 파일을 게시합니다</string>
     <string name="text_image_conversion_height">높이</string>
     <string name="text_image_conversion_jpeg_background">JPEG 투명 영역 배경</string>
     <string name="text_image_conversion_lock_aspect_ratio">가로세로 비율 고정</string>
     <string name="text_image_conversion_long_edge">긴 변</string>
     <string name="text_image_conversion_long_edge_hint">최대 긴 변</string>
     <string name="text_image_conversion_original_size">원본</string>
-    <string name="text_image_conversion_output_filename">출력 접미사: %1$s</string>
     <string name="text_image_conversion_output_resolution">출력 해상도: %1$d x %2$d</string>
     <string name="text_image_conversion_output_resolution_unavailable">출력 해상도: -</string>
     <string name="text_image_conversion_percentage">백분율</string>

@@ -15,6 +15,8 @@ internal data class ConverterFormEvaluation(
     val resizeError: ImageResizeError?,
     val estimatedBytes: Long?,
     val options: ImageConversionOptions?,
+    /** The output replaces the original, in its own format (ROADMAP 8.3). */
+    val overwrite: Boolean = false,
 ) {
     val convertEnabled: Boolean get() = options != null
     val targetFileSizeInvalid: Boolean get() = targetFileSizeActive && targetFileSizeBytes == null
@@ -31,12 +33,20 @@ internal class ConverterFormEvaluator(
     private val maxOutputBytes: Long,
     private val sdkInt: Int,
     private val withinMemoryBudget: (ImagePixelSize) -> Boolean,
+    /** The request lets the original be replaced (ROADMAP 8.3). */
+    canOverwrite: Boolean = false,
 ) {
     init {
         require(formats.isNotEmpty()) { "At least one output format is required" }
     }
 
     val formatList: List<ImageOutputFormat> get() = formats
+
+    /**
+     * The format an overwrite keeps: the original's own, or null when it cannot be written (GIF, HEIF...) or the
+     * request does not allow replacing the original; then "Overwrite the original" is not offered.
+     */
+    val overwriteFormat: ImageOutputFormat? = if (canOverwrite) formats.firstOrNull { it.mimeType == sourceInfo.mimeType } else null
 
     fun defaultDraft(defaultPercentage: String = "100"): ConversionDialogDraft {
         val size = sourceInfo.displaySize
@@ -61,7 +71,7 @@ internal class ConverterFormEvaluator(
     }
 
     fun format(draft: ConversionDialogDraft): ImageOutputFormat =
-        formats.firstOrNull { it.mimeType == draft.formatMimeType } ?: formats.first()
+        overwriteFormat?.takeIf { draft.overwrite } ?: formats.firstOrNull { it.mimeType == draft.formatMimeType } ?: formats.first()
 
     fun heightForWidth(width: Int?): Int? = width?.let { ImageConversionSizing.heightForWidth(sourceInfo.displaySize, it) }
 
@@ -115,6 +125,7 @@ internal class ConverterFormEvaluator(
             resizeError = resize.error,
             estimatedBytes = estimatedBytes,
             options = options,
+            overwrite = draft.overwrite && overwriteFormat != null,
         )
     }
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,6 +40,7 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ConversionDial
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ConverterFormEvaluation
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageResizeError
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageResizeMode
+import io.github.supermonster003.autojs6.plugin.three.maple.image.EditorSavePolicy
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
 
 /** Observable converter form; the Activity owns it and snapshots it into [ConversionDialogDraft] for recreation. */
@@ -56,6 +58,8 @@ internal class ConverterFormState(draft: ConversionDialogDraft) {
     var targetFileSizeEnabled by mutableStateOf(draft.targetFileSizeEnabled)
     var targetFileSizeKibibytes by mutableStateOf(draft.targetFileSizeKibibytes)
     var preserveExifMetadata by mutableStateOf(draft.preserveExifMetadata)
+    var overwrite by mutableStateOf(draft.overwrite)
+    var preserveExifTouched by mutableStateOf(draft.preserveExifTouched)
 
     fun snapshot() = ConversionDialogDraft(
         formatMimeType = formatMimeType,
@@ -71,6 +75,8 @@ internal class ConverterFormState(draft: ConversionDialogDraft) {
         targetFileSizeKibibytes = targetFileSizeKibibytes,
         longEdge = longEdge,
         preserveExifMetadata = preserveExifMetadata,
+        overwrite = overwrite,
+        preserveExifTouched = preserveExifTouched,
     )
 }
 
@@ -83,6 +89,12 @@ internal data class ConverterUiModel(
     val formatIndex: Int = 0,
     val outputSuffix: String = "",
     val maxTargetKibibytes: Long = 0L,
+    /** "Overwrite the original" is offered, and the index of the original's format it locks to. */
+    val overwriteAvailable: Boolean = false,
+    val overwriteFormatIndex: Int = -1,
+    /** The host replaced the original; the bar offers its undo until the converter closes (ROADMAP 8.3). */
+    val replacementUndo: Boolean = false,
+    val replacementUndoBusy: Boolean = false,
 )
 
 /** Strings the page cannot derive itself: error texts per resize error and the byte formatter of the estimate. */
@@ -100,6 +112,9 @@ internal class ConverterCallbacks(
     val onWidth: (String) -> Unit,
     val onHeight: (String) -> Unit,
     val onLockAspectRatio: (Boolean) -> Unit,
+    val onPreserveExif: (Boolean) -> Unit,
+    val onOverwrite: (Boolean) -> Unit,
+    val onUndoReplacement: () -> Unit,
 )
 
 private val resizeModes = listOf(ImageResizeMode.ORIGINAL, ImageResizeMode.PERCENTAGE, ImageResizeMode.LONG_EDGE, ImageResizeMode.CUSTOM)
@@ -142,6 +157,7 @@ internal fun ConverterScreen(
                         Form(model, form, evaluation, texts, callbacks, enabled = !model.converting)
                         Spacer(Modifier.height(16.dp))
                     }
+                    if (model.replacementUndo) ReplacementUndoBar(model, callbacks)
                     EstimateBar(model, evaluation, texts)
                 }
             }
@@ -183,34 +199,18 @@ private fun Form(
     enabled: Boolean,
 ) {
     val horizontal = MapleSettingsDefaults.horizontalPadding
-    MapleSectionHeader(stringResource(R.string.apk_info_format))
-    MapleSegmented(
-        options = model.formatLabels,
-        selectedIndex = model.formatIndex,
+    val tag = "maple.converter"
+    ConversionFormatSection(
+        labels = model.formatLabels,
+        selectedIndex = if (evaluation.overwrite) model.overwriteFormatIndex else model.formatIndex,
         onSelect = callbacks.onFormat,
         enabled = enabled,
-        tagPrefix = "maple.converter.format",
-        modifier = Modifier.padding(horizontal = horizontal),
+        tagPrefix = tag,
+        locked = evaluation.overwrite,
     )
     Spacer(Modifier.height(8.dp))
-    MapleSliderRow(
-        title = stringResource(R.string.text_image_conversion_quality),
-        value = form.quality,
-        range = 1..100,
-        onValueChange = { form.quality = it },
-        onDark = false,
-        enabled = enabled && evaluation.qualityEnabled,
-        modifier = Modifier.padding(horizontal = horizontal).testTag("maple.converter.quality"),
-    )
-    if (evaluation.losslessVisible) {
-        MapleSwitchRow(
-            title = stringResource(R.string.text_image_conversion_webp_lossless),
-            checked = form.webpLossless,
-            onToggle = callbacks.onWebpLossless,
-            enabled = enabled,
-            modifier = Modifier.testTag("maple.converter.lossless"),
-        )
-    }
+    ConversionQualityRow(form.quality, { form.quality = it }, enabled && evaluation.qualityEnabled, tag)
+    if (evaluation.losslessVisible) ConversionLosslessRow(form.webpLossless, callbacks.onWebpLossless, enabled, tag)
     if (evaluation.targetFileSizeVisible) {
         MapleSwitchRow(
             title = stringResource(R.string.text_image_conversion_target_file_size),
@@ -218,7 +218,7 @@ private fun Form(
             checked = form.targetFileSizeEnabled,
             onToggle = callbacks.onTargetFileSizeEnabled,
             enabled = enabled,
-            modifier = Modifier.testTag("maple.converter.targetEnabled"),
+            modifier = Modifier.testTag("$tag.targetEnabled"),
         )
         if (evaluation.targetFileSizeActive) {
             MapleNumberField(
@@ -232,115 +232,72 @@ private fun Form(
                     null
                 },
                 enabled = enabled,
-                modifier = Modifier.padding(horizontal = horizontal).testTag("maple.converter.targetFileSize"),
+                modifier = Modifier.padding(horizontal = horizontal).testTag("$tag.targetFileSize"),
             )
         }
     }
-    MapleSectionHeader(stringResource(R.string.text_image_conversion_resize))
-    MapleChipFlow(
-        options = listOf(
-            stringResource(R.string.text_image_conversion_original_size),
-            stringResource(R.string.text_image_conversion_percentage),
-            stringResource(R.string.text_image_conversion_long_edge),
-            stringResource(R.string.text_image_conversion_custom_size),
-        ),
-        selectedIndex = resizeModes.indexOf(form.resizeMode),
-        onSelect = { form.resizeMode = resizeModes[it] },
-        enabled = enabled,
-        tagPrefix = "maple.converter.resize",
-        modifier = Modifier.padding(horizontal = horizontal),
-    )
     val error = evaluation.resizeError
-    when (form.resizeMode) {
-        ImageResizeMode.ORIGINAL -> Unit
-        ImageResizeMode.PERCENTAGE -> MapleNumberField(
-            value = form.percentage,
-            onValueChange = { form.percentage = it },
-            label = stringResource(R.string.text_image_conversion_percentage_hint),
-            suffix = "%",
-            error = error?.takeIf { it == ImageResizeError.INVALID_PERCENTAGE }?.let(texts.errorText),
-            enabled = enabled,
-            modifier = Modifier.padding(horizontal = horizontal, vertical = 8.dp).testTag("maple.converter.percentage"),
-        )
-        ImageResizeMode.LONG_EDGE -> MapleNumberField(
-            value = form.longEdge,
-            onValueChange = { form.longEdge = it },
-            label = stringResource(R.string.text_image_conversion_long_edge_hint),
-            suffix = "px",
-            error = error?.takeIf { it == ImageResizeError.INVALID_LONG_EDGE }?.let(texts.errorText),
-            enabled = enabled,
-            modifier = Modifier.padding(horizontal = horizontal, vertical = 8.dp).testTag("maple.converter.longEdge"),
-        )
-        ImageResizeMode.CUSTOM -> {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = horizontal, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                MapleNumberField(
-                    value = form.width,
-                    onValueChange = callbacks.onWidth,
-                    label = stringResource(R.string.text_image_conversion_width),
-                    suffix = "px",
-                    error = error?.takeIf { it == ImageResizeError.INVALID_WIDTH }?.let(texts.errorText),
-                    enabled = enabled,
-                    modifier = Modifier.weight(1f).testTag("maple.converter.width"),
-                )
-                MapleNumberField(
-                    value = form.height,
-                    onValueChange = callbacks.onHeight,
-                    label = stringResource(R.string.text_image_conversion_height),
-                    suffix = "px",
-                    error = error?.takeIf { it == ImageResizeError.INVALID_HEIGHT }?.let(texts.errorText),
-                    enabled = enabled,
-                    modifier = Modifier.weight(1f).testTag("maple.converter.height"),
-                )
-            }
-            MapleSwitchRow(
-                title = stringResource(R.string.text_image_conversion_lock_aspect_ratio),
-                checked = form.lockAspectRatio,
-                onToggle = callbacks.onLockAspectRatio,
-                enabled = enabled,
-                modifier = Modifier.testTag("maple.converter.lockAspect"),
-            )
-        }
-    }
+    fun fieldError(expected: ImageResizeError) = error?.takeIf { it == expected }?.let(texts.errorText)
+    ConversionResizeSection(
+        modes = resizeModes,
+        mode = form.resizeMode,
+        onMode = { form.resizeMode = it },
+        fields = ConversionResizeFields(
+            percentage = form.percentage,
+            onPercentage = { form.percentage = it },
+            percentageError = fieldError(ImageResizeError.INVALID_PERCENTAGE),
+            longEdge = form.longEdge,
+            onLongEdge = { form.longEdge = it },
+            longEdgeError = fieldError(ImageResizeError.INVALID_LONG_EDGE),
+            width = form.width,
+            onWidth = callbacks.onWidth,
+            widthError = fieldError(ImageResizeError.INVALID_WIDTH),
+            height = form.height,
+            onHeight = callbacks.onHeight,
+            heightError = fieldError(ImageResizeError.INVALID_HEIGHT),
+            lockAspectRatio = form.lockAspectRatio,
+            onLockAspectRatio = callbacks.onLockAspectRatio,
+        ),
+        enabled = enabled,
+        tagPrefix = tag,
+    )
     val generalError = error?.takeIf {
         it != ImageResizeError.INVALID_PERCENTAGE && it != ImageResizeError.INVALID_LONG_EDGE &&
             it != ImageResizeError.INVALID_WIDTH && it != ImageResizeError.INVALID_HEIGHT
     }
-    if (generalError != null) {
-        Text(
-            text = texts.errorText(generalError),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.error,
-            modifier = Modifier.padding(horizontal = horizontal, vertical = 4.dp).testTag("maple.converter.error"),
-        )
-    }
+    if (generalError != null) ConversionErrorText(texts.errorText(generalError), tag)
     if (evaluation.jpegBackgroundVisible) {
-        MapleSectionHeader(stringResource(R.string.text_image_conversion_jpeg_background))
-        MapleSegmented(
-            options = listOf(
-                stringResource(R.string.text_image_conversion_background_white),
-                stringResource(R.string.text_image_conversion_background_black),
-            ),
-            selectedIndex = if (form.jpegBackgroundBlack) 1 else 0,
-            onSelect = { form.jpegBackgroundBlack = it == 1 },
-            enabled = enabled,
-            tagPrefix = "maple.converter.background",
-            modifier = Modifier.padding(horizontal = horizontal),
-        )
+        ConversionJpegBackgroundSection(form.jpegBackgroundBlack, { form.jpegBackgroundBlack = it }, enabled, tag)
     }
     Spacer(Modifier.height(8.dp))
-    MapleSwitchRow(
-        title = stringResource(R.string.text_image_conversion_preserve_exif),
-        summary = stringResource(R.string.text_image_conversion_preserve_exif_helper),
-        checked = form.preserveExifMetadata,
-        onToggle = { form.preserveExifMetadata = it },
-        enabled = enabled,
-        modifier = Modifier.testTag("maple.converter.exif"),
-    )
+    ConversionExifRow(form.preserveExifMetadata, callbacks.onPreserveExif, enabled, tag)
+    if (model.overwriteAvailable) ConversionOverwriteRow(form.overwrite, callbacks.onOverwrite, enabled, tag)
 }
 
+/** After the host replaced the original: "Original overwritten" with Undo until the converter closes. */
+@Composable
+private fun ReplacementUndoBar(model: ConverterUiModel, callbacks: ConverterCallbacks) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(start = MapleSettingsDefaults.horizontalPadding, end = 8.dp)
+            .testTag("maple.converter.replacementUndo"),
+    ) {
+        Text(
+            text = stringResource(R.string.overwrite_saved),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.weight(1f),
+        )
+        androidx.compose.material3.TextButton(
+            onClick = callbacks.onUndoReplacement,
+            enabled = !model.replacementUndoBusy,
+            modifier = Modifier.defaultMinSize(minHeight = 48.dp).testTag("maple.converter.replacementUndo.action"),
+        ) { Text(stringResource(R.string.action_undo)) }
+    }
+}
 
 @Composable
 private fun EstimateBar(model: ConverterUiModel, evaluation: ConverterFormEvaluation, texts: ConverterTexts) {
@@ -373,8 +330,14 @@ private fun EstimateBar(model: ConverterUiModel, evaluation: ConverterFormEvalua
                     modifier = Modifier.testTag("maple.converter.estimate"),
                 )
                 Text(
-                    text = stringResource(R.string.text_image_conversion_output_filename, model.outputSuffix + "." + evaluation.format.extension) +
-                        "\n" + stringResource(R.string.text_image_conversion_filename_strategy),
+                    text = if (evaluation.overwrite) {
+                        stringResource(R.string.image_editor_save_replaces_name, model.title)
+                    } else {
+                        stringResource(
+                            R.string.image_editor_save_new_name,
+                            EditorSavePolicy.outputFileName(model.title, evaluation.format, model.outputSuffix, overwrite = false),
+                        )
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp).testTag("maple.converter.suffix"),

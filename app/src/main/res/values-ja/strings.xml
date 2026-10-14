@@ -399,14 +399,12 @@
     <string name="text_image_conversion_custom_size">カスタム</string>
     <string name="text_image_conversion_estimated_size">推定ファイルサイズ: ~%1$s</string>
     <string name="text_image_conversion_estimated_size_unavailable">推定ファイルサイズ: -</string>
-    <string name="text_image_conversion_filename_strategy">ホストは安全なサフィックスを付けた新しい同階層ファイルを公開します</string>
     <string name="text_image_conversion_height">高さ</string>
     <string name="text_image_conversion_jpeg_background">JPEG の透明部分の背景</string>
     <string name="text_image_conversion_lock_aspect_ratio">縦横比を固定</string>
     <string name="text_image_conversion_long_edge">長辺</string>
     <string name="text_image_conversion_long_edge_hint">長辺の上限</string>
     <string name="text_image_conversion_original_size">元のサイズ</string>
-    <string name="text_image_conversion_output_filename">出力サフィックス: %1$s</string>
     <string name="text_image_conversion_output_resolution">出力解像度: %1$d x %2$d</string>
     <string name="text_image_conversion_output_resolution_unavailable">出力解像度: -</string>
     <string name="text_image_conversion_percentage">パーセント</string>

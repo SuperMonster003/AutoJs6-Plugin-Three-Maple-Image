@@ -228,7 +228,7 @@ internal object ImageToolsRequestPolicy {
             allowedOutputMimeTypes = ImageToolsPlugin.OUTPUT_MIME_TYPES.toSet(),
             maxOutputBytes = ImageToolsPlugin.MAX_OUTPUT_BYTES,
             outputNameSuffix = if (expectedActionId == ImageToolsPlugin.EDIT_ACTION_ID) "edited" else "converted",
-            canOverwrite = expectedActionId == ImageToolsPlugin.EDIT_ACTION_ID,
+            canOverwrite = true,
             hostOutput = HostToolOutput(session, target.id),
         )
     }.getOrNull()

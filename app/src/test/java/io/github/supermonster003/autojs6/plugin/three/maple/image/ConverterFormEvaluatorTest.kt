@@ -136,4 +136,33 @@ class ConverterFormEvaluatorTest {
         val form = evaluator(formats = listOf(ImageOutputFormat.JPEG, ImageOutputFormat.WEBP))
         assertEquals(ImageOutputFormat.JPEG, form.format(form.defaultDraft().copy(formatMimeType = "image/png")))
     }
+
+    @Test
+    fun overwriteKeepsTheOriginalFormatWhateverWasPicked() {
+        val form = ConverterFormEvaluator(source, allFormats, 50L * 1024 * 1024, 33, { true }, canOverwrite = true)
+        assertEquals(ImageOutputFormat.JPEG, form.overwriteFormat)
+        val draft = form.defaultDraft().copy(formatMimeType = ImageOutputFormat.WEBP.mimeType, overwrite = true)
+        val result = form.evaluate(draft)
+        assertTrue(result.overwrite)
+        assertEquals(ImageOutputFormat.JPEG, result.format)
+        assertEquals(ImageOutputFormat.JPEG, result.options?.format)
+        // Switched off, the picked format applies again.
+        val plain = form.evaluate(draft.copy(overwrite = false))
+        assertFalse(plain.overwrite)
+        assertEquals(ImageOutputFormat.WEBP, plain.format)
+    }
+
+    @Test
+    fun overwriteIsNotOfferedWithoutPermissionOrForFormatsTheToolsCannotWrite() {
+        assertNull(evaluator().overwriteFormat)
+        val gif = source.copy(mimeType = "image/gif")
+        assertNull(ConverterFormEvaluator(gif, allFormats, 50L * 1024 * 1024, 33, { true }, canOverwrite = true).overwriteFormat)
+        val jpegNotAllowed = ConverterFormEvaluator(source, listOf(ImageOutputFormat.PNG), 50L * 1024 * 1024, 33, { true }, canOverwrite = true)
+        assertNull(jpegNotAllowed.overwriteFormat)
+        // A draft asking for an overwrite that is not possible converts to a new file in the picked format.
+        val form = evaluator()
+        val result = form.evaluate(form.defaultDraft().copy(overwrite = true))
+        assertFalse(result.overwrite)
+        assertEquals(ImageOutputFormat.PNG, result.format)
+    }
 }

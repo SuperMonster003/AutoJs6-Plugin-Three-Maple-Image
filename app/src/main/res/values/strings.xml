@@ -399,14 +399,12 @@
     <string name="text_image_conversion_custom_size">Custom</string>
     <string name="text_image_conversion_estimated_size">Estimated file size: ~%1$s</string>
     <string name="text_image_conversion_estimated_size_unavailable">Estimated file size: -</string>
-    <string name="text_image_conversion_filename_strategy">The host publishes a new sibling file with a safe suffix</string>
     <string name="text_image_conversion_height">Height</string>
     <string name="text_image_conversion_jpeg_background">JPEG transparent background</string>
     <string name="text_image_conversion_lock_aspect_ratio">Lock aspect ratio</string>
     <string name="text_image_conversion_long_edge">Long edge</string>
     <string name="text_image_conversion_long_edge_hint">Maximum long edge</string>
     <string name="text_image_conversion_original_size">Original</string>
-    <string name="text_image_conversion_output_filename">Output suffix: %1$s</string>
     <string name="text_image_conversion_output_resolution">Output resolution: %1$d x %2$d</string>
     <string name="text_image_conversion_output_resolution_unavailable">Output resolution: -</string>
     <string name="text_image_conversion_percentage">Percentage</string>

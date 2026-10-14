@@ -399,14 +399,12 @@
     <string name="text_image_conversion_custom_size">مخصص</string>
     <string name="text_image_conversion_estimated_size">حجم الملف المقدر: ~%1$s</string>
     <string name="text_image_conversion_estimated_size_unavailable">حجم الملف المقدر: -</string>
-    <string name="text_image_conversion_filename_strategy">ينشر المضيف ملفا مجاورا جديدا مع لاحقة آمنة</string>
     <string name="text_image_conversion_height">الارتفاع</string>
     <string name="text_image_conversion_jpeg_background">خلفية المناطق الشفافة في JPEG</string>
     <string name="text_image_conversion_lock_aspect_ratio">قفل نسبة العرض إلى الارتفاع</string>
     <string name="text_image_conversion_long_edge">الضلع الطويل</string>
     <string name="text_image_conversion_long_edge_hint">الحد الأقصى للضلع الطويل</string>
     <string name="text_image_conversion_original_size">الأصلي</string>
-    <string name="text_image_conversion_output_filename">لاحقة الإخراج: %1$s</string>
     <string name="text_image_conversion_output_resolution">دقة الإخراج: %1$d x %2$d</string>
     <string name="text_image_conversion_output_resolution_unavailable">دقة الإخراج: -</string>
     <string name="text_image_conversion_percentage">النسبة المئوية</string>

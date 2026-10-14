@@ -399,14 +399,12 @@
     <string name="text_image_conversion_custom_size">Пользовательский</string>
     <string name="text_image_conversion_estimated_size">Ожидаемый размер файла: ~%1$s</string>
     <string name="text_image_conversion_estimated_size_unavailable">Ожидаемый размер файла: -</string>
-    <string name="text_image_conversion_filename_strategy">Хост публикует новый соседний файл с безопасным суффиксом</string>
     <string name="text_image_conversion_height">Высота</string>
     <string name="text_image_conversion_jpeg_background">Фон прозрачных областей JPEG</string>
     <string name="text_image_conversion_lock_aspect_ratio">Сохранять соотношение сторон</string>
     <string name="text_image_conversion_long_edge">Длинная сторона</string>
     <string name="text_image_conversion_long_edge_hint">Максимальная длинная сторона</string>
     <string name="text_image_conversion_original_size">Исходный</string>
-    <string name="text_image_conversion_output_filename">Суффикс вывода: %1$s</string>
     <string name="text_image_conversion_output_resolution">Выходное разрешение: %1$d x %2$d</string>
     <string name="text_image_conversion_output_resolution_unavailable">Выходное разрешение: -</string>
     <string name="text_image_conversion_percentage">Процент</string>

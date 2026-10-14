@@ -12,6 +12,7 @@ import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -139,6 +140,33 @@ class HostToolOverwriteInstrumentationTest {
         assertEquals(40 to 20, size(File(directory, converted.single())))
         assertEquals(40 to 20, size(target))
         assertTrue(session.calls.containsAll(listOf("prepareOutput", "openPendingOutput", "commitOutput")))
+    }
+
+    @Test fun theConverterCanOverwriteTheTargetAndUndoIt() {
+        val session = FakeManagedSession(directory, target)
+        ActivityScenario.launchActivityForResult<ImageConverterActivity>(
+            HostRequestFixtures.toolIntent(context, target, session, ImageToolsPlugin.CONVERT_ACTION_ID),
+        ).use { scenario ->
+            compose.waitUntil(TIMEOUT) { exists("maple.converter.convert") && enabled("maple.converter.convert") }
+            // Half the size, written over the original in its own format (PNG), whatever format was picked.
+            compose.onNodeWithTag("maple.converter.format.0").performClick()
+            compose.onNodeWithTag("maple.converter.resize.1").performScrollTo().performClick()
+            compose.onNodeWithTag("maple.converter.percentage").performScrollTo().performTextReplacement("50")
+            compose.onNodeWithTag("maple.converter.overwrite").performScrollTo().performClick()
+            compose.waitForIdle()
+            compose.onNodeWithTag("maple.converter.convert").performClick()
+            compose.waitUntil(TIMEOUT) { exists("maple.converter.replacementUndo") }
+            assertEquals(20 to 10, size(target))
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(target.path, options)
+            assertEquals("image/png", options.outMimeType)
+            assertEquals(listOf("wide.png"), directory.list().orEmpty().filterNot { it.startsWith(".") }.sorted())
+
+            compose.onNodeWithTag("maple.converter.replacementUndo.action").performClick()
+            compose.waitUntil(TIMEOUT) { scenario.state == androidx.lifecycle.Lifecycle.State.DESTROYED }
+        }
+        assertEquals(40 to 20, size(target))
+        assertTrue(session.calls.containsAll(listOf("prepareTargetReplacement", "undoTargetReplacement")))
     }
 
     /**

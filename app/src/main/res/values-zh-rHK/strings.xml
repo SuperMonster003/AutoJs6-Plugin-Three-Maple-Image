@@ -399,14 +399,12 @@
     <string name="text_image_conversion_custom_size">自訂</string>
     <string name="text_image_conversion_estimated_size">預計檔案大小: ~%1$s</string>
     <string name="text_image_conversion_estimated_size_unavailable">預計檔案大小: -</string>
-    <string name="text_image_conversion_filename_strategy">宿主使用安全後綴發佈新的同級檔案</string>
     <string name="text_image_conversion_height">高度</string>
     <string name="text_image_conversion_jpeg_background">JPEG 透明區域背景</string>
     <string name="text_image_conversion_lock_aspect_ratio">鎖定長寬比</string>
     <string name="text_image_conversion_long_edge">長邊限制</string>
     <string name="text_image_conversion_long_edge_hint">最大長邊</string>
     <string name="text_image_conversion_original_size">原始</string>
-    <string name="text_image_conversion_output_filename">輸出後綴: %1$s</string>
     <string name="text_image_conversion_output_resolution">輸出解像度: %1$d x %2$d</string>
     <string name="text_image_conversion_output_resolution_unavailable">輸出解像度: -</string>
     <string name="text_image_conversion_percentage">百分比</string>

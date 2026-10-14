@@ -78,80 +78,44 @@ private fun BatchConvertForm(
     onChange: (BatchConversionSettings) -> Unit,
     enabled: Boolean,
 ) {
-    val horizontal = MapleSettingsDefaults.horizontalPadding
     val sdk = Build.VERSION.SDK_INT
     val formats = ImageOutputFormat.entries
-    MapleSectionHeader(stringResource(R.string.apk_info_format))
-    MapleSegmented(
-        options = formats.map { it.displayName },
+    val tag = "maple.batch"
+    ConversionFormatSection(
+        labels = formats.map { it.displayName },
         selectedIndex = formats.indexOf(settings.format),
         onSelect = { onChange(settings.copy(format = formats[it])) },
         enabled = enabled,
-        tagPrefix = "maple.batch.format",
-        modifier = Modifier.padding(horizontal = horizontal),
+        tagPrefix = tag,
     )
     Spacer(Modifier.height(8.dp))
-    MapleSliderRow(
-        title = stringResource(R.string.text_image_conversion_quality),
-        value = settings.quality,
-        range = 1..100,
-        onValueChange = { onChange(settings.copy(quality = it)) },
-        onDark = false,
-        enabled = enabled && BatchConversionPolicy.qualityEnabled(settings, sdk),
-        modifier = Modifier.padding(horizontal = horizontal).testTag("maple.batch.quality"),
-    )
+    ConversionQualityRow(settings.quality, { onChange(settings.copy(quality = it)) }, enabled && BatchConversionPolicy.qualityEnabled(settings, sdk), tag)
     if (BatchConversionPolicy.losslessVisible(settings, sdk)) {
-        MapleSwitchRow(
-            title = stringResource(R.string.text_image_conversion_webp_lossless),
-            checked = settings.webpLossless,
-            onToggle = { onChange(settings.copy(webpLossless = it)) },
-            enabled = enabled,
-            modifier = Modifier.testTag("maple.batch.lossless"),
-        )
+        ConversionLosslessRow(settings.webpLossless, { onChange(settings.copy(webpLossless = it)) }, enabled, tag)
     }
-    MapleSectionHeader(stringResource(R.string.text_image_conversion_resize))
-    val modes = BatchConversionPolicy.RESIZE_MODES
-    MapleChipFlow(
-        options = listOf(
-            stringResource(R.string.text_image_conversion_original_size),
-            stringResource(R.string.text_image_conversion_percentage),
-            stringResource(R.string.text_image_conversion_long_edge),
-        ),
-        selectedIndex = modes.indexOf(settings.resizeMode).coerceAtLeast(0),
-        onSelect = { onChange(settings.copy(resizeMode = modes[it])) },
-        enabled = enabled,
-        tagPrefix = "maple.batch.resize",
-        modifier = Modifier.padding(horizontal = horizontal),
-    )
-    when (settings.resizeMode) {
-        ImageResizeMode.PERCENTAGE -> MapleNumberField(
-            value = settings.percentage,
-            onValueChange = { onChange(settings.copy(percentage = it)) },
-            label = stringResource(R.string.text_image_conversion_percentage_hint),
-            suffix = "%",
-            error = if (error == BatchSettingsError.INVALID_PERCENTAGE) {
+    ConversionResizeSection(
+        modes = BatchConversionPolicy.RESIZE_MODES,
+        mode = settings.resizeMode,
+        onMode = { onChange(settings.copy(resizeMode = it)) },
+        fields = ConversionResizeFields(
+            percentage = settings.percentage,
+            onPercentage = { onChange(settings.copy(percentage = it)) },
+            percentageError = if (error == BatchSettingsError.INVALID_PERCENTAGE) {
                 stringResource(R.string.error_image_conversion_invalid_percentage, ImageConversionSizing.MIN_PERCENTAGE, ImageConversionSizing.MAX_PERCENTAGE)
             } else {
                 null
             },
-            enabled = enabled,
-            modifier = Modifier.padding(horizontal = horizontal, vertical = 8.dp).testTag("maple.batch.percentage"),
-        )
-        ImageResizeMode.LONG_EDGE -> MapleNumberField(
-            value = settings.longEdge,
-            onValueChange = { onChange(settings.copy(longEdge = it)) },
-            label = stringResource(R.string.text_image_conversion_long_edge_hint),
-            suffix = "px",
-            error = if (error == BatchSettingsError.INVALID_LONG_EDGE) {
+            longEdge = settings.longEdge,
+            onLongEdge = { onChange(settings.copy(longEdge = it)) },
+            longEdgeError = if (error == BatchSettingsError.INVALID_LONG_EDGE) {
                 stringResource(R.string.error_image_conversion_invalid_long_edge, ImageConversionSizing.MAX_DIMENSION)
             } else {
                 null
             },
-            enabled = enabled,
-            modifier = Modifier.padding(horizontal = horizontal, vertical = 8.dp).testTag("maple.batch.longEdge"),
-        )
-        else -> Unit
-    }
+        ),
+        enabled = enabled,
+        tagPrefix = tag,
+    )
     MapleSectionHeader(stringResource(R.string.batch_convert_rotation))
     val rotations = BatchConversionPolicy.ROTATIONS
     MapleSegmented(
@@ -159,32 +123,14 @@ private fun BatchConvertForm(
         selectedIndex = rotations.indexOf(settings.rotationDegrees).coerceAtLeast(0),
         onSelect = { onChange(settings.copy(rotationDegrees = rotations[it])) },
         enabled = enabled,
-        tagPrefix = "maple.batch.rotation",
-        modifier = Modifier.padding(horizontal = horizontal),
+        tagPrefix = "$tag.rotation",
+        modifier = Modifier.padding(horizontal = MapleSettingsDefaults.horizontalPadding),
     )
     if (settings.format == ImageOutputFormat.JPEG) {
-        MapleSectionHeader(stringResource(R.string.text_image_conversion_jpeg_background))
-        MapleSegmented(
-            options = listOf(
-                stringResource(R.string.text_image_conversion_background_white),
-                stringResource(R.string.text_image_conversion_background_black),
-            ),
-            selectedIndex = if (settings.jpegBackgroundBlack) 1 else 0,
-            onSelect = { onChange(settings.copy(jpegBackgroundBlack = it == 1)) },
-            enabled = enabled,
-            tagPrefix = "maple.batch.background",
-            modifier = Modifier.padding(horizontal = horizontal),
-        )
+        ConversionJpegBackgroundSection(settings.jpegBackgroundBlack, { onChange(settings.copy(jpegBackgroundBlack = it)) }, enabled, tag)
     }
     Spacer(Modifier.height(8.dp))
-    MapleSwitchRow(
-        title = stringResource(R.string.text_image_conversion_preserve_exif),
-        summary = stringResource(R.string.text_image_conversion_preserve_exif_helper),
-        checked = settings.preserveExif,
-        onToggle = { onChange(settings.copy(preserveExif = it)) },
-        enabled = enabled,
-        modifier = Modifier.testTag("maple.batch.exif"),
-    )
+    ConversionExifRow(settings.preserveExif, { onChange(settings.copy(preserveExif = it)) }, enabled, tag)
 }
 
 

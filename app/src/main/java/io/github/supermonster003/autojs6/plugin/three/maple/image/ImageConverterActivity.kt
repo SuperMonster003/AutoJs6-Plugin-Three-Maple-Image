@@ -44,6 +44,7 @@ open class ImageConverterActivity : ConfiguredActivity() {
     private var form by mutableStateOf<ConverterFormState?>(null)
     private var ui by mutableStateOf(ConverterUiModel())
     private var targetConfirmation by mutableStateOf<ImageTargetFileSizeResult?>(null)
+    private var replacementUndoTimeout: kotlinx.coroutines.Job? = null
 
     internal open fun resolveRequest(): ImageToolsRequest? = ImageToolsRequestPolicy.resolve(this, intent, ImageToolsPlugin.CONVERT_ACTION_ID)
 
@@ -101,6 +102,20 @@ open class ImageConverterActivity : ConfiguredActivity() {
                     if (checked) evaluator?.heightForWidth(it.width.trim().toIntOrNull())?.let { height -> it.height = height.toString() }
                 }
             },
+            onPreserveExif = { checked ->
+                form?.let {
+                    it.preserveExifMetadata = checked
+                    it.preserveExifTouched = true
+                }
+            },
+            onOverwrite = { checked ->
+                form?.let {
+                    it.overwrite = checked
+                    // Overwriting without the capture details would lose the date the gallery sorts by.
+                    if (!it.preserveExifTouched) it.preserveExifMetadata = checked
+                }
+            },
+            onUndoReplacement = { model.undoReplacement() },
         )
         setContent {
             MapleTheme(palette = appPalette) {
@@ -210,7 +225,10 @@ open class ImageConverterActivity : ConfiguredActivity() {
                 ui = ui.copy(loading = false, converting = false)
                 targetConfirmation = state.targetFileSizeResult
             }
-            ConverterStage.SUCCEEDED -> handleTerminalResult(success = true, targetFileSizeResult = state.targetFileSizeResult)
+            ConverterStage.SUCCEEDED -> {
+                if (terminalResultHandled) state.replacementUndo?.let(::renderReplacementUndo)
+                handleTerminalResult(success = true, targetFileSizeResult = state.targetFileSizeResult, state = state)
+            }
             ConverterStage.SOURCE_FAILED -> if (!terminalResultHandled) {
                 terminalResultHandled = true
                 toast(R.string.error_image_conversion_invalid_source)
@@ -234,6 +252,7 @@ open class ImageConverterActivity : ConfiguredActivity() {
             maxOutputBytes = activeRequest.maxOutputBytes,
             sdkInt = Build.VERSION.SDK_INT,
             withinMemoryBudget = { ImageBitmapIO.isWithinConversionMemoryBudget(sourceInfo, it) },
+            canOverwrite = activeRequest.canOverwrite,
         )
         evaluator = formEvaluator
         val draft = model.draft ?: formEvaluator.defaultDraft(getString(R.string.value_100))
@@ -244,22 +263,26 @@ open class ImageConverterActivity : ConfiguredActivity() {
             formatLabels = formats.map { it.displayName },
             formatIndex = formats.indexOf(formEvaluator.format(draft)),
             maxTargetKibibytes = formEvaluator.maxTargetKibibytes(),
+            overwriteAvailable = formEvaluator.overwriteFormat != null,
+            overwriteFormatIndex = formats.indexOf(formEvaluator.overwriteFormat),
         )
         return true
     }
 
     private fun convert() {
         val state = form ?: return
-        val options = evaluator?.evaluate(state.snapshot())?.options ?: return
+        val evaluation = evaluator?.evaluate(state.snapshot()) ?: return
+        val options = evaluation.options ?: return
         if (model.state.value.stage != ConverterStage.READY) return
         model.draft = state.snapshot()
-        model.convert(options)
+        model.convert(options, overwrite = evaluation.overwrite)
     }
 
     private fun handleTerminalResult(
         success: Boolean,
         error: Throwable? = null,
         targetFileSizeResult: ImageTargetFileSizeResult? = null,
+        state: ImageConverterScreenState? = null,
     ) {
         if (terminalResultHandled || isFinishing || isDestroyed) return
         terminalResultHandled = true
@@ -268,8 +291,16 @@ open class ImageConverterActivity : ConfiguredActivity() {
             val activeRequest = request ?: return finish()
             setResult(
                 RESULT_OK,
-                Intent().putExtra(ExplorerActionIntentExtras.OUTPUT_TRANSACTION_ID, activeRequest.transactionId),
+                Intent().putExtra(ExplorerActionIntentExtras.OUTPUT_TRANSACTION_ID, activeRequest.transactionId).apply {
+                    // A standalone caller writes the output over the original (ROADMAP 8.3).
+                    if (state?.overwritten == true && activeRequest.hostOutput == null) putExtra(StandaloneImageWork.EXTRA_OVERWRITE, true)
+                },
             )
+            state?.replacementUndo?.let { undo ->
+                // The host replaced the original: offer its one-step undo for a moment before leaving.
+                renderReplacementUndo(undo)
+                return
+            }
             if (targetFileSizeResult == null) {
                 toast(R.string.text_done)
             } else {
@@ -294,6 +325,30 @@ open class ImageConverterActivity : ConfiguredActivity() {
         finish()
     }
 
+    /** The undo bar after a host replacement (ROADMAP 8.3), like the editor's: closes after a while or after an undo. */
+    private fun renderReplacementUndo(undo: ReplacementUndo) {
+        when (undo.state) {
+            ReplacementUndoState.AVAILABLE -> {
+                if (ui.replacementUndo) return
+                ui = ui.copy(replacementUndo = true, replacementUndoBusy = false)
+                replacementUndoTimeout?.cancel()
+                replacementUndoTimeout = lifecycleScope.launch {
+                    kotlinx.coroutines.delay(REPLACEMENT_UNDO_WINDOW_MILLIS)
+                    if (!isFinishing) finish()
+                }
+            }
+            ReplacementUndoState.RUNNING -> {
+                replacementUndoTimeout?.cancel()
+                ui = ui.copy(replacementUndoBusy = true)
+            }
+            ReplacementUndoState.RESTORED, ReplacementUndoState.FAILED -> {
+                replacementUndoTimeout?.cancel()
+                toast(if (undo.state == ReplacementUndoState.RESTORED) R.string.overwrite_restored else R.string.overwrite_undo_failed)
+                if (!isFinishing) finish()
+            }
+        }
+    }
+
     private fun toast(messageRes: Int) =
         Toast.makeText(this, messageRes, Toast.LENGTH_LONG).show()
 
@@ -313,4 +368,8 @@ open class ImageConverterActivity : ConfiguredActivity() {
 
     private fun formatQuality(quality: Int): String =
         String.format(Locale.getDefault(), "%d", quality)
+
+    private companion object {
+        const val REPLACEMENT_UNDO_WINDOW_MILLIS = 8_000L
+    }
 }

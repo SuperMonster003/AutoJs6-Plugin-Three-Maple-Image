@@ -118,8 +118,7 @@ internal class HomeActions(private val activity: HomeActivity) {
         } else {
             // Keep a previous finished edit available until it is explicitly saved or replaced.
             val newId = withContext(Dispatchers.IO) {
-                // Only the editor offers to overwrite so far; the converter follows with ROADMAP 8.3.
-                val overwritable = mode == MODE_EDIT && StandaloneOverwrite.isOverwritable(activity, document)
+                val overwritable = StandaloneOverwrite.isOverwritable(activity, document)
                 StandaloneImageWork.create(
                     activity,
                     document,
