@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
@@ -130,7 +132,10 @@ internal fun MapleParameterPanel(
 ) {
     val canvas = MapleTheme.canvas
     Column(modifier = modifier.fillMaxWidth().background(canvas.scrimStrong).padding(horizontal = 16.dp, vertical = 8.dp)) {
-        content()
+        // A short window (a phone in landscape) caps the panel: the controls scroll, Cancel and confirm stay in view.
+        Column(modifier = Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
+            content()
+        }
         Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TextButton(
                 onClick = onCancel,

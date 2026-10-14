@@ -317,6 +317,7 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Added` From the AutoJs6 file manager: Edit image and Convert image can overwrite the original; View image can delete the opened or selected images, which go to the AutoJs6 Trash and can be restored with Undo (other images of the folder reached by swiping cannot be deleted)
 * `Fixed` "Edit image" and "Convert image" missing from image files' "More" menus in the AutoJs6 file manager
 * `Fixed` On Android 15, renaming or deleting images on a storage card asked for a system confirmation, even for images saved by this app
+* `Fixed` On a phone in landscape, an editor tool panel (such as Brush) could fill the screen and hide the image and the OK button; panels now take at most half the screen and scroll the rest
 
 #### v3.1.2
 

@@ -26,7 +26,8 @@
       ],
       "fix": [
         "Absence des actions de modification et de conversion des images dans le menu \"Plus\" des fichiers image du gestionnaire de fichiers AutoJs6",
-        "Sur Android 15, renommer ou supprimer des images sur une carte de stockage demandait une confirmation du système, même pour les images enregistrées par cette application"
+        "Sur Android 15, renommer ou supprimer des images sur une carte de stockage demandait une confirmation du système, même pour les images enregistrées par cette application",
+        "Sur un téléphone en paysage, un panneau d'outil de l'éditeur (comme Pinceau) pouvait remplir l'écran et masquer l'image et le bouton OK; les panneaux occupent désormais au plus la moitié de l'écran et le reste défile"
       ]
     },
     "v3.1.2": {

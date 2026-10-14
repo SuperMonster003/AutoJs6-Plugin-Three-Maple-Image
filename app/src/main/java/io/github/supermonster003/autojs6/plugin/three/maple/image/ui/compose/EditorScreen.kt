@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -69,6 +71,9 @@ internal object EditorScreenDefaults {
     val ADJUSTMENT_RANGE = -100..100
     val ROTATION_RANGE = -45..45
     const val BRUSH_WIDTH_MAX = 46
+
+    /** The bottom panel never takes more of the page than this, so the canvas stays visible (landscape phones). */
+    const val PANEL_MAX_HEIGHT_FRACTION = 0.5f
     const val MOSAIC_STRENGTH_MAX = 28
     val FILTER_THUMBNAIL = 56.dp
     val FILTER_ITEM_WIDTH = 64.dp
@@ -181,157 +186,166 @@ internal fun EditorScreen(
     dialogs: @Composable () -> Unit,
 ) {
     val canvas = MapleTheme.canvas
-    Column(modifier = Modifier.fillMaxSize().background(canvas.editorCanvas)) {
-        EditorTopBar(model, callbacks)
-        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-            AndroidView(factory = { editingView }, modifier = Modifier.fillMaxSize().testTag("maple.editor.canvas"))
-            if (model.busy) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).testTag("maple.editor.progress"),
-                    color = canvas.accentOnScrim,
-                    trackColor = canvas.accentOnScrim.copy(alpha = 0.3f),
-                )
-            }
-            if (model.comparing) {
-                Text(
-                    text = stringResource(R.string.image_editor_original),
-                    color = canvas.onScrim,
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 12.dp)
-                        .background(canvas.scrimStrong, RoundedCornerShape(16.dp))
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                        .testTag("maple.editor.originalLabel"),
-                )
-            }
-            if (model.replacementUndo) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .background(canvas.scrimStrong, RoundedCornerShape(12.dp))
-                        .padding(start = 16.dp, end = 8.dp)
-                        .testTag("maple.editor.replacementUndo"),
-                ) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val panelMaxHeight = maxHeight * EditorScreenDefaults.PANEL_MAX_HEIGHT_FRACTION
+        Column(modifier = Modifier.fillMaxSize().background(canvas.editorCanvas)) {
+            EditorTopBar(model, callbacks)
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                AndroidView(factory = { editingView }, modifier = Modifier.fillMaxSize().testTag("maple.editor.canvas"))
+                if (model.busy) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).testTag("maple.editor.progress"),
+                        color = canvas.accentOnScrim,
+                        trackColor = canvas.accentOnScrim.copy(alpha = 0.3f),
+                    )
+                }
+                if (model.comparing) {
                     Text(
-                        text = stringResource(R.string.overwrite_saved),
+                        text = stringResource(R.string.image_editor_original),
                         color = canvas.onScrim,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f),
-                    )
-                    androidx.compose.material3.TextButton(
-                        onClick = callbacks.onUndoReplacement,
-                        enabled = !model.replacementUndoBusy,
-                        modifier = Modifier.defaultMinSize(minHeight = 48.dp).testTag("maple.editor.replacementUndo.action"),
-                    ) { Text(stringResource(R.string.action_undo), color = canvas.accentOnScrim) }
-                }
-            }
-            if (model.loadFailed) {
-                Text(
-                    text = stringResource(R.string.text_cannot_read_file),
-                    color = canvas.onScrim,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.Center).padding(24.dp).testTag("maple.editor.error"),
-                )
-            }
-        }
-        Column(modifier = Modifier.fillMaxWidth().background(canvas.scrimStrong).windowInsetsPadding(WindowInsets.navigationBars)) {
-            when (model.toolState) {
-                EditorToolState.NORMAL -> {
-                    SecondaryTools(model, callbacks)
-                    PrimaryGroups(model, callbacks)
-                }
-                EditorToolState.LOOK -> MapleParameterPanel(
-                    onCancel = callbacks.onCancelTool,
-                    onConfirm = callbacks.onConfirmTool,
-                    cancelText = stringResource(R.string.dialog_button_cancel),
-                    confirmText = stringResource(R.string.dialog_button_confirm),
-                ) {
-                    LookPanel(model, callbacks)
-                }
-                EditorToolState.ROTATION -> MapleParameterPanel(
-                    onCancel = callbacks.onCancelTool,
-                    onConfirm = callbacks.onConfirmTool,
-                    cancelText = stringResource(R.string.dialog_button_cancel),
-                    confirmText = stringResource(R.string.dialog_button_confirm),
-                ) {
-                    MapleSliderRow(
-                        title = stringResource(R.string.image_editor_rotation_angle),
-                        value = model.rotationDegrees,
-                        range = EditorScreenDefaults.ROTATION_RANGE,
-                        onValueChange = callbacks.onRotationValue,
-                        valueText = stringResource(R.string.image_editor_rotation_degrees, model.rotationDegrees),
-                        centered = true,
-                        modifier = Modifier.testTag("maple.editor.rotation"),
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 12.dp)
+                            .background(canvas.scrimStrong, RoundedCornerShape(16.dp))
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                            .testTag("maple.editor.originalLabel"),
                     )
                 }
-                EditorToolState.CROP -> MapleParameterPanel(
-                    onCancel = callbacks.onCancelTool,
-                    onConfirm = callbacks.onConfirmTool,
-                    cancelText = stringResource(R.string.dialog_button_cancel),
-                    confirmText = stringResource(R.string.dialog_button_confirm),
-                ) {
+                if (model.replacementUndo) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                            .background(canvas.scrimStrong, RoundedCornerShape(12.dp))
+                            .padding(start = 16.dp, end = 8.dp)
+                            .testTag("maple.editor.replacementUndo"),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.overwrite_saved),
+                            color = canvas.onScrim,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f),
+                        )
+                        androidx.compose.material3.TextButton(
+                            onClick = callbacks.onUndoReplacement,
+                            enabled = !model.replacementUndoBusy,
+                            modifier = Modifier.defaultMinSize(minHeight = 48.dp).testTag("maple.editor.replacementUndo.action"),
+                        ) { Text(stringResource(R.string.action_undo), color = canvas.accentOnScrim) }
+                    }
+                }
+                if (model.loadFailed) {
                     Text(
-                        text = stringResource(R.string.image_editor_crop_aspect_ratio),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = canvas.onScrimMuted,
-                        modifier = Modifier.padding(bottom = 4.dp),
+                        text = stringResource(R.string.text_cannot_read_file),
+                        color = canvas.onScrim,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(Alignment.Center).padding(24.dp).testTag("maple.editor.error"),
                     )
-                    MapleChipRow(options = model.cropPresetLabels, selectedIndex = model.cropPresetIndex, onSelect = callbacks.onCropPreset)
-                    HelpText(model.interactionHelp)
                 }
-                EditorToolState.TEXT -> MapleParameterPanel(
-                    onCancel = callbacks.onCancelTool,
-                    onConfirm = callbacks.onConfirmTool,
-                    cancelText = stringResource(R.string.dialog_button_cancel),
-                    confirmText = stringResource(R.string.dialog_button_confirm),
-                ) {
-                    HelpText(model.interactionHelp)
-                }
-                EditorToolState.BRUSH -> MapleParameterPanel(
-                    onCancel = callbacks.onCancelTool,
-                    onConfirm = callbacks.onConfirmTool,
-                    cancelText = stringResource(R.string.dialog_button_cancel),
-                    confirmText = stringResource(R.string.dialog_button_confirm),
-                ) {
-                    MapleSegmented(options = model.brushToolLabels, selectedIndex = model.brushToolIndex, onSelect = callbacks.onBrushTool, onDark = true)
-                    if (model.brushColorVisible) {
-                        MapleColorButton(
-                            color = model.brushColor,
-                            label = stringResource(R.string.text_color_palette),
-                            onClick = callbacks.onBrushColor,
-                            modifier = Modifier.padding(top = 4.dp),
-                        )
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = panelMaxHeight)
+                    .background(canvas.scrimStrong)
+                    .windowInsetsPadding(WindowInsets.navigationBars),
+            ) {
+                when (model.toolState) {
+                    EditorToolState.NORMAL -> {
+                        SecondaryTools(model, callbacks)
+                        PrimaryGroups(model, callbacks)
                     }
-                    MapleSliderRow(
-                        title = stringResource(R.string.image_editor_brush_width),
-                        value = model.brushWidthProgress,
-                        range = 0..EditorScreenDefaults.BRUSH_WIDTH_MAX,
-                        onValueChange = callbacks.onBrushWidth,
-                        modifier = Modifier.testTag("maple.editor.brushWidth"),
-                    )
-                    if (model.mosaicStrengthVisible) {
+                    EditorToolState.LOOK -> MapleParameterPanel(
+                        onCancel = callbacks.onCancelTool,
+                        onConfirm = callbacks.onConfirmTool,
+                        cancelText = stringResource(R.string.dialog_button_cancel),
+                        confirmText = stringResource(R.string.dialog_button_confirm),
+                    ) {
+                        LookPanel(model, callbacks)
+                    }
+                    EditorToolState.ROTATION -> MapleParameterPanel(
+                        onCancel = callbacks.onCancelTool,
+                        onConfirm = callbacks.onConfirmTool,
+                        cancelText = stringResource(R.string.dialog_button_cancel),
+                        confirmText = stringResource(R.string.dialog_button_confirm),
+                    ) {
                         MapleSliderRow(
-                            title = stringResource(R.string.image_editor_mosaic_strength),
-                            value = model.mosaicStrengthProgress,
-                            range = 0..EditorScreenDefaults.MOSAIC_STRENGTH_MAX,
-                            onValueChange = callbacks.onMosaicStrength,
-                            valueText = model.mosaicStrengthLabel,
-                            modifier = Modifier.testTag("maple.editor.mosaicStrength"),
+                            title = stringResource(R.string.image_editor_rotation_angle),
+                            value = model.rotationDegrees,
+                            range = EditorScreenDefaults.ROTATION_RANGE,
+                            onValueChange = callbacks.onRotationValue,
+                            valueText = stringResource(R.string.image_editor_rotation_degrees, model.rotationDegrees),
+                            centered = true,
+                            modifier = Modifier.testTag("maple.editor.rotation"),
                         )
                     }
-                }
-                EditorToolState.SHAPES -> MapleParameterPanel(
-                    onCancel = callbacks.onCancelTool,
-                    onConfirm = callbacks.onConfirmTool,
-                    cancelText = stringResource(R.string.dialog_button_cancel),
-                    confirmText = stringResource(R.string.dialog_button_confirm),
-                ) {
-                    ShapesPanel(model, callbacks)
+                    EditorToolState.CROP -> MapleParameterPanel(
+                        onCancel = callbacks.onCancelTool,
+                        onConfirm = callbacks.onConfirmTool,
+                        cancelText = stringResource(R.string.dialog_button_cancel),
+                        confirmText = stringResource(R.string.dialog_button_confirm),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.image_editor_crop_aspect_ratio),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = canvas.onScrimMuted,
+                            modifier = Modifier.padding(bottom = 4.dp),
+                        )
+                        MapleChipRow(options = model.cropPresetLabels, selectedIndex = model.cropPresetIndex, onSelect = callbacks.onCropPreset)
+                        HelpText(model.interactionHelp)
+                    }
+                    EditorToolState.TEXT -> MapleParameterPanel(
+                        onCancel = callbacks.onCancelTool,
+                        onConfirm = callbacks.onConfirmTool,
+                        cancelText = stringResource(R.string.dialog_button_cancel),
+                        confirmText = stringResource(R.string.dialog_button_confirm),
+                    ) {
+                        HelpText(model.interactionHelp)
+                    }
+                    EditorToolState.BRUSH -> MapleParameterPanel(
+                        onCancel = callbacks.onCancelTool,
+                        onConfirm = callbacks.onConfirmTool,
+                        cancelText = stringResource(R.string.dialog_button_cancel),
+                        confirmText = stringResource(R.string.dialog_button_confirm),
+                    ) {
+                        MapleSegmented(options = model.brushToolLabels, selectedIndex = model.brushToolIndex, onSelect = callbacks.onBrushTool, onDark = true)
+                        if (model.brushColorVisible) {
+                            MapleColorButton(
+                                color = model.brushColor,
+                                label = stringResource(R.string.text_color_palette),
+                                onClick = callbacks.onBrushColor,
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                        }
+                        MapleSliderRow(
+                            title = stringResource(R.string.image_editor_brush_width),
+                            value = model.brushWidthProgress,
+                            range = 0..EditorScreenDefaults.BRUSH_WIDTH_MAX,
+                            onValueChange = callbacks.onBrushWidth,
+                            modifier = Modifier.testTag("maple.editor.brushWidth"),
+                        )
+                        if (model.mosaicStrengthVisible) {
+                            MapleSliderRow(
+                                title = stringResource(R.string.image_editor_mosaic_strength),
+                                value = model.mosaicStrengthProgress,
+                                range = 0..EditorScreenDefaults.MOSAIC_STRENGTH_MAX,
+                                onValueChange = callbacks.onMosaicStrength,
+                                valueText = model.mosaicStrengthLabel,
+                                modifier = Modifier.testTag("maple.editor.mosaicStrength"),
+                            )
+                        }
+                    }
+                    EditorToolState.SHAPES -> MapleParameterPanel(
+                        onCancel = callbacks.onCancelTool,
+                        onConfirm = callbacks.onConfirmTool,
+                        cancelText = stringResource(R.string.dialog_button_cancel),
+                        confirmText = stringResource(R.string.dialog_button_confirm),
+                    ) {
+                        ShapesPanel(model, callbacks)
+                    }
                 }
             }
         }

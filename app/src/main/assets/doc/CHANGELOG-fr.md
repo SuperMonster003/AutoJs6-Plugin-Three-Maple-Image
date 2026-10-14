@@ -23,6 +23,7 @@
 * `Fonctionnalité` Depuis le gestionnaire de fichiers AutoJs6: Modifier l'image et Convertir l'image peuvent remplacer l'original; Afficher l'image peut supprimer les images ouvertes ou sélectionnées, qui vont dans la Corbeille d'AutoJs6 et se récupèrent avec Annuler (les autres images du dossier atteintes en balayant ne peuvent pas être supprimées)
 * `Correctif` Absence des actions de modification et de conversion des images dans le menu "Plus" des fichiers image du gestionnaire de fichiers AutoJs6
 * `Correctif` Sur Android 15, renommer ou supprimer des images sur une carte de stockage demandait une confirmation du système, même pour les images enregistrées par cette application
+* `Correctif` Sur un téléphone en paysage, un panneau d'outil de l'éditeur (comme Pinceau) pouvait remplir l'écran et masquer l'image et le bouton OK; les panneaux occupent désormais au plus la moitié de l'écran et le reste défile
 
 ## v3.1.2
 

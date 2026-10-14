@@ -26,7 +26,8 @@
       ],
       "fix": [
         "\"Edit image\" and \"Convert image\" missing from image files' \"More\" menus in the AutoJs6 file manager",
-        "On Android 15, renaming or deleting images on a storage card asked for a system confirmation, even for images saved by this app"
+        "On Android 15, renaming or deleting images on a storage card asked for a system confirmation, even for images saved by this app",
+        "On a phone in landscape, an editor tool panel (such as Brush) could fill the screen and hide the image and the OK button; panels now take at most half the screen and scroll the rest"
       ]
     },
     "v3.1.2": {

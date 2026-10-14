@@ -317,6 +317,7 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 * `Función` Desde el gestor de archivos AutoJs6: Editar imagen y Convertir imagen pueden sobrescribir el original; Ver imagen puede eliminar las imágenes abiertas o seleccionadas, que van a la Papelera de AutoJs6 y se pueden recuperar con Deshacer (las demás imágenes de la carpeta a las que se llega deslizando no se pueden eliminar)
 * `Corrección` Ausencia de las acciones de edición y conversión de imágenes en el menú "Más" de los archivos de imagen del gestor de archivos AutoJs6
 * `Corrección` En Android 15, al renombrar o eliminar imágenes de una tarjeta de almacenamiento se pedía una confirmación del sistema, incluso para imágenes guardadas por esta aplicación
+* `Corrección` En un teléfono en horizontal, un panel de herramientas del editor (como Pincel) podía ocupar toda la pantalla y ocultar la imagen y el botón OK; ahora los paneles ocupan como máximo media pantalla y el resto se desplaza
 
 #### v3.1.2
 
