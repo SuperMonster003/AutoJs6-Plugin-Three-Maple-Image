@@ -188,6 +188,10 @@
     <string name="recycle_bin_title">回收站</string>
     <string name="release_history">发行历史</string>
     <string name="release_history_unavailable">发行历史暂不可用</string>
+    <string name="rename_album_failed">无法重命名这个相册. 不在 DCIM 或 Pictures 中的相册需要先开启 所有文件访问.</string>
+    <string name="rename_album_images_only">未开启 所有文件访问 时只把相册中的图片移到新名称下, 文件夹里的其他文件 (例如视频) 会留在原处.</string>
+    <string name="rename_album_taken">已有同名文件夹</string>
+    <string name="rename_album_title">重命名相册</string>
     <string name="rename_error_blank">请输入名称</string>
     <string name="rename_error_failed">未能重命名文件</string>
     <string name="rename_error_illegal">名称包含不允许的字符</string>

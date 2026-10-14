@@ -149,6 +149,61 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         } else outcome
     }
 
+    /**
+     * Whether an album folder can be renamed as a whole (ROADMAP 7.4): Android 11+ with all files access, Android 7-10
+     * on the internal storage. Otherwise a rename moves the album's images into a new folder.
+     */
+    fun renamesFolders(path: AlbumPath): Boolean = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> Environment.isExternalStorageManager()
+        else -> path.isPrimary
+    }
+
+    /**
+     * Renames the album folder at [path] to [name] (a sibling folder). With [renamesFolders] the folder itself is
+     * renamed, everything in it included; otherwise its [items] move into the new folder (other files stay), which
+     * Android 10+ only allows under DCIM/ and Pictures/. The undo renames back.
+     */
+    suspend fun renameAlbum(path: AlbumPath, items: List<MediaItem>, name: String): WriteOutcome {
+        if (readOnly(path)) return WriteOutcome(readOnlyCard = items.size)
+        val target = AlbumPath(path.volume, MediaFileNamePolicy.renamedFolder(path.relativePath, name))
+        val directory = directoryOf(path)
+        val targetDirectory = directoryOf(target)
+        if (namesIn(target, excludeId = null).isNotEmpty() || targetDirectory?.exists() == true) return WriteOutcome(nameTaken = true)
+        if (renamesFolders(path) && directory != null && targetDirectory != null) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && routeFor(MediaWriteOperation.MOVE, items) == null) return WriteOutcome(cancelled = true)
+            val renamed = withContext(Dispatchers.IO) { directory.isDirectory && directory.renameTo(targetDirectory) }
+            if (!renamed) return WriteOutcome(failed = items.size)
+            rescanRenamed(directory, targetDirectory)
+            return WriteOutcome(succeeded = items.size, undo = {
+                val back = withContext(Dispatchers.IO) { targetDirectory.renameTo(directory) }
+                if (back) rescanRenamed(targetDirectory, directory)
+                if (back) WriteOutcome(succeeded = items.size) else WriteOutcome(failed = items.size)
+            })
+        }
+        if (!isWritableAlbumPath(target.relativePath)) return WriteOutcome(failed = items.size)
+        return move(items, target, NameConflictChoice.SKIP)
+    }
+
+    /** After a folder rename: the media library forgets the old paths and lists the files under the new ones. */
+    private suspend fun rescanRenamed(from: File, to: File) {
+        val moved = withContext(Dispatchers.IO) { to.walkTopDown().filter { it.isFile }.toList() }
+        val old = moved.map { File(from, it.relativeTo(to).path).absolutePath }
+        scan(old + moved.map { it.absolutePath })
+    }
+
+    /** The directory of an album folder, when the app can name it (internal storage, or a mounted card on Android 11+). */
+    private fun directoryOf(path: AlbumPath): File? {
+        val root = if (path.isPrimary) {
+            externalRoot()
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val storage = context.getSystemService(android.os.storage.StorageManager::class.java)
+            storage?.storageVolumes?.firstOrNull { it.mediaStoreVolumeName.equals(path.volume, ignoreCase = true) }?.directory
+        } else {
+            null
+        } ?: return null
+        return File(root, path.relativePath.trimEnd('/'))
+    }
+
     /** How many of [items] would meet an existing name in [target] (ignoring case). */
     suspend fun conflicts(items: List<MediaItem>, target: AlbumPath): Int {
         val taken = namesIn(target, excludeId = null).mapTo(HashSet()) { it.lowercase() }

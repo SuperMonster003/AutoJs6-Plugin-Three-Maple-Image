@@ -27,10 +27,16 @@ internal object MediaFileNamePolicy {
         return FileNameCheck.Valid(name, extensionChanged, unchanged = name == currentName)
     }
 
-    /** A folder name for "new album" (`Pictures/<name>`), with the same character rules. */
-    fun checkFolder(proposed: String): FileNameCheck = when (val result = check("", proposed)) {
+    /** A folder name for "new album" (`Pictures/<name>`) or an album rename, with the same character rules. */
+    fun checkFolder(proposed: String, currentName: String = ""): FileNameCheck = when (val result = check(currentName, proposed)) {
         is FileNameCheck.Valid -> result.copy(extensionChanged = false)
         is FileNameCheck.Invalid -> result
+    }
+
+    /** `Pictures/Trips/` renamed to [name]: `Pictures/<name>/` (the parent stays). */
+    fun renamedFolder(relativePath: String, name: String): String {
+        val parent = relativePath.trimEnd('/').substringBeforeLast('/', missingDelimiterValue = "")
+        return if (parent.isEmpty()) "$name/" else "$parent/$name/"
     }
 
     fun extension(name: String): String = name.substringAfterLast('.', "").lowercase(Locale.ROOT).takeIf { name.contains('.') }.orEmpty()

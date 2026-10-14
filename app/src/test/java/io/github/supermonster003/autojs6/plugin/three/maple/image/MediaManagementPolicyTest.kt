@@ -30,6 +30,15 @@ class MediaManagementPolicyTest {
     }
 
     @Test
+    fun anAlbumRenameKeepsTheParentFolder() {
+        assertEquals("Pictures/Vacation/", MediaFileNamePolicy.renamedFolder("Pictures/Trips/", "Vacation"))
+        assertEquals("DCIM/Camera 2/", MediaFileNamePolicy.renamedFolder("DCIM/Camera/", "Camera 2"))
+        assertEquals("Holidays/", MediaFileNamePolicy.renamedFolder("Trips/", "Holidays"))
+        assertEquals(FileNameCheck.Valid("Trips", extensionChanged = false, unchanged = true), MediaFileNamePolicy.checkFolder("Trips", currentName = "Trips"))
+        assertEquals(FileNameCheck.Valid("Trips.2024", extensionChanged = false, unchanged = false), MediaFileNamePolicy.checkFolder("Trips.2024", currentName = "Trips"))
+    }
+
+    @Test
     fun conflictsGetTheSmallestFreeSuffixIgnoringCase() {
         assertEquals("a.jpg", NameConflictPolicy.uniqueName("a.jpg", listOf("b.jpg")))
         assertEquals("a (1).jpg", NameConflictPolicy.uniqueName("a.jpg", listOf("A.JPG")))

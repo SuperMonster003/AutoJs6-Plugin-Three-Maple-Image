@@ -188,6 +188,10 @@
     <string name="recycle_bin_title">سلة المحذوفات</string>
     <string name="release_history">سجل الإصدارات</string>
     <string name="release_history_unavailable">سجل الإصدارات غير متاح</string>
+    <string name="rename_album_failed">تعذرت إعادة تسمية هذا الألبوم. تحتاج الألبومات خارج DCIM و Pictures الى الوصول الى كل الملفات أولا.</string>
+    <string name="rename_album_images_only">من دون الوصول الى كل الملفات تنتقل صور الألبوم فقط الى الاسم الجديد, وتبقى الملفات الأخرى في المجلد (مثل الفيديو) في مكانها.</string>
+    <string name="rename_album_taken">يوجد مجلد بهذا الاسم بالفعل</string>
+    <string name="rename_album_title">إعادة تسمية الألبوم</string>
     <string name="rename_error_blank">أدخل اسما</string>
     <string name="rename_error_failed">تعذرت إعادة تسمية الملف</string>
     <string name="rename_error_illegal">يحتوي الاسم على حرف غير مسموح به</string>

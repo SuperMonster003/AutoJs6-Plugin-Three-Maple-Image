@@ -61,6 +61,7 @@ private fun NameDialog(
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit,
     testTag: String,
+    note: String? = null,
 ) {
     var value by remember { mutableStateOf(TextFieldValue(initial, selection = TextRange(0, selectionEnd))) }
     var edited by rememberSaveable { mutableStateOf(false) }
@@ -100,7 +101,34 @@ private fun NameDialog(
                 .focusRequester(focus)
                 .testTag("$testTag.input"),
         )
+        if (note != null) {
+            Text(
+                text = note,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = MapleSettingsDefaults.horizontalPadding, vertical = 4.dp).testTag("$testTag.note"),
+            )
+        }
     }
+}
+
+/** Rename an album folder (ROADMAP 7.4); [imagesOnly] says that only its images move (no folder rename possible). */
+@Composable
+internal fun RenameAlbumDialog(name: String, imagesOnly: Boolean, externalError: String?, busy: Boolean, onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+    NameDialog(
+        title = stringResource(R.string.rename_album_title),
+        label = stringResource(R.string.target_new_album_label),
+        initial = name,
+        selectionEnd = name.length,
+        confirmText = stringResource(R.string.action_rename),
+        check = { MediaFileNamePolicy.checkFolder(it, currentName = name) },
+        externalError = externalError,
+        busy = busy,
+        onDismiss = onDismiss,
+        onConfirm = onConfirm,
+        testTag = "maple.renameAlbum",
+        note = if (imagesOnly) stringResource(R.string.rename_album_images_only) else null,
+    )
 }
 
 /** Rename one image (ROADMAP 7.3); the base name is preselected so typing keeps the extension. */

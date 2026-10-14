@@ -188,6 +188,10 @@
     <string name="recycle_bin_title">Corbeille</string>
     <string name="release_history">Historique des versions</string>
     <string name="release_history_unavailable">L\'historique des versions est indisponible</string>
+    <string name="rename_album_failed">Impossible de renommer cet album. Les albums hors de DCIM et Pictures demandent d\'abord l\'accès à tous les fichiers.</string>
+    <string name="rename_album_images_only">Sans l\'accès à tous les fichiers, seules les images de l\'album passent sous le nouveau nom; les autres fichiers du dossier (des vidéos, par exemple) restent où ils sont.</string>
+    <string name="rename_album_taken">Un dossier porte déjà ce nom</string>
+    <string name="rename_album_title">Renommer l\'album</string>
     <string name="rename_error_blank">Saisissez un nom</string>
     <string name="rename_error_failed">Impossible de renommer le fichier</string>
     <string name="rename_error_illegal">Le nom contient un caractère non autorisé</string>

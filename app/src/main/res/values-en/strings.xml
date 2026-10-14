@@ -188,6 +188,10 @@
     <string name="recycle_bin_title">Recycle bin</string>
     <string name="release_history">Release history</string>
     <string name="release_history_unavailable">Release history is unavailable</string>
+    <string name="rename_album_failed">This album could not be renamed. Albums outside DCIM and Pictures need all files access first.</string>
+    <string name="rename_album_images_only">Without all files access only the album\'s images move to the new name; other files in the folder (videos, for example) stay where they are.</string>
+    <string name="rename_album_taken">A folder with this name already exists</string>
+    <string name="rename_album_title">Rename album</string>
     <string name="rename_error_blank">Enter a name</string>
     <string name="rename_error_failed">The file could not be renamed</string>
     <string name="rename_error_illegal">The name contains a character that is not allowed</string>

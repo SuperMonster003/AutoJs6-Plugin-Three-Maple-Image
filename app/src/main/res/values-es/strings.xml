@@ -188,6 +188,10 @@
     <string name="recycle_bin_title">Papelera</string>
     <string name="release_history">Historial de versiones</string>
     <string name="release_history_unavailable">El historial de versiones no está disponible</string>
+    <string name="rename_album_failed">No se pudo cambiar el nombre del álbum. Los álbumes fuera de DCIM y Pictures necesitan antes el acceso a todos los archivos.</string>
+    <string name="rename_album_images_only">Sin acceso a todos los archivos solo se mueven las imágenes del álbum al nuevo nombre; los demás archivos de la carpeta (por ejemplo, videos) se quedan donde están.</string>
+    <string name="rename_album_taken">Ya existe una carpeta con este nombre</string>
+    <string name="rename_album_title">Cambiar nombre del álbum</string>
     <string name="rename_error_blank">Escribe un nombre</string>
     <string name="rename_error_failed">No se pudo cambiar el nombre del archivo</string>
     <string name="rename_error_illegal">El nombre contiene un carácter no permitido</string>

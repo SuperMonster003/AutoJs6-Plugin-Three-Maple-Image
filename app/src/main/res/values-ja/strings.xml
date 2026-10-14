@@ -188,6 +188,10 @@
     <string name="recycle_bin_title">ゴミ箱</string>
     <string name="release_history">リリース履歴</string>
     <string name="release_history_unavailable">リリース履歴を表示できません</string>
+    <string name="rename_album_failed">このアルバムの名前を変更できませんでした. DCIM と Pictures 以外のアルバムには, 先に すべてのファイルへのアクセス が必要です.</string>
+    <string name="rename_album_images_only">すべてのファイルへのアクセス がオフの場合, 新しい名前に移るのはアルバムの画像だけで, フォルダー内の他のファイル (動画など) は元の場所に残ります.</string>
+    <string name="rename_album_taken">同じ名前のフォルダーがすでにあります</string>
+    <string name="rename_album_title">アルバム名を変更</string>
     <string name="rename_error_blank">名前を入力してください</string>
     <string name="rename_error_failed">ファイル名を変更できませんでした</string>
     <string name="rename_error_illegal">使用できない文字が含まれています</string>

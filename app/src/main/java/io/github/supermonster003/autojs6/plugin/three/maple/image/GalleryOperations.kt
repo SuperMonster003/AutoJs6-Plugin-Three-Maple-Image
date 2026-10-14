@@ -35,6 +35,7 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.Map
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleSettingsDefaults
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaSelectionActions
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.NewAlbumDialog
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.RenameAlbumDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.RenameDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.TargetAlbum
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.TargetAlbumDialog
@@ -66,6 +67,9 @@ internal sealed interface GalleryDialog {
     data class Conflict(val items: List<MediaItem>, val copy: Boolean, val target: TargetAlbum, val count: Int) : GalleryDialog
 
     data class Progress(val copy: Boolean, val control: WriteControl) : GalleryDialog
+
+    /** Rename an album folder (ROADMAP 7.4); [imagesOnly]: no folder rename, its images move to the new name. */
+    data class RenameAlbum(val album: AlbumSummary, val imagesOnly: Boolean) : GalleryDialog
 
     /** Delete whole albums (ROADMAP 7.4): their [items] go to the recycle bin, or for good when it is off. */
     data class ConfirmDeleteAlbums(val albumCount: Int, val items: List<MediaItem>, val forGood: Boolean) : GalleryDialog
@@ -328,8 +332,40 @@ internal class GalleryOperations(
             onPin = ::pinAlbums,
             onExclude = ::excludeAlbums,
             onDelete = ::deleteAlbums,
+            onRename = ::renameAlbum,
             allPinned = selected.isNotEmpty() && selected.all { it.pinned },
         )
+    }
+
+    /** Asks for the new name of the one selected album. */
+    fun renameAlbum() = launch {
+        val album = target.selectedAlbums().singleOrNull() ?: return@launch
+        renameError = null
+        show(GalleryDialog.RenameAlbum(album, imagesOnly = !coordinator.renamesFolders(album.path)))
+    }
+
+    private fun runRenameAlbum(album: AlbumSummary, name: String) = launch {
+        renameBusy = true
+        val outcome = try {
+            coordinator.renameAlbum(album.path, target.albumItems(album), name)
+        } finally {
+            renameBusy = false
+        }
+        when {
+            outcome.nameTaken -> renameError = activity.getString(R.string.rename_album_taken)
+            outcome.cancelled -> {
+                show(null)
+                explainRefusedPermission()
+            }
+            outcome.readOnlyCard > 0 -> renameError = quantity(R.plurals.gallery_card_read_only_count, outcome.readOnlyCard)
+            outcome.succeeded == 0 -> renameError = activity.getString(R.string.rename_album_failed)
+            else -> {
+                show(null)
+                target.clearAlbumSelection()
+                finishWrite()
+                notify(activity.getString(R.string.gallery_renamed, name), outcome.undo, afterUndo = ::refreshAll)
+            }
+        }
     }
 
     /** Pins the selected albums, or unpins them when every one is pinned already. */
@@ -557,6 +593,14 @@ internal class GalleryOperations(
                     show(null)
                     deleteForGood(current.items, current.reason)
                 },
+            )
+            is GalleryDialog.RenameAlbum -> RenameAlbumDialog(
+                name = current.album.path.relativePath.trimEnd('/').substringAfterLast('/').ifEmpty { current.album.name },
+                imagesOnly = current.imagesOnly,
+                externalError = renameError,
+                busy = renameBusy,
+                onDismiss = { show(null) },
+                onConfirm = { name -> runRenameAlbum(current.album, name) },
             )
             is GalleryDialog.ConfirmDeleteAlbums -> ConfirmDialog(
                 title = pluralStringResource(R.plurals.delete_albums_title, current.albumCount, current.albumCount),

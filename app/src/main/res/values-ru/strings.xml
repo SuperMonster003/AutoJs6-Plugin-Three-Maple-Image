@@ -188,6 +188,10 @@
     <string name="recycle_bin_title">Корзина</string>
     <string name="release_history">История выпусков</string>
     <string name="release_history_unavailable">История выпусков недоступна</string>
+    <string name="rename_album_failed">Не удалось переименовать альбом. Для альбомов вне DCIM и Pictures сначала нужен доступ ко всем файлам.</string>
+    <string name="rename_album_images_only">Без доступа ко всем файлам под новое имя перемещаются только изображения альбома; другие файлы папки (например, видео) остаются на месте.</string>
+    <string name="rename_album_taken">Папка с таким именем уже есть</string>
+    <string name="rename_album_title">Переименовать альбом</string>
     <string name="rename_error_blank">Введите имя</string>
     <string name="rename_error_failed">Не удалось переименовать файл</string>
     <string name="rename_error_illegal">Имя содержит недопустимый символ</string>
