@@ -25,7 +25,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -125,8 +124,8 @@ class AlbumSelectionInstrumentationTest {
             tile(bucketB).performTouchInput { longClick() }
             compose.onNodeWithTag("maple.albums.delete").performClick()
             compose.onNodeWithTag("maple.dialog.confirm").performClick()
-            compose.waitUntil(TIMEOUT_MILLIS) { albums(scenario).none { it.id == bucketB } }
-            assertTrue(albums(scenario).any { it.id == bucketA })
+            // The album list reloads after the delete; wait for the settled list rather than a passing moment of it.
+            compose.waitUntil(TIMEOUT_MILLIS) { albums(scenario).let { list -> list.none { it.id == bucketB } && list.any { it.id == bucketA } } }
             assertFalse(runBlocking { MediaStoreRepository(context).also { it.invalidate() }.loadAll() }.any { it.bucketId == bucketB })
         }
     }
