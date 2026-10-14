@@ -65,6 +65,7 @@ La lecture utilise des entrées en lecture seule. La retouche et la conversion c
 - Sélection multiple et rangement: un appui long sur une image de la grille lance la sélection, un toucher ajoute ou retire, et en gardant le doigt posé après l'appui long on fait glisser pour choisir une plage (la grille défile près du bord haut ou bas); `Tout sélectionner` et `Inverser la sélection` sont aussi là. Partagez, ajoutez aux favoris, déplacez, copiez ou supprimez plusieurs images d'un coup, ou renommez-en une et affichez ses détails. Déplacer et copier proposent vos albums ou un nouvel album, les plus récents en premier; si un nom existe déjà, la question n'est posée qu'une fois (garder les deux, ignorer ou remplacer), et les lots importants affichent la progression et peuvent être annulés.
 - Corbeille, annulation et favoris: les images supprimées passent d'abord par la corbeille (celle du système sur Android 11+, celle de l'application sur Android 7-10, conservées 30 jours), et après une suppression, un déplacement ou un renommage une barre en bas propose d'annuler; `Corbeille` dans le menu en haut à droite de l'accueil permet de restaurer, supprimer définitivement ou vider. Les images favorites sont réunies dans l'album `Favoris` en tête de la liste des albums; dans la visionneuse ouverte depuis un album, le coeur de la barre du haut ajoute l'image courante aux favoris et `Supprimer` dans la barre du bas la supprime.
 - Organiser les albums et rechercher: un appui long sur un album de la liste sélectionne des albums, que l'on peut `Épingler` (après `Favoris`), `Exclure` (absents de cette galerie seulement, les fichiers ne changent pas), `Masquer` (un fichier .nomedia dans le dossier les masque aussi des autres galeries; nécessite `Accès à tous les fichiers`), supprimer en entier (vers la corbeille, avec annulation) ou renommer; `Dossiers exclus` et `Dossiers masqués` dans `Paramètres` les listent et les rétablissent. La recherche de l'accueil porte sur les noms d'albums et de fichiers, et l'image ouverte parcourt les résultats; dans un album, la recherche filtre par nom de fichier.
+- Conversion par lot: sélectionnez des images dans un album et choisissez `Plus` > `Convertir` pour les convertir avec les mêmes réglages (format, qualité, taille d'origine, pourcentage ou grand côté, rotation dans le sens horaire, fond JPEG, conserver ou non l'EXIF sûr); les nouvelles images sont enregistrées dans le même album sous `<nom>_converted` sans remplacer les originales, le lot peut être annulé et les images non converties sont listées avec la raison et peuvent être réessayées. Dans le gestionnaire de fichiers d'AutoJs6, `Plus` > `Convertir les images` dans la barre de sélection fait de même pour les images sélectionnées (nécessite une version d'AutoJs6 avec ce bouton) et n'enregistre les nouveaux fichiers que si toutes les images sont converties.
 - Autorisations seulement si nécessaire: l'accueil autonome demande l'accès aux photos une seule fois, au premier lancement, puis plus jamais de lui-même; sans cet accès, `Choisir une image`, `Choisir un dossier`, `Modifier l'image` et `Convertir l'image` fonctionnent toujours via le sélecteur du système. Android 14+ permet de n'autoriser que certaines photos (`Gérer les photos sélectionnées`). `Paramètres` > `Autorisation de stockage` permet d'accorder à nouveau l'accès, de gérer les dossiers autorisés (affichés comme albums même sans accès aux photos) et l'option `Accès à tous les fichiers`. Ouvrir des images depuis AutoJs6 ou d'autres applications ne demande jamais d'autorisation.
 - Afficher comme album: dans le menu d'un dossier du gestionnaire de fichiers d'AutoJs6, choisissez `Afficher comme album` pour voir ses images en grille et ouvrir ses sous-dossiers, en lecture seule via la session de l'hôte, sans demande d'autorisation ni chemin absolu affiché.
 - Ouvrir une sélection précise: dans le mode de sélection d'AutoJs6, choisissez jusqu'à 128 images prises en charge dans un même dossier puis touchez `Afficher l'image`; la visionneuse conserve l'ordre de sélection de l'hôte et limite le balayage à ce groupe.
@@ -238,7 +239,7 @@ Pour garder l'édition fluide et stable, les images au-dessus du budget de pixel
 
 **Peut-il traiter plusieurs images à la fois, ou enregistrer le résultat dans un autre dossier?**
 
-La lecture accepte une sélection d'images; la retouche et la conversion traitent une image à la fois. Depuis l'accueil autonome vous choisissez la destination; les appels AutoJs6 créent un nouveau fichier à côté de la source.
+La conversion fonctionne par lot: sélectionnez des images dans un album et choisissez `Plus` > `Convertir`, les nouvelles images sont enregistrées dans cet album; dans le gestionnaire de fichiers d'AutoJs6, sélectionnez des images et choisissez `Plus` > `Convertir les images` (nécessite une version d'AutoJs6 avec ce bouton), elles sont enregistrées à côté des originales. La retouche traite une image à la fois. Pour retoucher ou convertir une seule image depuis l'accueil autonome vous choisissez la destination; les appels AutoJs6 créent un nouveau fichier à côté de la source.
 
 ******
 
@@ -273,7 +274,7 @@ MIME type: Explorer: avif/bmp/gif/heic/heif/jfif/jpe/jpeg/jpg/png/webp; ACTION_V
 required host build: 5276
 ```
 
-L'implémentation actuelle vise la version 12 du protocole explorer-action: l'action principale déclare une cible mono-fichier, un accès en lecture seule et `readSiblings`. La session de l'hôte n'expose que les voisins directs; le plugin conserve les images prises en charge, lisibles et non symboliques, applique l'ordre naturel des noms et maintient une fenêtre limitée à 128 pages autour de l'image sélectionnée. Une seconde action en lecture seule dans la barre de sélection déclare plusieurs fichiers sans `readSiblings`; elle accepte de 1 à 128 images prises en charge sous un même parent, conserve l'ordre de sélection de l'hôte et ne transmet que les cibles explicitement autorisées. L'édition, la conversion, les détails de fichiers, la suppression, le déplacement et le renommage restent des fonctions de l'hôte; sans le plugin, l'hôte se rabat sur une demande externe `ACTION_VIEW` en lecture seule.
+L'implémentation actuelle vise la version 12 du protocole explorer-action: l'action principale déclare une cible mono-fichier, un accès en lecture seule et `readSiblings`. La session de l'hôte n'expose que les voisins directs; le plugin conserve les images prises en charge, lisibles et non symboliques, applique l'ordre naturel des noms et maintient une fenêtre limitée à 128 pages autour de l'image sélectionnée. Une seconde action en lecture seule dans la barre de sélection déclare plusieurs fichiers sans `readSiblings`; elle accepte de 1 à 128 images prises en charge sous un même parent, conserve l'ordre de sélection de l'hôte et ne transmet que les cibles explicitement autorisées. L'édition, la conversion, les détails de fichiers, la suppression, le déplacement et le renommage restent des fonctions de l'hôte; sans le plugin, l'hôte se rabat sur une demande externe `ACTION_VIEW` en lecture seule. Une troisième action de la barre de sélection, `convert-images`, déclare plusieurs fichiers avec `ACCESS_CREATE_IN_PARENT`: chaque image devient un nouveau fichier dans le dossier source, relu pour vérification, et les fichiers sont publiés ensemble comme un lot de sortie entièrement annulé si une image échoue.
 
 ******
 
@@ -290,6 +291,17 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 ### Historique des versions
 
 ******
+
+#### v3.1.2
+
+###### 2026/10/14
+
+* `Note` La conversion par lot depuis le gestionnaire de fichiers d'AutoJs6 nécessite une version d'AutoJs6 avec un bouton Plus dans la barre de sélection, que les versions publiées d'AutoJs6 n'ont pas encore; en attendant, convertissez par lot depuis les albums de ce plugin
+* `Fonctionnalité` Conversion par lot: sélectionnez des images dans un album et choisissez Plus > Convertir pour toutes les convertir avec les mêmes réglages (format, qualité, taille d'origine / pourcentage / grand côté, rotation dans le sens horaire, fond JPEG pour la transparence, conserver ou non les données EXIF sûres)
+* `Fonctionnalité` Les images converties par lot sont enregistrées à côté des originales sous le nom <nom>_converted et ne les remplacent jamais; pour les albums où Android n'autorise pas l'ajout d'images (comme Download), elles vont dans un dossier du même nom sous Pictures
+* `Fonctionnalité` Le lot affiche sa progression et peut être annulé à tout moment (l'image en cours est enregistrée entièrement ou pas du tout); les images qui n'ont pas pu être converties sont listées avec la raison et peuvent être réessayées avec les mêmes réglages
+* `Fonctionnalité` Dans le gestionnaire de fichiers d'AutoJs6, Convertir les images agit sur les images sélectionnées: les nouvelles images sont enregistrées à côté des originales, et seulement si toutes sont converties, donc un échec ne laisse aucun nouveau fichier
+* `Correctif` Après l'ouverture d'une image depuis un album, l'image suivante ou précédente restait parfois en chargement, et Imprimer restait indisponible
 
 #### v3.1.1
 
@@ -318,18 +330,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 * `Fonctionnalité` Ouverte depuis un album, la visionneuse gagne un bouton cœur dans la barre du haut, et Supprimer remplace Ouvrir avec dans la barre du bas; Ouvrir avec, Renommer, Déplacer et Copier sont dans le menu en haut à droite
 * `Fonctionnalité` Les images des dossiers autorisés peuvent être supprimées (définitivement, après confirmation, sans corbeille) et renommées
 * `Dépendance` Ajout de Room 2.8.1 pour conserver les favoris et les entrées de la corbeille d'Android 7-10
-
-#### v3.0.0
-
-###### 2026/10/13
-
-* `Note` Lancée seule, l'application demande une fois l'accès aux photos (photos et vidéos sur Android 13+, stockage sur les versions antérieures) pour afficher les albums; en cas de refus elle ne le redemande plus d'elle-même, l'affichage, la retouche et la conversion restent possibles via le sélecteur du système, et l'accès peut être accordé plus tard depuis l'accueil ou Paramètres > Autorisation de stockage. Ouvrir des images depuis AutoJs6 ou d'autres applications ne demande jamais d'autorisation
-* `Fonctionnalité` L'écran d'accueil devient une vue en albums: images de l'appareil regroupées par dossier (couverture, nom, nombre) ou vue à plat du contenu de tous les dossiers; la grille propose 3 à 6 colonnes (menu ou pincement), un tri par nom, date de modification, date de prise de vue ou taille mémorisé par album, une barre de défilement rapide avec indication de date et l'actualisation par glissement
-* `Fonctionnalité` La visionneuse parcourt tout l'album par glissement à gauche et à droite, une bande de miniatures saute à une page au toucher et la grille revient à la dernière image vue
-* `Fonctionnalité` Faites pivoter une image à deux doigts; au relâchement elle se cale sur le quart de tour le plus proche, ne change que l'affichage, peut être annulée et se désactive dans Paramètres > Visionneuse
-* `Fonctionnalité` Une nouvelle page Autorisation de stockage dans les Paramètres affiche l'accès actuel, l'accorde de nouveau, gère les photos sélectionnées sur Android 14+, ajoute ou retire des dossiers autorisés (affichés comme albums même sans accès aux photos) et propose l'option Accès à tous les fichiers
-* `Fonctionnalité` Le menu de dossier du gestionnaire de fichiers d'AutoJs6 gagne Afficher comme album, qui montre les images du dossier en grille et ouvre ses sous-dossiers
-* `Dépendance` Ajout de Navigation Compose 2.10.2 pour la navigation entre l'accueil et les pages d'album
 
 ##### Historique complet
 

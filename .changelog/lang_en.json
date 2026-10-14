@@ -5,6 +5,21 @@
   "changelog_label_improvement": "Improved",
   "changelog_label_dependency": "Dependency",
   "$data": {
+    "v3.1.2": {
+      "released_date": "2026/10/14",
+      "hint": [
+        "Batch conversion from the AutoJs6 file manager needs an AutoJs6 version with a More button in its selection bar, which the released AutoJs6 versions do not have yet; until then, convert in batches from the albums of this plugin"
+      ],
+      "feature": [
+        "Batch conversion: select images in an album and choose More > Convert to convert them all with one set of settings (format, quality, original size / percentage / long edge, clockwise rotation, JPEG background for transparency, whether to keep safe EXIF data)",
+        "Batch-converted images are saved next to their originals as <name>_converted and never replace them; albums that Android does not let apps add images to (such as Download) save into a folder of the same name under Pictures",
+        "A batch shows its progress and can be cancelled at any time (the image being converted is saved completely or not at all); images that could not be converted are listed with the reason and can be retried with the same settings",
+        "In the AutoJs6 file manager, Convert images works on selected images: the new images are saved next to the originals, and only when every image converts, so a failure leaves no new file"
+      ],
+      "fix": [
+        "After opening an image from an album, the next or previous image sometimes kept loading, and Print stayed unavailable"
+      ]
+    },
     "v3.1.1": {
       "released_date": "2026/10/14",
       "hint": [

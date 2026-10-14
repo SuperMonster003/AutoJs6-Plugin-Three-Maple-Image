@@ -65,6 +65,7 @@ Viewing uses read-only inputs. Editing and conversion produce a separate output;
 - Multi-select and organizing: long-press an image in the grid to start selecting, tap to add or remove, and keep your finger down after the long press to drag over a range (the grid scrolls near the top or bottom edge); `Select all` and `Invert selection` are there too. Share, favorite, move, copy or delete many images at once, or rename one and view its details. Move and copy offer your albums or a new album, with recently used ones first; when a name is already taken you are asked once (keep both, skip or replace), and larger batches show progress and can be cancelled.
 - Recycle bin, undo and favorites: deleted images go to a recycle bin first (the system one on Android 11+, the app's own on Android 7-10, kept for 30 days), and a bar at the bottom offers undo after deleting, moving or renaming; `Recycle bin` in the home's top-right menu restores, deletes for good or empties it. Favorited images gather in the `Favorites` album at the front of the album list; in the viewer opened from an album, the heart in the top bar favorites the current image and `Delete` in the bottom bar deletes it.
 - Organizing albums and search: long-press an album in the album list to select albums, then `Pin` them (after `Favorites`), `Exclude` them (gone from this gallery only, the files stay as they are), `Hide` them (a .nomedia file in the folder hides them from other galleries too; needs `All files access`), delete whole albums (to the recycle bin, with undo) or rename one; `Excluded folders` and `Hidden folders` in `Settings` list them and bring them back. Search on the home screen looks at album names and file names, and an opened image pages through the results; inside an album the search filters by file name.
+- Batch conversion: select images in an album and choose `More` > `Convert` to convert them with one set of settings (format, quality, original size, percentage or long edge, clockwise rotation, JPEG background, whether to keep safe EXIF); new images are saved in the same album as `<name>_converted` and never replace the originals, a running batch can be cancelled, and images that could not be converted are listed with the reason and can be retried. In the AutoJs6 file manager, `More` > `Convert images` in the selection bar does the same for selected images (needs an AutoJs6 version with that button) and saves the new files only when every image converts.
 - Permissions only when needed: the standalone home asks for photo access once, on its first launch, and never again by itself; without it, `Choose image`, `Choose folder`, `Edit image` and `Convert image` keep working through the system picker. Android 14+ supports access to selected photos only (`Manage selected photos`). `Settings` > `Storage permission` grants access again, manages authorized folders (shown as albums even without photo access) and the optional `All files access`. Opening images from AutoJs6 or other apps never asks for a permission.
 - View as album: in the folder menu of the AutoJs6 file manager, choose `View as album` to see the folder's images as a grid and open its subfolders, read-only through the host session, with no permission request and no absolute paths shown.
 - Open an exact selection: in AutoJs6 selection mode, choose up to 128 supported images from one folder and tap `View image`; the viewer keeps the host selection order and swipes only within that chosen group.
@@ -238,7 +239,7 @@ To keep editing smooth and stable, images above the editing pixel budget (up to 
 
 **Can it process multiple images at once, or save the result to another directory?**
 
-Viewing supports a selected group of images. Editing and conversion handle one image at a time. From the standalone home screen, you choose where to save the result; calls from AutoJs6 create a new sibling file.
+Yes, conversion works in batches: select images in an album and choose `More` > `Convert`, and the new images are saved in that album; in the AutoJs6 file manager, select images and choose `More` > `Convert images` (needs an AutoJs6 version with that button), and the new images are saved next to the originals. Editing handles one image at a time. When you edit or convert one image from the standalone home screen, you choose where to save the result; calls from AutoJs6 create a new sibling file.
 
 ******
 
@@ -273,7 +274,7 @@ MIME type: Explorer: avif/bmp/gif/heic/heif/jfif/jpe/jpeg/jpg/png/webp; ACTION_V
 required host build: 5276
 ```
 
-The current implementation targets explorer-action protocol version 12: the primary action declares a single-file target, read-only access, and `readSiblings`. The host session exposes only direct siblings; the plugin filters supported readable non-link images, applies natural file-name ordering, and keeps a bounded window of at most 128 pages around the selected image. A second read-only selection-toolbar action declares multiple files without `readSiblings`; it accepts 1 to 128 supported images under one parent, preserves host selection order, and transfers only explicitly granted targets. Editing, conversion, file details, deletion, moving, and renaming remain host features; without the plugin, the host falls back to a read-only external `ACTION_VIEW` request.
+The current implementation targets explorer-action protocol version 12: the primary action declares a single-file target, read-only access, and `readSiblings`. The host session exposes only direct siblings; the plugin filters supported readable non-link images, applies natural file-name ordering, and keeps a bounded window of at most 128 pages around the selected image. A second read-only selection-toolbar action declares multiple files without `readSiblings`; it accepts 1 to 128 supported images under one parent, preserves host selection order, and transfers only explicitly granted targets. Editing, conversion, file details, deletion, moving, and renaming remain host features; without the plugin, the host falls back to a read-only external `ACTION_VIEW` request. A third selection toolbar action, `convert-images`, declares multiple files with `ACCESS_CREATE_IN_PARENT`: each image becomes a new file in the source directory, is read back, and the files are published together as one output batch that rolls back completely if any image fails.
 
 ******
 
@@ -290,6 +291,17 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 ### Release History
 
 ******
+
+#### v3.1.2
+
+###### 2026/10/14
+
+* `Hint` Batch conversion from the AutoJs6 file manager needs an AutoJs6 version with a More button in its selection bar, which the released AutoJs6 versions do not have yet; until then, convert in batches from the albums of this plugin
+* `Added` Batch conversion: select images in an album and choose More > Convert to convert them all with one set of settings (format, quality, original size / percentage / long edge, clockwise rotation, JPEG background for transparency, whether to keep safe EXIF data)
+* `Added` Batch-converted images are saved next to their originals as <name>_converted and never replace them; albums that Android does not let apps add images to (such as Download) save into a folder of the same name under Pictures
+* `Added` A batch shows its progress and can be cancelled at any time (the image being converted is saved completely or not at all); images that could not be converted are listed with the reason and can be retried with the same settings
+* `Added` In the AutoJs6 file manager, Convert images works on selected images: the new images are saved next to the originals, and only when every image converts, so a failure leaves no new file
+* `Fixed` After opening an image from an album, the next or previous image sometimes kept loading, and Print stayed unavailable
 
 #### v3.1.1
 
@@ -318,18 +330,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Added` Opened from an album, the viewer gains a heart button in the top bar, and Delete replaces Open with in the bottom bar; Open with, Rename, Move and Copy are in the top right menu
 * `Added` Images in authorized folders can be deleted (for good, after a confirmation, without the recycle bin) and renamed
 * `Dependency` Added Room 2.8.1 to keep the favorites and the Android 7-10 recycle bin records
-
-#### v3.0.0
-
-###### 2026/10/13
-
-* `Hint` Launched on its own, the app asks once for photo access (photos and videos on Android 13+, storage on older versions) to show your albums; if you refuse it never asks again by itself, viewing, editing and converting keep working through the system picker, and you can grant access later from the home screen or Settings > Storage permission. Opening images from AutoJs6 or other apps never asks for any permission
-* `Added` The home screen becomes an album view: images on the device grouped by folder (cover, name, count), or a flat view of all folder contents; the image grid offers 3-6 columns (menu or pinch), sorting by name, date modified, date taken or size remembered per album, a fast scroller with a date hint and pull to refresh
-* `Added` The viewer pages through the whole album with left and right swipes, a thumbnail strip jumps to a page on tap, and the grid returns to the last image viewed
-* `Added` Rotate an image with two fingers; it snaps to the nearest quarter turn on release, changes the display only, can be undone and can be turned off in Settings > Viewer
-* `Added` A new Storage permission page in Settings shows the current access, grants it again, manages selected photos on Android 14+, adds or removes authorized folders (shown as albums even without photo access) and offers the optional All files access
-* `Added` The folder menu of the AutoJs6 file manager gains View as album, which shows the folder's images as a grid and opens its subfolders
-* `Dependency` Added Navigation Compose 2.10.2 for navigation between the home screen and album pages
 
 ##### Full history
 

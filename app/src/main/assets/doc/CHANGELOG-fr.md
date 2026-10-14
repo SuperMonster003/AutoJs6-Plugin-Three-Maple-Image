@@ -4,6 +4,17 @@
 
 ******
 
+## v3.1.2
+
+###### 2026/10/14
+
+* `Note` La conversion par lot depuis le gestionnaire de fichiers d'AutoJs6 nécessite une version d'AutoJs6 avec un bouton Plus dans la barre de sélection, que les versions publiées d'AutoJs6 n'ont pas encore; en attendant, convertissez par lot depuis les albums de ce plugin
+* `Fonctionnalité` Conversion par lot: sélectionnez des images dans un album et choisissez Plus > Convertir pour toutes les convertir avec les mêmes réglages (format, qualité, taille d'origine / pourcentage / grand côté, rotation dans le sens horaire, fond JPEG pour la transparence, conserver ou non les données EXIF sûres)
+* `Fonctionnalité` Les images converties par lot sont enregistrées à côté des originales sous le nom <nom>_converted et ne les remplacent jamais; pour les albums où Android n'autorise pas l'ajout d'images (comme Download), elles vont dans un dossier du même nom sous Pictures
+* `Fonctionnalité` Le lot affiche sa progression et peut être annulé à tout moment (l'image en cours est enregistrée entièrement ou pas du tout); les images qui n'ont pas pu être converties sont listées avec la raison et peuvent être réessayées avec les mêmes réglages
+* `Fonctionnalité` Dans le gestionnaire de fichiers d'AutoJs6, Convertir les images agit sur les images sélectionnées: les nouvelles images sont enregistrées à côté des originales, et seulement si toutes sont converties, donc un échec ne laisse aucun nouveau fichier
+* `Correctif` Après l'ouverture d'une image depuis un album, l'image suivante ou précédente restait parfois en chargement, et Imprimer restait indisponible
+
 ## v3.1.1
 
 ###### 2026/10/14
