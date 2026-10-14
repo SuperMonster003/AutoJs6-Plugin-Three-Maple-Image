@@ -317,3 +317,29 @@ internal fun MapleColorButton(
         Text(label, style = MaterialTheme.typography.bodyLarge, color = textColor.disabledIf(!enabled))
     }
 }
+
+/** A short number input (percentage, pixels, KiB) with its unit as suffix and an error line under it. */
+@Composable
+internal fun MapleNumberField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    suffix: String,
+    error: String?,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    androidx.compose.material3.OutlinedTextField(
+        value = value,
+        onValueChange = { onValueChange(it.take(12)) },
+        label = { Text(label) },
+        suffix = { Text(suffix) },
+        isError = error != null,
+        supportingText = error?.let { { Text(it) } },
+        singleLine = true,
+        enabled = enabled,
+        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+        textStyle = MaterialTheme.typography.bodyLarge.copy(textDirection = androidx.compose.ui.text.style.TextDirection.Ltr),
+        modifier = modifier.fillMaxWidth(),
+    )
+}

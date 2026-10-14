@@ -28,6 +28,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorCallbacks
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorColorDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorColorDialogState
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorResizeDialog
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorResizeDialogState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorDialogDefaults
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorGroup
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.EditorSaveDialog
@@ -90,6 +92,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
     private var textDialog by mutableStateOf<EditorTextDialogState?>(null)
     private var saveDialog by mutableStateOf<EditorSaveDialogState?>(null)
     private var colorDialog by mutableStateOf<ColorDialogHolder?>(null)
+    private var resizeDialog by mutableStateOf<EditorResizeDialogState?>(null)
     private var exitConfirmationVisible by mutableStateOf(false)
 
     private class ColorDialogHolder(
@@ -138,6 +141,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
                 if (group == EditorGroup.FILTER) ensureFilterThumbnails()
             },
             onCrop = ::beginCrop,
+            onResize = { showResizeDialog() },
             onRotateLeft = { commitOperation { ImageEditingEngine.transform(it, rotation = -90f) } },
             onRotateRight = { commitOperation { ImageEditingEngine.transform(it, rotation = 90f) } },
             onRotateFine = ::beginFineRotation,
@@ -187,6 +191,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
         textDialog = null
         saveDialog = null
         colorDialog = null
+        resizeDialog = null
         lookPreviewJob?.cancel()
         thumbnailJob?.cancel()
         lookPreviewSource = null
@@ -236,6 +241,14 @@ open class ImageEditorActivity : ConfiguredActivity() {
                 },
             )
         }
+        resizeDialog?.let { state ->
+            EditorResizeDialog(
+                state = state,
+                errorText = ::resizeErrorText,
+                onDismissRequest = { resizeDialog = null; syncDialogFlag() },
+                onConfirm = { confirmResizeDialog(state) },
+            )
+        }
         if (exitConfirmationVisible) {
             MapleDialog(
                 title = getString(R.string.text_unsaved_changes),
@@ -255,7 +268,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
     }
 
     private fun syncDialogFlag() {
-        composeDialogOpen = textDialog != null || saveDialog != null || colorDialog != null || exitConfirmationVisible
+        composeDialogOpen = textDialog != null || saveDialog != null || colorDialog != null || resizeDialog != null || exitConfirmationVisible
     }
 
     // endregion
@@ -645,6 +658,23 @@ open class ImageEditorActivity : ConfiguredActivity() {
         ui = ui.copy(toolState = EditorToolState.NORMAL)
     }
 
+    private fun showResizeDialog(draft: EditorResizeDraft? = null) {
+        val current = bitmap ?: return
+        if (!canStartTool() || resizeDialog != null) return
+        val source = ImagePixelSize(current.width, current.height)
+        resizeDialog = EditorResizeDialogState(source, ImageBitmapIO.editingPixelBudget(), draft ?: EditorResizePolicy.defaultDraft(source))
+        syncDialogFlag()
+    }
+
+    private fun confirmResizeDialog(state: EditorResizeDialogState) {
+        val size = EditorResizePolicy.resolve(state.source, state.draft, state.maxPixels).takeIf { it.isValid }?.size ?: return
+        resizeDialog = null
+        syncDialogFlag()
+        // The same size would only add an empty history step.
+        if (size == state.source) return
+        commitOperation { ImageEditingEngine.resize(it, size.width, size.height) }
+    }
+
     private fun commitOperation(operation: (Bitmap) -> Bitmap) {
         if (bitmap == null || busy || toolState != EditorToolState.NORMAL) return
         model.commitOperation(operation)
@@ -820,6 +850,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
             )
         },
         colorDialogDraft = colorDialog?.let { EditorColorDialogDraft(it.target, it.state.input) },
+        resizeDialogDraft = resizeDialog?.draft,
         exitConfirmationVisible = exitConfirmationVisible,
     )
 
@@ -859,6 +890,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
         refreshActions()
         state.textDialogDraft?.let(::showTextDialog)
         state.saveDialogDraft?.let(::showSaveDialog)
+        state.resizeDialogDraft?.let(::showResizeDialog)
         state.colorDialogDraft?.let { draft ->
             when (draft.target) {
                 EditorColorTarget.BRUSH -> showColorPicker(

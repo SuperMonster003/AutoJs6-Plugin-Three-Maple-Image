@@ -13,13 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,8 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -225,7 +221,7 @@ private fun Form(
             modifier = Modifier.testTag("maple.converter.targetEnabled"),
         )
         if (evaluation.targetFileSizeActive) {
-            NumberField(
+            MapleNumberField(
                 value = form.targetFileSizeKibibytes,
                 onValueChange = { form.targetFileSizeKibibytes = it },
                 label = stringResource(R.string.text_image_conversion_target_file_size_hint),
@@ -257,7 +253,7 @@ private fun Form(
     val error = evaluation.resizeError
     when (form.resizeMode) {
         ImageResizeMode.ORIGINAL -> Unit
-        ImageResizeMode.PERCENTAGE -> NumberField(
+        ImageResizeMode.PERCENTAGE -> MapleNumberField(
             value = form.percentage,
             onValueChange = { form.percentage = it },
             label = stringResource(R.string.text_image_conversion_percentage_hint),
@@ -266,7 +262,7 @@ private fun Form(
             enabled = enabled,
             modifier = Modifier.padding(horizontal = horizontal, vertical = 8.dp).testTag("maple.converter.percentage"),
         )
-        ImageResizeMode.LONG_EDGE -> NumberField(
+        ImageResizeMode.LONG_EDGE -> MapleNumberField(
             value = form.longEdge,
             onValueChange = { form.longEdge = it },
             label = stringResource(R.string.text_image_conversion_long_edge_hint),
@@ -280,7 +276,7 @@ private fun Form(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = horizontal, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                NumberField(
+                MapleNumberField(
                     value = form.width,
                     onValueChange = callbacks.onWidth,
                     label = stringResource(R.string.text_image_conversion_width),
@@ -289,7 +285,7 @@ private fun Form(
                     enabled = enabled,
                     modifier = Modifier.weight(1f).testTag("maple.converter.width"),
                 )
-                NumberField(
+                MapleNumberField(
                     value = form.height,
                     onValueChange = callbacks.onHeight,
                     label = stringResource(R.string.text_image_conversion_height),
@@ -345,30 +341,6 @@ private fun Form(
     )
 }
 
-@Composable
-private fun NumberField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    suffix: String,
-    error: String?,
-    enabled: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = { onValueChange(it.take(12)) },
-        label = { Text(label) },
-        suffix = { Text(suffix) },
-        isError = error != null,
-        supportingText = error?.let { { Text(it) } },
-        singleLine = true,
-        enabled = enabled,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        textStyle = MaterialTheme.typography.bodyLarge.copy(textDirection = TextDirection.Ltr),
-        modifier = modifier.fillMaxWidth(),
-    )
-}
 
 @Composable
 private fun EstimateBar(model: ConverterUiModel, evaluation: ConverterFormEvaluation, texts: ConverterTexts) {

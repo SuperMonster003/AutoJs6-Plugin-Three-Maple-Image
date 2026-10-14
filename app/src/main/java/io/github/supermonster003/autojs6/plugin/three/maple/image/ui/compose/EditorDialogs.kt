@@ -35,6 +35,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
+import io.github.supermonster003.autojs6.plugin.three.maple.image.EditorResizeDraft
+import io.github.supermonster003.autojs6.plugin.three.maple.image.EditorResizePolicy
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ImagePixelSize
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageResizeError
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageResizeMode
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ThemeColorValue
 
@@ -298,4 +303,111 @@ internal fun parseEditorColor(value: String): Int? {
     if (normalized.length != 6 && normalized.length != 8) return null
     val parsed = normalized.toLongOrNull(16) ?: return null
     return if (normalized.length == 6) (0xFF000000L or parsed).toInt() else parsed.toInt()
+}
+
+/** Draft of the resize dialog (ROADMAP 8.1); the Activity owns it so a rotation keeps what was typed. */
+internal class EditorResizeDialogState(val source: ImagePixelSize, val maxPixels: Long, draft: EditorResizeDraft) {
+    var draft by mutableStateOf(draft)
+}
+
+/**
+ * Resize of the edited image: percentage, long edge, or width and height with an optional locked ratio. The new size
+ * (or why it cannot be made) shows live; the editor's pixel budget is the upper limit.
+ */
+@Composable
+internal fun EditorResizeDialog(
+    state: EditorResizeDialogState,
+    errorText: (ImageResizeError) -> String,
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    val source = state.source
+    val draft = state.draft
+    val result = EditorResizePolicy.resolve(source, draft, state.maxPixels)
+    val error = result.error
+    MapleDialog(
+        title = stringResource(R.string.text_image_conversion_resize),
+        onDismissRequest = onDismissRequest,
+        confirmText = stringResource(R.string.dialog_button_confirm),
+        onConfirm = onConfirm,
+        dismissText = stringResource(R.string.dialog_button_cancel),
+        confirmEnabled = result.isValid,
+        modifier = Modifier.testTag("maple.editor.resize"),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = MapleDialogDefaults.contentPadding)) {
+            val modes = EditorResizePolicy.MODES
+            MapleSegmented(
+                options = listOf(
+                    stringResource(R.string.text_image_conversion_percentage),
+                    stringResource(R.string.text_image_conversion_long_edge),
+                    stringResource(R.string.text_image_conversion_custom_size),
+                ),
+                selectedIndex = modes.indexOf(draft.mode).coerceAtLeast(0),
+                onSelect = { state.draft = draft.copy(mode = modes[it]) },
+                tagPrefix = "maple.editor.resize.mode",
+            )
+            Spacer(Modifier.height(8.dp))
+            when (draft.mode) {
+                ImageResizeMode.LONG_EDGE -> MapleNumberField(
+                    value = draft.longEdge,
+                    onValueChange = { state.draft = draft.copy(longEdge = it) },
+                    label = stringResource(R.string.text_image_conversion_long_edge_hint),
+                    suffix = "px",
+                    error = error?.let(errorText),
+                    enabled = true,
+                    modifier = Modifier.testTag("maple.editor.resize.longEdge"),
+                )
+                ImageResizeMode.CUSTOM -> {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        MapleNumberField(
+                            value = draft.width,
+                            onValueChange = { state.draft = EditorResizePolicy.withWidth(source, draft, it) },
+                            label = stringResource(R.string.text_image_conversion_width),
+                            suffix = "px",
+                            error = null,
+                            enabled = true,
+                            modifier = Modifier.weight(1f).testTag("maple.editor.resize.width"),
+                        )
+                        MapleNumberField(
+                            value = draft.height,
+                            onValueChange = { state.draft = EditorResizePolicy.withHeight(source, draft, it) },
+                            label = stringResource(R.string.text_image_conversion_height),
+                            suffix = "px",
+                            error = null,
+                            enabled = true,
+                            modifier = Modifier.weight(1f).testTag("maple.editor.resize.height"),
+                        )
+                    }
+                    if (error != null) {
+                        Text(errorText(error), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                    }
+                }
+                else -> MapleNumberField(
+                    value = draft.percentage,
+                    onValueChange = { state.draft = draft.copy(percentage = it) },
+                    label = stringResource(R.string.text_image_conversion_percentage_hint),
+                    suffix = "%",
+                    error = error?.let(errorText),
+                    enabled = true,
+                    modifier = Modifier.testTag("maple.editor.resize.percentage"),
+                )
+            }
+        }
+        if (draft.mode == ImageResizeMode.CUSTOM) {
+            MapleSwitchRow(
+                title = stringResource(R.string.text_image_conversion_lock_aspect_ratio),
+                checked = draft.lockAspectRatio,
+                onToggle = { state.draft = EditorResizePolicy.withLock(source, draft, it) },
+                modifier = Modifier.testTag("maple.editor.resize.lock"),
+            )
+        }
+        result.size?.let { size ->
+            Text(
+                text = stringResource(R.string.details_resolution) + ": " + stringResource(R.string.metadata_resolution, size.width, size.height),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = MapleDialogDefaults.contentPadding, vertical = 8.dp).testTag("maple.editor.resize.result"),
+            )
+        }
+    }
 }

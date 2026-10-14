@@ -8,20 +8,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import io.github.supermonster003.autojs6.plugin.three.maple.image.BatchConversionPolicy
 import io.github.supermonster003.autojs6.plugin.three.maple.image.BatchConversionSettings
@@ -128,7 +124,7 @@ private fun BatchConvertForm(
         modifier = Modifier.padding(horizontal = horizontal),
     )
     when (settings.resizeMode) {
-        ImageResizeMode.PERCENTAGE -> BatchNumberField(
+        ImageResizeMode.PERCENTAGE -> MapleNumberField(
             value = settings.percentage,
             onValueChange = { onChange(settings.copy(percentage = it)) },
             label = stringResource(R.string.text_image_conversion_percentage_hint),
@@ -141,7 +137,7 @@ private fun BatchConvertForm(
             enabled = enabled,
             modifier = Modifier.padding(horizontal = horizontal, vertical = 8.dp).testTag("maple.batch.percentage"),
         )
-        ImageResizeMode.LONG_EDGE -> BatchNumberField(
+        ImageResizeMode.LONG_EDGE -> MapleNumberField(
             value = settings.longEdge,
             onValueChange = { onChange(settings.copy(longEdge = it)) },
             label = stringResource(R.string.text_image_conversion_long_edge_hint),
@@ -191,30 +187,6 @@ private fun BatchConvertForm(
     )
 }
 
-@Composable
-private fun BatchNumberField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    suffix: String,
-    error: String?,
-    enabled: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = { onValueChange(it.take(12)) },
-        label = { Text(label) },
-        suffix = { Text(suffix) },
-        isError = error != null,
-        supportingText = error?.let { { Text(it) } },
-        singleLine = true,
-        enabled = enabled,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        textStyle = MaterialTheme.typography.bodyLarge.copy(textDirection = TextDirection.Ltr),
-        modifier = modifier.fillMaxWidth(),
-    )
-}
 
 /** Progress of a running batch: images done of the total, failures so far, and "Cancel" (the current image finishes). */
 @Composable

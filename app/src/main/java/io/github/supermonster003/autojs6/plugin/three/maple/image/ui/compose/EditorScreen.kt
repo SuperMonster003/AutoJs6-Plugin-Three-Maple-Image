@@ -108,6 +108,7 @@ internal class EditorCallbacks(
     val onReleaseHistory: () -> Unit,
     val onGroup: (EditorGroup) -> Unit,
     val onCrop: () -> Unit,
+    val onResize: () -> Unit,
     val onRotateLeft: () -> Unit,
     val onRotateRight: () -> Unit,
     val onRotateFine: () -> Unit,
@@ -408,6 +409,7 @@ private fun SecondaryTools(model: EditorUiModel, callbacks: EditorCallbacks) {
     val tools = when (model.group) {
         EditorGroup.TRANSFORM -> listOf(
             MapleTool("crop", painterResource(R.drawable.ic_crop_24), stringResource(R.string.image_editor_crop), callbacks.onCrop),
+            MapleTool("resize", painterResource(R.drawable.ic_resize_24), stringResource(R.string.text_image_conversion_resize), callbacks.onResize),
             MapleTool("rotateLeft", painterResource(R.drawable.ic_rotate_left_24), stringResource(R.string.image_editor_rotate_left), callbacks.onRotateLeft),
             MapleTool("rotateRight", painterResource(R.drawable.ic_rotate_right_24), stringResource(R.string.image_editor_rotate_right), callbacks.onRotateRight),
             MapleTool("rotateFine", painterResource(R.drawable.ic_rotate_fine_24), stringResource(R.string.image_editor_rotate_fine), callbacks.onRotateFine),

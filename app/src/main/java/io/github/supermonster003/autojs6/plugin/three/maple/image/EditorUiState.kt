@@ -88,5 +88,6 @@ internal data class EditorUiState(
     val saveOptions: EditorSaveOptions = EditorSaveOptions(),
     val saveDialogDraft: EditorSaveOptions? = null,
     val colorDialogDraft: EditorColorDialogDraft? = null,
+    val resizeDialogDraft: EditorResizeDraft? = null,
     val exitConfirmationVisible: Boolean = false,
 )

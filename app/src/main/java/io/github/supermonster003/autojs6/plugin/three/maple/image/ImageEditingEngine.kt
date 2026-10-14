@@ -157,6 +157,29 @@ internal object ImageEditingEngine {
         return Bitmap.createScaledBitmap(source, width, height, true)
     }
 
+    /**
+     * [source] at exactly [width] x [height] (ROADMAP 8.1 resize). A strong reduction halves first, so every step
+     * averages its pixels instead of skipping most of them (bilinear alone aliases below half size).
+     */
+    fun resize(source: Bitmap, width: Int, height: Int): Bitmap {
+        require(width > 0 && height > 0) { "Invalid size $width x $height" }
+        if (width == source.width && height == source.height) return source.copy(source.config ?: Bitmap.Config.ARGB_8888, true)
+        var current = source
+        try {
+            while (current.width >= width * 2 && current.height >= height * 2) {
+                val half = Bitmap.createScaledBitmap(current, current.width / 2, current.height / 2, true)
+                if (current !== source) current.recycle()
+                current = half
+            }
+            val result = Bitmap.createScaledBitmap(current, width, height, true)
+            if (current !== source && current !== result) current.recycle()
+            return result
+        } catch (error: Throwable) {
+            if (current !== source) current.recycle()
+            throw error
+        }
+    }
+
     /** One [size] x [size] center-cropped thumbnail of [source] per [FilterPreset], in enum order. */
     fun filterThumbnails(source: Bitmap, size: Int): List<Bitmap> {
         val side = minOf(source.width, source.height)

@@ -61,7 +61,7 @@ open class ImageConverterActivity : ConfiguredActivity() {
             previewModel = activeRequest.inputUri,
             outputSuffix = activeRequest.outputNameSuffix,
         )
-        val texts = ConverterTexts(errorText = ::errorText, formatBytes = ::formatBytes)
+        val texts = ConverterTexts(errorText = { resizeErrorText(it) }, formatBytes = ::formatBytes)
         val callbacks = ConverterCallbacks(
             onBack = ::requestExit,
             onConvert = ::convert,
@@ -290,21 +290,6 @@ open class ImageConverterActivity : ConfiguredActivity() {
             )
         }
         finish()
-    }
-
-    private fun errorText(error: ImageResizeError): String = when (error) {
-        ImageResizeError.INVALID_SOURCE -> getString(R.string.error_image_conversion_invalid_source)
-        ImageResizeError.INVALID_PERCENTAGE -> getString(
-            R.string.error_image_conversion_invalid_percentage,
-            ImageConversionSizing.MIN_PERCENTAGE,
-            ImageConversionSizing.MAX_PERCENTAGE,
-        )
-        ImageResizeError.INVALID_LONG_EDGE -> getString(R.string.error_image_conversion_invalid_long_edge, ImageConversionSizing.MAX_DIMENSION)
-        ImageResizeError.INVALID_WIDTH -> getString(R.string.error_image_conversion_invalid_width)
-        ImageResizeError.INVALID_HEIGHT -> getString(R.string.error_image_conversion_invalid_height)
-        ImageResizeError.DIMENSION_TOO_LARGE -> getString(R.string.error_image_conversion_dimension_too_large, ImageConversionSizing.MAX_DIMENSION)
-        ImageResizeError.PIXEL_COUNT_TOO_LARGE -> getString(R.string.error_image_conversion_pixel_count_too_large, ImageConversionSizing.MAX_PIXEL_COUNT)
-        ImageResizeError.MEMORY_BUDGET_EXCEEDED -> getString(R.string.error_image_conversion_memory_budget_exceeded)
     }
 
     private fun toast(messageRes: Int) =
