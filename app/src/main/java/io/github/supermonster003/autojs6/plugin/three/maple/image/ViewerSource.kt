@@ -111,12 +111,14 @@ internal class ViewerSourceLoader(
     constructor(context: Context) : this(
         loadAlbum = { bucketId, sort ->
             val media = MediaStoreRepository(context)
+            // Excluded folders stay out of "all images" and the favorites here too (ROADMAP 7.4).
+            val marks = kotlin.runCatching { FolderMarksRepository(context).current() }.getOrDefault(FolderMarkState.NONE)
             if (bucketId == MediaCatalog.FAVORITES) {
                 // The favorites album pages through the favorites in the grid's order.
-                val favorites = FavoritesRepository(context).resolve(media.loadAll())
+                val favorites = marks.visible(FavoritesRepository(context).resolve(media.loadAll()))
                 if (sort == MediaSort.DEFAULT) favorites else MediaCatalog.sort(favorites, sort)
             } else {
-                media.loadBucketAll(bucketId, sort)
+                media.loadBucketAll(bucketId, sort, marks)
             }
         },
         loadFolder = { treeUri, sort ->

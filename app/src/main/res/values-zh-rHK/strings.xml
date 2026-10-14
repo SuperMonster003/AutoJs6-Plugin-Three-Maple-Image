@@ -64,6 +64,12 @@
     <string name="error_image_format_requires_android">此裝置需要 Android %2$d 或更新版本才能顯示 %1$s 圖像</string>
     <string name="error_no_external_viewer">沒有可用的其他圖像檢視器</string>
     <string name="error_print_failed">無法建立列印文件</string>
+    <string name="excluded_folders_empty">沒有排除的資料夾</string>
+    <string name="excluded_folders_empty_body">在相簿列表中長按相簿, 選擇 排除 即可.</string>
+    <string name="excluded_folders_restore">重新顯示</string>
+    <string name="excluded_folders_row_summary">圖庫中不顯示的相簿</string>
+    <string name="excluded_folders_summary">這些資料夾中的圖片不會出現在圖庫的任何地方: 相簿, 所有圖片, 收藏與搜尋. 從 AutoJs6 或其他應用程式開啟時不受影響, 裝置上的檔案也不會改變.</string>
+    <string name="excluded_folders_title">已排除的資料夾</string>
     <string name="exif_capture_time">拍攝時間: %1$s</string>
     <string name="exif_device">裝置: %1$s</string>
     <string name="exif_exposure">曝光: %1$s</string>

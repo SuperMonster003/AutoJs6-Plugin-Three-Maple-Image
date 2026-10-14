@@ -55,6 +55,7 @@ internal fun SettingsScreen(
     syncSystemFavorites: Boolean?,
     onSyncSystemFavorites: (Boolean) -> Unit,
     onStoragePermission: () -> Unit,
+    onExcludedFolders: () -> Unit,
     onReleaseHistory: () -> Unit,
     onAbout: () -> Unit,
 ) {
@@ -105,6 +106,13 @@ internal fun SettingsScreen(
                 iconResource = R.drawable.ic_folder_24,
                 onClick = onStoragePermission,
                 modifier = Modifier.testTag("maple.settings.storage"),
+            )
+            MapleSettingsRow(
+                title = stringResource(R.string.excluded_folders_title),
+                summary = stringResource(R.string.excluded_folders_row_summary),
+                iconResource = R.drawable.ic_block_24,
+                onClick = onExcludedFolders,
+                modifier = Modifier.testTag("maple.settings.excludedFolders"),
             )
             MapleSwitchRow(
                 title = stringResource(R.string.settings_recycle_bin_title),

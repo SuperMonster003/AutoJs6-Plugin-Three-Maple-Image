@@ -64,6 +64,12 @@
     <string name="error_image_format_requires_android">Для изображений %1$s на этом устройстве требуется Android %2$d или новее</string>
     <string name="error_no_external_viewer">Другого средства просмотра изображений нет</string>
     <string name="error_print_failed">Не удалось создать документ для печати</string>
+    <string name="excluded_folders_empty">Нет исключённых папок</string>
+    <string name="excluded_folders_empty_body">Нажмите и удерживайте альбом в списке альбомов и выберите Исключить.</string>
+    <string name="excluded_folders_restore">Показать снова</string>
+    <string name="excluded_folders_row_summary">Альбомы, которые галерея не показывает</string>
+    <string name="excluded_folders_summary">Изображения из этих папок не показываются нигде в галерее: в альбомах, во всех изображениях, в избранном и в поиске. Открытие из AutoJs6 или других приложений не затрагивается, файлы на устройстве не меняются.</string>
+    <string name="excluded_folders_title">Исключённые папки</string>
     <string name="exif_capture_time">Время съёмки: %1$s</string>
     <string name="exif_device">Устройство: %1$s</string>
     <string name="exif_exposure">Экспозиция: %1$s</string>

@@ -64,6 +64,12 @@
     <string name="error_image_format_requires_android">이 기기에서 %1$s 이미지를 표시하려면 Android %2$d 이상이 필요합니다</string>
     <string name="error_no_external_viewer">사용 가능한 다른 이미지 뷰어가 없습니다</string>
     <string name="error_print_failed">인쇄 문서를 만들 수 없습니다</string>
+    <string name="excluded_folders_empty">제외한 폴더가 없습니다</string>
+    <string name="excluded_folders_empty_body">앨범 목록에서 앨범을 길게 누르고 제외를 선택하세요.</string>
+    <string name="excluded_folders_restore">다시 표시</string>
+    <string name="excluded_folders_row_summary">갤러리에 표시하지 않는 앨범</string>
+    <string name="excluded_folders_summary">이 폴더의 이미지는 갤러리 어디에도 표시되지 않습니다 (앨범, 모든 이미지, 즐겨찾기, 검색). AutoJs6나 다른 앱에서 열 때는 영향이 없으며 기기의 파일도 바뀌지 않습니다.</string>
+    <string name="excluded_folders_title">제외한 폴더</string>
     <string name="exif_capture_time">촬영 시각: %1$s</string>
     <string name="exif_device">기기: %1$s</string>
     <string name="exif_exposure">노출: %1$s</string>

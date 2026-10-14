@@ -64,6 +64,12 @@
     <string name="error_image_format_requires_android">%1$s 画像をこのデバイスで表示するには Android %2$d 以降が必要です</string>
     <string name="error_no_external_viewer">ほかの画像ビューアーを利用できません</string>
     <string name="error_print_failed">印刷ドキュメントを作成できませんでした</string>
+    <string name="excluded_folders_empty">除外したフォルダーはありません</string>
+    <string name="excluded_folders_empty_body">アルバム一覧でアルバムを長押しして 除外 を選びます.</string>
+    <string name="excluded_folders_restore">再表示</string>
+    <string name="excluded_folders_row_summary">ギャラリーに表示しないアルバム</string>
+    <string name="excluded_folders_summary">これらのフォルダーの画像はギャラリーのどこにも表示されません (アルバム, すべての画像, お気に入り, 検索). AutoJs6 や他のアプリから開く場合は影響せず, 端末上のファイルも変わりません.</string>
+    <string name="excluded_folders_title">除外したフォルダー</string>
     <string name="exif_capture_time">撮影日時: %1$s</string>
     <string name="exif_device">撮影機器: %1$s</string>
     <string name="exif_exposure">露出: %1$s</string>

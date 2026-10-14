@@ -277,7 +277,7 @@ private fun AlbumCell(album: AlbumSummary, callbacks: AlbumGridCallbacks, modifi
         badge = when (album.kind) {
             AlbumKind.FOLDER -> painterResource(R.drawable.ic_folder_24)
             AlbumKind.FAVORITES -> painterResource(R.drawable.ic_favorite_24)
-            else -> null
+            else -> if (album.pinned) painterResource(R.drawable.ic_push_pin_24) else null
         },
         enabled = album.available,
         onClick = { callbacks.onOpenAlbum(album) },

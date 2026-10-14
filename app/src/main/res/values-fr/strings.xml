@@ -64,6 +64,12 @@
     <string name="error_image_format_requires_android">Les images %1$s nécessitent Android %2$d ou version ultérieure sur cet appareil</string>
     <string name="error_no_external_viewer">Aucune autre visionneuse d\'images n\'est disponible</string>
     <string name="error_print_failed">Impossible de créer le document d\'impression</string>
+    <string name="excluded_folders_empty">Aucun dossier exclu</string>
+    <string name="excluded_folders_empty_body">Appuyez longuement sur un album dans la liste des albums et choisissez Exclure.</string>
+    <string name="excluded_folders_restore">Afficher à nouveau</string>
+    <string name="excluded_folders_row_summary">Albums que la galerie n\'affiche pas</string>
+    <string name="excluded_folders_summary">Les images de ces dossiers n\'apparaissent nulle part dans la galerie: albums, toutes les images, favoris et recherche. Les ouvrir depuis AutoJs6 ou une autre application n\'est pas concerné, et rien ne change sur l\'appareil.</string>
+    <string name="excluded_folders_title">Dossiers exclus</string>
     <string name="exif_capture_time">Prise de vue : %1$s</string>
     <string name="exif_device">Appareil : %1$s</string>
     <string name="exif_exposure">Exposition : %1$s</string>

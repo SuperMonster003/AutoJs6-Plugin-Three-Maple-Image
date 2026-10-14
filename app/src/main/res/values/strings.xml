@@ -64,6 +64,12 @@
     <string name="error_image_format_requires_android">%1$s images require Android %2$d or later on this device</string>
     <string name="error_no_external_viewer">No other image viewer is available</string>
     <string name="error_print_failed">The print document could not be created</string>
+    <string name="excluded_folders_empty">No excluded folders</string>
+    <string name="excluded_folders_empty_body">Long-press an album in the album list and choose Exclude.</string>
+    <string name="excluded_folders_restore">Show again</string>
+    <string name="excluded_folders_row_summary">Albums the gallery leaves out</string>
+    <string name="excluded_folders_summary">Images in these folders do not appear anywhere in the gallery: albums, all images, favorites and search. Opening them from AutoJs6 or another app is not affected, and nothing on the device changes.</string>
+    <string name="excluded_folders_title">Excluded folders</string>
     <string name="exif_capture_time">Captured: %1$s</string>
     <string name="exif_device">Device: %1$s</string>
     <string name="exif_exposure">Exposure: %1$s</string>

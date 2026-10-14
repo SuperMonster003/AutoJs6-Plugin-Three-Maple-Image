@@ -42,7 +42,7 @@ internal class MediaStoreRepository(
     @Volatile
     private var cachedNameOrder: NameOrder? = null
 
-    private class NameOrder(val source: List<MediaItem>, val bucketId: Long, val sort: MediaSort, val items: List<MediaItem>)
+    private class NameOrder(val source: List<MediaItem>, val bucketId: Long, val sort: MediaSort, val excluded: Set<String>, val items: List<MediaItem>)
 
     val collection: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
@@ -81,9 +81,17 @@ internal class MediaStoreRepository(
      * cheap; name order is natural (numbers compare numerically, like the viewer's sibling order), which SQLite
      * cannot express, so name pages are sliced from the cached full scan instead.
      */
-    suspend fun loadBucket(bucketId: Long, sort: MediaSort = MediaSort.DEFAULT, limit: Int, offset: Int = 0): List<MediaItem> {
-        if (sort.field == MediaSortField.NAME) {
-            val album = nameOrdered(bucketId, sort)
+    suspend fun loadBucket(
+        bucketId: Long,
+        sort: MediaSort = MediaSort.DEFAULT,
+        limit: Int,
+        offset: Int = 0,
+        marks: FolderMarkState = FolderMarkState.NONE,
+    ): List<MediaItem> {
+        // Excluded folders leave "all images" (ROADMAP 7.4); filtering provider pages would shift the offsets, so
+        // that view pages through a filtered copy of the full scan instead.
+        if (sort.field == MediaSortField.NAME || excludes(bucketId, marks)) {
+            val album = ordered(bucketId, sort, marks)
             return album.subList(offset.coerceAtMost(album.size), (offset + limit).coerceAtMost(album.size))
         }
         return withContext(Dispatchers.IO) {
@@ -98,13 +106,21 @@ internal class MediaStoreRepository(
         }
     }
 
-    private suspend fun nameOrdered(bucketId: Long, sort: MediaSort): List<MediaItem> {
+    private fun excludes(bucketId: Long, marks: FolderMarkState): Boolean = bucketId == MediaCatalog.ALL_BUCKETS && marks.excluded.isNotEmpty()
+
+    /** One album (or every bucket without the excluded folders) sorted in memory; the last result is kept for paging. */
+    private suspend fun ordered(bucketId: Long, sort: MediaSort, marks: FolderMarkState): List<MediaItem> {
         val all = loadAll()
-        cachedNameOrder?.let { cached -> if (cached.source === all && cached.bucketId == bucketId && cached.sort == sort) return cached.items }
-        val items = withContext(Dispatchers.Default) {
-            MediaCatalog.sort(all.filter { bucketId == MediaCatalog.ALL_BUCKETS || it.bucketId == bucketId }, sort)
+        val excluded = if (bucketId == MediaCatalog.ALL_BUCKETS) marks.excluded else emptySet()
+        cachedNameOrder?.let { cached ->
+            if (cached.source === all && cached.bucketId == bucketId && cached.sort == sort && cached.excluded == excluded) return cached.items
         }
-        cachedNameOrder = NameOrder(all, bucketId, sort, items)
+        val items = withContext(Dispatchers.Default) {
+            val album = if (bucketId == MediaCatalog.ALL_BUCKETS) marks.visible(all) else all.filter { it.bucketId == bucketId }
+            // The full scan is already in the default order.
+            if (sort == MediaSort.DEFAULT && bucketId == MediaCatalog.ALL_BUCKETS) album else MediaCatalog.sort(album, sort)
+        }
+        cachedNameOrder = NameOrder(all, bucketId, sort, excluded, items)
         return items
     }
 
@@ -115,8 +131,8 @@ internal class MediaStoreRepository(
         if (bucketId == MediaCatalog.ALL_BUCKETS) null else arrayOf(bucketId.toString())
 
     /** Every image of one album in the requested order; the viewer pages through this list (ROADMAP 6.3). */
-    suspend fun loadBucketAll(bucketId: Long, sort: MediaSort = MediaSort.DEFAULT): List<MediaItem> {
-        if (sort.field == MediaSortField.NAME) return nameOrdered(bucketId, sort)
+    suspend fun loadBucketAll(bucketId: Long, sort: MediaSort = MediaSort.DEFAULT, marks: FolderMarkState = FolderMarkState.NONE): List<MediaItem> {
+        if (sort.field == MediaSortField.NAME || excludes(bucketId, marks)) return ordered(bucketId, sort, marks)
         // The shared full scan is already in the default order (the provider query below would return the same rows).
         if (sort == MediaSort.DEFAULT) sharedAll?.let { all ->
             return if (bucketId == MediaCatalog.ALL_BUCKETS) all else withContext(Dispatchers.Default) { all.filter { it.bucketId == bucketId } }

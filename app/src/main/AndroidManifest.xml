@@ -58,6 +58,7 @@
         <activity android:name=".HomeActivity" android:exported="false" android:theme="@style/Theme.Standalone" />
         <activity android:name=".AppSettingsActivity" android:exported="false" android:theme="@style/Theme.Standalone" android:parentActivityName=".HomeActivity" />
         <activity android:name=".StoragePermissionActivity" android:exported="false" android:theme="@style/Theme.Standalone" android:parentActivityName=".AppSettingsActivity" />
+        <activity android:name=".ExcludedFoldersActivity" android:exported="false" android:theme="@style/Theme.Standalone" android:parentActivityName=".AppSettingsActivity" />
         <activity android:name=".AboutActivity" android:exported="false" android:theme="@style/Theme.Standalone" android:parentActivityName=".AppSettingsActivity" />
         <activity android:name=".ReleaseHistoryActivity" android:exported="false" android:theme="@style/Theme.Standalone" android:parentActivityName=".AppSettingsActivity" />
         <activity-alias android:name=".launcher.AdaptiveLightIconAlias" android:targetActivity=".HomeActivity" android:enabled="false" android:exported="true" android:icon="@mipmap/ic_launcher_system_light" android:label="@string/app_name">

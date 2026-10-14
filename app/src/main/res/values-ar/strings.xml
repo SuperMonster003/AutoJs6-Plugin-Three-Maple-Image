@@ -64,6 +64,12 @@
     <string name="error_image_format_requires_android">تتطلب صور %1$s نظام Android %2$d أو أحدث على هذا الجهاز</string>
     <string name="error_no_external_viewer">لا يتوفر عارض صور اخر</string>
     <string name="error_print_failed">تعذر إنشاء مستند الطباعة</string>
+    <string name="excluded_folders_empty">لا توجد مجلدات مستبعدة</string>
+    <string name="excluded_folders_empty_body">اضغط مطولا على ألبوم في قائمة الألبومات واختر استبعاد.</string>
+    <string name="excluded_folders_restore">إظهار مجددا</string>
+    <string name="excluded_folders_row_summary">ألبومات لا يعرضها المعرض</string>
+    <string name="excluded_folders_summary">لا تظهر صور هذه المجلدات في أي مكان من المعرض: الألبومات وكل الصور والمفضلة والبحث. ولا يتأثر فتحها من AutoJs6 أو من تطبيق آخر, ولا يتغير شيء على الجهاز.</string>
+    <string name="excluded_folders_title">المجلدات المستبعدة</string>
     <string name="exif_capture_time">وقت الالتقاط: %1$s</string>
     <string name="exif_device">الجهاز: %1$s</string>
     <string name="exif_exposure">التعريض: %1$s</string>

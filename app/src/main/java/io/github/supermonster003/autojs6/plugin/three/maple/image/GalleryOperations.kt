@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.os.storage.StorageManager
 import android.provider.DocumentsContract
 import android.provider.Settings
 import android.text.format.Formatter
@@ -371,21 +370,13 @@ internal class GalleryOperations(
         val albums = target.albums()
             .filter { it.kind == AlbumKind.MEDIA && it.subtitle.isNotEmpty() && MediaWriteCoordinator.isWritableAlbum(AlbumPath(it.volume, it.subtitle)) }
             .filter { copy || openPath == null || it.id != open.id }
-            .map { TargetAlbum(it.name, AlbumPath(it.volume, it.subtitle), storageLabel(it.volume)) }
+            .map { TargetAlbum(it.name, AlbumPath(it.volume, it.subtitle), StorageVolumes.label(activity, it.volume)) }
             .distinctBy { GalleryPreferences.encodeTarget(it.path) }
         val byPath = albums.associateBy { GalleryPreferences.encodeTarget(it.path) }
         val recent = preferences.recentTargets
             .filter { MediaWriteCoordinator.isWritableAlbum(it) && (copy || openPath == null || !it.sameAs(openPath)) }
-            .map { path -> byPath[GalleryPreferences.encodeTarget(path)] ?: TargetAlbum(path.relativePath.trimEnd('/').substringAfterLast('/'), path, storageLabel(path.volume)) }
+            .map { path -> byPath[GalleryPreferences.encodeTarget(path)] ?: TargetAlbum(path.relativePath.trimEnd('/').substringAfterLast('/'), path, StorageVolumes.label(activity, path.volume)) }
         return recent to albums
-    }
-
-    /** The system's name of a storage card ("SanDisk SD card"); null for the internal storage. */
-    private fun storageLabel(volume: String): String? {
-        if (MediaCatalog.isPrimaryVolume(volume) || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
-        val storage = activity.getSystemService(StorageManager::class.java) ?: return volume.uppercase()
-        val match = storage.storageVolumes.firstOrNull { it.mediaStoreVolumeName.equals(volume, ignoreCase = true) }
-        return match?.getDescription(activity) ?: volume.uppercase()
     }
 
     private fun chooseTarget(items: List<MediaItem>, copy: Boolean, target: TargetAlbum) = launch {
