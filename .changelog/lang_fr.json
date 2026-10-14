@@ -10,6 +10,9 @@
       "hint": [
         "Nécessite AutoJs6 6.8.0 (une version de développement ou stable intégrant le protocole v24, introduit le 2026-10-14, avec un numéro de build de 5352 ou plus); les versions de développement antérieures également numérotées 5352 ne suffisent pas",
         "Les hôtes sans protocole v24 ignorent toutes les actions du gestionnaire de fichiers de ce plugin, y compris l'affichage d'une image ou des images sélectionnées, la navigation dans un dossier comme album, l'édition, la conversion et la conversion par lots"
+      ],
+      "fix": [
+        "Absence des actions de modification et de conversion des images dans le menu \"Plus\" des fichiers image du gestionnaire de fichiers AutoJs6"
       ]
     },
     "v3.1.2": {

@@ -10,6 +10,7 @@
 
 * `Aviso` Requiere AutoJs6 6.8.0 (una versión de desarrollo o estable que incluya el protocolo v24, introducido el 2026-10-14, con número de compilación 5352 o superior); las versiones de desarrollo anteriores también numeradas 5352 no cumplen este requisito
 * `Aviso` Los hosts sin el protocolo v24 ignoran todas las acciones de este plugin en el gestor de archivos, incluidas la visualización de una imagen o de imágenes seleccionadas, la exploración de una carpeta como álbum, la edición, la conversión y la conversión por lotes
+* `Corrección` Ausencia de las acciones de edición y conversión de imágenes en el menú "Más" de los archivos de imagen del gestor de archivos AutoJs6
 
 ## v3.1.2
 

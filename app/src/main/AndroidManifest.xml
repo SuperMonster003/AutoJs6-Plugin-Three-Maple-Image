@@ -97,8 +97,18 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
-        <activity android:name=".ImageEditorActivity" android:exported="true" android:permission="org.autojs.permission.PLUGIN" android:theme="@style/Theme.Standalone" />
-        <activity android:name=".ImageConverterActivity" android:exported="true" android:permission="org.autojs.permission.PLUGIN" android:theme="@style/Theme.Standalone" />
+        <activity android:name=".ImageEditorActivity" android:exported="true" android:permission="org.autojs.permission.PLUGIN" android:theme="@style/Theme.Standalone">
+            <intent-filter>
+                <action android:name="org.autojs.plugin.EXPLORER_ACTION_EXECUTE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ImageConverterActivity" android:exported="true" android:permission="org.autojs.permission.PLUGIN" android:theme="@style/Theme.Standalone">
+            <intent-filter>
+                <action android:name="org.autojs.plugin.EXPLORER_ACTION_EXECUTE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".StandaloneImageEditorActivity" android:exported="false" android:theme="@style/Theme.Standalone" />
         <activity android:name=".StandaloneImageConverterActivity" android:exported="false" android:theme="@style/Theme.Standalone" />
         <provider android:name="androidx.core.content.FileProvider" android:authorities="io.github.supermonster003.autojs6.plugin.three.maple.image.standalone-images" android:exported="false" android:grantUriPermissions="true">
