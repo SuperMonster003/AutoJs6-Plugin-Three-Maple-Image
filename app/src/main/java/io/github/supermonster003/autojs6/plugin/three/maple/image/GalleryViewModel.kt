@@ -291,6 +291,8 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             columns = preferences.mediaColumns,
             refreshing = current.refreshing && sameAlbum,
             selection = if (sameAlbum) current.selection else emptySet(),
+            // The favorites flow only emits on changes, so a fresh grid state must carry the current marks.
+            favoriteIds = favoriteIds,
         )
         loadPage(reset = true)
     }

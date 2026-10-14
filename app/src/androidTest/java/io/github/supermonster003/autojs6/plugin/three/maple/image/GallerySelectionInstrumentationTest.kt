@@ -5,7 +5,9 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.SystemClock
 import android.util.Log
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -78,6 +80,30 @@ class GallerySelectionInstrumentationTest {
     }
 
     @Test
+    fun aFavoriteStaysMarkedWhenTheAlbumOpensAgain() {
+        insert(COUNT)
+        val favorites = FavoritesRepository(context)
+        openAlbum { scenario, items ->
+            val first = items[0].id
+            try {
+                compose.onNodeWithTag("maple.media.item.$first").performTouchInput { longClick() }
+                compose.onNodeWithTag("maple.selection.favorite").performClick()
+                compose.waitUntil(TIMEOUT_MILLIS) { first in favoriteIds(scenario) }
+                // Coming back to the album (or refreshing it) opens it again; the marks must not wait for the next change.
+                scenario.onActivity { activity -> activity.galleryForTesting.let { it.openAlbum(it.grid.value.album!!) } }
+                compose.waitForIdle()
+                assertTrue(first in favoriteIds(scenario))
+                compose.onNodeWithTag("maple.media.item.$first").performTouchInput { longClick() }
+                var unfavorite = ""
+                scenario.onActivity { unfavorite = it.getString(R.string.action_unfavorite) }
+                compose.onNodeWithTag("maple.selection.favorite").assert(hasText(unfavorite))
+            } finally {
+                runBlocking { favorites.remove(listOf(first)) }
+            }
+        }
+    }
+
+    @Test
     fun selectAllOverAThousandImagesIsQuick() {
         val enabled = InstrumentationRegistry.getArguments().getString("selectionLoad") == "true"
         assumeTrue("set -e selectionLoad true to insert 1000 images", enabled)
@@ -99,6 +125,12 @@ class GallerySelectionInstrumentationTest {
         for (n in 1..count) {
             inserted += MediaStoreTestImages.insert(context, folder, "select-%04d.png".format(Locale.ROOT, n), if (n % 2 == 0) Color.MAGENTA else Color.GREEN)
         }
+    }
+
+    private fun favoriteIds(scenario: ActivityScenario<HomeActivity>): Set<Long> {
+        var ids: Set<Long> = emptySet()
+        scenario.onActivity { ids = it.galleryForTesting.grid.value.favoriteIds }
+        return ids
     }
 
     private fun selection(scenario: ActivityScenario<HomeActivity>): Set<Long> {
