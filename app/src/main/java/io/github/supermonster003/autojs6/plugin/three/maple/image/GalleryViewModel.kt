@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -278,6 +279,8 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                     media.invalidate()
                     loaded = runCatching { media.loadBuckets() }.getOrNull()
                 }
+                // A reload replaced by a newer one is cancelled; runCatching must not turn that into a failure.
+                ensureActive()
                 if (loaded == null) _albums.update { s -> s.copy(failed = true) }
                 loaded.orEmpty()
             } else {
@@ -326,6 +329,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             }
             favoriteOrder = null
             val favoritesSummary = favoritesAlbum()
+            ensureActive()
             _albums.update { state ->
                 state.copy(
                     loading = false,
@@ -672,6 +676,9 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                 val ordered = folderOrdered(cached.first, sort)
                 page = ordered.subList(offset.coerceAtMost(ordered.size), (offset + PAGE_SIZE).coerceAtMost(ordered.size))
             }
+            // runCatching above also swallows the cancellation of a superseded load (a reopen of the same album); such
+            // a load must not publish its empty page as the finished album.
+            ensureActive()
             _grid.update { state ->
                 if (state.album?.id != album.id) return@update state
                 state.copy(
