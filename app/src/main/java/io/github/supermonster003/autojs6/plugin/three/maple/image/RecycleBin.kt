@@ -2,7 +2,6 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.app.Application
 import android.content.ContentResolver
-import android.content.ContentUris
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -65,6 +64,7 @@ internal class RecycleBinRepository(context: Context, private val now: () -> Lon
             MediaStore.MediaColumns.MIME_TYPE,
             MediaStore.MediaColumns.SIZE,
             MediaStore.MediaColumns.DATE_EXPIRES,
+            MediaStore.MediaColumns.VOLUME_NAME,
         )
         val entries = ArrayList<RecycleBinEntry>()
         val nowMillis = now()
@@ -78,7 +78,8 @@ internal class RecycleBinRepository(context: Context, private val now: () -> Lon
                         displayName = RecycleBinNames.original(cursor.getString(1).orEmpty()),
                         mimeType = cursor.getString(2).orEmpty(),
                         sizeBytes = cursor.getLong(3),
-                        model = ContentUris.withAppendedId(collection, id),
+                        // A card row is restored or deleted through its own volume (see MediaStoreRepository.itemUri).
+                        model = MediaStoreRepository.itemUri(cursor.getString(5) ?: MediaCatalog.PRIMARY_VOLUME, id),
                         remainingDays = daysUntil(expiresMillis, nowMillis),
                     )
                 }

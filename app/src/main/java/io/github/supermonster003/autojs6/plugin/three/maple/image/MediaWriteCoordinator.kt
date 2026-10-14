@@ -568,7 +568,7 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
             relativePath = entry.target.relativePath,
             displayName = entry.targetName,
             volume = entry.target.volume,
-            contentUri = ContentUris.withAppendedId(media.collection, id).toString(),
+            contentUri = MediaStoreRepository.itemUri(entry.target.volume, id).toString(),
         )
     }
 

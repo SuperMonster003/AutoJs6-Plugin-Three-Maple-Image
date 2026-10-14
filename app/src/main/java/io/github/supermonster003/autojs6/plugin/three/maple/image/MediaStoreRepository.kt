@@ -277,7 +277,7 @@ internal class MediaStoreRepository(
                     bucketId = cursor.getLong(bucketIdColumn),
                     bucketName = cursor.getString(bucketNameColumn).orEmpty(),
                     relativePath = location.relativePath,
-                    contentUri = ContentUris.withAppendedId(collection, id).toString(),
+                    contentUri = itemUri(location.volume, id).toString(),
                     volume = location.volume,
                 ),
             )
@@ -299,6 +299,21 @@ internal class MediaStoreRepository(
     }
 
     companion object {
+        /**
+         * The content uri of one image row. A storage card row is addressed through its own volume: Android 15 treats
+         * an update through the `external` collection as a move to the internal storage and refuses a rename or a
+         * trash there ("Changing volume ... not allowed"), so the gallery fell back to a system confirmation.
+         */
+        fun itemUri(volume: String, id: Long): Uri =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !MediaCatalog.isPrimaryVolume(volume)) {
+                ContentUris.withAppendedId(MediaStore.Images.Media.getContentUri(volume), id)
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentUris.withAppendedId(MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL), id)
+            } else {
+                @Suppress("DEPRECATION")
+                ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+            }
+
         const val DEFAULT_QUIET_MILLIS = 500L
         const val DEFAULT_MAX_WAIT_MILLIS = 5_000L
 
