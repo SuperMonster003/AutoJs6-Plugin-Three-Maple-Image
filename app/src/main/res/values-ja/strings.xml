@@ -395,7 +395,7 @@
     <string name="text_cannot_read_file">ファイルを読めません</string>
     <string name="text_color_palette">カラーパレット</string>
     <string name="text_done">完了</string>
-    <string name="text_edit">編集する</string>
+    <string name="text_edit">編集</string>
     <string name="text_failed">失敗</string>
     <string name="text_image_conversion_background_black">黒</string>
     <string name="text_image_conversion_background_white">白</string>
@@ -429,7 +429,7 @@
     <string name="text_output_too_large">エンコードされた画像がホストの出力上限を超えています</string>
     <string name="text_please_wait" tools:ignore="TypographyEllipsis">しばらくお待ちください...</string>
     <string name="text_redo">やり直す</string>
-    <string name="text_save">保存する</string>
+    <string name="text_save">保存</string>
     <string name="text_should_not_be_empty">テキストを空にすることはできません</string>
     <string name="text_size">サイズ</string>
     <string name="text_undo">元に戻す</string>

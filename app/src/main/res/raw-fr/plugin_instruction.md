@@ -11,7 +11,7 @@ HEIC et HEIF nécessitent Android 9 ou version ultérieure, tandis qu'AVIF néce
 
 Les très grandes images JPEG, PNG et HEIC/HEIF statiques utilisent un aperçu sous-échantillonné et borné; pendant le zoom, seules les zones visibles en haute résolution sont décodées. Le cache de tuiles est libéré au changement de page ou sous pression mémoire.
 
-Pour n'ouvrir qu'un groupe explicite, passez en mode de sélection dans AutoJs6, choisissez de 1 à 128 images prises en charge dans un même dossier puis touchez `Afficher l'image`. La visionneuse conserve l'ordre de sélection et limite la pagination à ce groupe; chaque URI sélectionné est validé séparément et reste en lecture seule.
+Pour n'ouvrir qu'un groupe explicite, passez en mode de sélection dans AutoJs6, choisissez de 1 à 128 images prises en charge dans un même dossier puis touchez `Afficher l'image`. La visionneuse conserve l'ordre de sélection et limite la pagination à ce groupe; chaque URI sélectionné est validé séparément et reste en lecture seule. Chaque image sélectionnée peut être envoyée dans la Corbeille d'AutoJs6 avec `Supprimer` dans la barre du bas et récupérée avec Annuler; l'image ouverte en touchant un seul fichier se supprime de la même façon, mais pas les autres images de son dossier.
 
 La visionneuse adapte l'image à l'écran et prend en charge la pagination gauche/droite du même dossier à l'échelle 1x, le zoom focal par pincement, le déplacement, le basculement par double appui entre l'ajustement et un zoom 2,5x centré sur le point touché, ainsi que les métadonnées par page. Le facteur actuel apparaît pendant le pincement et brièvement après un double appui. Les GIF animés bouclent avec une commande de pause/reprise qui reste masquée pour les images statiques. L'image remplit tout l'écran sous des barres translucides en surimpression; appuyez sur l'image pour les masquer ou les afficher, et la barre de titre ajoute un compteur de pages du type `3 / 12` lorsque plusieurs images sont ouvertes. Le partage et l'ouverture avec une autre application sont disponibles pour l'image ouverte initialement et désactivés sur les pages voisines de session.
 
@@ -27,11 +27,13 @@ Les photos sont automatiquement pivotées ou mises en miroir selon leur orientat
 
 Dans le gestionnaire de fichiers, `Afficher comme album` dans le menu d'un dossier ouvre ce dossier comme album via la session de l'hôte. Les sous-dossiers jusqu'à 8 niveaux apparaissent comme cellules de dossier, les images s'ouvrent dans la visionneuse avec pagination dans ce dossier et seules les 4096 premières entrées de chaque dossier sont listées. Ce mode ne requiert aucune permission de stockage et ne divulgue aucun chemin de fichier; les actions de gestion n'y sont pas disponibles.
 
+`Modifier l'image` et `Convertir l'image` dans le menu du fichier enregistrent par défaut un nouveau fichier à côté de l'original; avec `Remplacer l'original` activé dans la boîte d'enregistrement ou sur la page de conversion, ils remplacent l'original (même format), et le remplacement peut être annulé pendant 8 secondes. Chaque sortie est préparée et relue avant d'être publiée, si bien qu'un échec ne laisse aucun fichier partiel.
+
 La version 5352 ou ultérieure de l'hôte est requise.
 
 Limites de sécurité et de confidentialité:
 
 - La source sélectionnée utilise un URI `content` temporaire en lecture seule; les voisins directs ne sont ouverts que par la session `readSiblings` limitée de l'hôte.
 - Les fichiers de plus de 8 TiB sont refusés.
-- Le plugin ne demande aucune autorisation de stockage ou de réseau.
-- La modification permanente, la conversion, la suppression, le déplacement et le renommage restent des fonctions de l'hôte.
+- Ouvert depuis AutoJs6, le plugin ne demande aucune autorisation et ne déclare pas d'autorisation réseau.
+- La suppression n'envoie que les fichiers sélectionnés dans la Corbeille d'AutoJs6; le déplacement, le renommage et les détails de fichiers restent des fonctions de l'hôte.

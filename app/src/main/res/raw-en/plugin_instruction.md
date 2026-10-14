@@ -11,7 +11,7 @@ HEIC and HEIF require Android 9 or later, while AVIF requires Android 12 or late
 
 Oversized JPEG, PNG, and static HEIC/HEIF images use a bounded sampled preview and decode only visible high-resolution regions while zoomed. Tile caches are released on page changes and memory pressure.
 
-To open only an explicit group, enter selection mode in AutoJs6, select 1 to 128 supported images from one folder, and tap `View image`. The viewer preserves selection order and left/right paging stays inside that group; every selected URI is independently validated and remains read-only.
+To open only an explicit group, enter selection mode in AutoJs6, select 1 to 128 supported images from one folder, and tap `View image`. The viewer preserves selection order and left/right paging stays inside that group; every selected URI is independently validated and remains read-only. Each selected image can be moved to the AutoJs6 Trash with `Delete` in the bottom bar and restored with undo; the image opened by tapping a single file can be deleted the same way, but not the other images of its folder.
 
 The viewer fits the image to the screen and supports left/right same-folder paging at 1x, focal pinch zoom, panning, a double-tap toggle between fit and 2.5x around the touch point, and per-page metadata. The current multiplier appears while pinching and briefly after a double-tap. Animated GIFs loop with a pause/resume control that stays hidden for static images. The image fills the whole screen under translucent overlay bars; tap the image to hide or show them, and the title bar adds a `3 / 12` page counter when several images are open. Sharing and opening with another app are available for the originally opened image and disabled on session-only sibling pages.
 
@@ -27,11 +27,13 @@ Photos are automatically rotated or mirrored to their EXIF orientation. `Rotate`
 
 In the file manager, `View as album` in a directory's menu opens that directory as an album through the host session: subfolders up to 8 levels deep appear as folder cells, images open in the viewer with left/right paging inside that folder, and only the first 4096 entries of a folder are listed. This mode needs no storage permission and never discloses file paths; management actions are not available in it.
 
+`Edit image` and `Convert image` in the file menu save a new file next to the original by default; with `Overwrite the original` turned on in the save dialog or on the converter page they replace the original (same format), and the replacement can be undone within 8 seconds. Every output is staged and read back before it is published, so a failure leaves no partial file.
+
 Host build 5352 or later is required.
 
 Safety and privacy limits:
 
 - The selected source uses a temporary read-only `content` URI; direct siblings are opened only through the scoped host `readSiblings` session.
 - Files larger than 8 TiB are rejected.
-- The plugin requests no storage or network permission.
-- Permanent image editing, conversion, deletion, moving, and renaming remain host features.
+- Opened from AutoJs6, the plugin requests no permission, and it declares no network permission.
+- Deleting moves only the files you selected, into the AutoJs6 Trash; moving, renaming and file details remain host features.

@@ -8,9 +8,21 @@
 
 ###### 2026/10/15
 
-* `Hint` Requires AutoJs6 6.8.0 (a development or stable build including protocol v24, introduced on 2026-10-14, with build number 5352 or higher); earlier development builds also numbered 5352 do not meet this requirement
+* `Hint` Requires AutoJs6 6.8.0 (a development build from 2026-10-15 or later, or a stable build, with build number 5352 or higher); earlier development builds also numbered 5352 do not meet this requirement
 * `Hint` Hosts without protocol v24 ignore all of this plugin's file manager actions, including viewing an image, viewing selected images, browsing a folder as an album, editing, conversion and batch conversion
+* `Hint` An overwrite can be undone once, from its notice: when editing or converting in this app, a backup of the original is kept until the next overwrite (images over 256 MiB warn first that undo is not possible); when editing or converting from the AutoJs6 file manager, undo is available for 8 seconds
+* `Added` Redesigned editor: the top bar has Undo, Redo, Compare (hold to show the original) and Save; tools are grouped into Transform, Adjust, Filters, Draw, Annotate and Text; the canvas can be zoomed with two fingers and dragged
+* `Added` Filters: 14 of them (such as Mono, Sepia, Vintage, Film, Fade), with adjustable intensity, and they combine with adjustments
+* `Added` Adjust adds Exposure, Hue, Highlights, Shadows, Sharpen and Vignette
+* `Added` Transform adds Resize: by percentage, by long edge or to a custom width and height (with locked aspect ratio)
+* `Added` Annotate: rectangles, ellipses, arrows and lines, drawn by dragging on the image, then moved and resized; rectangles and ellipses can be outlined or filled
+* `Added` Long-press the canvas to pick a color: a magnifier shows the pixels under your finger and the color value, which becomes the brush and annotation color when you lift
+* `Added` Saving offers Overwrite the original (off by default) and Keep capture details (camera, date and exposure settings; location is always removed), and shows the file name that will be saved
+* `Added` Rotated images can be saved from the viewer: JPEG only gets a new orientation tag and is not recompressed; PNG and WebP are re-encoded. This can be turned off in Settings > Viewer > Offer to save rotations
+* `Added` The converter uses the same settings layout as batch conversion, and it can overwrite the original too
+* `Added` From the AutoJs6 file manager: Edit image and Convert image can overwrite the original; View image can delete the opened or selected images, which go to the AutoJs6 Trash and can be restored with Undo (other images of the folder reached by swiping cannot be deleted)
 * `Fixed` "Edit image" and "Convert image" missing from image files' "More" menus in the AutoJs6 file manager
+* `Fixed` On Android 15, renaming or deleting images on a storage card asked for a system confirmation, even for images saved by this app
 
 ## v3.1.2
 

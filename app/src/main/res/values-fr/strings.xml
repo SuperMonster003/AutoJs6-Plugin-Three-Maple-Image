@@ -395,7 +395,7 @@
     <string name="text_cannot_read_file">Impossible de lire le fichier</string>
     <string name="text_color_palette">Palette de couleurs</string>
     <string name="text_done">Terminé</string>
-    <string name="text_edit">Editer</string>
+    <string name="text_edit">Modifier</string>
     <string name="text_failed">Échec</string>
     <string name="text_image_conversion_background_black">Noir</string>
     <string name="text_image_conversion_background_white">Blanc</string>

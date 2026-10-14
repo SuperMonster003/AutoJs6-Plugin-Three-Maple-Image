@@ -8,9 +8,21 @@
 
 ###### 2026/10/15
 
-* `Aviso` Requiere AutoJs6 6.8.0 (una versión de desarrollo o estable que incluya el protocolo v24, introducido el 2026-10-14, con número de compilación 5352 o superior); las versiones de desarrollo anteriores también numeradas 5352 no cumplen este requisito
+* `Aviso` Requiere AutoJs6 6.8.0 (una versión de desarrollo del 2026-10-15 o posterior, o una versión estable, con número de compilación 5352 o superior); las versiones de desarrollo anteriores también numeradas 5352 no cumplen este requisito
 * `Aviso` Los hosts sin el protocolo v24 ignoran todas las acciones de este plugin en el gestor de archivos, incluidas la visualización de una imagen o de imágenes seleccionadas, la exploración de una carpeta como álbum, la edición, la conversión y la conversión por lotes
+* `Aviso` Sobrescribir el original se puede deshacer una vez, desde su aviso: al editar o convertir en esta aplicación se guarda una copia del original hasta la siguiente sobrescritura (las imágenes de más de 256 MiB avisan antes de que no se podrá deshacer); al editar o convertir desde el gestor de archivos AutoJs6, se puede deshacer durante 8 segundos
+* `Función` Editor rediseñado: la barra superior tiene Deshacer, Rehacer, Comparar (mantén pulsado para ver el original) y Guardar; las herramientas se agrupan en Transformar, Ajustar, Filtros, Dibujar, Anotar y Texto; el lienzo se puede ampliar con dos dedos y arrastrar
+* `Función` Filtros: 14 (como Mono, Sepia, Vintage, Película, Desvaído), con intensidad ajustable y combinables con los ajustes
+* `Función` Ajustar añade Exposición, Tono, Altas luces, Sombras, Nitidez y Viñeta
+* `Función` Transformar añade Cambiar tamaño: por porcentaje, por lado largo o con ancho y alto personalizados (con proporción bloqueada)
+* `Función` Anotar: rectángulos, elipses, flechas y líneas que se dibujan arrastrando sobre la imagen y luego se mueven y cambian de tamaño; los rectángulos y elipses pueden ser de contorno o rellenos
+* `Función` Mantén pulsado el lienzo para tomar un color: una lupa muestra los píxeles bajo tu dedo y el valor del color, que pasa a ser el color del pincel y de las anotaciones al levantar el dedo
+* `Función` Al guardar se puede elegir Sobrescribir el original (desactivado por defecto) y Conservar los datos de captura (cámara, fecha y ajustes de exposición; la ubicación siempre se quita), y se muestra el nombre del archivo que se guardará
+* `Función` Las imágenes giradas se pueden guardar desde el visor: en JPEG solo cambia la marca de orientación, sin volver a comprimir; PNG y WebP se vuelven a codificar. Se puede desactivar en Ajustes > Visor > Ofrecer guardar las rotaciones
+* `Función` El conversor usa la misma pantalla de ajustes que la conversión por lotes y también puede sobrescribir el original
+* `Función` Desde el gestor de archivos AutoJs6: Editar imagen y Convertir imagen pueden sobrescribir el original; Ver imagen puede eliminar las imágenes abiertas o seleccionadas, que van a la Papelera de AutoJs6 y se pueden recuperar con Deshacer (las demás imágenes de la carpeta a las que se llega deslizando no se pueden eliminar)
 * `Corrección` Ausencia de las acciones de edición y conversión de imágenes en el menú "Más" de los archivos de imagen del gestor de archivos AutoJs6
+* `Corrección` En Android 15, al renombrar o eliminar imágenes de una tarjeta de almacenamiento se pedía una confirmación del sistema, incluso para imágenes guardadas por esta aplicación
 
 ## v3.1.2
 

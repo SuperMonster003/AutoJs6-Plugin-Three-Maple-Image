@@ -266,7 +266,7 @@
     <string name="overwrite_saved">تم استبدال الصورة الأصلية</string>
     <string name="overwrite_undo_failed">تعذرت استعادة الصورة الأصلية: تغيّر الملف في هذه الأثناء</string>
     <string name="overwrite_without_undo_message">لا توجد مساحة للاحتفاظ بنسخة من الصورة الأصلية, لذا لا يمكن التراجع عن هذا الاستبدال.</string>
-    <string name="overwrite_without_undo_title">الاستبدال دون تراجع؟</string>
+    <string name="overwrite_without_undo_title">الاستبدال دون تراجع?</string>
     <string name="page_counter">%1$d / %2$d</string>
     <string name="plugin_description">عرض الصور وتحريرها وتحويل صيغها</string>
     <string name="progress_copying">جار نسخ الصور</string>
@@ -395,7 +395,7 @@
     <string name="text_cannot_read_file">لا يمكن قراءة الملف</string>
     <string name="text_color_palette">لوحة الألوان</string>
     <string name="text_done">فعله</string>
-    <string name="text_edit">يحرر</string>
+    <string name="text_edit">تحرير</string>
     <string name="text_failed">باءت بالفشل</string>
     <string name="text_image_conversion_background_black">أسود</string>
     <string name="text_image_conversion_background_white">أبيض</string>
@@ -429,7 +429,7 @@
     <string name="text_output_too_large">تتجاوز الصورة المشفرة حد إخراج المضيف</string>
     <string name="text_please_wait" tools:ignore="TypographyEllipsis">الرجاء الانتظار...</string>
     <string name="text_redo">إعادة</string>
-    <string name="text_save">احفظ</string>
+    <string name="text_save">حفظ</string>
     <string name="text_should_not_be_empty">النص لا يمكن أن يكون فارغًا</string>
     <string name="text_size">مقاس</string>
     <string name="text_undo">الغاء التحميل</string>
@@ -443,7 +443,7 @@
     <string name="viewer_rotation_gesture_title">التدوير بإصبعين</string>
     <string name="viewer_rotation_hint">تم التدوير %1$d°</string>
     <string name="viewer_rotation_reencode_message">لا يمكن حفظ تدوير صورة WebP إلا بإعادة ضغطها, وقد تنخفض الجودة قليلا. يمكنك التراجع مباشرة بعد الحفظ.</string>
-    <string name="viewer_rotation_reencode_title">حفظ التدوير بإعادة الترميز؟</string>
+    <string name="viewer_rotation_reencode_title">حفظ التدوير بإعادة الترميز?</string>
     <string name="viewer_rotation_save_summary">بعد تدوير صورة يمكنك حفظ التدوير فيها (JPEG دون فقدان للجودة)</string>
     <string name="viewer_rotation_save_title">عرض حفظ التدوير</string>
     <string name="viewer_rotation_saved">تم حفظ التدوير</string>

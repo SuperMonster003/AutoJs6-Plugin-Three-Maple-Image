@@ -395,7 +395,7 @@
     <string name="text_cannot_read_file">파일을 읽을 수 없다</string>
     <string name="text_color_palette">색상 팔레트</string>
     <string name="text_done">완료</string>
-    <string name="text_edit">편집하다</string>
+    <string name="text_edit">편집</string>
     <string name="text_failed">실패한</string>
     <string name="text_image_conversion_background_black">검정</string>
     <string name="text_image_conversion_background_white">흰색</string>
@@ -429,7 +429,7 @@
     <string name="text_output_too_large">인코딩된 이미지가 호스트 출력 제한을 초과합니다</string>
     <string name="text_please_wait" tools:ignore="TypographyEllipsis">잠시만 기다려주세요...</string>
     <string name="text_redo">다시 실행</string>
-    <string name="text_save">구하다</string>
+    <string name="text_save">저장</string>
     <string name="text_should_not_be_empty">텍스트는 비어질 수 없다</string>
     <string name="text_size">크기</string>
     <string name="text_undo">실행 취소</string>
