@@ -232,7 +232,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 - [x] (插件) 重命名 (3.1.0): 单张, 输入时校验非法字符 / 保留名 / 以点开头 / 255 字节, 扩展名变更提示, 重名在提交后提示; 媒体库更新 `DISPLAY_NAME` (Android 11+ 一次写请求), 已授权文件夹经 `DocumentsContract.renameDocument`; 带撤销. 验收: `MediaManagementPolicyTest` 文件名用例; `renameMoveAndTheirUndoKeepTheRows` 五个 API 级别通过. 提交 0a6d4cd.
 - [x] (插件) 移动与复制 (3.1.0): 目标相册选择器 (新建相册, 最近使用 5 个, 全部相册; Android 10+ 仅 DCIM / Pictures), 冲突询问一次应用到全部 (保留两者 / 跳过 / 替换 = 原同名图片进回收站), 多张时进度与取消; Android 10+ 移动 = `RELATIVE_PATH` 更新, 7-9 = 文件重命名 (跨分区时复制后删除) 并更新行; 复制 = `insert` + `IS_PENDING` 流复制 (7-9 保留修改时间). 验收: 冲突 / 替换 / 中途取消保留已完成项的 instrumentation 五个 API 级别通过. 提交 0a6d4cd.
-- [ ] (验证) 跨卷 (内置 / SD 卡) 移动与复制: 当前设备矩阵没有插 SD 卡的设备; 实现上移动保持在原卷 (只改 `RELATIVE_PATH`), 复制写入主存储. 有卡设备时补测.
+- [x] (验证) 跨卷 (内置 / 存储卡) 移动与复制: 维护者 2026-10-14 给 XQ-DQ72 (API 33) 与 G8441 (API 28) 插入 TF 卡后实测, 3.1.0 有三处问题: Android 10+ 移动只改 `RELATIVE_PATH`, 图片留在原卷, 出现在另一个同名相册而不是所选相册; 复制总写入内置存储; Android 7-9 卡上图片的相对路径被算成 `storage/<id>/...`, 以它为目标会在内置存储建出这棵目录, 跨分区移动在删不掉卡上原图时留下副本. 修复 (`fb10751`): 图片与相册带上所在卷 (Android 10+ `VOLUME_NAME`, 之前由文件路径的 `/storage/<id>/` 推出), 目标 = 卷 + 相对路径; Android 11+ 跨卷移动 = 复制到目标卷再删除原图 (写入确认在实测设备上已覆盖删除; 否则补一次删除确认, 拒绝则撤回副本), 复制写入目标相册所在的卷, 同名冲突与 "替换" 只看目标卷, 目标列表为存储卡相册标注系统给的卡名 ("SD card · Pictures/..."); Android 7-10 应用无权写存储卡, 卡上相册不作为目标, 对卡上图片的删除 / 移动 / 重命名保持原样并提示 (`gallery_card_read_only_count`), 复制到内置存储照常. 验收: `StorageCardInstrumentationTest` (无卡自动跳过) Android 11+ 三例 (跨卷移动与撤销, 复制与冲突按卷, 卡上回收与重命名) 在 XQ-DQ72 通过, 只读用例在 G8441 通过; 冒烟脚本把相册放在卡上 (其他应用保存的图片) 在 XQ-DQ72 走通 收藏 / 跨卷移动 (一次确认) / 删除 / 回收站恢复; 内置存储回归 (协调器 9 例与选择用例) 在 API 30 模拟器通过. 随 3.1.1 发布.
 
 ### 7.4 收藏, 排除, 置顶, 隐藏
 
@@ -253,7 +253,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 7.7 测试与发布
 
-- [ ] (测试) 全量 JVM / instrumentation / CI; 设备矩阵冒烟 (删除 / 回收站 / 移动 / 收藏 / 搜索 各一次). 进度 (2026-10-14, 3.1.0 部分): JVM 与 lint 通过, 全量 instrumentation 103 例在 22120RN86C (API 33) 通过, CI (`7dadcc4`, 含 API 35 模拟器全量 instrumentation) 全绿; release 冒烟 (收藏 / 移动 / 删除 / 回收站) 在 API 28 / 30 / 33 / 36 通过 (附录 E). 搜索随 3.1.1.
+- [ ] (测试) 全量 JVM / instrumentation / CI; 设备矩阵冒烟 (删除 / 回收站 / 移动 / 收藏 / 搜索 各一次). 进度 (2026-10-14, 3.1.0 部分): JVM 与 lint 通过, 全量 instrumentation 103 例在 22120RN86C (API 33) 通过, CI (`7dadcc4`, 含 API 35 模拟器全量 instrumentation) 全绿; release 冒烟 (收藏 / 移动 / 删除 / 回收站) 在 API 28 / 30 / 33 / 35 / 36 (7 个环境, 3 台补测于同日稍后) 通过 (附录 E). 搜索随 3.1.1.
 - [x] (发布) 按 P1-P6 发布 v3.1.0; `hint` 说明回收站行为按 Android 版本不同 (宿主入口删除随 3.1.1, 其 hint 移到下一条). 发布 (2026-10-14, 维护者授权代为执行 P1-P5, 不补截图): P1 `VERSION_NAME=3.1.0`, changelog 10 种语言 (2 hint / 6 feature / Room 依赖) 并入, README 10 种语言新增多选与回收站亮点, 回收站 FAQ, 更新所有文件访问回答与安全说明 (提交 `fbc7e0b`); P3 R9 门禁与冒烟通过, 冒烟发现的收藏标记问题已修复 (`7dadcc4`); P4 CI 全绿后轻量 tag `v3.1.0` (`7dadcc4`), `autojs6-plugin-three-maple-image-v3.1.0-115e8c55.apk` (versionCode 126, 3,837,717 B, SHA-256 `03d4fc71f273408ac375176c7f08aed36378e03aee82bdc7f9e08544d95ebc3b`), GitHub Release (Latest) https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image/releases/tag/v3.1.0; P5 索引清单 `126.json` 与生成文件 (索引仓库 `eb45167`); P6 本版不改宿主. 记录见 `docs/release/v3.1.0.md`.
 - [ ] (发布) 按 P1-P6 发布 v3.1.1; `hint` 说明宿主入口删除需要支持 v24 的宿主版本.
 
@@ -506,8 +506,9 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 | Sony G8441 (BH900ASK9E, 横屏) | 28 | 覆盖 debug (116 -> 126) | 2378 ms (装包后首次) / 559 ms | 全部通过, 私有回收站, 无系统确认 |
 | Redmi 22120RN86C (bek749scrwv4wo8h) | 33 | 覆盖 debug (121 -> 126) | 561 / 643 ms | 全部通过, 三次系统确认 (`com.android.providers.media.module`) |
 | AVD_API_36.1_16K (只读实例, 16 KB 页) | 36 | 全新安装 | 639 / 684 ms | 全部通过, 三次系统确认 |
-| Xiaomi 23046RP50C (968e9f18) | 35 | 未做: 该机的 3.0.0 release 包在其他会话的记录里标为保留, 未覆盖 | - | API 35 的写入路径由 OPD2413 上的 debug instrumentation 覆盖 |
-| OnePlus OPD2413 / Sony XQ-DQ72 | 35 / 33 | 未做: 冒烟时离线 | - | - |
+| Xiaomi 23046RP50C (968e9f18, 中文 HyperOS) | 35 | 覆盖 3.0.0 release (103 -> 126), 维护者 2026-10-14 同意升级 | 231 / 244 ms | 全部通过, 三次系统确认 (`com.android.providers.media.module`); HyperOS 偶尔不响应启动后的第一次注入点按, 脚本重试 |
+| OnePlus OPD2413 (63751f63) | 35 | 覆盖 (121 -> 126) | 156 / 168 ms | 全部通过, 三次系统确认 |
+| Sony XQ-DQ72 (QV770340J7) | 33 | 覆盖 3.0.0 release (103 -> 126) | 188 / 210 ms | 全部通过, 三次系统确认 (`com.google.android.providers.media.module`) |
 | Sony XQ-AT72 (QV710AF65F) | 31 | 未做: 维护者占用该机手动测试 Ace 编辑器 | - | - |
 
 ---
