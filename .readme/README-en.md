@@ -60,10 +60,11 @@ Viewing uses read-only inputs. Editing and conversion produce a separate output;
 
 ******
 
-- Album home: launched on its own, the app opens an album grid of the images on the device (cover, name, count), with authorized folders as their own group; `Show all folder contents` in the menu opens a flat view. The media grid offers 3-6 columns (menu or pinch), sorting by name, date modified, date taken or size remembered per album, a fast scroller with a date bubble, and pull to refresh.
+- Album home: launched on its own, the app opens an album grid of the images on the device (cover, name, count), with authorized folders as their own group; `Show all folder contents` in the menu opens a flat view. The media grid offers 3-6 columns (menu or pinch), sorting by name, date modified, date taken, size or random order with optional groups by day or by month (the group title stays at the top), for every album or with `This album only` for the current one, a fast scroller with a date bubble, and pull to refresh; the album list sorts by name, date modified, date taken or number of images.
 - Paged viewer with a thumbnail strip: images opened from the grid swipe through the whole album, the strip highlights the current page and jumps on tap, and the grid scrolls back to the last image viewed. Rotate the picture with two fingers; it snaps to the nearest quarter turn on release (display only; turn it off in `Settings` > `Viewer` > `Two-finger rotation`).
 - Multi-select and organizing: long-press an image in the grid to start selecting, tap to add or remove, and keep your finger down after the long press to drag over a range (the grid scrolls near the top or bottom edge); `Select all` and `Invert selection` are there too. Share, favorite, move, copy or delete many images at once, or rename one and view its details. Move and copy offer your albums or a new album, with recently used ones first; when a name is already taken you are asked once (keep both, skip or replace), and larger batches show progress and can be cancelled.
 - Recycle bin, undo and favorites: deleted images go to a recycle bin first (the system one on Android 11+, the app's own on Android 7-10, kept for 30 days), and a bar at the bottom offers undo after deleting, moving or renaming; `Recycle bin` in the home's top-right menu restores, deletes for good or empties it. Favorited images gather in the `Favorites` album at the front of the album list; in the viewer opened from an album, the heart in the top bar favorites the current image and `Delete` in the bottom bar deletes it.
+- Organizing albums and search: long-press an album in the album list to select albums, then `Pin` them (after `Favorites`), `Exclude` them (gone from this gallery only, the files stay as they are), `Hide` them (a .nomedia file in the folder hides them from other galleries too; needs `All files access`), delete whole albums (to the recycle bin, with undo) or rename one; `Excluded folders` and `Hidden folders` in `Settings` list them and bring them back. Search on the home screen looks at album names and file names, and an opened image pages through the results; inside an album the search filters by file name.
 - Permissions only when needed: the standalone home asks for photo access once, on its first launch, and never again by itself; without it, `Choose image`, `Choose folder`, `Edit image` and `Convert image` keep working through the system picker. Android 14+ supports access to selected photos only (`Manage selected photos`). `Settings` > `Storage permission` grants access again, manages authorized folders (shown as albums even without photo access) and the optional `All files access`. Opening images from AutoJs6 or other apps never asks for a permission.
 - View as album: in the folder menu of the AutoJs6 file manager, choose `View as album` to see the folder's images as a grid and open its subfolders, read-only through the host session, with no permission request and no absolute paths shown.
 - Open an exact selection: in AutoJs6 selection mode, choose up to 128 supported images from one folder and tap `View image`; the viewer keeps the host selection order and swipes only within that chosen group.
@@ -205,11 +206,15 @@ Limited access only exposes the photos picked in the system photo picker, so onl
 
 **What is `All files access` for? Do I need it?**
 
-No. It is an optional advanced switch that opens the system settings page; browsing albums only needs photo access. With it on, deleting, moving and renaming images saved by other apps no longer asks the system for confirmation batch by batch (on Android 12+ you can instead turn on just `Media management` in `Settings` > `Storage permission`); hidden (.nomedia) folders and similar features come in later versions. It can be turned off at any time in the system settings.
+No. It is an optional advanced switch that opens the system settings page; browsing albums only needs photo access. With it on, deleting, moving and renaming images saved by other apps no longer asks the system for confirmation batch by batch (on Android 12+ you can instead turn on just `Media management` in `Settings` > `Storage permission`); hiding albums (writing .nomedia into their folders) needs it. It can be turned off at any time in the system settings.
 
 **Where do deleted images go? Why does the system ask for confirmation when I delete or move?**
 
 Deleted images go to the recycle bin first and can be restored from `Recycle bin` in the home's top-right menu. Android 11+ uses the system recycle bin, which the system empties after about 30 days; Android 7-10 uses the app's own recycle bin, which keeps images for 30 days, uses at most a tenth of the free space (up to 2 GiB) and is removed together with the app. With `Recycle bin` turned off in `Settings`, deleting asks first and cannot be undone. On Android 11+ changing images saved by other apps needs the system's confirmation, once per batch; with `Media management` (Android 12+) or `All files access` turned on it is no longer asked each time.
+
+**What is the difference between `Exclude` and `Hide`?**
+
+`Exclude` only affects this gallery: the folder's images no longer appear in the album list, `All images`, `Favorites` or search, nothing on the device changes, and `Settings` > `Excluded folders` brings them back. `Hide` puts a .nomedia file into the folder, so the system and other gallery apps stop showing its images too (nothing is deleted); on Android 11+ it needs `All files access` first, and `Settings` > `Hidden folders` shows them again. Neither changes what the AutoJs6 file manager shows.
 
 **The file menu does not show `Edit image` and `Convert image`?**
 
@@ -246,7 +251,7 @@ The plugin is built on a deny-by-default principle. All of the following measure
 - Viewing uses read-only inputs. Editing and conversion produce a separate output; the source image is preserved. Standalone file access uses the Android document picker.
 - Opening images from AutoJs6 (`View image`, `View as album`) or from other apps never requests a runtime permission; the standalone home asks for photo access at most once by itself, and `All files access` and `Media management` can only be turned on by you in the system settings.
 - The plugin does not declare the network permission (`INTERNET`): albums, thumbnails and image details are read on the device and never leave it.
-- Deleting, moving and renaming only happen after you choose them in an album or the viewer; images opened from AutoJs6 or other apps do not offer these actions.
+- Deleting, moving, renaming and hiding only happen after you choose them in an album or the viewer; images opened from AutoJs6 or other apps do not offer these actions.
 
 ******
 
@@ -286,6 +291,20 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v3.1.1
+
+###### 2026/10/14
+
+* `Hint` Hiding an album puts a .nomedia file into its folder, so other gallery apps no longer show its images either (nothing is deleted); on Android 11 and later it needs All files access first. To leave an album out of this gallery only, use Exclude
+* `Hint` Exclude only affects this gallery: excluded albums disappear from the album list, all images, favorites and search, the files on the device stay as they are, and Settings > Excluded folders brings them back
+* `Added` Multi-select in the album list: long-press an album to pin, exclude, hide, delete whole albums (to the recycle bin, with undo) or rename an album
+* `Added` Pinned albums come right after Favorites, before the other albums, with a pin mark
+* `Added` Settings > Hidden folders lists hidden folders and shows them again, and can list them at the end of the album list (browse and share only)
+* `Added` Sorting moves to a dialog: random order and groups by day or by month (the group title stays at the top), optionally for the current album only; the album list sorts by name, date modified, date taken or number of images and remembers it
+* `Added` Search: the home screen searches album names and file names, and an opened image pages through the results; inside an album the search filters by file name
+* `Fixed` Moving an image from a storage card into an album on the internal storage (or the other way round) left it on its old storage, in another album with the same name, and copies always went to the internal storage; both now land in the chosen album
+* `Fixed` On Android 7-10 deleting, moving or renaming images on a storage card could leave copies behind or create stray folders on the internal storage; these versions do not let apps change a storage card, so such images now stay as they are with a message
+
 #### v3.1.0
 
 ###### 2026/10/14
@@ -311,28 +330,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Added` A new Storage permission page in Settings shows the current access, grants it again, manages selected photos on Android 14+, adds or removes authorized folders (shown as albums even without photo access) and offers the optional All files access
 * `Added` The folder menu of the AutoJs6 file manager gains View as album, which shows the folder's images as a grid and opens its subfolders
 * `Dependency` Added Navigation Compose 2.10.2 for navigation between the home screen and album pages
-
-#### v2.1.0
-
-###### 2026/10/13
-
-* `Hint` The APK now carries libandroidx.graphics.path.so, a native library bundled with Jetpack Compose (about 10 KB each for arm64-v8a, armeabi-v7a, x86_64 and x86); the plugin itself still contains no native code and remains one universal APK
-* `Hint` The first few launches after installation are a little slower on older devices until the system finishes its background optimization
-* `Added` The whole interface moves to Material 3 (Jetpack Compose): home, settings, about, release history, viewer, editor and converter are rebuilt, follow the theme color and dark mode, and support large fonts and right-to-left layouts
-* `Added` The editor toolbar becomes grouped tool strips with icons and labels (transform, adjust, draw, text); the parameter panel follows the active tool, and the text, save and palette dialogs are rebuilt
-* `Added` The converter turns from a dialog into a full page form that shows only the inputs of the current resize mode, with the output resolution, estimated size and suffix pinned at the bottom
-* `Added` The viewer bottom bar now offers Details, Rotate, Edit, Share and Open with; images opened from the standalone home or from another app can go straight to the editor and save the result
-* `Fixed` The in-app release history page was blank (the ## version headings of the generated file were not recognized)
-* `Fixed` After switching the app language to Arabic, pages that were already open kept a left-to-right layout
-* `Fixed` In light mode the status bar icons of the viewer and editor followed the page theme and turned dark, so they were invisible over the dark canvas
-* `Improved` Plugin Center icons use the sizes, positions, light and dark artwork, and circular backgrounds adjusted in Icon Studio, retaining reproducible sources and parameters
-* `Improved` Android App info icons share Icon Studio artwork and light/dark backgrounds while preserving transparent Plugin Center artwork and existing launcher choices
-* `Improved` Icons are unified as Material 24 dp vectors; bitmap icons and unused color, style and string resources are removed
-* `Improved` A built-in startup baseline profile lowers the home cold start cost of the interface migration once the system has run its background optimization
-* `Dependency` Added Jetpack Compose BOM 2026.09.00 for the user interface migration
-* `Dependency` Added the Glide Compose integration 1.0.0-beta10 for image loading in Compose screens
-* `Dependency` Upgraded Glide 5.0.5 -> 5.0.9
-* `Dependency` Upgraded the AutoJs6 Gradle Platform Versions and Native Alignment plugins 1.9.0 -> 1.9.1
 
 ##### Full history
 

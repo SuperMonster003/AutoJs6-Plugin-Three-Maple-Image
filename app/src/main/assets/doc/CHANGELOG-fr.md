@@ -4,6 +4,20 @@
 
 ******
 
+## v3.1.1
+
+###### 2026/10/14
+
+* `Note` Masquer un album place un fichier .nomedia dans son dossier: les autres galeries n'affichent plus ses images non plus (rien n'est supprimé); sur Android 11 et versions ultérieures, il faut d'abord l'accès à tous les fichiers. Pour retirer un album de cette galerie seulement, utilisez Exclure
+* `Note` Exclure ne concerne que cette galerie: les albums exclus n'apparaissent plus dans la liste des albums, toutes les images, les favoris ni la recherche, les fichiers de l'appareil ne changent pas, et Paramètres > Dossiers exclus les rétablit
+* `Fonctionnalité` Sélection multiple dans la liste des albums: un appui long permet d'épingler, exclure, masquer, supprimer des albums entiers (vers la corbeille, avec annulation) ou renommer un album
+* `Fonctionnalité` Les albums épinglés viennent juste après Favoris, avant les autres, avec une marque d'épingle
+* `Fonctionnalité` Paramètres > Dossiers masqués liste les dossiers masqués et les affiche à nouveau, et peut aussi les montrer à la fin de la liste des albums (consultation et partage seulement)
+* `Fonctionnalité` Le tri passe dans une boîte de dialogue: ordre aléatoire et groupes par jour ou par mois (le titre du groupe reste en haut), éventuellement pour l'album courant seulement; la liste des albums se trie par nom, date de modification, date de prise de vue ou nombre d'images et s'en souvient
+* `Fonctionnalité` Recherche: l'accueil cherche dans les noms d'albums et de fichiers, et l'image ouverte parcourt les résultats; dans un album, la recherche filtre par nom de fichier
+* `Correctif` Déplacer une image d'une carte mémoire vers un album du stockage interne (ou l'inverse) la laissait sur son stockage d'origine, dans un autre album du même nom, et les copies allaient toujours sur le stockage interne; les deux arrivent maintenant dans l'album choisi
+* `Correctif` Sur Android 7-10, supprimer, déplacer ou renommer des images d'une carte mémoire pouvait laisser des copies ou créer des dossiers en trop sur le stockage interne; ces versions ne permettent pas aux applications de modifier la carte, ces images restent donc telles quelles avec un message
+
 ## v3.1.0
 
 ###### 2026/10/14

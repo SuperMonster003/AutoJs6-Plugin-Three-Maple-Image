@@ -4,6 +4,20 @@
 
 ******
 
+## v3.1.1
+
+###### 2026/10/14
+
+* `Aviso` Ocultar un álbum coloca un archivo .nomedia en su carpeta, así que las demás galerías tampoco muestran sus imágenes (no se elimina nada); en Android 11 y posteriores primero hace falta el acceso a todos los archivos. Para quitar un álbum solo de esta galería use Excluir
+* `Aviso` Excluir solo afecta a esta galería: los álbumes excluidos no aparecen en la lista de álbumes, todas las imágenes, favoritos ni la búsqueda, los archivos del dispositivo no cambian y Ajustes > Carpetas excluidas los recupera
+* `Función` Selección múltiple en la lista de álbumes: mantenga pulsado un álbum para fijar, excluir, ocultar, eliminar álbumes completos (a la papelera, con deshacer) o cambiar el nombre de un álbum
+* `Función` Los álbumes fijados van justo después de Favoritos, antes del resto, con una marca de chincheta
+* `Función` Ajustes > Carpetas ocultas muestra las carpetas ocultas y permite volver a mostrarlas, y también listarlas al final de la lista de álbumes (solo ver y compartir)
+* `Función` La ordenación pasa a un diálogo: orden aleatorio y grupos por día o por mes (el título del grupo queda fijo arriba), opcionalmente solo para el álbum actual; la lista de álbumes se ordena por nombre, fecha de modificación, fecha de captura o número de imágenes y lo recuerda
+* `Función` Búsqueda: el inicio busca nombres de álbumes y de archivos, y la imagen abierta pasa por los resultados; dentro de un álbum se filtra por nombre de archivo
+* `Corrección` Al mover una imagen de una tarjeta de memoria a un álbum del almacenamiento interno (o al revés) se quedaba en su almacenamiento original, en otro álbum con el mismo nombre, y las copias siempre iban al almacenamiento interno; ahora ambas llegan al álbum elegido
+* `Corrección` En Android 7-10 eliminar, mover o cambiar el nombre de imágenes de una tarjeta de memoria podía dejar copias o crear carpetas sobrantes en el almacenamiento interno; esas versiones no permiten que las aplicaciones modifiquen la tarjeta, así que ahora esas imágenes se quedan como están con un aviso
+
 ## v3.1.0
 
 ###### 2026/10/14

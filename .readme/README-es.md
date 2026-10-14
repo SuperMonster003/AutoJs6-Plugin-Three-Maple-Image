@@ -60,10 +60,11 @@ La visualización usa entradas de solo lectura. La edición y conversión crean 
 
 ******
 
-- Inicio con álbumes: al abrirse por sí sola, la aplicación muestra una cuadrícula de álbumes con las imágenes del dispositivo (portada, nombre, cantidad) y las carpetas autorizadas en su propio grupo; `Mostrar el contenido de todas las carpetas` en el menú abre una vista plana. La cuadrícula ofrece 3-6 columnas (menú o pellizco), orden por nombre, fecha de modificación, fecha de captura o tamaño recordado por álbum, barra de desplazamiento rápido con fecha y deslizar para actualizar.
+- Inicio con álbumes: al abrirse por sí sola, la aplicación muestra una cuadrícula de álbumes con las imágenes del dispositivo (portada, nombre, cantidad) y las carpetas autorizadas en su propio grupo; `Mostrar el contenido de todas las carpetas` en el menú abre una vista plana. La cuadrícula ofrece 3-6 columnas (menú o pellizco), orden por nombre, fecha de modificación, fecha de captura, tamaño o aleatorio con grupos por día o por mes (el título del grupo queda fijo arriba), para todos los álbumes o con `Solo este álbum` para el actual, barra de desplazamiento rápido con fecha y deslizar para actualizar; la lista de álbumes se ordena por nombre, fecha de modificación, fecha de captura o número de imágenes.
 - Visor paginado con tira de miniaturas: las imágenes abiertas desde la cuadrícula se recorren deslizando por todo el álbum, la tira resalta la página actual y salta al tocarla, y la cuadrícula vuelve a la última imagen vista. Gire la imagen con dos dedos; al soltar se ajusta al cuarto de vuelta más cercano (solo visualización; se desactiva en `Ajustes` > `Visor` > `Rotación con dos dedos`).
 - Selección múltiple y organización: mantenga pulsada una imagen de la cuadrícula para empezar a seleccionar, toque para añadir o quitar y, sin levantar el dedo tras la pulsación larga, arrastre para elegir un rango (la cuadrícula se desplaza cerca del borde superior o inferior); también hay `Seleccionar todo` e `Invertir selección`. Comparta, marque como favoritas, mueva, copie o elimine muchas imágenes a la vez, o cambie el nombre de una y vea sus detalles. Mover y copiar ofrecen sus álbumes o un álbum nuevo, con los usados recientemente primero; si un nombre ya existe se pregunta una sola vez (conservar ambas, omitir o reemplazar), y los lotes grandes muestran el progreso y se pueden cancelar.
 - Papelera, deshacer y favoritos: las imágenes eliminadas van primero a la papelera (la del sistema en Android 11+, la propia de la aplicación en Android 7-10, durante 30 días), y tras eliminar, mover o cambiar el nombre aparece abajo la opción de deshacer; `Papelera` en el menú superior derecho del inicio permite restaurar, eliminar para siempre o vaciar. Las imágenes favoritas se reúnen en el álbum `Favoritos` al principio de la lista de álbumes; en el visor abierto desde un álbum, el corazón de la barra superior marca la imagen actual como favorita y `Eliminar` en la barra inferior la elimina.
+- Organizar álbumes y buscar: mantenga pulsado un álbum en la lista para seleccionar álbumes y luego `Fijar` (después de `Favoritos`), `Excluir` (solo desaparecen de esta galería, los archivos no cambian), `Ocultar` (un archivo .nomedia en la carpeta los oculta también de otras galerías; requiere `Acceso a todos los archivos`), eliminar álbumes completos (a la papelera, con deshacer) o cambiar el nombre de uno; `Carpetas excluidas` y `Carpetas ocultas` en `Ajustes` los muestran y los recuperan. La búsqueda del inicio mira nombres de álbumes y de archivos, y la imagen abierta pasa por los resultados; dentro de un álbum la búsqueda filtra por nombre de archivo.
 - Permisos solo cuando hacen falta: el inicio independiente pide acceso a fotos una sola vez, en el primer arranque, y nunca más por sí mismo; sin él, `Elegir imagen`, `Elegir carpeta`, `Editar imagen` y `Convertir imagen` siguen funcionando con el selector del sistema. Android 14+ permite dar acceso solo a fotos seleccionadas (`Gestionar fotos seleccionadas`). `Ajustes` > `Permiso de almacenamiento` vuelve a conceder acceso, gestiona las carpetas autorizadas (se muestran como álbumes incluso sin acceso a fotos) y el opcional `Acceso a todos los archivos`. Abrir imágenes desde AutoJs6 u otras aplicaciones nunca pide permisos.
 - Ver como álbum: en el menú de una carpeta del gestor de archivos de AutoJs6, elija `Ver como álbum` para ver sus imágenes en cuadrícula y abrir sus subcarpetas, en solo lectura a través de la sesión del anfitrión, sin pedir permisos ni mostrar rutas absolutas.
 - Abrir una selección exacta: en el modo de selección de AutoJs6, elija hasta 128 imágenes compatibles de una carpeta y toque `Ver imagen`; el visor conserva el orden de selección del anfitrión y solo permite deslizar dentro de ese grupo.
@@ -205,11 +206,15 @@ El acceso limitado solo expone las fotos elegidas en el selector de fotos del si
 
 **Para qué sirve `Acceso a todos los archivos`? Lo necesito?**
 
-No. Es un interruptor avanzado opcional que abre la página de ajustes del sistema; recorrer los álbumes solo necesita acceso a fotos. Con él activado, eliminar, mover y cambiar el nombre de imágenes guardadas por otras aplicaciones ya no pide confirmación al sistema en cada lote (en Android 12+ basta con activar solo `Gestión de contenido multimedia` en `Ajustes` > `Permiso de almacenamiento`); las carpetas ocultas (.nomedia) y funciones parecidas llegarán en versiones posteriores. Se puede desactivar en cualquier momento en los ajustes del sistema.
+No. Es un interruptor avanzado opcional que abre la página de ajustes del sistema; recorrer los álbumes solo necesita acceso a fotos. Con él activado, eliminar, mover y cambiar el nombre de imágenes guardadas por otras aplicaciones ya no pide confirmación al sistema en cada lote (en Android 12+ basta con activar solo `Gestión de contenido multimedia` en `Ajustes` > `Permiso de almacenamiento`); ocultar álbumes (escribir .nomedia en sus carpetas) lo requiere. Se puede desactivar en cualquier momento en los ajustes del sistema.
 
 **Adónde van las imágenes eliminadas? Por qué el sistema pide confirmación al eliminar o mover?**
 
 Las imágenes eliminadas van primero a la papelera y se pueden restaurar desde `Papelera` en el menú superior derecho del inicio. Android 11+ usa la papelera del sistema, que el sistema vacía al cabo de unos 30 días; Android 7-10 usa la papelera propia de la aplicación, que guarda las imágenes 30 días, ocupa como máximo una décima parte del espacio libre (hasta 2 GiB) y se borra al desinstalar la aplicación. Con `Papelera` desactivada en `Ajustes`, eliminar pide confirmación y no se puede deshacer. En Android 11+ modificar imágenes guardadas por otras aplicaciones requiere la confirmación del sistema, una vez por lote; con `Gestión de contenido multimedia` (Android 12+) o `Acceso a todos los archivos` activados ya no se pide cada vez.
+
+**Qué diferencia hay entre `Excluir` y `Ocultar`?**
+
+`Excluir` solo afecta a esta galería: las imágenes de la carpeta dejan de aparecer en la lista de álbumes, `Todas las imágenes`, `Favoritos` y la búsqueda, los archivos del dispositivo no cambian y `Ajustes` > `Carpetas excluidas` las recupera. `Ocultar` pone un archivo .nomedia en la carpeta, así que el sistema y otras galerías también dejan de mostrar sus imágenes (no se elimina nada); en Android 11+ requiere antes `Acceso a todos los archivos`, y `Ajustes` > `Carpetas ocultas` las vuelve a mostrar. Ninguna de las dos cambia lo que muestra el administrador de archivos de AutoJs6.
 
 **El menú del archivo no muestra `Editar imagen` y `Convertir imagen`?**
 
@@ -246,7 +251,7 @@ El complemento se basa en el principio de denegación por defecto. Todas las med
 - La visualización usa entradas de solo lectura. La edición y conversión crean un archivo independiente y conservan el original. La aplicación independiente usa el selector de documentos de Android.
 - Abrir imágenes desde AutoJs6 (`Ver imagen`, `Ver como álbum`) o desde otras aplicaciones nunca solicita permisos en tiempo de ejecución; el inicio independiente pide acceso a fotos como máximo una vez por sí mismo, y `Acceso a todos los archivos` y `Gestión de contenido multimedia` solo los puede activar usted en los ajustes del sistema.
 - El plugin no declara el permiso de red (`INTERNET`): los álbumes, las miniaturas y los detalles de las imágenes se leen en el dispositivo y nunca salen de él.
-- Eliminar, mover y cambiar el nombre solo ocurre cuando usted lo elige en un álbum o en el visor; las imágenes abiertas desde AutoJs6 u otras aplicaciones no ofrecen estas acciones.
+- Eliminar, mover, cambiar el nombre y ocultar solo ocurre cuando usted lo elige en un álbum o en el visor; las imágenes abiertas desde AutoJs6 u otras aplicaciones no ofrecen estas acciones.
 
 ******
 
@@ -286,6 +291,20 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v3.1.1
+
+###### 2026/10/14
+
+* `Aviso` Ocultar un álbum coloca un archivo .nomedia en su carpeta, así que las demás galerías tampoco muestran sus imágenes (no se elimina nada); en Android 11 y posteriores primero hace falta el acceso a todos los archivos. Para quitar un álbum solo de esta galería use Excluir
+* `Aviso` Excluir solo afecta a esta galería: los álbumes excluidos no aparecen en la lista de álbumes, todas las imágenes, favoritos ni la búsqueda, los archivos del dispositivo no cambian y Ajustes > Carpetas excluidas los recupera
+* `Función` Selección múltiple en la lista de álbumes: mantenga pulsado un álbum para fijar, excluir, ocultar, eliminar álbumes completos (a la papelera, con deshacer) o cambiar el nombre de un álbum
+* `Función` Los álbumes fijados van justo después de Favoritos, antes del resto, con una marca de chincheta
+* `Función` Ajustes > Carpetas ocultas muestra las carpetas ocultas y permite volver a mostrarlas, y también listarlas al final de la lista de álbumes (solo ver y compartir)
+* `Función` La ordenación pasa a un diálogo: orden aleatorio y grupos por día o por mes (el título del grupo queda fijo arriba), opcionalmente solo para el álbum actual; la lista de álbumes se ordena por nombre, fecha de modificación, fecha de captura o número de imágenes y lo recuerda
+* `Función` Búsqueda: el inicio busca nombres de álbumes y de archivos, y la imagen abierta pasa por los resultados; dentro de un álbum se filtra por nombre de archivo
+* `Corrección` Al mover una imagen de una tarjeta de memoria a un álbum del almacenamiento interno (o al revés) se quedaba en su almacenamiento original, en otro álbum con el mismo nombre, y las copias siempre iban al almacenamiento interno; ahora ambas llegan al álbum elegido
+* `Corrección` En Android 7-10 eliminar, mover o cambiar el nombre de imágenes de una tarjeta de memoria podía dejar copias o crear carpetas sobrantes en el almacenamiento interno; esas versiones no permiten que las aplicaciones modifiquen la tarjeta, así que ahora esas imágenes se quedan como están con un aviso
+
 #### v3.1.0
 
 ###### 2026/10/14
@@ -311,28 +330,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 * `Función` La nueva página Permiso de almacenamiento en Ajustes muestra el acceso actual, lo vuelve a conceder, gestiona las fotos seleccionadas en Android 14+, añade o quita carpetas autorizadas (se muestran como álbumes incluso sin acceso a fotos) y ofrece el opcional Acceso a todos los archivos
 * `Función` El menú de carpeta del gestor de archivos de AutoJs6 incorpora Ver como álbum, que muestra las imágenes de la carpeta en cuadrícula y abre sus subcarpetas
 * `Dependencia` Se añade Navigation Compose 2.10.2 para la navegación entre el inicio y las páginas de álbum
-
-#### v2.1.0
-
-###### 2026/10/13
-
-* `Aviso` El APK ahora incluye libandroidx.graphics.path.so, una biblioteca nativa incluida con Jetpack Compose (unos 10 KB para cada una de arm64-v8a, armeabi-v7a, x86_64 y x86); el plugin en sí sigue sin contener código nativo y sigue siendo un único APK universal
-* `Aviso` Los primeros arranques tras la instalación son algo más lentos en dispositivos antiguos hasta que el sistema termina su optimización en segundo plano
-* `Función` Toda la interfaz pasa a Material 3 (Jetpack Compose): inicio, ajustes, acerca de, historial de versiones, visor, editor y conversor se rehacen, siguen el color del tema y el modo oscuro, y admiten fuentes grandes y diseño de derecha a izquierda
-* `Función` La barra de herramientas del editor pasa a ser tiras de herramientas agrupadas con iconos y etiquetas (transformar, ajustar, dibujar, texto); el panel de parámetros sigue a la herramienta activa y se rehacen los diálogos de texto, guardado y paleta
-* `Función` El conversor deja de ser un diálogo y pasa a ser una página completa que solo muestra las entradas del modo de tamaño actual, con la resolución de salida, el tamaño estimado y el sufijo fijados en la parte inferior
-* `Función` La barra inferior del visor ofrece ahora Detalles, Rotar, Editar, Compartir y Abrir con; las imágenes abiertas desde el inicio independiente o desde otra aplicación pueden pasar directamente al editor y guardar el resultado
-* `Corrección` La página de historial de versiones dentro de la aplicación estaba en blanco (no se reconocían los encabezados ## de versión del archivo generado)
-* `Corrección` Tras cambiar el idioma de la aplicación a árabe, las páginas ya abiertas mantenían el diseño de izquierda a derecha
-* `Corrección` En modo claro los iconos de la barra de estado del visor y del editor seguían el tema de la página y se volvían oscuros, por lo que no se veían sobre el lienzo oscuro
-* `Mejora` Los iconos del centro de plugins usan los tamaños, posiciones, imágenes claras y oscuras y fondos circulares ajustados en Icon Studio, conservando fuentes y parámetros reproducibles
-* `Mejora` Los iconos de información de la aplicación de Android comparten las imágenes y los fondos claros y oscuros de Icon Studio, conservando las imágenes transparentes del centro de plugins y las opciones del lanzador
-* `Mejora` Los iconos se unifican como vectores Material de 24 dp; se eliminan los iconos de mapa de bits y los recursos de color, estilo y texto sin uso
-* `Mejora` Un perfil base de arranque integrado reduce el coste de arranque en frío del inicio tras la migración de interfaz una vez que el sistema ejecuta su optimización en segundo plano
-* `Dependencia` Se añade Jetpack Compose BOM 2026.09.00 para la migración de la interfaz
-* `Dependencia` Se añade la integración Glide Compose 1.0.0-beta10 para cargar imágenes en las pantallas Compose
-* `Dependencia` Se actualiza Glide 5.0.5 -> 5.0.9
-* `Dependencia` Se actualizan los plugins AutoJs6 Gradle Platform Versions y Native Alignment 1.9.0 -> 1.9.1
 
 ##### Historial completo
 

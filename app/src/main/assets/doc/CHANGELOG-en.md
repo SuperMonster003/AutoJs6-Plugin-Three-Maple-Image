@@ -4,6 +4,20 @@
 
 ******
 
+## v3.1.1
+
+###### 2026/10/14
+
+* `Hint` Hiding an album puts a .nomedia file into its folder, so other gallery apps no longer show its images either (nothing is deleted); on Android 11 and later it needs All files access first. To leave an album out of this gallery only, use Exclude
+* `Hint` Exclude only affects this gallery: excluded albums disappear from the album list, all images, favorites and search, the files on the device stay as they are, and Settings > Excluded folders brings them back
+* `Added` Multi-select in the album list: long-press an album to pin, exclude, hide, delete whole albums (to the recycle bin, with undo) or rename an album
+* `Added` Pinned albums come right after Favorites, before the other albums, with a pin mark
+* `Added` Settings > Hidden folders lists hidden folders and shows them again, and can list them at the end of the album list (browse and share only)
+* `Added` Sorting moves to a dialog: random order and groups by day or by month (the group title stays at the top), optionally for the current album only; the album list sorts by name, date modified, date taken or number of images and remembers it
+* `Added` Search: the home screen searches album names and file names, and an opened image pages through the results; inside an album the search filters by file name
+* `Fixed` Moving an image from a storage card into an album on the internal storage (or the other way round) left it on its old storage, in another album with the same name, and copies always went to the internal storage; both now land in the chosen album
+* `Fixed` On Android 7-10 deleting, moving or renaming images on a storage card could leave copies behind or create stray folders on the internal storage; these versions do not let apps change a storage card, so such images now stay as they are with a message
+
 ## v3.1.0
 
 ###### 2026/10/14
