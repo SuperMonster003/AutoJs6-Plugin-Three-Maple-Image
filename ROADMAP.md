@@ -246,13 +246,13 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 7.5 搜索, 排序与分组
 
-- [ ] (插件) 搜索: 顶栏搜索相册名 (首页) 与文件名 (相册内 / 全局切换), 结果网格复用, 去抖与取消. 验收: 5 万库全局搜索首屏 < 500 ms (数据入文档). 进度 (3.1.1, 提交 a1351b1): 首页全局搜索 (相册名 + 全部文件名, 结果分 相册 / 图片 两段, 查看器按结果翻页) 与相册内搜索 (按文件名筛选整个相册) 已完成, 去抖 250 ms, 新查询取消旧查询; `MediaSearchTest` JVM 5 万个文件名筛选约 6 ms, `SearchInstrumentationTest` 在 API 30 模拟器 debug 包上从输入到结果上屏约 1.05 s (含 250 ms 去抖) 并在 API 33 通过. 待补: release 包在 5 万张真机图库上的首屏耗时.
+- [x] (插件) 搜索: 顶栏搜索相册名 (首页) 与文件名 (相册内 / 全局切换), 结果网格复用, 去抖与取消. 验收: 5 万库全局搜索首屏 < 500 ms (数据入文档). 证据 (3.1.1, 提交 a1351b1 与本条提交): 首页全局搜索 (相册名 + 全部文件名, 结果分 相册 / 图片 两段, 查看器按结果翻页) 与相册内搜索 (按文件名筛选整个相册), 去抖 250 ms, 新查询取消旧查询; 全量扫描改为并发调用共用一次 (首页加载相册时立即搜索不再重复扫描). 计时: release 候选包, AVD_API_30 (emulator-5560) 注入 50003 张 (100 个相册 x 500), `setprop log.tag.MapleSearch DEBUG` 后读应用日志, 从去抖结束到结果首帧: 命中一个相册的 500 张 55-100 ms, 命中全部 50000 张 69-190 ms, 按相册名命中 63-91 ms, 冷启动后立即搜索 72-125 ms (界面可点搜索时首页扫描已完成, 筛选 15-74 ms). 若在首页扫描完成前就开始搜索, 会等这次扫描结束 (6.5 节真机全量扫描 1.2-1.4 s). `MediaSearchTest` JVM 5 万个文件名筛选约 6 ms; `SearchInstrumentationTest` 在 API 30 模拟器与 API 33 通过. 测试图已删除.
 - [x] (插件) 排序对话框: 名称 / 修改时间 / 拍摄时间 (EXIF, 回落修改时间) / 大小 / 随机, 升降序, "仅本相册" 复选; 分组: 无 / 按日 / 按月 (粘性标题, 显示数量), 相册网格排序 (名称 / 修改时间 / 数量 / 自定义置顶). 验收: `MediaSortPolicyTest` JVM (自然排序, 空值, 稳定性); UI 用例. 证据 (3.1.1, 提交 4f90dfb): 排序对话框取代下拉菜单; 随机每次打开相册重新洗牌且不保存; 分组跟随所按的日期, 按设备时区切日 / 月, 组标题含数量并吸顶, 快速滚动条与定位跳过标题; "仅本相册" 不勾时作为默认并清除该相册自己的设置; 相册网格按 名称 / 修改时间 / 拍摄时间 / 数量 排序并记住, 置顶区在前. `MediaGroupingTest` (日 / 月切分与时区, 只按日期分组, 随机只取决于种子, 网格位置映射), `MediaCatalogTest` (各字段双向与稳定), `GalleryPreferencesTest` JVM; `GalleryPreferencesInstrumentationTest` (对话框改默认, 按日分组仅本相册且出现吸顶标题, 随机取消分组) 在 API 30 模拟器与 API 33 通过.
 
 ### 7.6 批量编辑输出
 
 - [ ] (插件) 批量转换 (T12, 独立入口): 多选 -> 批量转换对话框 (格式 / 质量 / 尺寸模式 / 移除 EXIF / 旋转 90 度步进), 进度对话框 (已完成 / 失败 / 取消), 输出写入同相册并加安全后缀, 失败项列表可重试. 验收: 100 张混合格式批量在 API 28 与 35 完成; 中途取消不留半成品.
-- [ ] (宿主) 核对 v15 批量输出对 "多目标 + 选择工具栏 + `OUTPUT_CREATE_SIBLING`" 图像转换动作的接受条件 (`ExplorerActionOutputPolicy`), 必要时放宽并补单元测试与 `docs/dev/explorer-action-output-transactions.md`. 验收: 宿主单元测试.
+- [x] (宿主) 核对 v15 批量输出对 "多目标 + 选择工具栏 + `OUTPUT_CREATE_SIBLING`" 图像转换动作的接受条件 (`ExplorerActionOutputPolicy`), 必要时放宽并补单元测试与 `docs/dev/explorer-action-output-transactions.md`. 验收: 宿主单元测试. 结论 (2026-10-14, 阅读宿主代码): 不需要改宿主. `OUTPUT_CREATE_SIBLING` (v3) 只用于单个文件, 由启动 Intent 携带一个输出 URI, 不适合多目标; 多目标转换按 Archive Manager 的做法声明 `ACCESS_CREATE_IN_PARENT` (v4, 多目标, 选择工具栏, 不设输出模式), 会话中每张 `prepareOutput` -> `openOutput` -> `openPendingOutput` 读回 -> `prepareOutputBatch` / `commitOutputBatch` (v15, 2-128 个) 一起发布, 单张时用 `commitOutput`. 差别: 宿主不再按图像格式校验这类输出 (插件自行读回校验), 冲突名由宿主按冲突策略处理. 现有目录策略单元测试已覆盖该形状 (`createInParentAccessIsAvailableOnlyToProtocolV4Actions`).
 - [ ] (插件) 宿主入口批量转换动作 `convert-images` (多目标, 选择工具栏): 每张一个输出事务, `prepareOutputBatch` / `commitOutputBatch` 全部成功才发布, 失败整体回滚并提示. 验收: `ExplorerActionV12InstrumentationTest` 新增批量用例; 实机验证宿主文件管理器多选 -> 批量转换.
 
 ### 7.7 测试与发布
