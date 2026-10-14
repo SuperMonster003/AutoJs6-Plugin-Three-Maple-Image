@@ -1,10 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="albums_excluded_count">
+        <item quantity="one">Исключён %1$d альбом</item>
+        <item quantity="few">Исключено %1$d альбома</item>
+        <item quantity="many">Исключено %1$d альбомов</item>
+        <item quantity="other">Исключено %1$d альбома</item>
+    </plurals>
+    <plurals name="albums_pinned_count">
+        <item quantity="one">Закреплён %1$d альбом</item>
+        <item quantity="few">Закреплено %1$d альбома</item>
+        <item quantity="many">Закреплено %1$d альбомов</item>
+        <item quantity="other">Закреплено %1$d альбома</item>
+    </plurals>
+    <plurals name="albums_unpinned_count">
+        <item quantity="one">Откреплён %1$d альбом</item>
+        <item quantity="few">Откреплено %1$d альбома</item>
+        <item quantity="many">Откреплено %1$d альбомов</item>
+        <item quantity="other">Откреплено %1$d альбома</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="one">Там уже есть %1$d изображение с таким же именем</item>
         <item quantity="few">Там уже есть %1$d изображения с такими же именами</item>
         <item quantity="many">Там уже есть %1$d изображений с такими же именами</item>
         <item quantity="other">Там уже есть %1$d изображения с такими же именами</item>
+    </plurals>
+    <plurals name="delete_albums_bin_message">
+        <item quantity="one">%1$d изображение будет перемещено в корзину, его можно восстановить.</item>
+        <item quantity="few">%1$d изображения будут перемещены в корзину, их можно восстановить.</item>
+        <item quantity="many">%1$d изображений будут перемещены в корзину, их можно восстановить.</item>
+        <item quantity="other">%1$d изображения будут перемещены в корзину, их можно восстановить.</item>
+    </plurals>
+    <plurals name="delete_albums_forever_message">
+        <item quantity="one">%1$d изображение будет удалено навсегда. Это нельзя отменить.</item>
+        <item quantity="few">%1$d изображения будут удалены навсегда. Это нельзя отменить.</item>
+        <item quantity="many">%1$d изображений будут удалены навсегда. Это нельзя отменить.</item>
+        <item quantity="other">%1$d изображения будут удалены навсегда. Это нельзя отменить.</item>
+    </plurals>
+    <plurals name="delete_albums_title">
+        <item quantity="one">Удалить %1$d альбом?</item>
+        <item quantity="few">Удалить %1$d альбома?</item>
+        <item quantity="many">Удалить %1$d альбомов?</item>
+        <item quantity="other">Удалить %1$d альбома?</item>
     </plurals>
     <plurals name="favorites_added_count">
         <item quantity="one">%1$d изображение добавлено в избранное</item>

@@ -88,6 +88,9 @@ class HomeActivity : ConfiguredActivity() {
             onRefresh = gallery::refreshAlbums,
             onShowAll = { navigate?.invoke("album/${AlbumKind.ALL.name}/${MediaCatalog.ALL_BUCKETS}") },
             onRecycleBin = { navigate?.invoke(ROUTE_RECYCLE_BIN) },
+            onAlbumLongPress = { album -> gallery.toggleAlbum(album.id) },
+            onClearAlbumSelection = gallery::clearAlbumSelection,
+            onSelectAllAlbums = gallery::selectAllAlbums,
         )
         setContent {
             MapleTheme(palette = appPalette) {
@@ -100,8 +103,15 @@ class HomeActivity : ConfiguredActivity() {
                         // Reports "Fully drawn" once the album list (or the no-permission state) is on screen: the
                         // startup metric of the large library check (ROADMAP 6.5).
                         ReportDrawnWhen { !albums.loading }
-                        AlbumGridScreen(state = albums, home = actions.uiState, callbacks = callbacks)
+                        AlbumGridScreen(
+                            state = albums,
+                            home = actions.uiState,
+                            callbacks = callbacks,
+                            albumActions = operations.albumActionsFor(albums),
+                            snackbarHostState = operations.snackbar,
+                        )
                         actions.Dialogs()
+                        operations.Dialogs()
                     }
                     composable(
                         route = ROUTE_ALBUM,
@@ -178,6 +188,9 @@ class HomeActivity : ConfiguredActivity() {
         override suspend fun albums(): List<AlbumSummary> = gallery.albums.value.albums
         override fun clearSelection() = gallery.clearSelection()
         override fun afterWrite() = gallery.refreshAfterWrite()
+        override fun selectedAlbums(): List<AlbumSummary> = gallery.albums.value.selectedAlbums
+        override fun clearAlbumSelection() = gallery.clearAlbumSelection()
+        override suspend fun albumItems(album: AlbumSummary): List<MediaItem> = gallery.albumItems(album)
     }
 
     override fun onStart() {

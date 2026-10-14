@@ -1,6 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -63,6 +65,20 @@ internal class AlbumGridCallbacks(
     val onRefresh: () -> Unit,
     val onShowAll: () -> Unit,
     val onRecycleBin: () -> Unit = {},
+    /** Long press on a media library album: starts (or extends) the album selection (ROADMAP 7.4). */
+    val onAlbumLongPress: (AlbumSummary) -> Unit = {},
+    val onClearAlbumSelection: () -> Unit = {},
+    val onSelectAllAlbums: () -> Unit = {},
+)
+
+/** The album selection bar (ROADMAP 7.4); null hides an action. [allPinned] turns "pin" into "unpin". */
+internal class AlbumSelectionActions(
+    val onPin: (() -> Unit)? = null,
+    val onExclude: (() -> Unit)? = null,
+    val onHide: (() -> Unit)? = null,
+    val onDelete: (() -> Unit)? = null,
+    val onRename: (() -> Unit)? = null,
+    val allPinned: Boolean = false,
 )
 
 /**
@@ -72,12 +88,31 @@ internal class AlbumGridCallbacks(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun AlbumGridScreen(state: GalleryUiState, home: HomeUiState, callbacks: AlbumGridCallbacks) {
+internal fun AlbumGridScreen(
+    state: GalleryUiState,
+    home: HomeUiState,
+    callbacks: AlbumGridCallbacks,
+    albumActions: AlbumSelectionActions = AlbumSelectionActions(),
+    snackbarHostState: SnackbarHostState? = null,
+) {
     var menuOpen by remember { mutableStateOf(false) }
     var sortOpen by remember { mutableStateOf(false) }
+    val selecting = state.selectingAlbums
+    BackHandler(enabled = selecting, onBack = callbacks.onClearAlbumSelection)
     MapleScreen(
-        title = stringResource(R.string.app_name),
+        title = if (selecting) pluralStringResource(R.plurals.gallery_selected_count, state.albumSelection.size, state.albumSelection.size) else stringResource(R.string.app_name),
+        onBack = if (selecting) callbacks.onClearAlbumSelection else null,
+        navigationIcon = if (selecting) painterResource(R.drawable.ic_close_24) else null,
+        navigationContentDescription = if (selecting) stringResource(R.string.selection_exit) else null,
+        bottomBar = { if (selecting) AlbumSelectionBar(state.albumSelection.size, albumActions) },
+        snackbarHostState = snackbarHostState,
         actions = {
+            if (selecting) {
+                IconButton(onClick = callbacks.onSelectAllAlbums, modifier = Modifier.testTag("maple.albums.selectAll")) {
+                    Icon(painterResource(R.drawable.ic_select_all_24), contentDescription = stringResource(R.string.selection_select_all))
+                }
+                return@MapleScreen
+            }
             IconButton(onClick = { sortOpen = true }, modifier = Modifier.testTag("maple.gallery.sort")) {
                 Icon(painterResource(R.drawable.ic_swap_vert_24), contentDescription = stringResource(R.string.gallery_sort))
             }
@@ -215,7 +250,7 @@ private fun AlbumGrid(
                 MapleSectionHeader(stringResource(R.string.gallery_section_albums))
             }
             itemsIndexed(albums, key = { _, album -> "${album.kind.name.lowercase()}.${album.id}" }) { index, album ->
-                AlbumCell(album, callbacks, Modifier.padding(cellPadding(index)))
+                AlbumCell(album, state, callbacks, Modifier.padding(cellPadding(index)))
             }
         }
         if (state.folders.isNotEmpty()) {
@@ -223,7 +258,7 @@ private fun AlbumGrid(
                 MapleSectionHeader(stringResource(R.string.storage_section_folders))
             }
             itemsIndexed(state.folders, key = { _, album -> "folder.${album.id}" }) { index, album ->
-                AlbumCell(album, callbacks, Modifier.padding(cellPadding(index)))
+                AlbumCell(album, state, callbacks, Modifier.padding(cellPadding(index)))
             }
         }
         if (showTools) {
@@ -268,8 +303,11 @@ private fun AlbumGrid(
 }
 
 @Composable
-private fun AlbumCell(album: AlbumSummary, callbacks: AlbumGridCallbacks, modifier: Modifier = Modifier) {
+private fun AlbumCell(album: AlbumSummary, state: GalleryUiState, callbacks: AlbumGridCallbacks, modifier: Modifier = Modifier) {
     val count = if (album.count >= 0) pluralStringResource(R.plurals.gallery_image_count, album.count, album.count) else stringResource(R.string.gallery_loading_folder)
+    // Only media library albums take part in the album selection; the others ignore it (ROADMAP 7.4).
+    val selectable = album.kind == AlbumKind.MEDIA
+    val selecting = state.selectingAlbums
     MapleAlbumCell(
         name = album.name,
         count = if (album.available) count else stringResource(R.string.storage_folder_unavailable),
@@ -279,10 +317,30 @@ private fun AlbumCell(album: AlbumSummary, callbacks: AlbumGridCallbacks, modifi
             AlbumKind.FAVORITES -> painterResource(R.drawable.ic_favorite_24)
             else -> if (album.pinned) painterResource(R.drawable.ic_push_pin_24) else null
         },
-        enabled = album.available,
-        onClick = { callbacks.onOpenAlbum(album) },
+        enabled = album.available && (!selecting || selectable),
+        selectionMode = selecting && selectable,
+        selected = album.id in state.albumSelection && selectable,
+        onLongClick = if (selectable) ({ callbacks.onAlbumLongPress(album) }) else null,
+        onLongClickLabel = if (selectable) stringResource(R.string.selection_start) else null,
+        onClick = { if (selecting) callbacks.onAlbumLongPress(album) else callbacks.onOpenAlbum(album) },
         modifier = modifier.testTag("maple.gallery.album.${album.kind.name.lowercase()}.${album.id}"),
     )
+}
+
+/** Bottom bar of the album selection: pin (or unpin), exclude, hide, delete and rename (one album). */
+@Composable
+private fun AlbumSelectionBar(selectionCount: Int, actions: AlbumSelectionActions) {
+    val pinLabel = stringResource(if (actions.allPinned) R.string.action_unpin else R.string.action_pin)
+    val all = buildList {
+        actions.onPin?.let { add(MapleAction(painterResource(R.drawable.ic_push_pin_24), pinLabel, it, testTag = "maple.albums.pin")) }
+        actions.onExclude?.let { add(MapleAction(painterResource(R.drawable.ic_block_24), stringResource(R.string.action_exclude), it, testTag = "maple.albums.exclude")) }
+        actions.onHide?.let { add(MapleAction(painterResource(R.drawable.ic_visibility_off_24), stringResource(R.string.action_hide), it, testTag = "maple.albums.hide")) }
+        actions.onDelete?.let { add(MapleAction(painterResource(R.drawable.ic_delete_24), stringResource(R.string.action_delete), it, testTag = "maple.albums.delete")) }
+        actions.onRename?.let {
+            add(MapleAction(painterResource(R.drawable.ic_edit_24), stringResource(R.string.action_rename), it, enabled = selectionCount == 1, testTag = "maple.albums.rename"))
+        }
+    }
+    if (all.isNotEmpty()) MapleBottomActionBar(actions = all, navigationBarInset = true)
 }
 
 /** Sort menu shared by the album list and the media grid: fields with a check mark, then the direction. */

@@ -3,6 +3,7 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -62,7 +63,11 @@ internal fun mediaTypeBadge(mimeType: String): String? = when (mimeType.lowercas
     else -> null
 }
 
-/** Album cell: square cover with 4 dp corners, optional corner badge, name (16 sp) and count (14 sp). */
+/**
+ * Album cell: square cover with 4 dp corners, optional corner badge, name (16 sp) and count (14 sp). In selection
+ * mode (ROADMAP 7.4) a mark at the top start shows the state (the badge moves to the top end) and a selected cover
+ * shrinks behind a tinted frame; [onLongClick] starts selecting.
+ */
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 internal fun MapleAlbumCell(
@@ -72,23 +77,52 @@ internal fun MapleAlbumCell(
     modifier: Modifier = Modifier,
     badge: Painter? = null,
     enabled: Boolean = true,
+    selectionMode: Boolean = false,
+    selected: Boolean = false,
+    onLongClick: (() -> Unit)? = null,
+    onLongClickLabel: String? = null,
     onClick: () -> Unit,
 ) {
     val canvas = MapleTheme.canvas
+    val inset = if (selectionMode) animateDpAsState(if (selected) SELECTED_INSET else 0.dp, label = "albumSelectionInset") else null
     Column(
         modifier = modifier
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .semantics(mergeDescendants = true) { contentDescription = "$name, $count" },
+            .combinedClickable(
+                enabled = enabled,
+                role = if (selectionMode) Role.Checkbox else Role.Button,
+                onLongClickLabel = onLongClickLabel,
+                onLongClick = onLongClick,
+                onClick = onClick,
+            )
+            .semantics(mergeDescendants = true) {
+                contentDescription = "$name, $count"
+                if (selectionMode) this.selected = selected
+            },
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(MapleGridDefaults.albumCornerRadius))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant),
         ) {
             if (coverModel != null) {
-                GlideImage(model = coverModel, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                GlideImage(
+                    model = coverModel,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize().then(
+                        if (inset == null) Modifier else Modifier.graphicsLayer {
+                            val scale = if (size.width > 0f) 1f - 2f * inset.value.toPx() / size.width else 1f
+                            scaleX = scale
+                            scaleY = scale
+                            if (selected) {
+                                shape = RoundedCornerShape(SELECTED_CORNER)
+                                clip = true
+                            }
+                        },
+                    ),
+                )
             } else {
                 Icon(
                     painter = painterResource(R.drawable.ic_image_24),
@@ -99,11 +133,27 @@ internal fun MapleAlbumCell(
             }
             if (badge != null) {
                 Box(
-                    modifier = Modifier.align(Alignment.TopStart).padding(6.dp).size(24.dp).background(canvas.scrimStrong, CircleShape),
+                    modifier = Modifier
+                        .align(if (selectionMode) Alignment.TopEnd else Alignment.TopStart)
+                        .padding(6.dp)
+                        .size(24.dp)
+                        .background(canvas.scrimStrong, CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(painter = badge, contentDescription = null, tint = canvas.onScrim, modifier = Modifier.size(16.dp))
                 }
+            }
+            if (selectionMode) {
+                Icon(
+                    painter = painterResource(if (selected) R.drawable.ic_check_circle_24 else R.drawable.ic_radio_button_unchecked_24),
+                    contentDescription = null,
+                    tint = if (selected) MaterialTheme.colorScheme.primary else canvas.onScrim,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(6.dp)
+                        .size(24.dp)
+                        .background(if (selected) MaterialTheme.colorScheme.onPrimary else canvas.scrim, CircleShape),
+                )
             }
         }
         Text(

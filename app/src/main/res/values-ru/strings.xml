@@ -8,12 +8,15 @@
     <string name="action_delete_forever">Удалить навсегда</string>
     <string name="action_dismiss_hint">Скрыть</string>
     <string name="action_edit_image">Редактировать изображение</string>
+    <string name="action_exclude">Исключить</string>
     <string name="action_favorite">В избранное</string>
+    <string name="action_hide">Скрыть</string>
     <string name="action_hide_image_details">Скрыть сведения</string>
     <string name="action_more">Ещё</string>
     <string name="action_move">Переместить</string>
     <string name="action_open_external">Открыть в другом приложении</string>
     <string name="action_pause_animation">Приостановить анимацию</string>
+    <string name="action_pin">Закрепить</string>
     <string name="action_print">Печать / сохранить PDF</string>
     <string name="action_rename">Переименовать</string>
     <string name="action_reset_zoom">Сбросить масштаб</string>
@@ -24,6 +27,7 @@
     <string name="action_show_image_details">Показать сведения</string>
     <string name="action_undo">Отменить</string>
     <string name="action_unfavorite">Из избранного</string>
+    <string name="action_unpin">Открепить</string>
     <string name="action_view_image">Просмотреть изображение</string>
     <string name="apk_info_format">Формат</string>
     <string name="conflict_auto_rename">Оставить оба</string>

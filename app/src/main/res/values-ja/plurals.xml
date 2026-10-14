@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="albums_excluded_count">
+        <item quantity="other">%1$d 個のアルバムを除外しました</item>
+    </plurals>
+    <plurals name="albums_pinned_count">
+        <item quantity="other">%1$d 個のアルバムを固定しました</item>
+    </plurals>
+    <plurals name="albums_unpinned_count">
+        <item quantity="other">%1$d 個のアルバムの固定を解除しました</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="other">同じ名前の画像が %1$d 枚あります</item>
+    </plurals>
+    <plurals name="delete_albums_bin_message">
+        <item quantity="other">含まれる %1$d 枚の画像はゴミ箱に移動し, 復元できます.</item>
+    </plurals>
+    <plurals name="delete_albums_forever_message">
+        <item quantity="other">含まれる %1$d 枚の画像は完全に削除され, 元に戻せません.</item>
+    </plurals>
+    <plurals name="delete_albums_title">
+        <item quantity="other">%1$d 個のアルバムを削除しますか?</item>
     </plurals>
     <plurals name="favorites_added_count">
         <item quantity="other">%1$d 枚の画像をお気に入りに追加しました</item>

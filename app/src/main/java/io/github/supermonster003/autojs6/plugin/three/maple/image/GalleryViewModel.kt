@@ -51,8 +51,14 @@ internal data class GalleryUiState(
     val failed: Boolean = false,
     /** A user-initiated reload (pull to refresh) is in flight while the current albums stay on screen. */
     val refreshing: Boolean = false,
+    /** Bucket ids of the media library albums selected on the album grid (ROADMAP 7.4); kept across rotation. */
+    val albumSelection: Set<Long> = emptySet(),
 ) {
     val canReadMediaStore: Boolean get() = access?.canReadMediaStore == true
+
+    val selectingAlbums: Boolean get() = albumSelection.isNotEmpty()
+
+    val selectedAlbums: List<AlbumSummary> get() = if (albumSelection.isEmpty()) emptyList() else albums.filter { it.id in albumSelection }
 }
 
 internal data class MediaGridUiState(
@@ -259,7 +265,17 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             }
             favoriteOrder = null
             val favoritesSummary = favoritesAlbum()
-            _albums.update { it.copy(loading = false, refreshing = false, albums = arrangeAlbums(albums, it.albumSort), folders = folders, favorites = favoritesSummary) }
+            _albums.update { state ->
+                state.copy(
+                    loading = false,
+                    refreshing = false,
+                    albums = arrangeAlbums(albums, state.albumSort),
+                    folders = folders,
+                    favorites = favoritesSummary,
+                    // A selected album that went away (deleted, excluded, moved out) leaves the selection.
+                    albumSelection = state.albumSelection.filterTo(LinkedHashSet()) { id -> albums.any { it.id == id } },
+                )
+            }
             // The open album's title and count follow the reloaded list (after a delete or move, for example).
             _grid.update { grid ->
                 val open = grid.album ?: return@update grid
@@ -370,6 +386,24 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     fun clearReveal() {
         _grid.update { if (it.reveal == null) it else it.copy(reveal = null) }
     }
+
+    // ---- album selection (ROADMAP 7.4) ----
+
+    fun toggleAlbum(id: Long) {
+        _albums.update { it.copy(albumSelection = MediaSelection.toggle(it.albumSelection, id)) }
+    }
+
+    fun clearAlbumSelection() {
+        _albums.update { if (it.albumSelection.isEmpty()) it else it.copy(albumSelection = emptySet()) }
+    }
+
+    fun selectAllAlbums() {
+        _albums.update { state -> state.copy(albumSelection = state.albums.mapTo(LinkedHashSet()) { it.id }) }
+    }
+
+    /** Every image of a media library album, for album-wide actions (delete, rename). */
+    suspend fun albumItems(album: AlbumSummary): List<MediaItem> =
+        runCatching { media.loadBucketAll(album.id) }.getOrDefault(emptyList())
 
     // ---- selection (ROADMAP 7.1) ----
 

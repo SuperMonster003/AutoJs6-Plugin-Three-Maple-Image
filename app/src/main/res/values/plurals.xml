@@ -1,8 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="albums_excluded_count">
+        <item quantity="one">%1$d album excluded</item>
+        <item quantity="other">%1$d albums excluded</item>
+    </plurals>
+    <plurals name="albums_pinned_count">
+        <item quantity="one">%1$d album pinned</item>
+        <item quantity="other">%1$d albums pinned</item>
+    </plurals>
+    <plurals name="albums_unpinned_count">
+        <item quantity="one">%1$d album unpinned</item>
+        <item quantity="other">%1$d albums unpinned</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="one">%1$d image with the same name is already there</item>
         <item quantity="other">%1$d images with the same names are already there</item>
+    </plurals>
+    <plurals name="delete_albums_bin_message">
+        <item quantity="one">Its %1$d image goes to the recycle bin and can be restored.</item>
+        <item quantity="other">Their %1$d images go to the recycle bin and can be restored.</item>
+    </plurals>
+    <plurals name="delete_albums_forever_message">
+        <item quantity="one">%1$d image will be deleted for good. This cannot be undone.</item>
+        <item quantity="other">%1$d images will be deleted for good. This cannot be undone.</item>
+    </plurals>
+    <plurals name="delete_albums_title">
+        <item quantity="one">Delete %1$d album?</item>
+        <item quantity="other">Delete %1$d albums?</item>
     </plurals>
     <plurals name="favorites_added_count">
         <item quantity="one">%1$d image added to favorites</item>

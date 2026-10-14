@@ -29,6 +29,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumSelectionActions
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ConflictDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleSettingsDefaults
@@ -65,6 +66,9 @@ internal sealed interface GalleryDialog {
     data class Conflict(val items: List<MediaItem>, val copy: Boolean, val target: TargetAlbum, val count: Int) : GalleryDialog
 
     data class Progress(val copy: Boolean, val control: WriteControl) : GalleryDialog
+
+    /** Delete whole albums (ROADMAP 7.4): their [items] go to the recycle bin, or for good when it is off. */
+    data class ConfirmDeleteAlbums(val albumCount: Int, val items: List<MediaItem>, val forGood: Boolean) : GalleryDialog
 }
 
 internal enum class DeleteReason {
@@ -96,6 +100,14 @@ internal interface OperationTarget {
 
     /** A write finished or was undone: reload what shows the images. */
     fun afterWrite()
+
+    /** The albums selected on the album grid (ROADMAP 7.4); none outside the home screen. */
+    fun selectedAlbums(): List<AlbumSummary> = emptyList()
+
+    fun clearAlbumSelection() {}
+
+    /** Every image of a media library album. */
+    suspend fun albumItems(album: AlbumSummary): List<MediaItem> = emptyList()
 }
 
 /**
@@ -117,6 +129,7 @@ internal class GalleryOperations(
     private var snackbarJob: Job? = null
     private val preferences = GalleryPreferences(activity)
     private val favorites = FavoritesRepository(activity)
+    private val folderMarks = FolderMarksRepository(activity)
     private var renameError by mutableStateOf<String?>(null)
     private var renameBusy by mutableStateOf(false)
     private var progressDone by mutableIntStateOf(0)
@@ -305,6 +318,69 @@ internal class GalleryOperations(
         recycleBin?.load()
     }
 
+    // ---- album actions (ROADMAP 7.4) ----
+
+    /** The album selection bar for [state]; empty outside the album selection. */
+    fun albumActionsFor(state: GalleryUiState): AlbumSelectionActions {
+        if (!state.selectingAlbums) return AlbumSelectionActions()
+        val selected = state.selectedAlbums
+        return AlbumSelectionActions(
+            onPin = ::pinAlbums,
+            onExclude = ::excludeAlbums,
+            onDelete = ::deleteAlbums,
+            allPinned = selected.isNotEmpty() && selected.all { it.pinned },
+        )
+    }
+
+    /** Pins the selected albums, or unpins them when every one is pinned already. */
+    fun pinAlbums() = launch {
+        val albums = target.selectedAlbums()
+        if (albums.isEmpty()) return@launch
+        val unpin = albums.all { it.pinned }
+        val paths = albums.map { it.path }
+        if (unpin) folderMarks.unmark(paths, FolderMark.PINNED) else folderMarks.mark(paths, FolderMark.PINNED)
+        target.clearAlbumSelection()
+        notify(quantity(if (unpin) R.plurals.albums_unpinned_count else R.plurals.albums_pinned_count, albums.size))
+    }
+
+    /** Leaves the selected albums out of the gallery; the undo (and Settings > Excluded folders) brings them back. */
+    fun excludeAlbums() = launch {
+        val albums = target.selectedAlbums()
+        if (albums.isEmpty()) return@launch
+        val paths = albums.map { it.path }
+        folderMarks.mark(paths, FolderMark.EXCLUDED)
+        target.clearAlbumSelection()
+        notify(quantity(R.plurals.albums_excluded_count, albums.size), undo = {
+            folderMarks.unmark(paths, FolderMark.EXCLUDED)
+            WriteOutcome(succeeded = paths.size)
+        })
+    }
+
+    /** Asks before deleting every image of the selected albums. */
+    fun deleteAlbums() = launch {
+        val albums = target.selectedAlbums()
+        if (albums.isEmpty()) return@launch
+        val items = albums.flatMap { target.albumItems(it) }
+        if (items.isEmpty()) return@launch
+        show(GalleryDialog.ConfirmDeleteAlbums(albums.size, items, forGood = !ApplicationSettingsStore(activity).load().recycleBinEnabled))
+    }
+
+    private fun deleteAlbumItems(items: List<MediaItem>, forGood: Boolean) = launch {
+        target.clearAlbumSelection()
+        if (forGood) {
+            val outcome = coordinator.delete(items)
+            if (outcome.cancelled) {
+                explainRefusedPermission()
+                return@launch
+            }
+            favorites.remove(items.map { it.id })
+            finishWrite()
+            notify(summary(R.plurals.gallery_deleted_count, outcome))
+        } else {
+            trash(items)
+        }
+    }
+
     // ---- rename / move / copy (ROADMAP 7.3) ----
 
     fun rename() = launch {
@@ -480,6 +556,20 @@ internal class GalleryOperations(
                 onConfirm = {
                     show(null)
                     deleteForGood(current.items, current.reason)
+                },
+            )
+            is GalleryDialog.ConfirmDeleteAlbums -> ConfirmDialog(
+                title = pluralStringResource(R.plurals.delete_albums_title, current.albumCount, current.albumCount),
+                message = pluralStringResource(
+                    if (current.forGood) R.plurals.delete_albums_forever_message else R.plurals.delete_albums_bin_message,
+                    current.items.size,
+                    current.items.size,
+                ),
+                confirmText = stringResource(if (current.forGood) R.string.action_delete_forever else R.string.action_delete),
+                onDismiss = { show(null) },
+                onConfirm = {
+                    show(null)
+                    deleteAlbumItems(current.items, current.forGood)
                 },
             )
             is GalleryDialog.ConfirmBinDelete -> ConfirmDialog(

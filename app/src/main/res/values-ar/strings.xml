@@ -8,12 +8,15 @@
     <string name="action_delete_forever">حذف نهائي</string>
     <string name="action_dismiss_hint">تجاهل</string>
     <string name="action_edit_image">تحرير الصورة</string>
+    <string name="action_exclude">استبعاد</string>
     <string name="action_favorite">المفضلة</string>
+    <string name="action_hide">إخفاء</string>
     <string name="action_hide_image_details">إخفاء التفاصيل</string>
     <string name="action_more">المزيد</string>
     <string name="action_move">نقل</string>
     <string name="action_open_external">فتح بتطبيق اخر</string>
     <string name="action_pause_animation">إيقاف الحركة مؤقتا</string>
+    <string name="action_pin">تثبيت</string>
     <string name="action_print">طباعة / حفظ PDF</string>
     <string name="action_rename">إعادة التسمية</string>
     <string name="action_reset_zoom">اعادة ضبط التكبير</string>
@@ -24,6 +27,7 @@
     <string name="action_show_image_details">عرض التفاصيل</string>
     <string name="action_undo">تراجع</string>
     <string name="action_unfavorite">إزالة من المفضلة</string>
+    <string name="action_unpin">إلغاء التثبيت</string>
     <string name="action_view_image">عرض الصورة</string>
     <string name="apk_info_format">التنسيق</string>
     <string name="conflict_auto_rename">الاحتفاظ بالاثنين</string>

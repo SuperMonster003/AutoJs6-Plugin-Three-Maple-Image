@@ -8,12 +8,15 @@
     <string name="action_delete_forever">永久刪除</string>
     <string name="action_dismiss_hint">關閉提示</string>
     <string name="action_edit_image">編輯圖像</string>
+    <string name="action_exclude">排除</string>
     <string name="action_favorite">收藏</string>
+    <string name="action_hide">隱藏</string>
     <string name="action_hide_image_details">隱藏詳情</string>
     <string name="action_more">更多</string>
     <string name="action_move">移動</string>
     <string name="action_open_external">使用其他應用程式開啟</string>
     <string name="action_pause_animation">暫停動圖</string>
+    <string name="action_pin">置頂</string>
     <string name="action_print">列印 / 儲存 PDF</string>
     <string name="action_rename">重新命名</string>
     <string name="action_reset_zoom">重設縮放</string>
@@ -24,6 +27,7 @@
     <string name="action_show_image_details">顯示詳情</string>
     <string name="action_undo">復原</string>
     <string name="action_unfavorite">取消收藏</string>
+    <string name="action_unpin">取消置頂</string>
     <string name="action_view_image">檢視圖像</string>
     <string name="apk_info_format">格式</string>
     <string name="conflict_auto_rename">保留兩者</string>

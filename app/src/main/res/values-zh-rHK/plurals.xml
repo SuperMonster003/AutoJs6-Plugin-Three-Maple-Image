@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="albums_excluded_count">
+        <item quantity="other">已排除 %1$d 個相簿</item>
+    </plurals>
+    <plurals name="albums_pinned_count">
+        <item quantity="other">已置頂 %1$d 個相簿</item>
+    </plurals>
+    <plurals name="albums_unpinned_count">
+        <item quantity="other">已取消置頂 %1$d 個相簿</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="other">目標相簿已有 %1$d 張同名圖片</item>
+    </plurals>
+    <plurals name="delete_albums_bin_message">
+        <item quantity="other">其中的 %1$d 張圖片會移到回收筒, 可以還原.</item>
+    </plurals>
+    <plurals name="delete_albums_forever_message">
+        <item quantity="other">其中的 %1$d 張圖片將被永久刪除, 無法復原.</item>
+    </plurals>
+    <plurals name="delete_albums_title">
+        <item quantity="other">刪除 %1$d 個相簿?</item>
     </plurals>
     <plurals name="favorites_added_count">
         <item quantity="other">已收藏 %1$d 張圖片</item>

@@ -1,9 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="albums_excluded_count">
+        <item quantity="one">%1$d album exclu</item>
+        <item quantity="many">%1$d albums exclus</item>
+        <item quantity="other">%1$d albums exclus</item>
+    </plurals>
+    <plurals name="albums_pinned_count">
+        <item quantity="one">%1$d album épinglé</item>
+        <item quantity="many">%1$d albums épinglés</item>
+        <item quantity="other">%1$d albums épinglés</item>
+    </plurals>
+    <plurals name="albums_unpinned_count">
+        <item quantity="one">%1$d album désépinglé</item>
+        <item quantity="many">%1$d albums désépinglés</item>
+        <item quantity="other">%1$d albums désépinglés</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="one">%1$d image du même nom existe déjà</item>
         <item quantity="many">%1$d images des mêmes noms existent déjà</item>
         <item quantity="other">%1$d images des mêmes noms existent déjà</item>
+    </plurals>
+    <plurals name="delete_albums_bin_message">
+        <item quantity="one">Son image (%1$d) ira dans la corbeille et pourra être restaurée.</item>
+        <item quantity="many">Leurs %1$d images iront dans la corbeille et pourront être restaurées.</item>
+        <item quantity="other">Leurs %1$d images iront dans la corbeille et pourront être restaurées.</item>
+    </plurals>
+    <plurals name="delete_albums_forever_message">
+        <item quantity="one">%1$d image sera supprimée définitivement. Cette action est irréversible.</item>
+        <item quantity="many">%1$d images seront supprimées définitivement. Cette action est irréversible.</item>
+        <item quantity="other">%1$d images seront supprimées définitivement. Cette action est irréversible.</item>
+    </plurals>
+    <plurals name="delete_albums_title">
+        <item quantity="one">Supprimer %1$d album?</item>
+        <item quantity="many">Supprimer %1$d albums?</item>
+        <item quantity="other">Supprimer %1$d albums?</item>
     </plurals>
     <plurals name="favorites_added_count">
         <item quantity="one">%1$d image ajoutée aux favoris</item>

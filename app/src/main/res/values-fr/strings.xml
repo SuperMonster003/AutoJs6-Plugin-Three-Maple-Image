@@ -8,12 +8,15 @@
     <string name="action_delete_forever">Supprimer définitivement</string>
     <string name="action_dismiss_hint">Ignorer</string>
     <string name="action_edit_image">Modifier l\'image</string>
+    <string name="action_exclude">Exclure</string>
     <string name="action_favorite">Favori</string>
+    <string name="action_hide">Masquer</string>
     <string name="action_hide_image_details">Masquer les détails</string>
     <string name="action_more">Plus</string>
     <string name="action_move">Déplacer</string>
     <string name="action_open_external">Ouvrir avec une autre application</string>
     <string name="action_pause_animation">Mettre l\'animation en pause</string>
+    <string name="action_pin">Épingler</string>
     <string name="action_print">Imprimer / enregistrer en PDF</string>
     <string name="action_rename">Renommer</string>
     <string name="action_reset_zoom">Réinitialiser le zoom</string>
@@ -24,6 +27,7 @@
     <string name="action_show_image_details">Afficher les détails</string>
     <string name="action_undo">Annuler</string>
     <string name="action_unfavorite">Retirer des favoris</string>
+    <string name="action_unpin">Désépingler</string>
     <string name="action_view_image">Afficher l\'image</string>
     <string name="apk_info_format">Format</string>
     <string name="conflict_auto_rename">Conserver les deux</string>

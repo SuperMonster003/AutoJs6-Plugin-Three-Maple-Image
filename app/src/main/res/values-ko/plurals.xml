@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="albums_excluded_count">
+        <item quantity="other">앨범 %1$d개를 제외했습니다</item>
+    </plurals>
+    <plurals name="albums_pinned_count">
+        <item quantity="other">앨범 %1$d개를 고정했습니다</item>
+    </plurals>
+    <plurals name="albums_unpinned_count">
+        <item quantity="other">앨범 %1$d개의 고정을 해제했습니다</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="other">같은 이름의 이미지가 %1$d개 있습니다</item>
+    </plurals>
+    <plurals name="delete_albums_bin_message">
+        <item quantity="other">포함된 이미지 %1$d개는 휴지통으로 이동하며 복원할 수 있습니다.</item>
+    </plurals>
+    <plurals name="delete_albums_forever_message">
+        <item quantity="other">포함된 이미지 %1$d개가 영구 삭제되며 실행 취소할 수 없습니다.</item>
+    </plurals>
+    <plurals name="delete_albums_title">
+        <item quantity="other">앨범 %1$d개를 삭제할까요?</item>
     </plurals>
     <plurals name="favorites_added_count">
         <item quantity="other">이미지 %1$d개를 즐겨찾기에 추가했습니다</item>

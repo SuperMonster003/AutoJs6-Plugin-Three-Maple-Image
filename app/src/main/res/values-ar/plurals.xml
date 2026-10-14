@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="albums_excluded_count">
+        <item quantity="zero">تم استبعاد %1$d ألبوم</item>
+        <item quantity="one">تم استبعاد ألبوم واحد (%1$d)</item>
+        <item quantity="two">تم استبعاد ألبومين (%1$d)</item>
+        <item quantity="few">تم استبعاد %1$d ألبومات</item>
+        <item quantity="many">تم استبعاد %1$d ألبوما</item>
+        <item quantity="other">تم استبعاد %1$d ألبوم</item>
+    </plurals>
+    <plurals name="albums_pinned_count">
+        <item quantity="zero">تم تثبيت %1$d ألبوم</item>
+        <item quantity="one">تم تثبيت ألبوم واحد (%1$d)</item>
+        <item quantity="two">تم تثبيت ألبومين (%1$d)</item>
+        <item quantity="few">تم تثبيت %1$d ألبومات</item>
+        <item quantity="many">تم تثبيت %1$d ألبوما</item>
+        <item quantity="other">تم تثبيت %1$d ألبوم</item>
+    </plurals>
+    <plurals name="albums_unpinned_count">
+        <item quantity="zero">تم إلغاء تثبيت %1$d ألبوم</item>
+        <item quantity="one">تم إلغاء تثبيت ألبوم واحد (%1$d)</item>
+        <item quantity="two">تم إلغاء تثبيت ألبومين (%1$d)</item>
+        <item quantity="few">تم إلغاء تثبيت %1$d ألبومات</item>
+        <item quantity="many">تم إلغاء تثبيت %1$d ألبوما</item>
+        <item quantity="other">تم إلغاء تثبيت %1$d ألبوم</item>
+    </plurals>
     <plurals name="conflict_title">
         <item quantity="zero">توجد %1$d صورة بالأسماء نفسها</item>
         <item quantity="one">توجد صورة واحدة (%1$d) بالاسم نفسه</item>
@@ -7,6 +31,30 @@
         <item quantity="few">توجد %1$d صور بالأسماء نفسها</item>
         <item quantity="many">توجد %1$d صورة بالأسماء نفسها</item>
         <item quantity="other">توجد %1$d صورة بالأسماء نفسها</item>
+    </plurals>
+    <plurals name="delete_albums_bin_message">
+        <item quantity="zero">ستنتقل %1$d صورة الى سلة المحذوفات ويمكن استعادتها.</item>
+        <item quantity="one">ستنتقل صورة واحدة (%1$d) الى سلة المحذوفات ويمكن استعادتها.</item>
+        <item quantity="two">ستنتقل صورتان (%1$d) الى سلة المحذوفات ويمكن استعادتهما.</item>
+        <item quantity="few">ستنتقل %1$d صور الى سلة المحذوفات ويمكن استعادتها.</item>
+        <item quantity="many">ستنتقل %1$d صورة الى سلة المحذوفات ويمكن استعادتها.</item>
+        <item quantity="other">ستنتقل %1$d صورة الى سلة المحذوفات ويمكن استعادتها.</item>
+    </plurals>
+    <plurals name="delete_albums_forever_message">
+        <item quantity="zero">سيتم حذف %1$d صورة نهائيا ولا يمكن التراجع.</item>
+        <item quantity="one">سيتم حذف صورة واحدة (%1$d) نهائيا ولا يمكن التراجع.</item>
+        <item quantity="two">سيتم حذف صورتين (%1$d) نهائيا ولا يمكن التراجع.</item>
+        <item quantity="few">سيتم حذف %1$d صور نهائيا ولا يمكن التراجع.</item>
+        <item quantity="many">سيتم حذف %1$d صورة نهائيا ولا يمكن التراجع.</item>
+        <item quantity="other">سيتم حذف %1$d صورة نهائيا ولا يمكن التراجع.</item>
+    </plurals>
+    <plurals name="delete_albums_title">
+        <item quantity="zero">حذف %1$d ألبوم?</item>
+        <item quantity="one">حذف ألبوم واحد (%1$d)?</item>
+        <item quantity="two">حذف ألبومين (%1$d)?</item>
+        <item quantity="few">حذف %1$d ألبومات?</item>
+        <item quantity="many">حذف %1$d ألبوما?</item>
+        <item quantity="other">حذف %1$d ألبوم?</item>
     </plurals>
     <plurals name="favorites_added_count">
         <item quantity="zero">تمت إضافة %1$d صورة إلى المفضلة</item>

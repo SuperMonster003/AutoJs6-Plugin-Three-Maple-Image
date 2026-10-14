@@ -8,12 +8,15 @@
     <string name="action_delete_forever">Delete forever</string>
     <string name="action_dismiss_hint">Dismiss</string>
     <string name="action_edit_image">Edit image</string>
+    <string name="action_exclude">Exclude</string>
     <string name="action_favorite">Favorite</string>
+    <string name="action_hide">Hide</string>
     <string name="action_hide_image_details">Hide details</string>
     <string name="action_more">More</string>
     <string name="action_move">Move</string>
     <string name="action_open_external">Open with another app</string>
     <string name="action_pause_animation">Pause animation</string>
+    <string name="action_pin">Pin</string>
     <string name="action_print">Print / Save PDF</string>
     <string name="action_rename">Rename</string>
     <string name="action_reset_zoom">Reset zoom</string>
@@ -24,6 +27,7 @@
     <string name="action_show_image_details">Show details</string>
     <string name="action_undo">Undo</string>
     <string name="action_unfavorite">Unfavorite</string>
+    <string name="action_unpin">Unpin</string>
     <string name="action_view_image">View image</string>
     <string name="apk_info_format">Format</string>
     <string name="conflict_auto_rename">Keep both</string>

@@ -8,12 +8,15 @@
     <string name="action_delete_forever">Eliminar para siempre</string>
     <string name="action_dismiss_hint">Descartar</string>
     <string name="action_edit_image">Editar imagen</string>
+    <string name="action_exclude">Excluir</string>
     <string name="action_favorite">Favorito</string>
+    <string name="action_hide">Ocultar</string>
     <string name="action_hide_image_details">Ocultar detalles</string>
     <string name="action_more">Más</string>
     <string name="action_move">Mover</string>
     <string name="action_open_external">Abrir con otra aplicación</string>
     <string name="action_pause_animation">Pausar animación</string>
+    <string name="action_pin">Fijar</string>
     <string name="action_print">Imprimir / guardar PDF</string>
     <string name="action_rename">Cambiar nombre</string>
     <string name="action_reset_zoom">Restablecer zoom</string>
@@ -24,6 +27,7 @@
     <string name="action_show_image_details">Mostrar detalles</string>
     <string name="action_undo">Deshacer</string>
     <string name="action_unfavorite">Quitar de favoritos</string>
+    <string name="action_unpin">Dejar de fijar</string>
     <string name="action_view_image">Ver imagen</string>
     <string name="apk_info_format">Formato</string>
     <string name="conflict_auto_rename">Conservar ambos</string>
@@ -88,9 +92,9 @@
     <string name="gallery_choose_image">Elegir imagen</string>
     <string name="gallery_columns">Columnas</string>
     <string name="gallery_columns_value">%1$d columnas</string>
-    <string name="gallery_delete_confirm_title">¿Eliminar definitivamente?</string>
+    <string name="gallery_delete_confirm_title">Eliminar definitivamente?</string>
     <string name="gallery_delete_folder_note">Las imágenes de las carpetas autorizadas no van a la papelera.</string>
-    <string name="gallery_delete_too_large">Estas imágenes superan la capacidad de la papelera (como máximo la décima parte del espacio libre, hasta 2 GiB). ¿Eliminarlas definitivamente? Esta acción no se puede deshacer.</string>
+    <string name="gallery_delete_too_large">Estas imágenes superan la capacidad de la papelera (como máximo la décima parte del espacio libre, hasta 2 GiB). Eliminarlas definitivamente? Esta acción no se puede deshacer.</string>
     <string name="gallery_empty_album_title">Este álbum está vacío</string>
     <string name="gallery_empty_no_images_body">Aquí aparecen las imágenes de la biblioteca del dispositivo y de las carpetas autorizadas</string>
     <string name="gallery_empty_no_images_title">No se encontraron imágenes</string>
@@ -179,7 +183,7 @@
     <string name="progress_moving">Moviendo imágenes</string>
     <string name="recycle_bin_empty_action">Vaciar papelera</string>
     <string name="recycle_bin_empty_body">Las imágenes eliminadas se guardan aquí 30 días y luego se eliminan definitivamente</string>
-    <string name="recycle_bin_empty_confirm">¿Eliminar definitivamente todo el contenido de la papelera? Esta acción no se puede deshacer.</string>
+    <string name="recycle_bin_empty_confirm">Eliminar definitivamente todo el contenido de la papelera? Esta acción no se puede deshacer.</string>
     <string name="recycle_bin_empty_title">La papelera está vacía</string>
     <string name="recycle_bin_title">Papelera</string>
     <string name="release_history">Historial de versiones</string>
