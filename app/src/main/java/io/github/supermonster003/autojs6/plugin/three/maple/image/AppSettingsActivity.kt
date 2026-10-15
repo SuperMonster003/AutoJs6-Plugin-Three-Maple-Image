@@ -19,6 +19,7 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.Map
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleThemeColorLabels
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SettingsScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SettingsSummaries
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.labelResource
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -35,6 +36,8 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         data object ThemeColor : SettingsDialog
         data object LauncherIcon : SettingsDialog
         data object ExtendedDetailFields : SettingsDialog
+        data object DoubleTapZoom : SettingsDialog
+        data object MaxZoom : SettingsDialog
     }
 
     private lateinit var settingsStore: ApplicationSettingsStore
@@ -42,8 +45,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
     private lateinit var hostResult: AutoJs6HostSettingsResult
     private var dialog by mutableStateOf<SettingsDialog?>(null)
     private var launcherIconSummary by mutableStateOf("")
-    private var viewerRotationGesture by mutableStateOf(true)
-    private var viewerRotationSave by mutableStateOf(true)
+    private var viewer by mutableStateOf(ViewerSettings())
     private var showLocation by mutableStateOf(false)
     private var extendedDetails by mutableStateOf(false)
     private var extendedDetailFields by mutableStateOf(ExtendedDetailsPolicy.SUGGESTED)
@@ -54,8 +56,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         super.onCreate(savedInstanceState)
         settingsStore = ApplicationSettingsStore(applicationContext)
         settings = settingsStore.load()
-        viewerRotationGesture = settings.viewerRotationGesture
-        viewerRotationSave = settings.viewerRotationSave
+        viewer = settings.viewer
         showLocation = settings.showLocation
         extendedDetails = settings.extendedDetails
         extendedDetailFields = settings.extendedDetailFields
@@ -77,10 +78,10 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     onDarkMode = { open(SettingsDialog.DarkMode) },
                     onThemeColor = { open(SettingsDialog.ThemeColor) },
                     onLauncherIcon = { open(SettingsDialog.LauncherIcon) },
-                    viewerRotationGesture = viewerRotationGesture,
-                    onViewerRotationGesture = ::updateViewerRotationGesture,
-                    viewerRotationSave = viewerRotationSave,
-                    onViewerRotationSave = ::updateViewerRotationSave,
+                    viewer = viewer,
+                    onViewerChange = ::updateViewer,
+                    onDoubleTapZoom = { open(SettingsDialog.DoubleTapZoom) },
+                    onMaxZoom = { open(SettingsDialog.MaxZoom) },
                     showLocation = showLocation,
                     onShowLocation = ::updateShowLocation,
                     extendedDetails = extendedDetails,
@@ -103,16 +104,10 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         }
     }
 
-    private fun updateViewerRotationGesture(enabled: Boolean) {
-        viewerRotationGesture = enabled
-        settings = settings.copy(viewerRotationGesture = enabled)
-        settingsStore.saveViewerRotationGesture(enabled)
-    }
-
-    private fun updateViewerRotationSave(enabled: Boolean) {
-        viewerRotationSave = enabled
-        settings = settings.copy(viewerRotationSave = enabled)
-        settingsStore.saveViewerRotationSave(enabled)
+    private fun updateViewer(value: ViewerSettings) {
+        viewer = value
+        settings = settings.copy(viewer = value)
+        settingsStore.saveViewer(value)
     }
 
     private fun updateShowLocation(enabled: Boolean) {
@@ -198,6 +193,35 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     selected = fields.indices.filter { fields[it] in extendedDetailFields }.toSet(),
                     onDismissRequest = ::close,
                     onConfirm = { indices -> close(); updateExtendedDetailFields(indices.map(fields::get).toSet()) },
+                    confirmText = getString(R.string.dialog_button_confirm),
+                    dismissText = getString(R.string.dialog_button_cancel),
+                )
+            }
+            SettingsDialog.DoubleTapZoom -> {
+                val values = ViewerDoubleTapZoom.entries
+                MapleChoiceDialog(
+                    title = getString(R.string.viewer_double_tap_zoom_title),
+                    options = values.map { MapleChoice(getString(it.labelResource())) },
+                    selectedIndex = values.indexOf(viewer.doubleTapZoom),
+                    onDismissRequest = ::close,
+                    onConfirm = { index -> close(); updateViewer(viewer.copy(doubleTapZoom = values[index])) },
+                    confirmText = getString(R.string.dialog_button_confirm),
+                    dismissText = getString(R.string.dialog_button_cancel),
+                )
+            }
+            SettingsDialog.MaxZoom -> {
+                val values = ViewerMaxZoom.entries
+                MapleChoiceDialog(
+                    title = getString(R.string.viewer_max_zoom_title),
+                    options = values.map { value ->
+                        MapleChoice(
+                            label = getString(value.labelResource()),
+                            description = if (value == ViewerMaxZoom.ACTUAL_PIXELS) getString(R.string.viewer_max_zoom_actual_pixels_summary) else null,
+                        )
+                    },
+                    selectedIndex = values.indexOf(viewer.maxZoom),
+                    onDismissRequest = ::close,
+                    onConfirm = { index -> close(); updateViewer(viewer.copy(maxZoom = values[index])) },
                     confirmText = getString(R.string.dialog_button_confirm),
                     dismissText = getString(R.string.dialog_button_cancel),
                 )

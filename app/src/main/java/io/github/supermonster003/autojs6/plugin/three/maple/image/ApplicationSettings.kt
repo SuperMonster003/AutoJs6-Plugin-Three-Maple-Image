@@ -35,10 +35,8 @@ internal data class ApplicationSettings(
     val customThemeColor: Int = AppSettingsPolicy.AUTOJS6_DEFAULT_THEME_COLOR,
     val darkMode: AppDarkMode = AppDarkMode.FOLLOW_AUTOJS6,
     val language: AppLanguage = AppLanguage.FOLLOW_AUTOJS6,
-    /** Two-finger rotation in the viewer (ROADMAP D8); display-only, so it does not touch the appearance revision. */
-    val viewerRotationGesture: Boolean = true,
-    /** After a rotation the viewer offers to save it into the image (ROADMAP 8.2, T15); on by default. */
-    val viewerRotationSave: Boolean = true,
+    /** Viewer gestures (ROADMAP D8 / 8.2 / 9.2); display-only, so they do not touch the appearance revision. */
+    val viewer: ViewerSettings = ViewerSettings(),
     /**
      * The details show where a photo was taken and offer to open it in a map; saving and converting offer to keep
      * the location (ROADMAP 9.1, T14). Off by default: everything then behaves as before, the location is removed.
@@ -174,8 +172,7 @@ internal class ApplicationSettingsStore(context: Context) {
             preferences.getString(KEY_LANGUAGE, null),
             AppLanguage.FOLLOW_AUTOJS6,
         ),
-        viewerRotationGesture = preferences.getBoolean(KEY_VIEWER_ROTATION_GESTURE, true),
-        viewerRotationSave = preferences.getBoolean(KEY_VIEWER_ROTATION_SAVE, true),
+        viewer = ViewerSettings.read(preferences),
         showLocation = preferences.getBoolean(KEY_SHOW_LOCATION, false),
         extendedDetails = preferences.getBoolean(KEY_EXTENDED_DETAILS, false),
         extendedDetailFields = preferences.getString(KEY_EXTENDED_DETAIL_FIELDS, null)
@@ -194,8 +191,7 @@ internal class ApplicationSettingsStore(context: Context) {
             )
             .putString(KEY_DARK_MODE, settings.darkMode.name)
             .putString(KEY_LANGUAGE, settings.language.name)
-            .putBoolean(KEY_VIEWER_ROTATION_GESTURE, settings.viewerRotationGesture)
-            .putBoolean(KEY_VIEWER_ROTATION_SAVE, settings.viewerRotationSave)
+            .also { ViewerSettings.write(it, settings.viewer) }
             .putBoolean(KEY_SHOW_LOCATION, settings.showLocation)
             .putBoolean(KEY_EXTENDED_DETAILS, settings.extendedDetails)
             .putString(KEY_EXTENDED_DETAIL_FIELDS, ExtendedDetailsPolicy.encode(settings.extendedDetailFields))
@@ -206,12 +202,8 @@ internal class ApplicationSettingsStore(context: Context) {
     }
 
     /** Viewer gestures do not change appearance, so they skip the revision that recreates open activities. */
-    fun saveViewerRotationGesture(enabled: Boolean) {
-        preferences.edit().putBoolean(KEY_VIEWER_ROTATION_GESTURE, enabled).apply()
-    }
-
-    fun saveViewerRotationSave(enabled: Boolean) {
-        preferences.edit().putBoolean(KEY_VIEWER_ROTATION_SAVE, enabled).apply()
+    fun saveViewer(viewer: ViewerSettings) {
+        ViewerSettings.write(preferences.edit(), viewer).apply()
     }
 
     fun saveShowLocation(enabled: Boolean) {
@@ -243,8 +235,6 @@ internal class ApplicationSettingsStore(context: Context) {
         const val KEY_CUSTOM_THEME_COLOR = "custom-theme-color"
         const val KEY_DARK_MODE = "dark-mode"
         const val KEY_LANGUAGE = "language"
-        const val KEY_VIEWER_ROTATION_GESTURE = "viewer-rotation-gesture"
-        const val KEY_VIEWER_ROTATION_SAVE = "viewer-rotation-save"
         const val KEY_SHOW_LOCATION = "show-location"
         const val KEY_EXTENDED_DETAILS = "extended-details"
         const val KEY_EXTENDED_DETAIL_FIELDS = "extended-detail-fields"

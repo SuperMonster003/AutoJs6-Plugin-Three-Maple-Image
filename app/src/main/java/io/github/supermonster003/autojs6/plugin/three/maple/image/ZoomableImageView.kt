@@ -12,8 +12,8 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
+import android.view.ViewConfiguration
 import androidx.appcompat.widget.AppCompatImageView
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageZoomState.MAX_ZOOM
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageZoomState.MIN_ZOOM
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageZoomState.ZOOM_EPSILON
 import kotlin.math.abs
@@ -42,6 +42,35 @@ class ZoomableImageView @JvmOverloads constructor(
     /** Two-finger rotation (ROADMAP D8); when off, two fingers only pinch. */
     var rotationGestureEnabled: Boolean = true
 
+    // Optional gestures (ROADMAP 9.2); the defaults are the behavior from before they were settings.
+
+    /** Double tap, then drag up or down to zoom with one finger (the platform's quick scale). */
+    var oneFingerZoom: Boolean = true
+        set(value) {
+            field = value
+            scaleDetector.isQuickScaleEnabled = value
+        }
+
+    /** A tap near the left or right edge at 1x turns the page instead of toggling the bars. */
+    var edgeTapPaging: Boolean = false
+
+    /** A quick drag down at 1x calls [onSwipeDown]. */
+    var swipeDownToClose: Boolean = false
+
+    /** A vertical drag on the left third at 1x reports the brightness through [onBrightnessDrag]. */
+    var brightnessSwipe: Boolean = false
+
+    internal var doubleTapZoom: ViewerDoubleTapZoom = ViewerDoubleTapZoom.TWO_AND_HALF
+    internal var maxZoom: ViewerMaxZoom = ViewerMaxZoom.FIVE
+
+    /** The image's pixel size as shown (EXIF orientation applied), for "actual pixels"; the drawable's when unknown. */
+    internal var sourcePixelSize: ImagePixelSize? = null
+
+    var onSwipeDown: (() -> Unit)? = null
+
+    /** The drag since it started, down positive, in pixels of a view [height] tall; [finished] on the last call. */
+    var onBrightnessDrag: ((distanceY: Float, height: Int, finished: Boolean) -> Unit)? = null
+
     private val baseMatrix = Matrix()
     private val displayMatrix = Matrix()
     private val drawableRect = RectF()
@@ -67,6 +96,15 @@ class ZoomableImageView @JvmOverloads constructor(
     private var lastGestureAngle = 0f
     private var gestureRotationDegrees = 0f
     private var snapAnimator: ValueAnimator? = null
+    private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
+    private var downX = 0f
+    private var downY = 0f
+    private var brightnessCandidate = false
+    private var brightnessActive = false
+
+    // A double tap toggles the zoom when its second tap lifts, unless that tap dragged into a quick scale.
+    private var doubleTapPending = false
+    private var quickScaled = false
 
     private val scaleDetector = ScaleGestureDetector(
         context,
@@ -75,6 +113,7 @@ class ZoomableImageView @JvmOverloads constructor(
                 ensureBaseMatrix()
                 if (drawable == null) return false
                 gestureHadMultiplePointers = true
+                if (doubleTapPending) quickScaled = true
                 parent?.requestDisallowInterceptTouchEvent(true)
                 lastScaleFocusX = detector.focusX
                 lastScaleFocusY = detector.focusY
@@ -86,7 +125,7 @@ class ZoomableImageView @JvmOverloads constructor(
                 val reportedFactor = detector.scaleFactor
                 if (!reportedFactor.isFinite() || reportedFactor <= 0f) return false
 
-                val targetZoom = (zoom * reportedFactor).coerceIn(MIN_ZOOM, MAX_ZOOM)
+                val targetZoom = (zoom * reportedFactor).coerceIn(MIN_ZOOM, maximumZoom)
                 val appliedFactor = targetZoom / zoom
 
                 // A pinch can translate as well as scale. Track the centroid explicitly so the
@@ -129,12 +168,29 @@ class ZoomableImageView @JvmOverloads constructor(
             override fun onDown(event: MotionEvent): Boolean = true
 
             override fun onSingleTapConfirmed(event: MotionEvent): Boolean {
-                performClick()
+                val direction = if (edgeTapPaging && !isZoomedIn) ViewerGesturePolicy.edgeTapDirection(event.x, width) else null
+                if (direction != null) onPageSwipe?.invoke(direction) else performClick()
                 return true
             }
 
             override fun onDoubleTap(event: MotionEvent): Boolean {
-                return toggleDoubleTapZoom(event.x, event.y)
+                // Without quick scale nothing can follow the second tap, so it zooms right away.
+                if (!oneFingerZoom) return toggleDoubleTapZoom(event.x, event.y)
+                doubleTapPending = true
+                quickScaled = false
+                return true
+            }
+
+            override fun onDoubleTapEvent(event: MotionEvent): Boolean {
+                if (!doubleTapPending) return false
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_UP -> {
+                        doubleTapPending = false
+                        if (!quickScaled) toggleDoubleTapZoom(event.x, event.y)
+                    }
+                    MotionEvent.ACTION_CANCEL -> doubleTapPending = false
+                }
+                return true
             }
 
             override fun onFling(
@@ -144,11 +200,12 @@ class ZoomableImageView @JvmOverloads constructor(
                 velocityY: Float,
             ): Boolean {
                 down ?: return false
+                if (brightnessActive) return false
                 return routePageFling(
                     distanceX = up.x - down.x,
                     distanceY = up.y - down.y,
                     velocityX = velocityX,
-                )
+                ) || routeSwipeDown(up.x - down.x, up.y - down.y, velocityY)
             }
         },
     )
@@ -156,6 +213,21 @@ class ZoomableImageView @JvmOverloads constructor(
     init {
         isClickable = true
         scaleType = ScaleType.MATRIX
+        scaleDetector.isQuickScaleEnabled = oneFingerZoom
+    }
+
+    /** The largest zoom for the current image and settings. */
+    internal val maximumZoom: Float
+        get() = ImageZoomState.maximumZoom(maxZoom, doubleTapZoom, actualPixelsZoom())
+
+    /** Where one image pixel covers one screen pixel, for the current fit and user rotation. */
+    internal fun actualPixelsZoom(): Float? {
+        val current = drawable ?: return null
+        if (current !== configuredDrawable || configuredWidth == 0) return null
+        val size = sourcePixelSize ?: ImagePixelSize(current.intrinsicWidth, current.intrinsicHeight)
+        val fitted = RectF(drawableRect).also(baseMatrix::mapRect)
+        val shownWidth = if (rotationQuarterTurns % 2 != 0) size.height else size.width
+        return ImageZoomState.actualPixelsZoom(shownWidth, fitted.width())
     }
 
     override fun onDraw(canvas: android.graphics.Canvas) {
@@ -193,6 +265,10 @@ class ZoomableImageView @JvmOverloads constructor(
             activePointerId = event.getPointerId(0)
             lastTouchX = event.x
             lastTouchY = event.y
+            downX = event.x
+            downY = event.y
+            brightnessCandidate = brightnessSwipe && !isZoomedIn && ViewerGesturePolicy.inBrightnessZone(event.x, width)
+            brightnessActive = false
             edgeOverflowX = 0f
             // At 1x a horizontal drag belongs to the pager around this view; zoomed in, the image pans itself.
             parent?.requestDisallowInterceptTouchEvent(isZoomedIn)
@@ -203,6 +279,8 @@ class ZoomableImageView @JvmOverloads constructor(
         ) {
             gestureHadMultiplePointers = true
         }
+
+        if (trackBrightnessDrag(event)) return true
 
         scaleDetector.onTouchEvent(event)
         gestureDetector.onTouchEvent(event)
@@ -325,7 +403,7 @@ class ZoomableImageView @JvmOverloads constructor(
         ensureBaseMatrix()
         if (drawable == null) return false
 
-        val targetZoom = ImageZoomState.doubleTapTarget(zoom)
+        val targetZoom = ImageZoomState.doubleTapTarget(zoom, doubleTapZoom, actualPixelsZoom(), maximumZoom)
         if (targetZoom == MIN_ZOOM) {
             resetToCurrentFit()
             onZoomInteraction?.invoke(zoom, false)
@@ -382,6 +460,53 @@ class ZoomableImageView @JvmOverloads constructor(
 
     private val isZoomedIn: Boolean
         get() = zoom > MIN_ZOOM + ZOOM_EPSILON
+
+    internal fun routeSwipeDown(distanceX: Float, distanceY: Float, velocityY: Float): Boolean {
+        if (!swipeDownToClose || isZoomedIn || gestureHadMultiplePointers) return false
+        if (!ViewerGesturePolicy.isSwipeDown(distanceX, distanceY, velocityY, swipeDistanceThreshold, swipeVelocityThreshold)) return false
+        onSwipeDown?.invoke()
+        return true
+    }
+
+    /**
+     * The brightness drag (ROADMAP 9.2): once a single finger on the left third moved mostly up or down, the drag
+     * is reported and kept from the tap, zoom and page gestures; a second finger ends it. True while it owns the event.
+     */
+    private fun trackBrightnessDrag(event: MotionEvent): Boolean {
+        if (!brightnessCandidate) return false
+        if (event.pointerCount > 1) {
+            if (brightnessActive) onBrightnessDrag?.invoke(event.y - downY, height, true)
+            brightnessCandidate = false
+            brightnessActive = false
+            return false
+        }
+        when (event.actionMasked) {
+            MotionEvent.ACTION_MOVE -> {
+                if (!brightnessActive && ViewerGesturePolicy.isVerticalDrag(event.x - downX, event.y - downY, touchSlop)) {
+                    brightnessActive = true
+                    parent?.requestDisallowInterceptTouchEvent(true)
+                    // The detectors saw the down; a cancel keeps them from taking the drag as a tap or fling.
+                    val cancel = MotionEvent.obtain(event).apply { action = MotionEvent.ACTION_CANCEL }
+                    scaleDetector.onTouchEvent(cancel)
+                    gestureDetector.onTouchEvent(cancel)
+                    cancel.recycle()
+                }
+                if (brightnessActive) onBrightnessDrag?.invoke(event.y - downY, height, false)
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                val wasActive = brightnessActive
+                if (wasActive) onBrightnessDrag?.invoke(event.y - downY, height, true)
+                brightnessCandidate = false
+                brightnessActive = false
+                if (wasActive) {
+                    activePointerId = MotionEvent.INVALID_POINTER_ID
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                }
+                return wasActive
+            }
+        }
+        return brightnessActive
+    }
 
     // region Two-finger rotation (ROADMAP D8)
 

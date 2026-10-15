@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import android.print.PrintAttributes
 import android.print.PrintManager
+import android.provider.Settings
 import android.text.format.Formatter
 import android.view.WindowManager
 import android.widget.Toast
@@ -49,6 +50,7 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.Vie
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -94,11 +96,14 @@ class ImageViewerActivity : ConfiguredActivity() {
     private var restoredExpandedDetailsIndex = -1
     private var uiState by mutableStateOf(ViewerUiState())
     private var editBusy = false
-    private var rotationGestureEnabled = true
+    /** Gestures (ROADMAP D8 / 8.2 / 9.2), applied to every page view and refreshed on resume. */
+    private var viewerSettings = ViewerSettings()
+
+    /** The window brightness when a brightness drag started (ROADMAP 9.2); null between drags. */
+    private var brightnessDragStart: Float? = null
     private var rotationHintDismissed = false
     private var hostTrashBusy = false
     private val hostTrashedTargetIds = linkedSetOf<String>()
-    private var rotationSaveEnabled = true
 
     /** "Show location" (ROADMAP 9.1, T14): the details show the position and offer a map. */
     private var showLocation = false
@@ -158,8 +163,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         )
         readRestoredState(savedInstanceState)
         ApplicationSettingsStore(this).load().let { settings ->
-            rotationGestureEnabled = settings.viewerRotationGesture
-            rotationSaveEnabled = settings.viewerRotationSave
+            viewerSettings = settings.viewer
             showLocation = settings.showLocation
             extendedDetails = settings.extendedDetails
             extendedDetailFields = settings.extendedDetailFields
@@ -308,10 +312,10 @@ class ImageViewerActivity : ConfiguredActivity() {
     override fun onResume() {
         super.onResume()
         val settings = ApplicationSettingsStore(this).load()
-        val enabled = settings.viewerRotationGesture
-        if (enabled != rotationGestureEnabled) {
-            rotationGestureEnabled = enabled
-            hosts.values.forEach { host -> host.view.rotationGestureEnabled = enabled }
+        if (settings.viewer != viewerSettings) {
+            viewerSettings = settings.viewer
+            hosts.values.forEach { host -> applyGestures(host.view) }
+            syncRotationHint()
         }
         val detailsChanged = settings.showLocation != showLocation ||
             settings.extendedDetails != extendedDetails ||
@@ -424,6 +428,9 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     @VisibleForTesting
     internal fun currentRotationGestureEnabledForTesting(): Boolean? = currentHost()?.view?.rotationGestureEnabled
+
+    @VisibleForTesting
+    internal val windowBrightnessForTesting: Float get() = window.attributes.screenBrightness
 
     @VisibleForTesting
     internal fun toggleAnimationForTesting() {
@@ -627,7 +634,9 @@ class ImageViewerActivity : ConfiguredActivity() {
                 }
             }
             onPageSwipe = ::flipPage
-            rotationGestureEnabled = this@ImageViewerActivity.rotationGestureEnabled
+            onSwipeDown = { if (index == currentIndex) finish() }
+            onBrightnessDrag = { distanceY, height, finished -> if (index == currentIndex) dragBrightness(distanceY, height, finished) }
+            applyGestures(this)
         }
         val host = ViewerPageHost(index, page, view) { playback ->
             if (index == currentIndex) uiState = uiState.copy(animation = playback)
@@ -642,6 +651,35 @@ class ImageViewerActivity : ConfiguredActivity() {
             }
         }
         return host
+    }
+
+    private fun ImageMetadata.pixelSize(): ImagePixelSize? =
+        if (width != null && height != null && width > 0 && height > 0) ImagePixelSize(width, height) else null
+
+    private fun applyGestures(view: ZoomableImageView) {
+        view.rotationGestureEnabled = viewerSettings.rotationGesture
+        view.oneFingerZoom = viewerSettings.oneFingerZoom
+        view.edgeTapPaging = viewerSettings.edgeTapPaging
+        view.swipeDownToClose = viewerSettings.swipeDownToClose
+        view.brightnessSwipe = viewerSettings.brightnessSwipe
+        view.doubleTapZoom = viewerSettings.doubleTapZoom
+        view.maxZoom = viewerSettings.maxZoom
+    }
+
+    /** Up brightens, down dims, for this window only; the badge shows the level while dragging. */
+    private fun dragBrightness(distanceY: Float, height: Int, finished: Boolean) {
+        val start = brightnessDragStart ?: currentBrightness().also { brightnessDragStart = it }
+        val level = ViewerGesturePolicy.brightness(start, distanceY, height)
+        window.attributes = window.attributes.apply { screenBrightness = level }
+        if (finished) brightnessDragStart = null
+        showTransientIndicator(getString(R.string.viewer_brightness_indicator, (level * 100).roundToInt()), gestureInProgress = !finished)
+    }
+
+    /** The window's own level, else the system's (0-255 on most devices) as the start of a drag. */
+    private fun currentBrightness(): Float {
+        window.attributes.screenBrightness.takeIf { it >= 0f }?.let { return it }
+        val system = runCatching { Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS) }.getOrNull()
+        return ((system?.toFloat() ?: DEFAULT_SYSTEM_BRIGHTNESS) / MAX_SYSTEM_BRIGHTNESS).coerceIn(ViewerGesturePolicy.MIN_BRIGHTNESS, 1f)
     }
 
     private fun releasePage(map: HashMap<Int, ViewerPageHost>, index: Int) {
@@ -894,7 +932,7 @@ class ImageViewerActivity : ConfiguredActivity() {
      */
     private fun rotationSavable(host: ViewerPageHost?): Boolean {
         val page = host?.page?.image ?: return false
-        if (!rotationSaveEnabled || !launchRequest.editable || RotationSave.kind(page.mimeType) == null) return false
+        if (!viewerSettings.rotationSave || !launchRequest.editable || RotationSave.kind(page.mimeType) == null) return false
         val key = page.targetUri.toString()
         rotationWritable[key]?.let { return it }
         if (rotationChecks.add(key)) {
@@ -1021,6 +1059,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             if (!isLive(host, generation)) return@launch
             host.metadata = metadata
             host.metadataRead = true
+            host.view.sourcePixelSize = metadata?.pixelSize()
             syncIfCurrent(host)
             if (metadata != null && shouldTile(page, metadata, limits)) {
                 installTiledOrDefer(host, generation, metadata, limits)
@@ -1041,6 +1080,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             if (!isLive(host, generation)) return@launch
             host.metadata = metadata
             host.metadataRead = true
+            host.view.sourcePixelSize = metadata?.pixelSize()
             syncIfCurrent(host)
             when {
                 metadata == null -> failHost(host)
@@ -1339,11 +1379,17 @@ class ImageViewerActivity : ConfiguredActivity() {
     // region Overlay state
 
     private fun showZoomIndicator(zoom: Float, gestureInProgress: Boolean) {
-        val formattedZoom = ImageZoomIndicatorFormatter.format(zoom, resources.configuration.locales[0])
+        val maximum = currentHost()?.view?.maximumZoom ?: ImageZoomState.MAX_ZOOM
+        val formattedZoom = ImageZoomIndicatorFormatter.format(zoom, resources.configuration.locales[0], maximum)
             ?: return hideZoomIndicator()
+        showTransientIndicator(getString(R.string.zoom_indicator, formattedZoom), gestureInProgress)
+    }
+
+    /** The zoom badge, also used for the brightness level; it fades a moment after the gesture ends. */
+    private fun showTransientIndicator(text: String, gestureInProgress: Boolean) {
         zoomIndicatorJob?.cancel()
         zoomIndicatorJob = null
-        uiState = uiState.copy(zoomIndicatorText = getString(R.string.zoom_indicator, formattedZoom))
+        uiState = uiState.copy(zoomIndicatorText = text)
         if (!gestureInProgress) {
             zoomIndicatorJob = scope.launch {
                 delay(ZOOM_INDICATOR_DURATION_MILLIS)
@@ -1548,6 +1594,8 @@ class ImageViewerActivity : ConfiguredActivity() {
     // endregion
 
     private companion object {
+        const val DEFAULT_SYSTEM_BRIGHTNESS = 128f
+        const val MAX_SYSTEM_BRIGHTNESS = 255f
         const val STATE_CURRENT_INDEX = "currentIndex"
         const val STATE_ANIMATION_INDEX = "animationIndex"
         const val STATE_ANIMATION_PAUSED = "animationPaused"
