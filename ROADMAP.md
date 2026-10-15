@@ -88,7 +88,7 @@
 | M3 | v3.1.0 + v3.1.1 + v3.1.2 | 管理操作: 3.1.0 = 多选, 删除与回收站, 重命名/移动/复制, 收藏; 3.1.1 = 排除/置顶/隐藏, 相册网格多选, 搜索, 排序与分组; 3.1.2 = 批量输出; 宿主 v24 入口删除 | 已发布 v3.1.0 / v3.1.1 / v3.1.2 (2026-10-14, versionCode 126 / 147 / 152) |
 | M4 | v3.2.0 | 编辑与输出: 编辑器重做与五项扩展, 覆盖保存与撤销, 手势旋转保存, 转换器重做, 协议升级 | 已发布 v3.2.0 (2026-10-15, tag `90800e3`, versionCode 173) |
 | M5 | v3.3.0 | 查看器与设置全集: 幻灯片, 壁纸/分享副本, GPS 与地图, 手势与显示选项, 扩展详情, 平板/横屏, 无障碍与性能 | 已发布 v3.3.0 (2026-10-15, tag `12c9fe8`, versionCode 193) |
-| M6 | v3.4.0 | 脚本 API `gallery`: 宿主契约, 插件服务, augment, 四仓库文档 | 未开始 |
+| M6 | v3.4.0 | 脚本 API `gallery`: 宿主契约, 插件服务, augment, 四仓库文档 | 已发布 v3.4.0 (2026-10-15, tag `c8e7e9c`, versionCode 198); 宿主侧为本地提交, 待维护者推送 |
 
 依赖顺序:
 
@@ -222,7 +222,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 - [x] (插件) 媒体网格多选 (3.1.0): 长按进入, 点按切换, 长按后拖动范围选择 (边缘自动滚动), 全选 / 反选 (覆盖未加载的分页), 顶栏计数, 底部操作栏 (分享 / 收藏 / 移动 / 删除 / 更多: 复制 / 重命名 (单选) / 详情). 验收: `MediaGridSelectionTest` (长按, 点按, 拖动范围, 返回退出) 与 `MediaSelectionTest` JVM; `GallerySelectionInstrumentationTest` 重建 Activity 后选择保留 (API 35 OnePlus 通过); 1000 项全选 (`-e selectionLoad true`, 预算 2 s, 从点按到界面空闲) 在 AVD API 33 首测 2.0-4.1 s 不达标: 选择状态 35-61 ms 即就绪, 时间耗在选中缩进动画每帧重组全部可见格子; 缩进改为绘制阶段的图层缩放后 237-365 ms (装包后首轮 1437 ms). 提交 8d07aa0, 性能修正 a552c8b.
 - [x] (插件) 相册网格多选 (3.1.1): 长按媒体库相册进入, 点按切换, 全选, 返回 / 关闭退出; 底栏 置顶 (全部已置顶时取消置顶) / 排除 (带撤销) / 隐藏 / 删除 (确认后整册进回收站, 带撤销) / 重命名 (单选). 验收: `AlbumSelectionInstrumentationTest` (长按 / 点按 / 重建后保留 / 置顶与取消 / 排除与撤销 / 删除) 在 API 30 模拟器与 22120RN86C (API 33) 通过; 重命名见 `AlbumRenameInstrumentationTest` (文件夹整体改名: G8441 API 28, API 30 与 API 33 开启所有文件访问时; 只移动图片: API 30 / API 33 未开启时; 同名拒绝). 提交 0300d2d, cb47898.
-- [ ] (插件) 批量转换入口: 随 3.1.2 (7.6).
+- [x] (插件) 批量转换入口: 随 3.1.2 (7.6). 已随 3.1.2 完成, 见 7.6.
 - [x] (插件) `MediaWriteCoordinator` (3.1.0): Android 11+ `createTrashRequest` / `createDeleteRequest` / `createWriteRequest` / `createFavoriteRequest` 的 `IntentSender` 往返 (整批一次确认, 授予媒体管理时系统静默批准), 本应用创建的图片与所有文件访问下直接写 (被拒的行回落到一次请求); Android 7-10 走 `java.io.File` 并等待媒体扫描, 首次写入申请存储写入权限 ("不再询问" 时提示并跳设置). 移动 / 复制带进度与取消. 验收: `MediaWriteCoordinatorInstrumentationTest` 9 例在 API 28 (G8441), API 29 AVD, API 30 AVD, API 33 (Redmi 22120RN86C), API 35 (OnePlus OPD2413) 全部通过. 提交 4ca1156, 290eb05.
 
 ### 7.2 删除与回收站
@@ -364,7 +364,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 10.3 文档与声明
 
-- [x] (文档) `AutoJs6-Documentation/api/gallery.md` (+ 类型页), `AutoJs6-TypeScript-Declarations/aj6-int-gallery.d.ts`, Ace Editor 声明再生成 (`:app:generateAutoJs6LspDeclarations`), Offline Docs 同步 (10 种语言 changelog `improvement` + `generate_markdown.py`); 宿主与四仓库版本按 AGENTS 规则递增. 验收: 文档校验器 (`normalize-markdown.py` 等) 通过. 完成 (2026-10-15): 文档 `gallery.md` 与 `galleryViewSessionType.md` (e3e6ffe, 计数 113 = 039ce17, 已推送), 离线文档同步并通过 `--verify-offline` (937e6a7, 已推送); 声明 4.39.0 (0a9da06, 含 smoke 夹具用例, 覆盖校验通过); Ace Editor 2.1.0 (663a806, 经宿主 `generate-editor-assets.mjs` 导入与再生成并校验) 与宿主补全源索引 (5e566a076). 声明与 Ace 两仓库按其惯例只提交不推送.
+- [x] (文档) `AutoJs6-Documentation/api/gallery.md` (+ 类型页), `AutoJs6-TypeScript-Declarations/aj6-int-gallery.d.ts`, Ace Editor 声明再生成 (`:app:generateAutoJs6LspDeclarations`), Offline Docs 同步 (10 种语言 changelog `improvement` + `generate_markdown.py`); 宿主与四仓库版本按 AGENTS 规则递增. 验收: 文档校验器 (`normalize-markdown.py` 等) 通过. 完成 (2026-10-15): 文档 `gallery.md` 与 `galleryViewSessionType.md` (e3e6ffe, 计数 113 = 039ce17, 已推送), 离线文档同步并通过 `--verify-offline` (937e6a7, 已推送); 声明 4.39.0 (0a9da06, 含 smoke 夹具用例, 覆盖校验通过); Ace Editor 2.1.0 (663a806, 经宿主 `generate-editor-assets.mjs` 导入与再生成并校验) 与宿主补全源索引 (5e566a076). 声明与 Ace 两仓库于 2026-10-15 经维护者同意推送 (d.ts `0a9da06`, Ace `663a806`).
 - [~] (索引) 索引清单 `capabilities` 增加 `gallery` 协议版本. 进度 (2026-10-15): 插件在 gallery 服务上声明元数据 `org.autojs.plugin.gallery.CONTRACT_VERSION` (1) 与 `org.autojs.plugin.gallery.REQUIRES_HOST_VERSION` (5439), 不绑定即可读取. 索引生成器的契约字段按插件包而不是按引擎记录 (只有一组 `protocolApiMin` / `protocolApiMax`), 宿主插件中心也不读取 gallery 契约 (契约在绑定时校验, 不兼容时 `PLUGIN_INCOMPATIBLE`), 所以生成器读出这项元数据留待有使用方时再做; 3.4.0 的索引条目照旧记录 `requiresHostVersion` 5352 (文件管理器动作).
 
 ### 10.4 发布
