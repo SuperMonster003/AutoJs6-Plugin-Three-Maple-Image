@@ -74,8 +74,10 @@ jobs:
           arch: x86_64
           profile: pixel_7
           disable-animations: true
-          # The screen must stay lit and unlocked: system confirmations need it, and Glide pauses for a stopped activity.
+          # The screen must stay lit, unlocked and free of other apps' ANR dialogs (the launcher's covered the system
+          # confirmations here): system confirmations need it, and Glide pauses for a stopped activity.
           script: |
+            adb shell settings put global hide_error_dialogs 1
             adb shell svc power stayon true
             adb shell settings put system screen_off_timeout 2147483647
             adb shell wm dismiss-keyguard

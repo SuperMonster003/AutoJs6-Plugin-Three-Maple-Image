@@ -6,8 +6,9 @@ import androidx.test.uiautomator.UiDevice
 import java.util.regex.Pattern
 
 /**
- * The screen for tests that need it visible: a system confirmation only shows on a lit, unlocked screen, and Glide
- * pauses its requests while the activity is stopped. A CI emulator may turn its screen off part way through the run.
+ * The screen for tests that need it visible: a system confirmation only shows on a lit, unlocked screen free of other
+ * apps' "isn't responding" dialogs, and Glide pauses its requests while the activity is stopped. A CI emulator may
+ * turn its screen off part way through the run, and its launcher sometimes stops responding.
  */
 internal object TestScreen {
 
@@ -15,7 +16,14 @@ internal object TestScreen {
 
     fun awake() {
         device.wakeUp()
-        InstrumentationRegistry.getInstrumentation().uiAutomation.executeShellCommand("wm dismiss-keyguard").close()
+        shell("wm dismiss-keyguard")
+        // Later ANRs of other apps stay silent; one already on screen is answered with "Wait".
+        shell("settings put global hide_error_dialogs 1")
+        device.findObject(By.res("android", "aerr_wait"))?.click()
+    }
+
+    private fun shell(command: String) {
+        InstrumentationRegistry.getInstrumentation().uiAutomation.executeShellCommand(command).close()
     }
 
     /** What the screen shows, for the message of a failed wait: the foreground package and some visible texts. */
