@@ -28,6 +28,7 @@
     <string name="action_resume_animation">アニメーションを再開</string>
     <string name="action_rotate_clockwise">右へ90°回転</string>
     <string name="action_search">検索</string>
+    <string name="action_set_wallpaper">壁紙に設定</string>
     <string name="action_share">共有</string>
     <string name="action_share_copy">コピーを共有</string>
     <string name="action_show_image_details">詳細を表示</string>
@@ -94,6 +95,7 @@
     <string name="error_no_editor_app">画像を編集できる他のアプリがありません</string>
     <string name="error_no_external_viewer">ほかの画像ビューアーを利用できません</string>
     <string name="error_no_map_app">地図を開けるアプリがありません</string>
+    <string name="error_no_wallpaper_app">壁紙を設定できる他のアプリがありません</string>
     <string name="error_print_failed">印刷ドキュメントを作成できませんでした</string>
     <string name="excluded_folders_empty">除外したフォルダーはありません</string>
     <string name="excluded_folders_empty_body">アルバム一覧でアルバムを長押しして 除外 を選びます.</string>
@@ -487,5 +489,12 @@
     <string name="viewer_rotation_saved">回転を保存しました</string>
     <string name="viewer_rotation_too_large">この画像は大きすぎて, この端末では回転を保存できません</string>
     <string name="viewer_thumbnail_description">%2$d ページ中 %1$d ページ目</string>
+    <string name="wallpaper_crop_hint">枠は画面と同じ比率です. 枠や角をドラッグして, 壁紙に表示する部分を選びます</string>
+    <string name="wallpaper_done">壁紙を設定しました</string>
+    <string name="wallpaper_failed">壁紙を設定できませんでした</string>
+    <string name="wallpaper_set_with">別のアプリで設定</string>
+    <string name="wallpaper_target_both">両方</string>
+    <string name="wallpaper_target_home">ホーム画面</string>
+    <string name="wallpaper_target_lock">ロック画面</string>
     <string name="zoom_indicator">%1$s倍</string>
 </resources>

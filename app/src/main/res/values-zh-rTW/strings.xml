@@ -28,6 +28,7 @@
     <string name="action_resume_animation">繼續播放</string>
     <string name="action_rotate_clockwise">順時針旋轉 90 度</string>
     <string name="action_search">搜尋</string>
+    <string name="action_set_wallpaper">設為桌布</string>
     <string name="action_share">分享</string>
     <string name="action_share_copy">分享副本</string>
     <string name="action_show_image_details">顯示詳細資訊</string>
@@ -94,6 +95,7 @@
     <string name="error_no_editor_app">沒有可以編輯圖片的其他應用程式</string>
     <string name="error_no_external_viewer">沒有可用的其他圖片檢視器</string>
     <string name="error_no_map_app">沒有可以開啟地圖的應用程式</string>
+    <string name="error_no_wallpaper_app">沒有可以設定桌布的其他應用程式</string>
     <string name="error_print_failed">無法建立列印文件</string>
     <string name="excluded_folders_empty">沒有排除的資料夾</string>
     <string name="excluded_folders_empty_body">在相簿清單中長按相簿, 選擇 排除 即可.</string>
@@ -487,5 +489,12 @@
     <string name="viewer_rotation_saved">已儲存旋轉</string>
     <string name="viewer_rotation_too_large">圖片太大, 無法在此裝置上儲存旋轉</string>
     <string name="viewer_thumbnail_description">第 %1$d 頁, 共 %2$d 頁</string>
+    <string name="wallpaper_crop_hint">裁剪框與畫面同比例, 拖曳裁剪框或邊角, 選出桌布顯示的部分</string>
+    <string name="wallpaper_done">桌布已設定</string>
+    <string name="wallpaper_failed">無法設定桌布</string>
+    <string name="wallpaper_set_with">用其他應用程式設定</string>
+    <string name="wallpaper_target_both">兩者</string>
+    <string name="wallpaper_target_home">主畫面</string>
+    <string name="wallpaper_target_lock">鎖定畫面</string>
     <string name="zoom_indicator">%1$s 倍</string>
 </resources>

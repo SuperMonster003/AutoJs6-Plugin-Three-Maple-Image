@@ -28,6 +28,7 @@
     <string name="action_resume_animation">متابعة الحركة</string>
     <string name="action_rotate_clockwise">تدوير 90° باتجاه عقارب الساعة</string>
     <string name="action_search">بحث</string>
+    <string name="action_set_wallpaper">تعيين كخلفية</string>
     <string name="action_share">مشاركة</string>
     <string name="action_share_copy">مشاركة نسخة</string>
     <string name="action_show_image_details">عرض التفاصيل</string>
@@ -94,6 +95,7 @@
     <string name="error_no_editor_app">لا يوجد تطبيق آخر يمكنه تحرير الصور</string>
     <string name="error_no_external_viewer">لا يتوفر عارض صور اخر</string>
     <string name="error_no_map_app">لا يوجد تطبيق يمكنه فتح الخريطة</string>
+    <string name="error_no_wallpaper_app">لا يوجد تطبيق آخر يمكنه تعيين الخلفية</string>
     <string name="error_print_failed">تعذر إنشاء مستند الطباعة</string>
     <string name="excluded_folders_empty">لا توجد مجلدات مستبعدة</string>
     <string name="excluded_folders_empty_body">اضغط مطولا على ألبوم في قائمة الألبومات واختر استبعاد.</string>
@@ -487,5 +489,12 @@
     <string name="viewer_rotation_saved">تم حفظ التدوير</string>
     <string name="viewer_rotation_too_large">هذه الصورة أكبر من أن يُحفظ تدويرها على هذا الجهاز</string>
     <string name="viewer_thumbnail_description">الصفحة %1$d من %2$d</string>
+    <string name="wallpaper_crop_hint">للإطار شكل الشاشة, اسحبه أو اسحب حوافه لاختيار ما تعرضه الخلفية</string>
+    <string name="wallpaper_done">تم تعيين الخلفية</string>
+    <string name="wallpaper_failed">تعذر تعيين الخلفية</string>
+    <string name="wallpaper_set_with">التعيين بتطبيق آخر</string>
+    <string name="wallpaper_target_both">كلاهما</string>
+    <string name="wallpaper_target_home">الشاشة الرئيسية</string>
+    <string name="wallpaper_target_lock">شاشة القفل</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

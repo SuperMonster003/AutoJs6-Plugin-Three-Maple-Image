@@ -171,6 +171,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             onSlideshow = ::openSlideshowDialog,
             onShareCopy = ::openShareCopyDialog,
             onEditWith = ::editWithAnotherApp,
+            onSetWallpaper = ::setAsWallpaper,
             onResumeSlideshow = ::resumeSlideshow,
             onStopSlideshow = ::stopSlideshow,
             onReleaseHistory = ::showReleaseHistory,
@@ -1449,6 +1450,19 @@ class ImageViewerActivity : ConfiguredActivity() {
             putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(ownEntry))
         }
         startSafely(chooser)
+    }
+
+    /** Crops to the screen and sets the wallpaper (ROADMAP 9.1); where that is not allowed, another app is offered. */
+    private fun setAsWallpaper() {
+        val page = currentShareablePage() ?: return
+        if (Wallpapers.available(this)) {
+            startSafely(WallpaperActivity.intent(this, page))
+            return
+        }
+        val chooser = Wallpapers.attachDataIntent(page.targetUri, page.mimeType, page.displayName, getString(R.string.wallpaper_set_with))
+        runCatching { startActivity(chooser) }.onFailure {
+            Toast.makeText(this, R.string.error_no_wallpaper_app, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun currentShareablePage(): ImageViewerRequest? {

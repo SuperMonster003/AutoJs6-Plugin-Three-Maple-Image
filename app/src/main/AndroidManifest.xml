@@ -3,6 +3,7 @@
     <uses-permission android:name="org.autojs.permission.PLUGIN" />
     <!-- Photo access for the standalone gallery only (ROADMAP D1 / T5); host entries and ACTION_VIEW never request it. -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
@@ -54,6 +55,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ImageViewerActivity" android:exported="false" android:theme="@style/AppTheme.Viewer" />
+        <activity android:name=".WallpaperActivity" android:exported="false" android:theme="@style/Theme.Standalone" />
         <service android:name=".ExplorerActionService" android:exported="true" android:permission="org.autojs.permission.PLUGIN">
             <meta-data android:name="requiresHostVersion" android:value="@string/plugin_requires_host_version" />
             <intent-filter>

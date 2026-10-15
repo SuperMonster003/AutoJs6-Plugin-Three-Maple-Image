@@ -28,6 +28,7 @@
     <string name="action_resume_animation">继续播放</string>
     <string name="action_rotate_clockwise">顺时针旋转 90 度</string>
     <string name="action_search">搜索</string>
+    <string name="action_set_wallpaper">设为壁纸</string>
     <string name="action_share">分享</string>
     <string name="action_share_copy">分享副本</string>
     <string name="action_show_image_details">显示详情</string>
@@ -94,6 +95,7 @@
     <string name="error_no_editor_app">没有可以编辑图片的其他应用</string>
     <string name="error_no_external_viewer">没有可用的其他图像查看器</string>
     <string name="error_no_map_app">没有可以打开地图的应用</string>
+    <string name="error_no_wallpaper_app">没有可以设置壁纸的其他应用</string>
     <string name="error_print_failed">无法创建打印文档</string>
     <string name="excluded_folders_empty">没有排除的文件夹</string>
     <string name="excluded_folders_empty_body">在相册列表中长按相册, 选择 排除 即可.</string>
@@ -487,5 +489,12 @@
     <string name="viewer_rotation_saved">已保存旋转</string>
     <string name="viewer_rotation_too_large">图片太大, 无法在此设备上保存旋转</string>
     <string name="viewer_thumbnail_description">第 %1$d 页, 共 %2$d 页</string>
+    <string name="wallpaper_crop_hint">裁剪框与屏幕同比例, 拖动裁剪框或边角, 选出壁纸显示的部分</string>
+    <string name="wallpaper_done">壁纸已设置</string>
+    <string name="wallpaper_failed">无法设置壁纸</string>
+    <string name="wallpaper_set_with">用其他应用设置</string>
+    <string name="wallpaper_target_both">两者</string>
+    <string name="wallpaper_target_home">主屏幕</string>
+    <string name="wallpaper_target_lock">锁定屏幕</string>
     <string name="zoom_indicator">%1$s 倍</string>
 </resources>

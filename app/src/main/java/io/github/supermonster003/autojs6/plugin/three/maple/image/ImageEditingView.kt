@@ -40,6 +40,8 @@ internal class ImageEditingView @JvmOverloads constructor(
         data class Crop(
             val selection: RectF,
             val aspectRatioPreset: CropAspectRatioPreset,
+            /** A ratio that is not a preset (the screen's, for a wallpaper); it wins over [aspectRatioPreset]. */
+            val fixedAspectRatio: Float? = null,
         ) : CanvasState
         data class Brush(
             val tool: BrushTool,
@@ -101,6 +103,7 @@ internal class ImageEditingView @JvmOverloads constructor(
     private var rotationPreviewDegrees = 0f
     private var cropHandle: CropResizeHandle? = null
     private var cropAspectRatioPreset = CropAspectRatioPreset.FREE
+    private var cropFixedAspectRatio: Float? = null
     private var touchStartX = 0f
     private var touchStartY = 0f
     private var brushTool = BrushTool.PEN
@@ -252,10 +255,23 @@ internal class ImageEditingView @JvmOverloads constructor(
         invalidate()
     }
 
+    /** Starts a crop locked to [aspectRatio] (width / height), which is not one of the presets (ROADMAP 9.1 wallpaper). */
+    fun beginCrop(aspectRatio: Float) {
+        require(aspectRatio.isFinite() && aspectRatio > 0f) { "Crop aspect ratio must be positive" }
+        val source = bitmap ?: return
+        clearToolState()
+        mode = Mode.CROP
+        cropRect.set(0f, 0f, source.width.toFloat(), source.height.toFloat())
+        cropFixedAspectRatio = aspectRatio
+        applyCropAspectRatio(source)
+        invalidate()
+    }
+
     fun updateCropAspectRatio(aspectRatioPreset: CropAspectRatioPreset) {
         val source = bitmap ?: return
-        if (mode != Mode.CROP || cropAspectRatioPreset == aspectRatioPreset) return
+        if (mode != Mode.CROP || (cropFixedAspectRatio == null && cropAspectRatioPreset == aspectRatioPreset)) return
         cropAspectRatioPreset = aspectRatioPreset
+        cropFixedAspectRatio = null
         cropHandle = null
         applyCropAspectRatio(source)
         invalidate()
@@ -355,7 +371,7 @@ internal class ImageEditingView @JvmOverloads constructor(
     fun captureCanvasState(): CanvasState = when (mode) {
         Mode.NORMAL -> CanvasState.Normal
         Mode.ROTATION -> CanvasState.Rotation(rotationPreviewDegrees)
-        Mode.CROP -> CanvasState.Crop(RectF(cropRect), cropAspectRatioPreset)
+        Mode.CROP -> CanvasState.Crop(RectF(cropRect), cropAspectRatioPreset, cropFixedAspectRatio)
         Mode.BRUSH -> CanvasState.Brush(
             brushTool,
             brushColor,
@@ -379,6 +395,7 @@ internal class ImageEditingView @JvmOverloads constructor(
                 mode = Mode.CROP
                 cropRect.set(state.selection)
                 cropAspectRatioPreset = state.aspectRatioPreset
+                cropFixedAspectRatio = state.fixedAspectRatio
             }
             is CanvasState.Brush -> {
                 mode = Mode.BRUSH
@@ -418,6 +435,7 @@ internal class ImageEditingView @JvmOverloads constructor(
         rotationPreviewDegrees = 0f
         cropHandle = null
         cropAspectRatioPreset = CropAspectRatioPreset.FREE
+        cropFixedAspectRatio = null
         brushTool = BrushTool.PEN
         brushColor = Color.RED
         brushWidthOnScreen = dp(8f)
@@ -688,8 +706,11 @@ internal class ImageEditingView @JvmOverloads constructor(
         return compareRect
     }
 
+    private fun cropAspectRatio(source: Bitmap): Float? =
+        cropFixedAspectRatio ?: cropAspectRatioPreset.aspectRatio(source.width, source.height)
+
     private fun applyCropAspectRatio(source: Bitmap) {
-        val aspectRatio = cropAspectRatioPreset.aspectRatio(source.width, source.height) ?: return
+        val aspectRatio = cropAspectRatio(source) ?: return
         cropRect.set(
             CropSelectionGeometry.fitAspectRatio(
                 selection = cropRect.toCropSelection(),
@@ -944,7 +965,7 @@ internal class ImageEditingView @JvmOverloads constructor(
         val source = bitmap ?: return
         val desiredMinSize = max(MIN_CROP_BITMAP_SIZE, dp(MIN_CROP_SCREEN_SIZE_DP) / imageScale)
         val handle = cropHandle ?: return
-        val aspectRatio = cropAspectRatioPreset.aspectRatio(source.width, source.height)
+        val aspectRatio = cropAspectRatio(source)
         if (aspectRatio != null) {
             cropRect.set(
                 CropSelectionGeometry.resizeLocked(

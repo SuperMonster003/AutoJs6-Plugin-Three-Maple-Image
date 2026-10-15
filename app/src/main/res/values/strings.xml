@@ -28,6 +28,7 @@
     <string name="action_resume_animation">Resume animation</string>
     <string name="action_rotate_clockwise">Rotate 90° clockwise</string>
     <string name="action_search">Search</string>
+    <string name="action_set_wallpaper">Set as wallpaper</string>
     <string name="action_share">Share</string>
     <string name="action_share_copy">Share a copy</string>
     <string name="action_show_image_details">Show details</string>
@@ -94,6 +95,7 @@
     <string name="error_no_editor_app">No other app can edit images</string>
     <string name="error_no_external_viewer">No other image viewer is available</string>
     <string name="error_no_map_app">No app can open a map</string>
+    <string name="error_no_wallpaper_app">No other app can set the wallpaper</string>
     <string name="error_print_failed">The print document could not be created</string>
     <string name="excluded_folders_empty">No excluded folders</string>
     <string name="excluded_folders_empty_body">Long-press an album in the album list and choose Exclude.</string>
@@ -487,5 +489,12 @@
     <string name="viewer_rotation_saved">Rotation saved</string>
     <string name="viewer_rotation_too_large">This image is too large to save its rotation on this device</string>
     <string name="viewer_thumbnail_description">Page %1$d of %2$d</string>
+    <string name="wallpaper_crop_hint">The frame has the shape of the screen; drag it or its edges to choose what the wallpaper shows</string>
+    <string name="wallpaper_done">Wallpaper set</string>
+    <string name="wallpaper_failed">The wallpaper could not be set</string>
+    <string name="wallpaper_set_with">Set with another app</string>
+    <string name="wallpaper_target_both">Both</string>
+    <string name="wallpaper_target_home">Home screen</string>
+    <string name="wallpaper_target_lock">Lock screen</string>
     <string name="zoom_indicator">%1$sx</string>
 </resources>

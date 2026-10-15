@@ -28,6 +28,7 @@
     <string name="action_resume_animation">Reanudar animación</string>
     <string name="action_rotate_clockwise">Girar 90° a la derecha</string>
     <string name="action_search">Buscar</string>
+    <string name="action_set_wallpaper">Establecer como fondo de pantalla</string>
     <string name="action_share">Compartir</string>
     <string name="action_share_copy">Compartir una copia</string>
     <string name="action_show_image_details">Mostrar detalles</string>
@@ -94,6 +95,7 @@
     <string name="error_no_editor_app">Ninguna otra aplicación puede editar imágenes</string>
     <string name="error_no_external_viewer">No hay otro visor de imágenes disponible</string>
     <string name="error_no_map_app">Ninguna aplicación puede abrir un mapa</string>
+    <string name="error_no_wallpaper_app">Ninguna otra aplicación puede establecer el fondo de pantalla</string>
     <string name="error_print_failed">No se pudo crear el documento de impresión</string>
     <string name="excluded_folders_empty">No hay carpetas excluidas</string>
     <string name="excluded_folders_empty_body">Mantenga pulsado un álbum en la lista de álbumes y elija Excluir.</string>
@@ -487,5 +489,12 @@
     <string name="viewer_rotation_saved">Rotación guardada</string>
     <string name="viewer_rotation_too_large">Esta imagen es demasiado grande para guardar su rotación en este dispositivo</string>
     <string name="viewer_thumbnail_description">Página %1$d de %2$d</string>
+    <string name="wallpaper_crop_hint">El marco tiene la forma de la pantalla; arrástralo o arrastra sus bordes para elegir lo que muestra el fondo</string>
+    <string name="wallpaper_done">Fondo de pantalla establecido</string>
+    <string name="wallpaper_failed">No se pudo establecer el fondo de pantalla</string>
+    <string name="wallpaper_set_with">Establecer con otra aplicación</string>
+    <string name="wallpaper_target_both">Ambas</string>
+    <string name="wallpaper_target_home">Pantalla de inicio</string>
+    <string name="wallpaper_target_lock">Pantalla de bloqueo</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>

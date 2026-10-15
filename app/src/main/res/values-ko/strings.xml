@@ -28,6 +28,7 @@
     <string name="action_resume_animation">애니메이션 계속</string>
     <string name="action_rotate_clockwise">시계 방향으로 90° 회전</string>
     <string name="action_search">검색</string>
+    <string name="action_set_wallpaper">배경화면으로 설정</string>
     <string name="action_share">공유</string>
     <string name="action_share_copy">사본 공유</string>
     <string name="action_show_image_details">세부 정보 보기</string>
@@ -94,6 +95,7 @@
     <string name="error_no_editor_app">이미지를 편집할 수 있는 다른 앱이 없습니다</string>
     <string name="error_no_external_viewer">사용 가능한 다른 이미지 뷰어가 없습니다</string>
     <string name="error_no_map_app">지도를 열 수 있는 앱이 없습니다</string>
+    <string name="error_no_wallpaper_app">배경화면을 설정할 수 있는 다른 앱이 없습니다</string>
     <string name="error_print_failed">인쇄 문서를 만들 수 없습니다</string>
     <string name="excluded_folders_empty">제외한 폴더가 없습니다</string>
     <string name="excluded_folders_empty_body">앨범 목록에서 앨범을 길게 누르고 제외를 선택하세요.</string>
@@ -487,5 +489,12 @@
     <string name="viewer_rotation_saved">회전을 저장했습니다</string>
     <string name="viewer_rotation_too_large">이미지가 너무 커서 이 기기에서는 회전을 저장할 수 없습니다</string>
     <string name="viewer_thumbnail_description">%2$d페이지 중 %1$d페이지</string>
+    <string name="wallpaper_crop_hint">틀은 화면과 같은 비율입니다. 틀이나 모서리를 끌어 배경화면에 표시할 부분을 고르세요</string>
+    <string name="wallpaper_done">배경화면을 설정했습니다</string>
+    <string name="wallpaper_failed">배경화면을 설정할 수 없습니다</string>
+    <string name="wallpaper_set_with">다른 앱으로 설정</string>
+    <string name="wallpaper_target_both">둘 다</string>
+    <string name="wallpaper_target_home">홈 화면</string>
+    <string name="wallpaper_target_lock">잠금 화면</string>
     <string name="zoom_indicator">%1$s배</string>
 </resources>

@@ -121,6 +121,7 @@ internal class ViewerCallbacks(
     val onSlideshow: () -> Unit = {},
     val onShareCopy: () -> Unit = {},
     val onEditWith: () -> Unit = {},
+    val onSetWallpaper: () -> Unit = {},
     val onResumeSlideshow: () -> Unit = {},
     val onStopSlideshow: () -> Unit = {},
     val onReleaseHistory: () -> Unit,
@@ -560,6 +561,12 @@ private fun ViewerTopBar(state: ViewerUiState, callbacks: ViewerCallbacks) {
                     enabled = state.canForward,
                     onClick = { menuOpen = false; callbacks.onEditWith() },
                     modifier = Modifier.testTag("maple.viewer.menu.editWith"),
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_set_wallpaper)) },
+                    enabled = state.canForward,
+                    onClick = { menuOpen = false; callbacks.onSetWallpaper() },
+                    modifier = Modifier.testTag("maple.viewer.menu.wallpaper"),
                 )
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.action_slideshow)) },

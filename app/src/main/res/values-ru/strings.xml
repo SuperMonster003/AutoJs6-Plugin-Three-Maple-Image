@@ -28,6 +28,7 @@
     <string name="action_resume_animation">Продолжить анимацию</string>
     <string name="action_rotate_clockwise">Повернуть на 90° по часовой стрелке</string>
     <string name="action_search">Поиск</string>
+    <string name="action_set_wallpaper">Установить как обои</string>
     <string name="action_share">Отправить</string>
     <string name="action_share_copy">Поделиться копией</string>
     <string name="action_show_image_details">Показать сведения</string>
@@ -94,6 +95,7 @@
     <string name="error_no_editor_app">Нет другого приложения для редактирования изображений</string>
     <string name="error_no_external_viewer">Другого средства просмотра изображений нет</string>
     <string name="error_no_map_app">Нет приложения, которое может открыть карту</string>
+    <string name="error_no_wallpaper_app">Нет другого приложения для установки обоев</string>
     <string name="error_print_failed">Не удалось создать документ для печати</string>
     <string name="excluded_folders_empty">Нет исключённых папок</string>
     <string name="excluded_folders_empty_body">Нажмите и удерживайте альбом в списке альбомов и выберите Исключить.</string>
@@ -487,5 +489,12 @@
     <string name="viewer_rotation_saved">Поворот сохранён</string>
     <string name="viewer_rotation_too_large">Изображение слишком большое, чтобы сохранить поворот на этом устройстве</string>
     <string name="viewer_thumbnail_description">Страница %1$d из %2$d</string>
+    <string name="wallpaper_crop_hint">Рамка повторяет форму экрана; перетащите её или её края, чтобы выбрать, что покажут обои</string>
+    <string name="wallpaper_done">Обои установлены</string>
+    <string name="wallpaper_failed">Не удалось установить обои</string>
+    <string name="wallpaper_set_with">Установить в другом приложении</string>
+    <string name="wallpaper_target_both">Оба</string>
+    <string name="wallpaper_target_home">Главный экран</string>
+    <string name="wallpaper_target_lock">Экран блокировки</string>
     <string name="zoom_indicator">%1$s×</string>
 </resources>
