@@ -3,8 +3,8 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 import android.app.ActivityManager
 import android.content.ActivityNotFoundException
 import android.content.ClipData
-import android.content.ComponentName
 import android.content.ComponentCallbacks2
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -17,11 +17,15 @@ import android.os.ParcelFileDescriptor
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.text.format.Formatter
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.VisibleForTesting
+import androidx.compose.animation.core.Animatable as ComposeAnimatable
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -32,12 +36,15 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SlideshowDialog
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SlideshowDialogState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerCallbacks
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerManagement
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerPagerState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerPagerUi
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerUiState
+import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -46,7 +53,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 /**
  * Read-only image viewer. The launching intent resolves to a [ViewerSource] (ROADMAP 6.3): intent-borne page lists
@@ -92,6 +98,17 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     /** "Show location" (ROADMAP 9.1, T14): the details show the position and offer a map. */
     private var showLocation = false
+
+    // Slideshow (ROADMAP 9.1): the dialog draft, the running plan and the timer of the next slide.
+    private var slideshowDialog by mutableStateOf<SlideshowDialogState?>(null)
+    private var slideshowPlan: SlideshowPlan? = null
+    private var slideshowSettings: SlideshowSettings? = null
+    private var slideshowJob: Job? = null
+    private var slideshowNavigating = false
+    private val slideshowVeil = ComposeAnimatable(0f)
+    private val slideshowBack = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() = stopSlideshow()
+    }
     private var rotationSaveBusy = false
     private val rotationWritable = mutableMapOf<String, Boolean>()
     private val rotationChecks = mutableSetOf<String>()
@@ -145,6 +162,9 @@ class ImageViewerActivity : ConfiguredActivity() {
             onResetZoom = { hideZoomIndicator(); currentHost()?.view?.resetZoom(); syncRotationHint() },
             onPrint = ::printImage,
             onOpenMap = ::openMap,
+            onSlideshow = ::openSlideshowDialog,
+            onResumeSlideshow = ::resumeSlideshow,
+            onStopSlideshow = ::stopSlideshow,
             onReleaseHistory = ::showReleaseHistory,
             onToggleAnimation = { currentHost()?.animation?.toggle() },
             onPageChanged = ::onPagerPageChanged,
@@ -165,6 +185,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             exifText = getString(R.string.exif_unavailable),
             controlsVisible = savedInstanceState?.getBoolean(STATE_CONTROLS_VISIBLE, true) ?: true,
         )
+        onBackPressedDispatcher.addCallback(this, slideshowBack)
         setContent {
             MapleTheme(palette = appPalette) {
                 ViewerScreen(
@@ -173,8 +194,12 @@ class ImageViewerActivity : ConfiguredActivity() {
                     callbacks = callbacks,
                     // Every viewer shows it: an overwrite of an opened file offers its undo there too.
                     snackbarHostState = operations.snackbar,
+                    slideshowVeil = { slideshowVeil.value },
                 )
                 operations.Dialogs()
+                slideshowDialog?.let { draft ->
+                    SlideshowDialog(draft, onDismissRequest = { slideshowDialog = null }, onStart = { startSlideshow(draft.settings()) })
+                }
             }
         }
         if (launchRequest.source is ViewerSourceSpec.MediaAlbum || launchRequest.source is ViewerSourceSpec.Search) {
@@ -306,7 +331,14 @@ class ImageViewerActivity : ConfiguredActivity() {
         super.onSaveInstanceState(outState)
     }
 
+    override fun onPause() {
+        // Leaving the viewer holds a running show; it comes back paused with Resume and Stop.
+        pauseSlideshow()
+        super.onPause()
+    }
+
     override fun onDestroy() {
+        slideshowJob?.cancel()
         sourceJob?.cancel()
         pageJumpJob?.cancel()
         zoomIndicatorJob?.cancel()
@@ -560,7 +592,12 @@ class ImageViewerActivity : ConfiguredActivity() {
             id = R.id.image
             contentDescription = getString(R.string.image_content_description)
             setOnClickListener {
-                if (uiState.detailsExpanded) setExifDetailsExpanded(false) else setControlsVisible(!uiState.controlsVisible)
+                when {
+                    // A tap holds a running slideshow and brings the bars back with Resume and Stop.
+                    uiState.slideshowPlaying && !uiState.slideshowPaused -> pauseSlideshow()
+                    uiState.detailsExpanded -> setExifDetailsExpanded(false)
+                    else -> setControlsVisible(!uiState.controlsVisible)
+                }
             }
             onPageSwipe = ::flipPage
             rotationGestureEnabled = this@ImageViewerActivity.rotationGestureEnabled
@@ -590,6 +627,11 @@ class ImageViewerActivity : ConfiguredActivity() {
         if (jumpTarget >= 0 && index != jumpTarget) return
         if (index == jumpTarget) jumpTarget = -1
         onPageChanged(index)
+        // Swiped by hand during a show: it goes on from that page after a full interval.
+        if (!slideshowNavigating && uiState.slideshowPlaying && !uiState.slideshowPaused && slideshowPlan?.current != index) {
+            slideshowPlan?.moveTo(index)
+            scheduleSlide()
+        }
     }
 
     private fun onPageChanged(index: Int) {
@@ -628,22 +670,114 @@ class ImageViewerActivity : ConfiguredActivity() {
         jumpToPage(currentIndex + direction)
     }
 
-    private fun jumpToPage(index: Int) {
-        val source = source ?: return
-        val state = pagerState ?: return
+    private fun jumpToPage(index: Int, animate: Boolean = true): Job? {
+        val source = source ?: return null
+        val state = pagerState ?: return null
         val target = index.coerceIn(0, source.pages.size - 1)
-        if (target == currentIndex) return
+        if (target == currentIndex) return null
         pageJumpJob?.cancel()
         jumpTarget = target
         onPageChanged(target)
-        pageJumpJob = frameScope.launch {
+        return frameScope.launch {
             try {
-                state.animateScrollToPage(target)
+                if (animate) state.animateScrollToPage(target) else state.scrollToPage(target)
             } finally {
                 if (jumpTarget == target) jumpTarget = -1
             }
+        }.also { pageJumpJob = it }
+    }
+
+    // region Slideshow (ROADMAP 9.1)
+
+    private fun openSlideshowDialog() {
+        if ((source?.pages?.size ?: 0) < 2) return
+        slideshowDialog = SlideshowDialogState(SlideshowSettingsStore(this).load())
+    }
+
+    private fun startSlideshow(settings: SlideshowSettings) {
+        slideshowDialog = null
+        SlideshowSettingsStore(this).save(settings)
+        val current = source ?: return
+        val pages = current.pages
+        val plan = SlideshowPlan(
+            pageCount = pages.size,
+            start = currentIndex.coerceIn(0, pages.lastIndex),
+            eligible = { index -> settings.includeGifs || pages[index].image.mimeType != "image/gif" },
+            settings = settings,
+        )
+        if (!plan.hasNext) {
+            operations.message(getString(R.string.slideshow_nothing))
+            return
+        }
+        slideshowPlan = plan
+        slideshowSettings = settings
+        resumeSlideshow()
+    }
+
+    private fun resumeSlideshow() {
+        if (slideshowPlan == null) return
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        slideshowBack.isEnabled = true
+        uiState = uiState.copy(controlsVisible = false, detailsExpanded = false, slideshowPlaying = true, slideshowPaused = false)
+        scheduleSlide()
+    }
+
+    private fun scheduleSlide() {
+        slideshowJob?.cancel()
+        val settings = slideshowSettings ?: return
+        slideshowJob = frameScope.launch {
+            delay(settings.intervalSeconds * 1_000L)
+            val next = slideshowPlan?.next()
+            if (next == null) {
+                stopSlideshow()
+                operations.message(getString(R.string.slideshow_ended))
+                return@launch
+            }
+            showSlide(next, settings.transition)
+            scheduleSlide()
         }
     }
+
+    private suspend fun showSlide(target: Int, transition: SlideshowTransition) {
+        slideshowNavigating = true
+        try {
+            when (transition) {
+                SlideshowTransition.NONE -> jumpToPage(target, animate = false)?.join()
+                SlideshowTransition.SLIDE -> jumpToPage(target)?.join()
+                SlideshowTransition.FADE -> {
+                    slideshowVeil.animateTo(1f, tween(SLIDESHOW_FADE_MILLIS))
+                    jumpToPage(target, animate = false)?.join()
+                    slideshowVeil.animateTo(0f, tween(SLIDESHOW_FADE_MILLIS))
+                }
+            }
+        } finally {
+            slideshowNavigating = false
+        }
+    }
+
+    private fun pauseSlideshow() {
+        if (!uiState.slideshowPlaying) return
+        slideshowJob?.cancel()
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        frameScope.launch { slideshowVeil.snapTo(0f) }
+        uiState = uiState.copy(controlsVisible = true, slideshowPaused = true)
+    }
+
+    private fun stopSlideshow() {
+        slideshowJob?.cancel()
+        slideshowJob = null
+        slideshowPlan = null
+        slideshowSettings = null
+        slideshowBack.isEnabled = false
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        frameScope.launch { slideshowVeil.snapTo(0f) }
+        uiState = uiState.copy(controlsVisible = true, slideshowPlaying = false, slideshowPaused = false)
+    }
+
+    internal val slideshowRunningForTesting: Boolean
+        get() = slideshowJob?.isActive == true
+
+    // endregion
 
     private fun publishResult() {
         val source = source ?: return
@@ -693,6 +827,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             },
             pageIndex = index,
             pageCount = source.pages.size,
+            slideshowAvailable = source.pages.size > 1,
             metadataText = metadataText,
             detailsSummary = metadataText,
             exifText = metadata?.exif?.let(::formatExifDetails) ?: getString(R.string.exif_unavailable),
@@ -1295,6 +1430,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         const val STATE_ROTATION_QUARTER_TURNS = "rotationQuarterTurns"
         const val STATE_EXPANDED_DETAILS_INDEX = "expandedDetailsIndex"
         const val STATE_HOST_TRASHED_TARGETS = "hostTrashedTargets"
+        const val SLIDESHOW_FADE_MILLIS = 250
         const val STATE_CONTROLS_VISIBLE = "controlsVisible"
         const val ZOOM_INDICATOR_DURATION_MILLIS = 900L
         const val BYTES_PER_PIXEL = 4L

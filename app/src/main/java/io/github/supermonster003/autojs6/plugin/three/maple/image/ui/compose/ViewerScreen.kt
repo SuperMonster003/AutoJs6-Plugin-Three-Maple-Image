@@ -49,6 +49,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -73,6 +75,11 @@ internal data class ViewerUiState(
     val exifText: String = "",
     /** A `geo:` URI of where the image was taken, when "Show location" is on and the image has a position. */
     val mapUri: String? = null,
+    /** More than one page: the menu offers a slideshow (ROADMAP 9.1). */
+    val slideshowAvailable: Boolean = false,
+    val slideshowPlaying: Boolean = false,
+    /** A tap paused the show: the bar offers to resume or stop it. */
+    val slideshowPaused: Boolean = false,
     val loading: Boolean = true,
     val errorText: String? = null,
     val controlsVisible: Boolean = true,
@@ -111,6 +118,9 @@ internal class ViewerCallbacks(
     val onResetZoom: () -> Unit,
     val onPrint: () -> Unit,
     val onOpenMap: () -> Unit = {},
+    val onSlideshow: () -> Unit = {},
+    val onResumeSlideshow: () -> Unit = {},
+    val onStopSlideshow: () -> Unit = {},
     val onReleaseHistory: () -> Unit,
     val onToggleAnimation: () -> Unit,
     /** The pager settled on or crossed into another page. */
@@ -161,7 +171,14 @@ internal class ViewerPagerUi(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks: ViewerCallbacks, snackbarHostState: SnackbarHostState? = null) {
+internal fun ViewerScreen(
+    state: ViewerUiState,
+    pager: ViewerPagerUi?,
+    callbacks: ViewerCallbacks,
+    snackbarHostState: SnackbarHostState? = null,
+    /** Opacity of the black veil a fading slideshow passes through (ROADMAP 9.1); read while drawing only. */
+    slideshowVeil: () -> Float = { 0f },
+) {
     val canvas = MapleTheme.canvas
     Box(modifier = Modifier.fillMaxSize().background(canvas.viewerCanvas)) {
         if (pager == null) {
@@ -171,6 +188,7 @@ internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks
             // instead of feeding the old pager state the new keys.
             key(pager) { ViewerPager(pager, callbacks.onPageChanged) }
         }
+        Box(modifier = Modifier.fillMaxSize().graphicsLayer { alpha = slideshowVeil() }.background(Color.Black))
         AnimatedVisibility(
             visible = state.controlsVisible,
             enter = fadeIn(),
@@ -219,6 +237,7 @@ internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks
             }
             AnimatedVisibility(visible = state.controlsVisible, enter = fadeIn(), exit = fadeOut()) {
                 Column(modifier = Modifier.fillMaxWidth()) {
+                    if (state.slideshowPaused) SlideshowPausedBar(callbacks)
                     val rotationHint = state.rotationHint
                     if (rotationHint != null) {
                         Row(
@@ -384,6 +403,33 @@ internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks
     }
 }
 
+/** "Slideshow paused" with Resume and Stop, above the other bars while a tap holds the show (ROADMAP 9.1). */
+@Composable
+private fun SlideshowPausedBar(callbacks: ViewerCallbacks) {
+    val canvas = MapleTheme.canvas
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(canvas.scrim)
+            .padding(start = 16.dp, end = 4.dp)
+            .testTag("maple.viewer.slideshow.paused"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(R.string.slideshow_paused),
+            style = MaterialTheme.typography.bodyMedium,
+            color = canvas.onScrim,
+            modifier = Modifier.weight(1f).padding(vertical = 8.dp),
+        )
+        TextButton(onClick = callbacks.onStopSlideshow, modifier = Modifier.testTag("maple.viewer.slideshow.stop")) {
+            Text(stringResource(R.string.slideshow_stop), color = canvas.accentOnScrim)
+        }
+        TextButton(onClick = callbacks.onResumeSlideshow, modifier = Modifier.testTag("maple.viewer.slideshow.resume")) {
+            Text(stringResource(R.string.slideshow_resume), color = canvas.accentOnScrim)
+        }
+    }
+}
+
 /**
  * The pager keeps the current page and one neighbour on each side composed (preload), so a 1x horizontal swipe
  * lands on the next page without a blank frame; the zoomable View decides per gesture whether the pager may
@@ -501,6 +547,12 @@ private fun ViewerTopBar(state: ViewerUiState, callbacks: ViewerCallbacks) {
                         )
                     }
                 }
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_slideshow)) },
+                    enabled = state.slideshowAvailable,
+                    onClick = { menuOpen = false; callbacks.onSlideshow() },
+                    modifier = Modifier.testTag("maple.viewer.menu.slideshow"),
+                )
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.action_reset_zoom)) },
                     onClick = { menuOpen = false; callbacks.onResetZoom() },
