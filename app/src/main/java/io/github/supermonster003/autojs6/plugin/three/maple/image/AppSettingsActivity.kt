@@ -38,6 +38,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         data object ExtendedDetailFields : SettingsDialog
         data object DoubleTapZoom : SettingsDialog
         data object MaxZoom : SettingsDialog
+        data object Orientation : SettingsDialog
     }
 
     private lateinit var settingsStore: ApplicationSettingsStore
@@ -82,6 +83,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     onViewerChange = ::updateViewer,
                     onDoubleTapZoom = { open(SettingsDialog.DoubleTapZoom) },
                     onMaxZoom = { open(SettingsDialog.MaxZoom) },
+                    onOrientation = { open(SettingsDialog.Orientation) },
                     showLocation = showLocation,
                     onShowLocation = ::updateShowLocation,
                     extendedDetails = extendedDetails,
@@ -222,6 +224,18 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     selectedIndex = values.indexOf(viewer.maxZoom),
                     onDismissRequest = ::close,
                     onConfirm = { index -> close(); updateViewer(viewer.copy(maxZoom = values[index])) },
+                    confirmText = getString(R.string.dialog_button_confirm),
+                    dismissText = getString(R.string.dialog_button_cancel),
+                )
+            }
+            SettingsDialog.Orientation -> {
+                val values = ViewerOrientation.entries
+                MapleChoiceDialog(
+                    title = getString(R.string.viewer_orientation_title),
+                    options = values.map { MapleChoice(getString(it.labelResource())) },
+                    selectedIndex = values.indexOf(viewer.orientation),
+                    onDismissRequest = ::close,
+                    onConfirm = { index -> close(); updateViewer(viewer.copy(orientation = values[index])) },
                     confirmText = getString(R.string.dialog_button_confirm),
                     dismissText = getString(R.string.dialog_button_cancel),
                 )

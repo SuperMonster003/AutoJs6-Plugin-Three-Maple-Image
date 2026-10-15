@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ViewerDoubleTapZoom
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ViewerMaxZoom
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ViewerOrientation
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ViewerSettings
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ReleaseHistoryEntry
 
@@ -54,6 +55,7 @@ internal fun SettingsScreen(
     onViewerChange: (ViewerSettings) -> Unit,
     onDoubleTapZoom: () -> Unit,
     onMaxZoom: () -> Unit,
+    onOrientation: () -> Unit,
     showLocation: Boolean,
     onShowLocation: (Boolean) -> Unit,
     extendedDetails: Boolean,
@@ -165,6 +167,61 @@ internal fun SettingsScreen(
                 checked = viewer.brightnessSwipe,
                 onToggle = { onViewerChange(viewer.copy(brightnessSwipe = it)) },
                 modifier = Modifier.testTag("maple.settings.viewerBrightnessSwipe"),
+            )
+            MapleSettingsRow(
+                title = stringResource(R.string.viewer_orientation_title),
+                summary = stringResource(viewer.orientation.labelResource()),
+                iconResource = R.drawable.ic_rotate_left_24,
+                onClick = onOrientation,
+                modifier = Modifier.testTag("maple.settings.viewerOrientation"),
+            )
+            MapleSwitchRow(
+                title = stringResource(R.string.viewer_black_background_title),
+                summary = stringResource(R.string.viewer_black_background_summary),
+                iconResource = R.drawable.ic_dark_mode_24,
+                checked = viewer.blackBackground,
+                onToggle = { onViewerChange(viewer.copy(blackBackground = it)) },
+                modifier = Modifier.testTag("maple.settings.viewerBlackBackground"),
+            )
+            MapleSwitchRow(
+                title = stringResource(R.string.viewer_max_brightness_title),
+                summary = stringResource(R.string.viewer_max_brightness_summary),
+                iconResource = R.drawable.ic_brightness_24,
+                checked = viewer.maxBrightness,
+                onToggle = { onViewerChange(viewer.copy(maxBrightness = it)) },
+                modifier = Modifier.testTag("maple.settings.viewerMaxBrightness"),
+            )
+            MapleSwitchRow(
+                title = stringResource(R.string.viewer_hide_system_bars_title),
+                summary = stringResource(R.string.viewer_hide_system_bars_summary),
+                iconResource = R.drawable.ic_visibility_off_24,
+                checked = viewer.hideSystemBars,
+                onToggle = { onViewerChange(viewer.copy(hideSystemBars = it)) },
+                modifier = Modifier.testTag("maple.settings.viewerHideSystemBars"),
+            )
+            MapleSwitchRow(
+                title = stringResource(R.string.viewer_keep_screen_on_title),
+                summary = stringResource(R.string.viewer_keep_screen_on_summary),
+                iconResource = R.drawable.ic_highlights_24,
+                checked = viewer.keepScreenOn,
+                onToggle = { onViewerChange(viewer.copy(keepScreenOn = it)) },
+                modifier = Modifier.testTag("maple.settings.viewerKeepScreenOn"),
+            )
+            MapleSwitchRow(
+                title = stringResource(R.string.viewer_thumbnail_strip_title),
+                summary = stringResource(R.string.viewer_thumbnail_strip_summary),
+                iconResource = R.drawable.ic_perm_media_24,
+                checked = viewer.thumbnailStrip,
+                onToggle = { onViewerChange(viewer.copy(thumbnailStrip = it)) },
+                modifier = Modifier.testTag("maple.settings.viewerThumbnailStrip"),
+            )
+            MapleSwitchRow(
+                title = stringResource(R.string.viewer_highest_quality_title),
+                summary = stringResource(R.string.viewer_highest_quality_summary),
+                iconResource = R.drawable.ic_image_24,
+                checked = viewer.highestQuality,
+                onToggle = { onViewerChange(viewer.copy(highestQuality = it)) },
+                modifier = Modifier.testTag("maple.settings.viewerHighestQuality"),
             )
             MapleSwitchRow(
                 title = stringResource(R.string.settings_show_location_title),
@@ -370,6 +427,12 @@ private fun ReleaseEntry(entry: ReleaseHistoryEntry) {
 internal fun ViewerDoubleTapZoom.labelResource(): Int = when (this) {
     ViewerDoubleTapZoom.TWO_AND_HALF -> R.string.viewer_zoom_two_and_half
     ViewerDoubleTapZoom.ACTUAL_PIXELS -> R.string.viewer_zoom_actual_pixels
+}
+
+internal fun ViewerOrientation.labelResource(): Int = when (this) {
+    ViewerOrientation.FOLLOW_SYSTEM -> R.string.viewer_orientation_follow_system
+    ViewerOrientation.LOCKED -> R.string.viewer_orientation_locked
+    ViewerOrientation.FOLLOW_IMAGE -> R.string.viewer_orientation_follow_image
 }
 
 internal fun ViewerMaxZoom.labelResource(): Int = when (this) {

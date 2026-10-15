@@ -71,6 +71,9 @@ internal data class ViewerUiState(
     val pageIndex: Int = 0,
     val pageCount: Int = 0,
     val metadataText: String = "",
+    /** Display settings (ROADMAP 9.2): the black canvas (else the theme's background) and the thumbnail strip. */
+    val blackBackground: Boolean = true,
+    val thumbnailStrip: Boolean = true,
     /** Lines of the extended details (ROADMAP 9.1); empty shows [metadataText] instead. */
     val extendedDetails: List<String> = emptyList(),
     val detailsSummary: String = "",
@@ -185,7 +188,8 @@ internal fun ViewerScreen(
     slideshowVeil: () -> Float = { 0f },
 ) {
     val canvas = MapleTheme.canvas
-    Box(modifier = Modifier.fillMaxSize().background(canvas.viewerCanvas)) {
+    val background = if (state.blackBackground) canvas.viewerCanvas else MaterialTheme.colorScheme.background
+    Box(modifier = Modifier.fillMaxSize().background(background).testTag("maple.viewer.canvas")) {
         if (pager == null) {
             MapleLoading(dark = true)
         } else {
@@ -286,7 +290,7 @@ internal fun ViewerScreen(
                             }
                         }
                     }
-                    if (pager != null && pager.pageCount > 1) {
+                    if (state.thumbnailStrip && pager != null && pager.pageCount > 1) {
                         MapleThumbnailStrip(
                             count = pager.pageCount,
                             current = state.pageIndex,

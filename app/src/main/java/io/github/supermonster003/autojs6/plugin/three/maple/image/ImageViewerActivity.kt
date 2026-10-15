@@ -31,6 +31,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AndroidUiDispatcher
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -101,6 +104,9 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     /** The window brightness when a brightness drag started (ROADMAP 9.2); null between drags. */
     private var brightnessDragStart: Float? = null
+
+    /** Where the last brightness drag left the window; it then wins over "maximum brightness" until the viewer closes. */
+    private var draggedBrightness: Float? = null
     private var rotationHintDismissed = false
     private var hostTrashBusy = false
     private val hostTrashedTargetIds = linkedSetOf<String>()
@@ -206,6 +212,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             exifText = getString(R.string.exif_unavailable),
             controlsVisible = savedInstanceState?.getBoolean(STATE_CONTROLS_VISIBLE, true) ?: true,
         )
+        applyDisplaySettings()
         onBackPressedDispatcher.addCallback(this, slideshowBack)
         // Copies shared a day ago or earlier are gone by now (ROADMAP 9.1).
         scope.launch(Dispatchers.IO) { ShareCopies.cleanup(applicationContext) }
@@ -315,6 +322,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         if (settings.viewer != viewerSettings) {
             viewerSettings = settings.viewer
             hosts.values.forEach { host -> applyGestures(host.view) }
+            applyDisplaySettings()
             syncRotationHint()
         }
         val detailsChanged = settings.showLocation != showLocation ||
@@ -431,6 +439,10 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     @VisibleForTesting
     internal val windowBrightnessForTesting: Float get() = window.attributes.screenBrightness
+
+    @VisibleForTesting
+    internal val keepsScreenOnForTesting: Boolean
+        get() = window.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON != 0
 
     @VisibleForTesting
     internal fun toggleAnimationForTesting() {
@@ -656,6 +668,39 @@ class ImageViewerActivity : ConfiguredActivity() {
     private fun ImageMetadata.pixelSize(): ImagePixelSize? =
         if (width != null && height != null && width > 0 && height > 0) ImagePixelSize(width, height) else null
 
+    /** The display settings that live in the overlay state (ROADMAP 9.2), then the window's. */
+    private fun applyDisplaySettings() {
+        uiState = uiState.copy(blackBackground = viewerSettings.blackBackground, thumbnailStrip = viewerSettings.thumbnailStrip)
+        applyWindowState()
+        applyOrientation()
+    }
+
+    /** Screen-on, system bars and brightness from the settings, the overlay and a running slideshow. */
+    private fun applyWindowState() {
+        val running = uiState.slideshowPlaying && !uiState.slideshowPaused
+        if (ViewerDisplayPolicy.keepScreenOn(viewerSettings.keepScreenOn, running)) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        if (ViewerDisplayPolicy.systemBarsVisible(viewerSettings.hideSystemBars, uiState.controlsVisible)) {
+            controller.show(WindowInsetsCompat.Type.systemBars())
+        } else {
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+        }
+        val brightness = ViewerDisplayPolicy.windowBrightness(viewerSettings.maxBrightness, draggedBrightness)
+        if (window.attributes.screenBrightness != brightness) window.attributes = window.attributes.apply { screenBrightness = brightness }
+    }
+
+    /** "Follow the image" turns the screen to the current page's shape once its size is known. */
+    private fun applyOrientation() {
+        val metadata = currentHost()?.metadata
+        val requested = ViewerDisplayPolicy.requestedOrientation(viewerSettings.orientation, metadata?.width, metadata?.height) ?: return
+        if (requestedOrientation != requested) requestedOrientation = requested
+    }
+
     private fun applyGestures(view: ZoomableImageView) {
         view.rotationGestureEnabled = viewerSettings.rotationGesture
         view.oneFingerZoom = viewerSettings.oneFingerZoom
@@ -670,7 +715,8 @@ class ImageViewerActivity : ConfiguredActivity() {
     private fun dragBrightness(distanceY: Float, height: Int, finished: Boolean) {
         val start = brightnessDragStart ?: currentBrightness().also { brightnessDragStart = it }
         val level = ViewerGesturePolicy.brightness(start, distanceY, height)
-        window.attributes = window.attributes.apply { screenBrightness = level }
+        draggedBrightness = level
+        applyWindowState()
         if (finished) brightnessDragStart = null
         showTransientIndicator(getString(R.string.viewer_brightness_indicator, (level * 100).roundToInt()), gestureInProgress = !finished)
     }
@@ -781,9 +827,9 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     private fun resumeSlideshow() {
         if (slideshowPlan == null) return
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         slideshowBack.isEnabled = true
         uiState = uiState.copy(controlsVisible = false, detailsExpanded = false, slideshowPlaying = true, slideshowPaused = false)
+        applyWindowState()
         scheduleSlide()
     }
 
@@ -823,9 +869,9 @@ class ImageViewerActivity : ConfiguredActivity() {
     private fun pauseSlideshow() {
         if (!uiState.slideshowPlaying) return
         slideshowJob?.cancel()
-        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         frameScope.launch { slideshowVeil.snapTo(0f) }
         uiState = uiState.copy(controlsVisible = true, slideshowPaused = true)
+        applyWindowState()
     }
 
     private fun stopSlideshow() {
@@ -834,9 +880,9 @@ class ImageViewerActivity : ConfiguredActivity() {
         slideshowPlan = null
         slideshowSettings = null
         slideshowBack.isEnabled = false
-        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         frameScope.launch { slideshowVeil.snapTo(0f) }
         uiState = uiState.copy(controlsVisible = true, slideshowPlaying = false, slideshowPaused = false)
+        applyWindowState()
     }
 
     internal val slideshowRunningForTesting: Boolean
@@ -916,6 +962,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             management = managementState(),
             hostDelete = hostDeletable(host),
         )
+        applyOrientation()
     }
 
     /** The current page's user rotation, as the hint bar text; null when unrotated or dismissed (ROADMAP D8). */
@@ -1195,7 +1242,14 @@ class ImageViewerActivity : ConfiguredActivity() {
         val budgetPixels = host.view.largeImageLimits(memoryClassMebibytes).fullDecodeBudgetBytes / BYTES_PER_PIXEL
         Glide.with(this)
             .load(model)
-            .override(metrics.widthPixels.coerceAtLeast(1), metrics.heightPixels.coerceAtLeast(1))
+            .let { request ->
+                // "Highest quality" decodes the page at its own size; the budget below still caps it.
+                if (viewerSettings.highestQuality) {
+                    request.override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                } else {
+                    request.override(metrics.widthPixels.coerceAtLeast(1), metrics.heightPixels.coerceAtLeast(1))
+                }
+            }
             .downsample(BudgetedDownsampleStrategy(budgetPixels))
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
@@ -1410,6 +1464,7 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     private fun setControlsVisible(visible: Boolean) {
         uiState = uiState.copy(controlsVisible = visible)
+        applyWindowState()
     }
 
     // endregion
