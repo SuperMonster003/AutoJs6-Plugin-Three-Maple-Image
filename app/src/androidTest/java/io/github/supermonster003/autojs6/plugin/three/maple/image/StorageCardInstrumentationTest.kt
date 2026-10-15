@@ -35,7 +35,9 @@ import java.io.File
 /**
  * ROADMAP 7.3 across volumes, on a device with a storage card (skipped without one). Android 11+ moves an image
  * into the album that was chosen, on that album's volume, and copies land there as well; Android 7-10 cannot write
- * to a storage card, so the gallery leaves card images as they are and says so, without stray copies.
+ * to a storage card, so the gallery leaves card images as they are and says so, without stray copies. A card without
+ * room for the test images (an emulator card filled by other work) skips the class as well instead of failing on its
+ * fixtures.
  */
 @RunWith(AndroidJUnit4::class)
 class StorageCardInstrumentationTest {
@@ -62,7 +64,9 @@ class StorageCardInstrumentationTest {
     fun setUp() {
         val found = findCard()
         assumeTrue("no storage card mounted", found != null)
-        card = requireNotNull(found)
+        val free = requireNotNull(found).directory.usableSpace
+        assumeTrue("the storage card is full ($free bytes free)", free >= MIN_FREE_BYTES)
+        card = found
         scenario = ActivityScenario.launch(ComponentActivity::class.java)
         scenario.onActivity { coordinator = MediaWriteCoordinator(it) }
     }
@@ -252,5 +256,6 @@ class StorageCardInstrumentationTest {
 
     private companion object {
         const val TIMEOUT_MILLIS = 30_000L
+        const val MIN_FREE_BYTES = 1L shl 20
     }
 }

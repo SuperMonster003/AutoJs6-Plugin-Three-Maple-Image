@@ -2,6 +2,9 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,12 +21,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -395,15 +401,25 @@ internal fun ReleaseHistoryScreen(entries: List<ReleaseHistoryEntry>, onBack: ()
         LazyColumn(modifier = Modifier.fillMaxSize().padding(padding).testTag("maple.releaseHistory.list")) {
             itemsIndexed(entries, key = { _, entry -> entry.version }) { index, entry ->
                 if (index > 0) MapleHairline(insetStart = 24.dp)
-                ReleaseEntry(entry)
+                ReleaseEntry(entry, Modifier.testTag("maple.releaseHistory.entry.${entry.version}"))
             }
         }
     }
 }
 
 @Composable
-private fun ReleaseEntry(entry: ReleaseHistoryEntry) {
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp)) {
+private fun ReleaseEntry(entry: ReleaseHistoryEntry, modifier: Modifier = Modifier) {
+    // One focus stop per release: Tab and the arrow keys walk the history (the list scrolls to the focused release)
+    // and a screen reader reads a release in one go.
+    val interaction = remember { MutableInteractionSource() }
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) {}
+            .indication(interaction, ripple())
+            .focusable(interactionSource = interaction)
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = entry.version,
