@@ -10,6 +10,7 @@
     <string name="action_delete_forever">永久删除</string>
     <string name="action_dismiss_hint">关闭提示</string>
     <string name="action_edit_image">编辑图像</string>
+    <string name="action_edit_with">用其他应用编辑</string>
     <string name="action_exclude">排除</string>
     <string name="action_favorite">收藏</string>
     <string name="action_hide">隐藏</string>
@@ -28,6 +29,7 @@
     <string name="action_rotate_clockwise">顺时针旋转 90 度</string>
     <string name="action_search">搜索</string>
     <string name="action_share">分享</string>
+    <string name="action_share_copy">分享副本</string>
     <string name="action_show_image_details">显示详情</string>
     <string name="action_slideshow">幻灯片</string>
     <string name="action_undo">撤销</string>
@@ -89,6 +91,7 @@
     <string name="error_image_conversion_pixel_count_too_large">输出图片的总像素数不能超过 %1$d</string>
     <string name="error_image_decoder_unavailable">此设备的系统解码器无法显示 %1$s 图像</string>
     <string name="error_image_format_requires_android">此设备需要 Android %2$d 或更高版本才能显示 %1$s 图像</string>
+    <string name="error_no_editor_app">没有可以编辑图片的其他应用</string>
     <string name="error_no_external_viewer">没有可用的其他图像查看器</string>
     <string name="error_no_map_app">没有可以打开地图的应用</string>
     <string name="error_print_failed">无法创建打印文档</string>
@@ -318,6 +321,14 @@
     <string name="settings_show_location_title">显示位置信息</string>
     <string name="settings_sync_favorites_summary">同时在系统媒体库中标记收藏, 其他图库应用也能看到; 开启时导入系统中已有的收藏</string>
     <string name="settings_sync_favorites_title">同步系统收藏</string>
+    <string name="share_copy_custom">自定义</string>
+    <string name="share_copy_failed">无法生成副本</string>
+    <string name="share_copy_long_edge">长边 (像素)</string>
+    <string name="share_copy_smaller">缩小</string>
+    <string name="share_copy_smaller_summary">按长边缩小, 同样去掉元数据</string>
+    <string name="share_copy_still_note">动图的副本是静态图片</string>
+    <string name="share_copy_without_metadata">去除元数据</string>
+    <string name="share_copy_without_metadata_summary">原尺寸; 去掉相机, 日期, 位置等元数据</string>
     <string name="slideshow_ended">幻灯片已播放完</string>
     <string name="slideshow_include_gifs">包含 GIF 动图</string>
     <string name="slideshow_interval">间隔</string>

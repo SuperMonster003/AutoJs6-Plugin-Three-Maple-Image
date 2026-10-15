@@ -10,6 +10,7 @@
     <string name="action_delete_forever">Удалить навсегда</string>
     <string name="action_dismiss_hint">Скрыть</string>
     <string name="action_edit_image">Редактировать изображение</string>
+    <string name="action_edit_with">Редактировать в другом приложении</string>
     <string name="action_exclude">Исключить</string>
     <string name="action_favorite">В избранное</string>
     <string name="action_hide">Скрыть</string>
@@ -28,6 +29,7 @@
     <string name="action_rotate_clockwise">Повернуть на 90° по часовой стрелке</string>
     <string name="action_search">Поиск</string>
     <string name="action_share">Отправить</string>
+    <string name="action_share_copy">Поделиться копией</string>
     <string name="action_show_image_details">Показать сведения</string>
     <string name="action_slideshow">Слайд-шоу</string>
     <string name="action_undo">Отменить</string>
@@ -89,6 +91,7 @@
     <string name="error_image_conversion_pixel_count_too_large">Общее число пикселей выходного изображения не должно превышать %1$d</string>
     <string name="error_image_decoder_unavailable">Системный декодер этого устройства не может отобразить изображения %1$s</string>
     <string name="error_image_format_requires_android">Для изображений %1$s на этом устройстве требуется Android %2$d или новее</string>
+    <string name="error_no_editor_app">Нет другого приложения для редактирования изображений</string>
     <string name="error_no_external_viewer">Другого средства просмотра изображений нет</string>
     <string name="error_no_map_app">Нет приложения, которое может открыть карту</string>
     <string name="error_print_failed">Не удалось создать документ для печати</string>
@@ -318,6 +321,14 @@
     <string name="settings_show_location_title">Показывать местоположение</string>
     <string name="settings_sync_favorites_summary">Избранное отмечается и в системной медиатеке, его видят другие галереи; при включении импортируется уже существующее избранное</string>
     <string name="settings_sync_favorites_title">Синхронизировать системное избранное</string>
+    <string name="share_copy_custom">Свой размер</string>
+    <string name="share_copy_failed">Не удалось создать копию</string>
+    <string name="share_copy_long_edge">Длинная сторона (пикс.)</string>
+    <string name="share_copy_smaller">Меньше</string>
+    <string name="share_copy_smaller_summary">Уменьшается по длинной стороне, метаданные тоже удаляются</string>
+    <string name="share_copy_still_note">Копия анимированного изображения будет статичной</string>
+    <string name="share_copy_without_metadata">Без метаданных</string>
+    <string name="share_copy_without_metadata_summary">Полный размер; камера, дата, местоположение и другие метаданные удаляются</string>
     <string name="slideshow_ended">Слайд-шоу закончено</string>
     <string name="slideshow_include_gifs">Включать анимированные GIF</string>
     <string name="slideshow_interval">Интервал</string>

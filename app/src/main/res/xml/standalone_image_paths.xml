@@ -1,1 +1,1 @@
-<paths><cache-path name="images" path="standalone-images/" /></paths>
+<paths><cache-path name="images" path="standalone-images/" /><cache-path name="share" path="share-copies/" /></paths>

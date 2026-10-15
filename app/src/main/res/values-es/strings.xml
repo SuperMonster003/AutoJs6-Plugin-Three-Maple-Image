@@ -10,6 +10,7 @@
     <string name="action_delete_forever">Eliminar para siempre</string>
     <string name="action_dismiss_hint">Descartar</string>
     <string name="action_edit_image">Editar imagen</string>
+    <string name="action_edit_with">Editar con otra aplicación</string>
     <string name="action_exclude">Excluir</string>
     <string name="action_favorite">Favorito</string>
     <string name="action_hide">Ocultar</string>
@@ -28,6 +29,7 @@
     <string name="action_rotate_clockwise">Girar 90° a la derecha</string>
     <string name="action_search">Buscar</string>
     <string name="action_share">Compartir</string>
+    <string name="action_share_copy">Compartir una copia</string>
     <string name="action_show_image_details">Mostrar detalles</string>
     <string name="action_slideshow">Presentación</string>
     <string name="action_undo">Deshacer</string>
@@ -89,6 +91,7 @@
     <string name="error_image_conversion_pixel_count_too_large">La imagen de salida no debe superar %1$d píxeles</string>
     <string name="error_image_decoder_unavailable">El decodificador del sistema de este dispositivo no puede mostrar imágenes %1$s</string>
     <string name="error_image_format_requires_android">Las imágenes %1$s requieren Android %2$d o posterior en este dispositivo</string>
+    <string name="error_no_editor_app">Ninguna otra aplicación puede editar imágenes</string>
     <string name="error_no_external_viewer">No hay otro visor de imágenes disponible</string>
     <string name="error_no_map_app">Ninguna aplicación puede abrir un mapa</string>
     <string name="error_print_failed">No se pudo crear el documento de impresión</string>
@@ -318,6 +321,14 @@
     <string name="settings_show_location_title">Mostrar ubicación</string>
     <string name="settings_sync_favorites_summary">También marca los favoritos en la biblioteca multimedia del sistema para que otras galerías los vean; al activarlo se importan los favoritos existentes</string>
     <string name="settings_sync_favorites_title">Sincronizar favoritos del sistema</string>
+    <string name="share_copy_custom">Personalizado</string>
+    <string name="share_copy_failed">No se pudo crear la copia</string>
+    <string name="share_copy_long_edge">Lado largo (px)</string>
+    <string name="share_copy_smaller">Más pequeña</string>
+    <string name="share_copy_smaller_summary">Reducida al lado largo, también sin metadatos</string>
+    <string name="share_copy_still_note">La copia de una imagen animada es una imagen fija</string>
+    <string name="share_copy_without_metadata">Sin metadatos</string>
+    <string name="share_copy_without_metadata_summary">Tamaño completo; se quitan la cámara, la fecha, la ubicación y otros metadatos</string>
     <string name="slideshow_ended">Presentación terminada</string>
     <string name="slideshow_include_gifs">Incluir GIF animados</string>
     <string name="slideshow_interval">Intervalo</string>

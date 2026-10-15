@@ -10,6 +10,7 @@
     <string name="action_delete_forever">영구 삭제</string>
     <string name="action_dismiss_hint">닫기</string>
     <string name="action_edit_image">이미지 편집</string>
+    <string name="action_edit_with">다른 앱으로 편집</string>
     <string name="action_exclude">제외</string>
     <string name="action_favorite">즐겨찾기</string>
     <string name="action_hide">숨기기</string>
@@ -28,6 +29,7 @@
     <string name="action_rotate_clockwise">시계 방향으로 90° 회전</string>
     <string name="action_search">검색</string>
     <string name="action_share">공유</string>
+    <string name="action_share_copy">사본 공유</string>
     <string name="action_show_image_details">세부 정보 보기</string>
     <string name="action_slideshow">슬라이드쇼</string>
     <string name="action_undo">실행 취소</string>
@@ -89,6 +91,7 @@
     <string name="error_image_conversion_pixel_count_too_large">출력 이미지의 총 픽셀 수는 %1$d 이하여야 합니다</string>
     <string name="error_image_decoder_unavailable">이 기기의 시스템 디코더는 %1$s 이미지를 표시할 수 없습니다</string>
     <string name="error_image_format_requires_android">이 기기에서 %1$s 이미지를 표시하려면 Android %2$d 이상이 필요합니다</string>
+    <string name="error_no_editor_app">이미지를 편집할 수 있는 다른 앱이 없습니다</string>
     <string name="error_no_external_viewer">사용 가능한 다른 이미지 뷰어가 없습니다</string>
     <string name="error_no_map_app">지도를 열 수 있는 앱이 없습니다</string>
     <string name="error_print_failed">인쇄 문서를 만들 수 없습니다</string>
@@ -318,6 +321,14 @@
     <string name="settings_show_location_title">위치 정보 표시</string>
     <string name="settings_sync_favorites_summary">시스템 미디어 라이브러리에도 즐겨찾기를 표시해 다른 갤러리 앱에서도 볼 수 있습니다. 켜면 기존 즐겨찾기를 가져옵니다</string>
     <string name="settings_sync_favorites_title">시스템 즐겨찾기 동기화</string>
+    <string name="share_copy_custom">사용자 지정</string>
+    <string name="share_copy_failed">사본을 만들 수 없습니다</string>
+    <string name="share_copy_long_edge">긴 변 (픽셀)</string>
+    <string name="share_copy_smaller">축소</string>
+    <string name="share_copy_smaller_summary">긴 변에 맞춰 축소하며 메타데이터도 제거합니다</string>
+    <string name="share_copy_still_note">애니메이션 이미지의 사본은 정지 이미지입니다</string>
+    <string name="share_copy_without_metadata">메타데이터 없이</string>
+    <string name="share_copy_without_metadata_summary">원래 크기, 카메라, 날짜, 위치 등의 메타데이터를 제거합니다</string>
     <string name="slideshow_ended">슬라이드쇼가 끝났습니다</string>
     <string name="slideshow_include_gifs">GIF 애니메이션 포함</string>
     <string name="slideshow_interval">간격</string>

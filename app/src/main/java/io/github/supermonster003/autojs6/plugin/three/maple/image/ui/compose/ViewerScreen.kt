@@ -119,6 +119,8 @@ internal class ViewerCallbacks(
     val onPrint: () -> Unit,
     val onOpenMap: () -> Unit = {},
     val onSlideshow: () -> Unit = {},
+    val onShareCopy: () -> Unit = {},
+    val onEditWith: () -> Unit = {},
     val onResumeSlideshow: () -> Unit = {},
     val onStopSlideshow: () -> Unit = {},
     val onReleaseHistory: () -> Unit,
@@ -547,6 +549,18 @@ private fun ViewerTopBar(state: ViewerUiState, callbacks: ViewerCallbacks) {
                         )
                     }
                 }
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_share_copy)) },
+                    enabled = state.canForward,
+                    onClick = { menuOpen = false; callbacks.onShareCopy() },
+                    modifier = Modifier.testTag("maple.viewer.menu.shareCopy"),
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_edit_with)) },
+                    enabled = state.canForward,
+                    onClick = { menuOpen = false; callbacks.onEditWith() },
+                    modifier = Modifier.testTag("maple.viewer.menu.editWith"),
+                )
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.action_slideshow)) },
                     enabled = state.slideshowAvailable,

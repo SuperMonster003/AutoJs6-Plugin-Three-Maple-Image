@@ -10,6 +10,7 @@
     <string name="action_delete_forever">完全に削除</string>
     <string name="action_dismiss_hint">閉じる</string>
     <string name="action_edit_image">画像を編集</string>
+    <string name="action_edit_with">別のアプリで編集</string>
     <string name="action_exclude">除外</string>
     <string name="action_favorite">お気に入り</string>
     <string name="action_hide">非表示</string>
@@ -28,6 +29,7 @@
     <string name="action_rotate_clockwise">右へ90°回転</string>
     <string name="action_search">検索</string>
     <string name="action_share">共有</string>
+    <string name="action_share_copy">コピーを共有</string>
     <string name="action_show_image_details">詳細を表示</string>
     <string name="action_slideshow">スライドショー</string>
     <string name="action_undo">元に戻す</string>
@@ -89,6 +91,7 @@
     <string name="error_image_conversion_pixel_count_too_large">出力画像の総ピクセル数は %1$d 以下にしてください</string>
     <string name="error_image_decoder_unavailable">このデバイスのシステムデコーダーでは %1$s 画像を表示できません</string>
     <string name="error_image_format_requires_android">%1$s 画像をこのデバイスで表示するには Android %2$d 以降が必要です</string>
+    <string name="error_no_editor_app">画像を編集できる他のアプリがありません</string>
     <string name="error_no_external_viewer">ほかの画像ビューアーを利用できません</string>
     <string name="error_no_map_app">地図を開けるアプリがありません</string>
     <string name="error_print_failed">印刷ドキュメントを作成できませんでした</string>
@@ -318,6 +321,14 @@
     <string name="settings_show_location_title">位置情報を表示</string>
     <string name="settings_sync_favorites_summary">システムのメディアライブラリにもお気に入りを記録し, 他のギャラリーアプリでも表示されます. オンにすると既存のお気に入りを取り込みます</string>
     <string name="settings_sync_favorites_title">システムのお気に入りと同期</string>
+    <string name="share_copy_custom">カスタム</string>
+    <string name="share_copy_failed">コピーを作成できませんでした</string>
+    <string name="share_copy_long_edge">長辺 (ピクセル)</string>
+    <string name="share_copy_smaller">縮小</string>
+    <string name="share_copy_smaller_summary">長辺に合わせて縮小し, メタデータも削除します</string>
+    <string name="share_copy_still_note">アニメーション画像のコピーは静止画になります</string>
+    <string name="share_copy_without_metadata">メタデータなし</string>
+    <string name="share_copy_without_metadata_summary">元のサイズ. カメラ, 日時, 位置などのメタデータを削除します</string>
     <string name="slideshow_ended">スライドショーが終わりました</string>
     <string name="slideshow_include_gifs">GIF アニメーションを含める</string>
     <string name="slideshow_interval">間隔</string>

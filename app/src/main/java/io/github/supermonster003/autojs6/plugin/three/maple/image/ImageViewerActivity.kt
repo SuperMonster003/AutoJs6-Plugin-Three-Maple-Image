@@ -36,6 +36,8 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ShareCopyDialog
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ShareCopyDialogState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SlideshowDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SlideshowDialogState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerCallbacks
@@ -106,6 +108,10 @@ class ImageViewerActivity : ConfiguredActivity() {
     private var slideshowJob: Job? = null
     private var slideshowNavigating = false
     private val slideshowVeil = ComposeAnimatable(0f)
+    // "Share a copy" (ROADMAP 9.1): the dialog draft and the copy being made.
+    private var shareCopyDialog by mutableStateOf<ShareCopyDialogState?>(null)
+    private var shareCopyJob: Job? = null
+
     private val slideshowBack = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() = stopSlideshow()
     }
@@ -163,6 +169,8 @@ class ImageViewerActivity : ConfiguredActivity() {
             onPrint = ::printImage,
             onOpenMap = ::openMap,
             onSlideshow = ::openSlideshowDialog,
+            onShareCopy = ::openShareCopyDialog,
+            onEditWith = ::editWithAnotherApp,
             onResumeSlideshow = ::resumeSlideshow,
             onStopSlideshow = ::stopSlideshow,
             onReleaseHistory = ::showReleaseHistory,
@@ -186,6 +194,8 @@ class ImageViewerActivity : ConfiguredActivity() {
             controlsVisible = savedInstanceState?.getBoolean(STATE_CONTROLS_VISIBLE, true) ?: true,
         )
         onBackPressedDispatcher.addCallback(this, slideshowBack)
+        // Copies shared a day ago or earlier are gone by now (ROADMAP 9.1).
+        scope.launch(Dispatchers.IO) { ShareCopies.cleanup(applicationContext) }
         setContent {
             MapleTheme(palette = appPalette) {
                 ViewerScreen(
@@ -197,6 +207,9 @@ class ImageViewerActivity : ConfiguredActivity() {
                     slideshowVeil = { slideshowVeil.value },
                 )
                 operations.Dialogs()
+                shareCopyDialog?.let { draft ->
+                    ShareCopyDialog(draft, onDismissRequest = { shareCopyDialog = null }, onShare = { draft.request()?.let(::shareCopy) })
+                }
                 slideshowDialog?.let { draft ->
                     SlideshowDialog(draft, onDismissRequest = { slideshowDialog = null }, onStart = { startSlideshow(draft.settings()) })
                 }
@@ -1385,6 +1398,54 @@ class ImageViewerActivity : ConfiguredActivity() {
             return
         }
         val chooser = Intent.createChooser(target, getString(R.string.action_open_external)).apply {
+            putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(ownEntry))
+        }
+        startSafely(chooser)
+    }
+
+    private fun openShareCopyDialog() {
+        val page = currentShareablePage() ?: return
+        shareCopyDialog = ShareCopyDialogState(stillCopy = page.mimeType == "image/gif")
+    }
+
+    /** Makes the copy off the main thread, then hands it to the share sheet (ROADMAP 9.1). */
+    private fun shareCopy(request: ShareCopyRequest) {
+        val page = currentShareablePage() ?: return
+        shareCopyDialog = null
+        if (shareCopyJob?.isActive == true) return
+        shareCopyJob = scope.launch {
+            val copy = runCatching {
+                withContext(Dispatchers.IO) { ShareCopies.create(applicationContext, page.targetUri, page.displayName, request) }
+            }.getOrElse { error ->
+                val resizeError = (error as? ShareCopyException)?.error
+                operations.message(resizeError?.let(::resizeErrorText) ?: getString(R.string.share_copy_failed))
+                return@launch
+            }
+            val mimeType = contentResolver.getType(copy) ?: "image/*"
+            val target = Intent(Intent.ACTION_SEND).apply {
+                type = mimeType
+                clipData = ClipData.newRawUri(page.displayName, copy)
+                putExtra(Intent.EXTRA_STREAM, copy)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startSafely(Intent.createChooser(target, getString(R.string.action_share_copy)))
+        }
+    }
+
+    /** Hands the image to another app's editor (ROADMAP 9.1); this app is not offered. */
+    private fun editWithAnotherApp() {
+        val page = currentShareablePage() ?: return
+        val target = Intent(Intent.ACTION_EDIT).apply {
+            setDataAndType(page.targetUri, page.mimeType)
+            clipData = ClipData.newRawUri(page.displayName, page.targetUri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        val ownEntry = ComponentName(this, ExternalViewActivity::class.java)
+        if (!hasExternalHandler(target, ownEntry)) {
+            Toast.makeText(this, R.string.error_no_editor_app, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val chooser = Intent.createChooser(target, getString(R.string.action_edit_with)).apply {
             putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(ownEntry))
         }
         startSafely(chooser)

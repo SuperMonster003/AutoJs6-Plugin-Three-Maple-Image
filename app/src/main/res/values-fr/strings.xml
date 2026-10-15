@@ -10,6 +10,7 @@
     <string name="action_delete_forever">Supprimer définitivement</string>
     <string name="action_dismiss_hint">Ignorer</string>
     <string name="action_edit_image">Modifier l\'image</string>
+    <string name="action_edit_with">Modifier avec une autre application</string>
     <string name="action_exclude">Exclure</string>
     <string name="action_favorite">Favori</string>
     <string name="action_hide">Masquer</string>
@@ -28,6 +29,7 @@
     <string name="action_rotate_clockwise">Pivoter de 90° à droite</string>
     <string name="action_search">Rechercher</string>
     <string name="action_share">Partager</string>
+    <string name="action_share_copy">Partager une copie</string>
     <string name="action_show_image_details">Afficher les détails</string>
     <string name="action_slideshow">Diaporama</string>
     <string name="action_undo">Annuler</string>
@@ -89,6 +91,7 @@
     <string name="error_image_conversion_pixel_count_too_large">L\'image de sortie ne doit pas dépasser %1$d pixels</string>
     <string name="error_image_decoder_unavailable">Le décodeur système de cet appareil ne peut pas afficher les images %1$s</string>
     <string name="error_image_format_requires_android">Les images %1$s nécessitent Android %2$d ou version ultérieure sur cet appareil</string>
+    <string name="error_no_editor_app">Aucune autre application ne peut modifier les images</string>
     <string name="error_no_external_viewer">Aucune autre visionneuse d\'images n\'est disponible</string>
     <string name="error_no_map_app">Aucune application ne peut ouvrir une carte</string>
     <string name="error_print_failed">Impossible de créer le document d\'impression</string>
@@ -318,6 +321,14 @@
     <string name="settings_show_location_title">Afficher la position</string>
     <string name="settings_sync_favorites_summary">Marque aussi les favoris dans la médiathèque du système pour que les autres galeries les voient; l\'activation importe les favoris existants</string>
     <string name="settings_sync_favorites_title">Synchroniser les favoris du système</string>
+    <string name="share_copy_custom">Personnalisé</string>
+    <string name="share_copy_failed">Impossible de créer la copie</string>
+    <string name="share_copy_long_edge">Grand côté (px)</string>
+    <string name="share_copy_smaller">Plus petite</string>
+    <string name="share_copy_smaller_summary">Réduite au grand côté, sans métadonnées elle aussi</string>
+    <string name="share_copy_still_note">La copie d\'une image animée est une image fixe</string>
+    <string name="share_copy_without_metadata">Sans métadonnées</string>
+    <string name="share_copy_without_metadata_summary">Taille réelle; l\'appareil, la date, la position et les autres métadonnées sont retirés</string>
     <string name="slideshow_ended">Diaporama terminé</string>
     <string name="slideshow_include_gifs">Inclure les GIF animés</string>
     <string name="slideshow_interval">Intervalle</string>

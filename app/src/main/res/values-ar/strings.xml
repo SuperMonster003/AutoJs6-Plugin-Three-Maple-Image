@@ -10,6 +10,7 @@
     <string name="action_delete_forever">حذف نهائي</string>
     <string name="action_dismiss_hint">تجاهل</string>
     <string name="action_edit_image">تحرير الصورة</string>
+    <string name="action_edit_with">التحرير بتطبيق آخر</string>
     <string name="action_exclude">استبعاد</string>
     <string name="action_favorite">المفضلة</string>
     <string name="action_hide">إخفاء</string>
@@ -28,6 +29,7 @@
     <string name="action_rotate_clockwise">تدوير 90° باتجاه عقارب الساعة</string>
     <string name="action_search">بحث</string>
     <string name="action_share">مشاركة</string>
+    <string name="action_share_copy">مشاركة نسخة</string>
     <string name="action_show_image_details">عرض التفاصيل</string>
     <string name="action_slideshow">عرض الشرائح</string>
     <string name="action_undo">تراجع</string>
@@ -89,6 +91,7 @@
     <string name="error_image_conversion_pixel_count_too_large">يجب ألا يتجاوز عدد بكسلات الصورة الناتجة %1$d بكسل</string>
     <string name="error_image_decoder_unavailable">يتعذر على برنامج فك ترميز النظام في هذا الجهاز عرض صور %1$s</string>
     <string name="error_image_format_requires_android">تتطلب صور %1$s نظام Android %2$d أو أحدث على هذا الجهاز</string>
+    <string name="error_no_editor_app">لا يوجد تطبيق آخر يمكنه تحرير الصور</string>
     <string name="error_no_external_viewer">لا يتوفر عارض صور اخر</string>
     <string name="error_no_map_app">لا يوجد تطبيق يمكنه فتح الخريطة</string>
     <string name="error_print_failed">تعذر إنشاء مستند الطباعة</string>
@@ -318,6 +321,14 @@
     <string name="settings_show_location_title">إظهار الموقع</string>
     <string name="settings_sync_favorites_summary">يضع علامة المفضلة في مكتبة وسائط النظام أيضا لتراها تطبيقات المعرض الأخرى; عند التشغيل تستورد المفضلة الموجودة</string>
     <string name="settings_sync_favorites_title">مزامنة مفضلة النظام</string>
+    <string name="share_copy_custom">مخصص</string>
+    <string name="share_copy_failed">تعذر إنشاء النسخة</string>
+    <string name="share_copy_long_edge">الضلع الأطول (بكسل)</string>
+    <string name="share_copy_smaller">أصغر</string>
+    <string name="share_copy_smaller_summary">تصغير حسب الضلع الأطول مع إزالة البيانات الوصفية أيضا</string>
+    <string name="share_copy_still_note">نسخة الصورة المتحركة صورة ثابتة</string>
+    <string name="share_copy_without_metadata">بدون بيانات وصفية</string>
+    <string name="share_copy_without_metadata_summary">الحجم الكامل, وتزال بيانات الكاميرا والتاريخ والموقع وغيرها</string>
     <string name="slideshow_ended">انتهى عرض الشرائح</string>
     <string name="slideshow_include_gifs">تضمين صور GIF المتحركة</string>
     <string name="slideshow_interval">الفاصل الزمني</string>

@@ -150,7 +150,7 @@ internal fun MapleChoiceDialog(
     ) {
         Column(modifier = Modifier.testTag("maple.choice.list")) {
             options.forEachIndexed { index, option ->
-                ChoiceRow(
+                MapleChoiceRow(
                     option = option,
                     selected = index == pending,
                     onSelect = { pending = index },
@@ -161,8 +161,9 @@ internal fun MapleChoiceDialog(
     }
 }
 
+/** One radio row of a single-choice list; also used by dialogs that add more below the list. */
 @Composable
-private fun ChoiceRow(option: MapleChoice, selected: Boolean, onSelect: () -> Unit, modifier: Modifier = Modifier) {
+internal fun MapleChoiceRow(option: MapleChoice, selected: Boolean, onSelect: () -> Unit, modifier: Modifier = Modifier) {
     val minHeight = if (option.description.isNullOrEmpty()) 56.dp else 72.dp
     Row(
         modifier = modifier

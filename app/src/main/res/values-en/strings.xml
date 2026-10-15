@@ -10,6 +10,7 @@
     <string name="action_delete_forever">Delete forever</string>
     <string name="action_dismiss_hint">Dismiss</string>
     <string name="action_edit_image">Edit image</string>
+    <string name="action_edit_with">Edit with another app</string>
     <string name="action_exclude">Exclude</string>
     <string name="action_favorite">Favorite</string>
     <string name="action_hide">Hide</string>
@@ -28,6 +29,7 @@
     <string name="action_rotate_clockwise">Rotate 90° clockwise</string>
     <string name="action_search">Search</string>
     <string name="action_share">Share</string>
+    <string name="action_share_copy">Share a copy</string>
     <string name="action_show_image_details">Show details</string>
     <string name="action_slideshow">Slideshow</string>
     <string name="action_undo">Undo</string>
@@ -89,6 +91,7 @@
     <string name="error_image_conversion_pixel_count_too_large">The output image must not exceed %1$d pixels</string>
     <string name="error_image_decoder_unavailable">The system decoder on this device cannot display %1$s images</string>
     <string name="error_image_format_requires_android">%1$s images require Android %2$d or later on this device</string>
+    <string name="error_no_editor_app">No other app can edit images</string>
     <string name="error_no_external_viewer">No other image viewer is available</string>
     <string name="error_no_map_app">No app can open a map</string>
     <string name="error_print_failed">The print document could not be created</string>
@@ -318,6 +321,14 @@
     <string name="settings_show_location_title">Show location</string>
     <string name="settings_sync_favorites_summary">Also marks favorites in the system media library so other gallery apps see them; turning it on imports the favorites already there</string>
     <string name="settings_sync_favorites_title">Sync system favorites</string>
+    <string name="share_copy_custom">Custom</string>
+    <string name="share_copy_failed">The copy could not be made</string>
+    <string name="share_copy_long_edge">Long edge (px)</string>
+    <string name="share_copy_smaller">Smaller</string>
+    <string name="share_copy_smaller_summary">Scaled to a long edge, metadata removed as well</string>
+    <string name="share_copy_still_note">A copy of an animated image is a still image</string>
+    <string name="share_copy_without_metadata">Without metadata</string>
+    <string name="share_copy_without_metadata_summary">Full size; camera, date, location and other metadata are removed</string>
     <string name="slideshow_ended">Slideshow finished</string>
     <string name="slideshow_include_gifs">Include animated GIFs</string>
     <string name="slideshow_interval">Interval</string>
