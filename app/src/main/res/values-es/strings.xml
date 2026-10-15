@@ -324,6 +324,10 @@
     <string name="overwrite_without_undo_message">No hay espacio para guardar una copia del original, así que no se podrá deshacer.</string>
     <string name="overwrite_without_undo_title">Sobrescribir sin poder deshacer?</string>
     <string name="page_counter">%1$d / %2$d</string>
+    <string name="pick_confirm">Listo (%1$d)</string>
+    <string name="pick_permission_body">Permite el acceso a las fotos para que las imágenes que elijas se entreguen al script.</string>
+    <string name="pick_title_multiple">Elige imágenes</string>
+    <string name="pick_title_single">Elige una imagen</string>
     <string name="plugin_description">Visualización, edición y conversión de imágenes</string>
     <string name="progress_copying">Copiando imágenes</string>
     <string name="progress_count">%1$d / %2$d</string>

@@ -324,6 +324,10 @@
     <string name="overwrite_without_undo_message">لا توجد مساحة للاحتفاظ بنسخة من الصورة الأصلية, لذا لا يمكن التراجع عن هذا الاستبدال.</string>
     <string name="overwrite_without_undo_title">الاستبدال دون تراجع?</string>
     <string name="page_counter">%1$d / %2$d</string>
+    <string name="pick_confirm">تم (%1$d)</string>
+    <string name="pick_permission_body">اسمح بالوصول إلى الصور حتى يمكن تسليم الصور التي تختارها إلى البرنامج النصي.</string>
+    <string name="pick_title_multiple">اختر صورًا</string>
+    <string name="pick_title_single">اختر صورة</string>
     <string name="plugin_description">عرض الصور وتحريرها وتحويل صيغها</string>
     <string name="progress_copying">جار نسخ الصور</string>
     <string name="progress_count">%1$d / %2$d</string>

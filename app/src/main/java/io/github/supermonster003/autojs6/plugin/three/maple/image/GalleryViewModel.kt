@@ -121,6 +121,7 @@ internal data class MediaGridUiState(
 internal class GalleryViewModel(application: Application) : AndroidViewModel(application) {
 
     private val media = MediaStoreRepository(application)
+    private var pickFilter: ((MediaItem) -> Boolean)? = null
     private val folderRepository = AuthorizedFolderRepository(application)
     private val preferences = GalleryPreferences(application)
     private val favorites = FavoritesRepository(application)
@@ -711,6 +712,14 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
         reloadAfterChange()
     }
 
+    /**
+     * The script picker's filter (ROADMAP 10.2): only matching images are listed. A filtered album is loaded whole,
+     * so the page offsets never count images the filter dropped.
+     */
+    fun setPickFilter(filter: ((MediaItem) -> Boolean)?) {
+        pickFilter = filter
+    }
+
     private fun loadPage(reset: Boolean): Job? {
         val album = _grid.value.album ?: return null
         val job = viewModelScope.launch {
@@ -720,6 +729,22 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             val sort = _grid.value.sort
             val grouping = _grid.value.grouping
             val query = _grid.value.query
+            val filter = pickFilter
+            if (filter != null) {
+                if (!reset) return@launch
+                val (all, folderLimit) = wholeAlbum(album, sort)
+                val kept = withContext(Dispatchers.Default) { all.filter(filter).let { if (query.isNotBlank()) MediaSearch.items(it, query) else it } }
+                val groups = if (query.isBlank() && grouping != MediaGrouping.NONE && MediaCatalog.groupable(sort)) {
+                    withContext(Dispatchers.Default) { MediaCatalog.groups(kept, sort, grouping, TimeZone.getDefault()) }
+                } else {
+                    emptyList()
+                }
+                _grid.update { state ->
+                    if (state.album?.id != album.id) return@update state
+                    state.copy(items = kept, groups = groups, loading = false, refreshing = false, endReached = true, limit = folderLimit)
+                }
+                return@launch
+            }
             if (query.isNotBlank()) {
                 // A search covers the whole album at once; no sections while searching.
                 if (!reset) return@launch

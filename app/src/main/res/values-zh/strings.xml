@@ -324,6 +324,10 @@
     <string name="overwrite_without_undo_message">没有空间保留原图的副本, 这次覆盖将无法撤销.</string>
     <string name="overwrite_without_undo_title">覆盖后无法撤销, 继续吗?</string>
     <string name="page_counter">%1$d / %2$d</string>
+    <string name="pick_confirm">完成 (%1$d)</string>
+    <string name="pick_permission_body">授予照片访问权限后, 才能把你选择的图片交给脚本.</string>
+    <string name="pick_title_multiple">选择图片</string>
+    <string name="pick_title_single">选择一张图片</string>
     <string name="plugin_description">图片查看, 编辑与格式转换</string>
     <string name="progress_copying">正在复制图片</string>
     <string name="progress_count">%1$d / %2$d</string>

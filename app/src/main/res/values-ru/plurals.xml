@@ -138,6 +138,12 @@
         <item quantity="many">Скрыть %1$d альбомов?</item>
         <item quantity="other">Скрыть %1$d альбома?</item>
     </plurals>
+    <plurals name="pick_limit_reached">
+        <item quantity="one">Можно выбрать не более %1$d изображения</item>
+        <item quantity="few">Можно выбрать не более %1$d изображений</item>
+        <item quantity="many">Можно выбрать не более %1$d изображений</item>
+        <item quantity="other">Можно выбрать не более %1$d изображения</item>
+    </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="one">%1$d день</item>
         <item quantity="few">%1$d дня</item>

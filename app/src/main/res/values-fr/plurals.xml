@@ -115,6 +115,10 @@
         <item quantity="many">Masquer %1$d albums?</item>
         <item quantity="other">Masquer %1$d albums?</item>
     </plurals>
+    <plurals name="pick_limit_reached">
+        <item quantity="one">Vous pouvez choisir jusqu\'à %1$d image</item>
+        <item quantity="other">Vous pouvez choisir jusqu\'à %1$d images</item>
+    </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="one">%1$d jour</item>
         <item quantity="many">%1$d jours</item>

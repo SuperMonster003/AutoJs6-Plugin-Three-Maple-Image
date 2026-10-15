@@ -41,6 +41,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import io.github.supermonster003.autojs6.plugin.three.maple.image.scriptapi.GallerySessionActivity
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ShareCopyDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ShareCopyDialogState
@@ -798,6 +799,8 @@ class ImageViewerActivity : ConfiguredActivity() {
             }
         }
         publishResult()
+        // A script's viewer session (ROADMAP 10.2) reports the page to the host.
+        GallerySessionActivity.onViewerPage(intent, index)
         syncCurrentPage(pageChanged = true)
     }
 

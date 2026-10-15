@@ -324,6 +324,10 @@
     <string name="overwrite_without_undo_message">There is no room to keep a copy of the original, so this overwrite cannot be undone.</string>
     <string name="overwrite_without_undo_title">Overwrite without undo?</string>
     <string name="page_counter">%1$d / %2$d</string>
+    <string name="pick_confirm">Done (%1$d)</string>
+    <string name="pick_permission_body">Allow photo access so that the images you choose can be handed to the script.</string>
+    <string name="pick_title_multiple">Choose images</string>
+    <string name="pick_title_single">Choose an image</string>
     <string name="plugin_description">Image viewing, editing and format conversion</string>
     <string name="progress_copying">Copying images</string>
     <string name="progress_count">%1$d / %2$d</string>

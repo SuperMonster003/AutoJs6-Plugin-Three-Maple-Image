@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import org.json.JSONObject
 import java.io.File
+import java.io.InputStream
 import java.util.UUID
 
 /** Private standalone sessions never broaden the exported host's strict URI grant contract. */
@@ -23,13 +24,29 @@ internal object StandaloneImageWork {
     }
     /** [overwritable]: the caller can write [document] back, so the tool may offer to overwrite it (ROADMAP 8.2). */
     fun create(context: Context, document: StandaloneDocument, action: String, overwritable: Boolean = false): String {
-        require(action == ImageToolsPlugin.EDIT_ACTION_ID || action == ImageToolsPlugin.CONVERT_ACTION_ID)
         require(document.size <= ImageToolsRequestPolicy.MAX_INPUT_BYTES)
+        return create(context, document.name, document.mimeType, action, overwritable) { context.contentResolver.openInputStream(document.uri) }
+    }
+
+    /**
+     * A session whose input is read from [open] (a script's source descriptor, ROADMAP 10.2); [mimeType] null
+     * detects the type from the copied image. [saveDefaults] seed the editor's save dialog.
+     */
+    fun create(
+        context: Context,
+        name: String,
+        mimeType: String?,
+        action: String,
+        overwritable: Boolean = false,
+        saveDefaults: EditorSaveOptions? = null,
+        open: () -> InputStream?,
+    ): String {
+        require(action == ImageToolsPlugin.EDIT_ACTION_ID || action == ImageToolsPlugin.CONVERT_ACTION_ID)
         val id = UUID.randomUUID().toString()
         val directory = directory(context, id).apply { check(mkdirs()) }
         try {
             val input = File(directory, "input.bin")
-            context.contentResolver.openInputStream(document.uri)?.use { source ->
+            open()?.use { source ->
                 input.outputStream().use { output ->
                     val buffer = ByteArray(64 * 1024)
                     var bytes = 0L
@@ -43,8 +60,12 @@ internal object StandaloneImageWork {
                 }
             } ?: error("Input is unavailable")
             require(input.length() > 0)
-            val metadata = JSONObject().put("action", action).put("name", document.name)
-                .put("mime", document.mimeType).put("size", input.length()).put("overwrite", overwritable)
+            val detected = mimeType ?: BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                .also { BitmapFactory.decodeFile(input.path, it) }.outMimeType
+            requireNotNull(detected) { "Input is not a decodable image" }
+            val metadata = JSONObject().put("action", action).put("name", name)
+                .put("mime", detected).put("size", input.length()).put("overwrite", overwritable)
+            saveDefaults?.let { metadata.put("saveDefaults", saveDefaultsJson(it)) }
             File(directory, "session.json").writeText(metadata.toString())
             return id
         } catch (error: Throwable) {
@@ -67,7 +88,22 @@ internal object StandaloneImageWork {
             FileProvider.getUriForFile(context, authority, File(folder, "output.bin")),
             id, name, size, metadata.getString("mime"), ImageToolsPlugin.OUTPUT_MIME_TYPES.toSet(),
             ImageToolsPlugin.MAX_OUTPUT_BYTES, if (expectedAction == ImageToolsPlugin.EDIT_ACTION_ID) "edited" else "converted",
-            canOverwrite = metadata.optBoolean("overwrite", false))
+            canOverwrite = metadata.optBoolean("overwrite", false),
+            initialSaveOptions = metadata.optJSONObject("saveDefaults")?.let(::saveDefaults))
+    }.getOrNull()
+
+    private fun saveDefaultsJson(options: EditorSaveOptions): JSONObject = JSONObject()
+        .put("format", options.format.name).put("quality", options.quality).put("lossless", options.webpLossless)
+        .put("keepExif", options.keepExif).put("keepLocation", options.keepLocation)
+
+    private fun saveDefaults(json: JSONObject): EditorSaveOptions? = runCatching {
+        EditorSaveOptions(
+            format = EditorSaveFormat.valueOf(json.getString("format")),
+            quality = json.getInt("quality"),
+            webpLossless = json.optBoolean("lossless", false),
+            keepExif = json.optBoolean("keepExif", false),
+            keepLocation = json.optBoolean("keepLocation", false),
+        )
     }.getOrNull()
     fun hasOutput(context: Context, id: String): Boolean = runCatching {
         File(directory(context, id), "output.bin").length() > 0

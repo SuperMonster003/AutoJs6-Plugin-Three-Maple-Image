@@ -324,6 +324,10 @@
     <string name="overwrite_without_undo_message">Нет места для копии оригинала, поэтому перезапись нельзя будет отменить.</string>
     <string name="overwrite_without_undo_title">Перезаписать без отмены?</string>
     <string name="page_counter">%1$d / %2$d</string>
+    <string name="pick_confirm">Готово (%1$d)</string>
+    <string name="pick_permission_body">Разрешите доступ к фото, чтобы выбранные изображения можно было передать скрипту.</string>
+    <string name="pick_title_multiple">Выберите изображения</string>
+    <string name="pick_title_single">Выберите изображение</string>
     <string name="plugin_description">Просмотр, редактирование и преобразование изображений</string>
     <string name="progress_copying">Копирование изображений</string>
     <string name="progress_count">%1$d / %2$d</string>

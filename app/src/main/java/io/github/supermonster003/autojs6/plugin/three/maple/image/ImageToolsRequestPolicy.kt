@@ -29,6 +29,8 @@ internal data class ImageToolsRequest(
     val canOverwrite: Boolean = false,
     /** The host session of a "manage target" request (ROADMAP 8.2), which writes instead of [outputUri]. */
     val hostOutput: HostToolOutput? = null,
+    /** What the editor's save dialog starts with (a script's `gallery.edit` options, ROADMAP 10.2); null keeps the editor's own. */
+    val initialSaveOptions: EditorSaveOptions? = null,
 )
 
 /** Strictly validates the v3 read-only input and host-owned output transaction. */

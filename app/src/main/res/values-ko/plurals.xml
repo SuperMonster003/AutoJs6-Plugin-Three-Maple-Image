@@ -69,6 +69,9 @@
     <plurals name="hide_confirm_title">
         <item quantity="other">앨범 %1$d개를 숨길까요?</item>
     </plurals>
+    <plurals name="pick_limit_reached">
+        <item quantity="other">최대 %1$d장까지 선택할 수 있습니다</item>
+    </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="other">%1$d일</item>
     </plurals>

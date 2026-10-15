@@ -324,6 +324,10 @@
     <string name="overwrite_without_undo_message">沒有空間保留原圖的副本, 這次覆蓋將無法復原.</string>
     <string name="overwrite_without_undo_title">覆蓋後無法復原, 繼續嗎?</string>
     <string name="page_counter">%1$d / %2$d</string>
+    <string name="pick_confirm">完成 (%1$d)</string>
+    <string name="pick_permission_body">授予相片存取權限後, 才能把你選擇的圖片交給指令碼.</string>
+    <string name="pick_title_multiple">選擇圖片</string>
+    <string name="pick_title_single">選擇一張圖片</string>
     <string name="plugin_description">圖片檢視, 編輯與格式轉換</string>
     <string name="progress_copying">正在複製圖片</string>
     <string name="progress_count">%1$d / %2$d</string>

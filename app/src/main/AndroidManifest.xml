@@ -63,6 +63,21 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+        <!-- Script object "gallery" of AutoJs6 (ROADMAP 10.2): the service, the session Activity the host starts with a token, the picker and the viewer's images. -->
+        <service android:name=".scriptapi.GalleryPluginService" android:exported="true" android:permission="org.autojs.permission.PLUGIN">
+            <intent-filter>
+                <action android:name="org.autojs.plugin.GALLERY" />
+                <category android:name="gallery" />
+            </intent-filter>
+        </service>
+        <activity android:name=".scriptapi.GallerySessionActivity" android:excludeFromRecents="true" android:exported="true" android:permission="org.autojs.permission.PLUGIN" android:taskAffinity="" android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="org.autojs.plugin.GALLERY_SESSION_OPEN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".scriptapi.GalleryPickerActivity" android:exported="false" android:theme="@style/Theme.Standalone" />
+        <provider android:name=".scriptapi.GallerySessionImageProvider" android:authorities="io.github.supermonster003.autojs6.plugin.three.maple.image.gallery-images" android:exported="false" android:grantUriPermissions="false" />
         <activity android:name=".HomeActivity" android:exported="false" android:theme="@style/Theme.Standalone" />
         <activity android:name=".AppSettingsActivity" android:exported="false" android:theme="@style/Theme.Standalone" android:parentActivityName=".HomeActivity" />
         <activity android:name=".StoragePermissionActivity" android:exported="false" android:theme="@style/Theme.Standalone" android:parentActivityName=".AppSettingsActivity" />

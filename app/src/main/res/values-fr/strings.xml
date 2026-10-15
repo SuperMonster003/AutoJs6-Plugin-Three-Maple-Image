@@ -324,6 +324,10 @@
     <string name="overwrite_without_undo_message">Il n\'y a pas assez de place pour garder une copie de l\'original, ce remplacement ne pourra pas être annulé.</string>
     <string name="overwrite_without_undo_title">Remplacer sans pouvoir annuler ?</string>
     <string name="page_counter">%1$d / %2$d</string>
+    <string name="pick_confirm">Terminé (%1$d)</string>
+    <string name="pick_permission_body">Autorisez l\'accès aux photos pour que les images choisies soient transmises au script.</string>
+    <string name="pick_title_multiple">Choisissez des images</string>
+    <string name="pick_title_single">Choisissez une image</string>
     <string name="plugin_description">Affichage, retouche et conversion d\'images</string>
     <string name="progress_copying">Copie des images</string>
     <string name="progress_count">%1$d / %2$d</string>

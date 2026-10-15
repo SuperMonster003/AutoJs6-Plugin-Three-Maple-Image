@@ -128,6 +128,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
             finish()
             return
         }
+        request?.initialSaveOptions?.let { saveOptions = it }
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
@@ -864,7 +865,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
             keepExif = initial.keepExif,
             overwriteAvailable = overwriteFormat != null,
             keepExifAvailable = !sourceInfo.preservableExifMetadata.isEmpty,
-            keepLocation = draft?.keepLocation == true,
+            keepLocation = initial.keepLocation,
             keepLocationAvailable = ApplicationSettingsStore(this).load().showLocation &&
                 sourceInfo.preservableExifMetadata.hasLocation,
         )

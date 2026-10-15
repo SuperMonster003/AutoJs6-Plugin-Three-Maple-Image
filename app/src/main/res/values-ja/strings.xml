@@ -324,6 +324,10 @@
     <string name="overwrite_without_undo_message">元の画像のコピーを残す空き容量がないため, この上書きは元に戻せません.</string>
     <string name="overwrite_without_undo_title">元に戻せません. 上書きしますか?</string>
     <string name="page_counter">%1$d / %2$d</string>
+    <string name="pick_confirm">完了 (%1$d)</string>
+    <string name="pick_permission_body">選択した画像をスクリプトに渡すには, 写真へのアクセスを許可してください.</string>
+    <string name="pick_title_multiple">画像を選択</string>
+    <string name="pick_title_single">画像を 1 枚選択</string>
     <string name="plugin_description">画像の表示, 編集, 形式変換</string>
     <string name="progress_copying">画像をコピーしています</string>
     <string name="progress_count">%1$d / %2$d</string>

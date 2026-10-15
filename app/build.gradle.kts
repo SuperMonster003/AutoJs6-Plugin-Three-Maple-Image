@@ -146,6 +146,7 @@ dependencies {
 
     implementation(files("$rootDir/libs/common-plugin-api.aar"))
     implementation(files("$rootDir/libs/explorer-action-api.aar"))
+    implementation(files("$rootDir/libs/gallery-api.aar"))
 
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)

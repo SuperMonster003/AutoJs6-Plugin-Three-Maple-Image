@@ -69,6 +69,9 @@
     <plurals name="hide_confirm_title">
         <item quantity="other">隐藏 %1$d 个相册?</item>
     </plurals>
+    <plurals name="pick_limit_reached">
+        <item quantity="other">最多可选择 %1$d 张图片</item>
+    </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="other">%1$d 天</item>
     </plurals>

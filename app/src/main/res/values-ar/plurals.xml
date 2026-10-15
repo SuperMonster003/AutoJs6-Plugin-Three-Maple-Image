@@ -184,6 +184,14 @@
         <item quantity="many">إخفاء %1$d ألبوما?</item>
         <item quantity="other">إخفاء %1$d ألبوم?</item>
     </plurals>
+    <plurals name="pick_limit_reached">
+        <item quantity="zero">يمكنك اختيار %1$d صورة كحد أقصى</item>
+        <item quantity="one">يمكنك اختيار صورة واحدة كحد أقصى</item>
+        <item quantity="two">يمكنك اختيار صورتين كحد أقصى</item>
+        <item quantity="few">يمكنك اختيار %1$d صور كحد أقصى</item>
+        <item quantity="many">يمكنك اختيار %1$d صورة كحد أقصى</item>
+        <item quantity="other">يمكنك اختيار %1$d صورة كحد أقصى</item>
+    </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="zero">%1$d يوم</item>
         <item quantity="one">يوم واحد (%1$d)</item>

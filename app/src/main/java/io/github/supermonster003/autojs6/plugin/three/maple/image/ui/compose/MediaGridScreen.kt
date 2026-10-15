@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -106,6 +109,17 @@ internal class MediaGridCallbacks(
  * (authorized folders only delete and rename). Share, favorite, move and delete sit in the bar, the rest under
  * "More".
  */
+/**
+ * The script picker's mode of the grid (ROADMAP 10.2): the caller turns taps into choices, the bottom bar confirms
+ * a multiple choice, and the selection tools (select all, invert, the operations bar) stay hidden.
+ */
+internal class MediaGridPick(
+    val multiple: Boolean,
+    val confirmLabel: String,
+    val confirmEnabled: Boolean,
+    val onConfirm: () -> Unit,
+)
+
 internal class MediaSelectionActions(
     val onShare: (() -> Unit)? = null,
     val onFavorite: (() -> Unit)? = null,
@@ -134,6 +148,7 @@ internal fun MediaGridScreen(
     callbacks: MediaGridCallbacks,
     selectionActions: MediaSelectionActions = MediaSelectionActions(),
     snackbarHostState: SnackbarHostState? = null,
+    pick: MediaGridPick? = null,
 ) {
     var sortOpen by remember { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
@@ -171,7 +186,9 @@ internal fun MediaGridScreen(
         navigationIcon = if (selecting) painterResource(R.drawable.ic_close_24) else null,
         navigationContentDescription = if (selecting) stringResource(R.string.selection_exit) else null,
         actions = {
-            if (selecting) {
+            if (selecting && pick != null) {
+                // The picker keeps its choice small and explicit: no select all, no invert.
+            } else if (selecting) {
                 IconButton(onClick = callbacks.onSelectAll, modifier = Modifier.testTag("maple.selection.selectAll")) {
                     Icon(painterResource(R.drawable.ic_select_all_24), contentDescription = stringResource(R.string.selection_select_all))
                 }
@@ -240,7 +257,12 @@ internal fun MediaGridScreen(
                 }
             }
         },
-        bottomBar = { if (selecting) SelectionBar(selectionCount = state.selection.size, actions = selectionActions) },
+        bottomBar = {
+            when {
+                pick != null -> if (pick.multiple) PickConfirmBar(pick)
+                selecting -> SelectionBar(selectionCount = state.selection.size, actions = selectionActions)
+            }
+        },
         snackbarHostState = snackbarHostState,
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -411,6 +433,24 @@ private class DragPointer {
 }
 
 /** Bottom bar of selection mode: up to four direct actions plus "More" for the rest. */
+/** The picker's confirm bar: one button carrying the choice count. */
+@Composable
+private fun PickConfirmBar(pick: MediaGridPick) {
+    Surface(color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+        ) {
+            Button(onClick = pick.onConfirm, enabled = pick.confirmEnabled, modifier = Modifier.testTag("maple.pick.confirm")) {
+                Text(pick.confirmLabel)
+            }
+        }
+    }
+}
+
 @Composable
 private fun SelectionBar(selectionCount: Int, actions: MediaSelectionActions) {
     var moreOpen by remember { mutableStateOf(false) }

@@ -92,6 +92,10 @@
         <item quantity="one">Hide %1$d album?</item>
         <item quantity="other">Hide %1$d albums?</item>
     </plurals>
+    <plurals name="pick_limit_reached">
+        <item quantity="one">You can choose up to %1$d image</item>
+        <item quantity="other">You can choose up to %1$d images</item>
+    </plurals>
     <plurals name="recycle_bin_days_left">
         <item quantity="one">%1$d day</item>
         <item quantity="other">%1$d days</item>

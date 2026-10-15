@@ -324,6 +324,10 @@
     <string name="overwrite_without_undo_message">원본 사본을 보관할 공간이 없어 이번 덮어쓰기는 실행 취소할 수 없습니다.</string>
     <string name="overwrite_without_undo_title">실행 취소할 수 없습니다. 덮어쓸까요?</string>
     <string name="page_counter">%1$d / %2$d</string>
+    <string name="pick_confirm">완료 (%1$d)</string>
+    <string name="pick_permission_body">선택한 이미지를 스크립트에 전달하려면 사진 접근 권한을 허용하세요.</string>
+    <string name="pick_title_multiple">이미지 선택</string>
+    <string name="pick_title_single">이미지 1장 선택</string>
     <string name="plugin_description">이미지 보기, 편집 및 형식 변환</string>
     <string name="progress_copying">이미지 복사 중</string>
     <string name="progress_count">%1$d / %2$d</string>
