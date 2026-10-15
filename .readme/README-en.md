@@ -92,6 +92,7 @@ Viewing uses read-only inputs. Editing and conversion create a new file by defau
 - Four sizing modes cover `Original`, `Percentage` (1-1000), `Custom` with aspect-ratio locking, and `Long edge` (1920 px by default and never upscales); JPEG can fill transparency with white or black.
 - The converter and batch conversion share one form that previews the output resolution, estimated size and the file name to be saved in real time at the bottom, and the converter can also `Overwrite the original`. Safe EXIF preservation is off by default; when enabled it keeps bounded camera fields, normalizes orientation, and always removes embedded previews; GPS is removed by default, and with `Show location` on, `Keep location` can be chosen.
 - Configuration changes preserve the canvas, dialog drafts, undo/redo history, and running tasks. From AutoJs6, new files and overwrites are written through the host session: staged, read back and verified, and only then published, so a failure leaves nothing half-written; an overwrite can be undone within 8 seconds.
+- AutoJs6 scripts can also use 3-Maple Image through the `gallery` object: `gallery.pick` opens the picker and returns the images you choose, `gallery.view` shows images in the viewer, `gallery.edit` opens the editor and AutoJs6 saves the result, and `gallery.convert` converts images without showing anything. AutoJs6 opens the images and writes the results itself, so a script only reaches files it can access; picking needs the plugin's photo access, which the picker asks for first. This requires AutoJs6 6.8.0 host build 5439 or later.
 
 ******
 
@@ -306,6 +307,17 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v3.4.0
+
+###### 2026/10/15
+
+* `Hint` The AutoJs6 script object gallery requires AutoJs6 6.8.0 (build 5439) or later; viewing, editing and converting in the file manager still require build 5352
+* `Hint` Through gallery a script only handles files it can access itself: AutoJs6 opens the images and hands them to the plugin, AutoJs6 writes the results, and a pick only returns images the script can read
+* `Added` Pick images from scripts: AutoJs6 scripts can call gallery.pick to open the 3-Maple Image picker and let you choose one or more images (the script can limit the count and the image types); the script receives each image's path, dimensions, size and capture time. Without photo access the plugin asks you first
+* `Added` View from scripts: gallery.view opens the images a script names in the 3-Maple Image viewer; the script learns which one you are looking at and can close the viewer
+* `Added` Edit from scripts: gallery.edit opens an image in the 3-Maple Image editor; after you save, AutoJs6 writes the result (by default next to the original as name_edited), and leaving without saving gives the script null
+* `Added` Convert from scripts: gallery.convert converts an image without showing anything, with the converter's options (format, quality, size, target file size, background color, keep EXIF), by default next to the original as name_converted
+
 #### v3.3.0
 
 ###### 2026/10/15
@@ -350,17 +362,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Fixed` "Edit image" and "Convert image" missing from image files' "More" menus in the AutoJs6 file manager
 * `Fixed` On Android 15, renaming or deleting images on a storage card asked for a system confirmation, even for images saved by this app
 * `Fixed` On a phone in landscape, an editor tool panel (such as Brush) could fill the screen and hide the image and the OK button; panels now take at most half the screen and scroll the rest
-
-#### v3.1.2
-
-###### 2026/10/14
-
-* `Hint` Batch conversion from the AutoJs6 file manager needs an AutoJs6 version with a More button in its selection bar, which the released AutoJs6 versions do not have yet; until then, convert in batches from the albums of this plugin
-* `Added` Batch conversion: select images in an album and choose More > Convert to convert them all with one set of settings (format, quality, original size / percentage / long edge, clockwise rotation, JPEG background for transparency, whether to keep safe EXIF data)
-* `Added` Batch-converted images are saved next to their originals as <name>_converted and never replace them; albums that Android does not let apps add images to (such as Download) save into a folder of the same name under Pictures
-* `Added` A batch shows its progress and can be cancelled at any time (the image being converted is saved completely or not at all); images that could not be converted are listed with the reason and can be retried with the same settings
-* `Added` In the AutoJs6 file manager, Convert images works on selected images: the new images are saved next to the originals, and only when every image converts, so a failure leaves no new file
-* `Fixed` After opening an image from an album, the next or previous image sometimes kept loading, and Print stayed unavailable
 
 ##### Full history
 

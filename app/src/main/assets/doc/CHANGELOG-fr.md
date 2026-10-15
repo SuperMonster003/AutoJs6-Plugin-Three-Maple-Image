@@ -4,6 +4,17 @@
 
 ******
 
+## v3.4.0
+
+###### 2026/10/15
+
+* `Note` L'objet de script AutoJs6 gallery nécessite AutoJs6 6.8.0 (build 5439) ou plus récent; afficher, modifier et convertir depuis le gestionnaire de fichiers ne demandent toujours que le build 5352
+* `Note` Avec gallery, un script ne traite que les fichiers auxquels il a lui-même accès: AutoJs6 ouvre les images et les transmet au plugin, AutoJs6 écrit les résultats, et une sélection ne renvoie que les images que le script peut lire
+* `Fonctionnalité` Sélection d'images depuis les scripts: les scripts AutoJs6 peuvent appeler gallery.pick pour ouvrir le sélecteur de 3-Maple Image et vous laisser choisir une ou plusieurs images (le script peut limiter le nombre et les types d'image); le script reçoit le chemin, les dimensions, la taille et la date de prise de vue de chaque image. Sans accès aux photos, le plugin vous le demande d'abord
+* `Fonctionnalité` Affichage depuis les scripts: gallery.view ouvre les images indiquées par un script dans la visionneuse de 3-Maple Image; le script sait quelle image vous regardez et peut fermer la visionneuse
+* `Fonctionnalité` Modification depuis les scripts: gallery.edit ouvre une image dans l'éditeur de 3-Maple Image; après votre enregistrement, AutoJs6 écrit le résultat (par défaut à côté de l'original sous le nom nom_edited), et si vous quittez sans enregistrer le script reçoit null
+* `Fonctionnalité` Conversion depuis les scripts: gallery.convert convertit une image sans rien afficher, avec les options du convertisseur (format, qualité, taille, taille de fichier cible, couleur de fond, conserver l'EXIF), par défaut à côté de l'original sous le nom nom_converted
+
 ## v3.3.0
 
 ###### 2026/10/15

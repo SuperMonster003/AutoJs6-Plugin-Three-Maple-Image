@@ -31,6 +31,8 @@ En el administrador de archivos, `Ver como álbum` en el menú de un directorio 
 
 Se requiere la compilación 5352 o posterior del anfitrión.
 
+Los scripts de AutoJs6 también pueden usar 3-Maple Image con el objeto `gallery`: `gallery.pick` abre el selector y devuelve las imágenes elegidas, `gallery.view` muestra imágenes en el visor, `gallery.edit` abre el editor y AutoJs6 guarda el resultado, y `gallery.convert` convierte imágenes sin mostrar nada. AutoJs6 abre las imágenes y escribe los resultados, por lo que un script solo alcanza los archivos a los que puede acceder; la selección necesita el acceso a las fotos del plugin, que el selector pide primero. Esta función requiere la compilación 5439 o posterior del anfitrión AutoJs6 6.8.0.
+
 Límites de seguridad y privacidad:
 
 - El origen seleccionado usa un URI `content` temporal de solo lectura; los hermanos directos solo se abren mediante la sesión `readSiblings` limitada del anfitrión.

@@ -31,6 +31,8 @@ HEIC 与 HEIF 需要 Android 9 或更高版本, AVIF 需要 Android 12 或更高
 
 需要宿主构建版本 5352 或更高版本.
 
+AutoJs6 脚本也可以通过 `gallery` 对象使用 3-Maple Image: `gallery.pick` 打开选图界面并返回你选中的图片, `gallery.view` 用查看器显示图片, `gallery.edit` 打开编辑器并由 AutoJs6 保存结果, `gallery.convert` 不显示界面地转换图片. 图片由 AutoJs6 打开, 结果也由 AutoJs6 写入, 因此脚本只能处理它自己能访问的文件; 选图需要插件的照片权限, 选图界面会先申请. 此功能需要 AutoJs6 6.8.0 宿主构建版本 5439 或更高版本.
+
 安全和隐私限制:
 
 - 选中源文件使用临时只读 `content` URI; 同目录直属文件只能通过限域的宿主 `readSiblings` 会话打开.

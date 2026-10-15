@@ -355,7 +355,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 - [x] (宿主) `plugin-api/gallery-api`: AIDL `IGalleryPlugin` (`getInfo`, `openPicker`, `openViewer`, `openEditor`, `convert`) 与 `IGalleryCallback` (`onResult(generation, seq, Bundle)`), 键常量, 协议版本 1, 错误码; `docs/dev/gallery-plugin-protocol-v1.md`. 验收: 契约评审记录; AIDL 事务号固定. 完成 (宿主本地提交 09e991f9a, 构建 3784): 按评审实际为 `IGalleryPlugin` (`getInfo`, `getCapabilities`, `openPicker`, `openViewer`, `openEditor`, `convert`), `IGallerySession` (`getState`, `close`) 与 `oneway IGalleryCallback.onEvent(generation, seq, Bundle)`; `GalleryAidlOrderTest` / `GalleryContractTest` 固定事务号与字面值; `REQUIRED_HOST_VERSION_CODE` 暂为 5436, 脚本 API 落地的构建确定后再调整.
 - [x] (宿主) `core/plugin/gallery/` 客户端: 绑定, 租约与死亡处理, token 与 `startActivity` 启动插件 Activity (T17), 结果路径校验 (必须位于脚本可访问的共享存储或脚本指定输出目录), 超时与取消. 验收: 宿主单元测试. 完成 (宿主本地提交 a149ec2ea, 构建 3785): `GalleryPluginHost` (选择, 版本与功能协商, 专用绑定租约上的会话, 令牌启动, 无界面 `convert` 180 s 超时), `GallerySessionBridge` (generation / seq 检查, 进程死亡本地关闭), `GalleryFiles` (源文件只读打开, 选图结果只保留脚本可读路径, 输出暂存 + 回读 + 发布, 仅 overwrite 时替换); 插件中心发现 / 探测 / 默认启用; 单元测试 23 项通过.
-- [ ] (宿主) augment `gallery`: `pick(options)`, `view(paths, options)`, `edit(path, options)`, `convert(path, options)` 的同步与 `*Async` (Promise) 形态, 事件 (`view` 会话的 `page` / `close`), 错误 `GalleryError` (`PLUGIN_UNAVAILABLE` 家族复用 `AidlPluginHost.buildSelectionFailure`); 注册到 `ScriptRuntime`; 示例脚本. 验收: 宿主 Rhino 测试; 插件缺失时错误文案可读.
+- [x] (宿主) augment `gallery`: `pick(options)`, `view(paths, options)`, `edit(path, options)`, `convert(path, options)` 的同步与 `*Async` (Promise) 形态, 事件 (`view` 会话的 `page` / `close`), 错误 `GalleryError` (`PLUGIN_UNAVAILABLE` 家族复用 `AidlPluginHost.buildSelectionFailure`); 注册到 `ScriptRuntime`; 示例脚本. 验收: 宿主 Rhino 测试; 插件缺失时错误文案可读. 完成 (宿主本地提交 902141102, 构建 3787 = versionCode 5439, `GalleryIds.REQUIRED_HOST_VERSION_CODE` 随之改为 5439): `runtime/api/gallery` (参数校验, 值转换, 每脚本服务) 与 `runtime/api/augment/gallery` (全局对象, `GalleryError` 类, `GalleryViewSession` 发射器, 选图 / 编辑等待器); `pick` / `edit` / `convert` 的同步形态在 UI 线程拒绝; 脚本退出时选图器与编辑器结束, 查看器保留; 11 种语言的插件不可用提示 `error_gallery_plugin_unavailable`; 示例 `相册/选图并转换`, `相册/编辑图片`; 宿主 zh-Hans changelog 一条. 测试: JVM 22 项 (参数, 值, 错误类, 会话与等待器, 全局函数登记), 宿主 androidTest `GalleryScriptApiTest` (887e63908: 转换的默认名, 序号, 显式输出, 覆盖与错误码, 查看器跟随与关闭, 选图 / 编辑按返回键得到 null, 缺插件时 `PLUGIN_UNAVAILABLE`) 在 AVD API 30 + 宿主 debug + 插件 debug 通过.
 
 ### 10.2 插件服务
 
@@ -364,8 +364,8 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 10.3 文档与声明
 
-- [ ] (文档) `AutoJs6-Documentation/api/gallery.md` (+ 类型页), `AutoJs6-TypeScript-Declarations/aj6-int-gallery.d.ts`, Ace Editor 声明再生成 (`:app:generateAutoJs6LspDeclarations`), Offline Docs 同步 (10 种语言 changelog `improvement` + `generate_markdown.py`); 宿主与四仓库版本按 AGENTS 规则递增. 验收: 文档校验器 (`normalize-markdown.py` 等) 通过.
-- [ ] (索引) 索引清单 `capabilities` 增加 `gallery` 协议版本.
+- [x] (文档) `AutoJs6-Documentation/api/gallery.md` (+ 类型页), `AutoJs6-TypeScript-Declarations/aj6-int-gallery.d.ts`, Ace Editor 声明再生成 (`:app:generateAutoJs6LspDeclarations`), Offline Docs 同步 (10 种语言 changelog `improvement` + `generate_markdown.py`); 宿主与四仓库版本按 AGENTS 规则递增. 验收: 文档校验器 (`normalize-markdown.py` 等) 通过. 完成 (2026-10-15): 文档 `gallery.md` 与 `galleryViewSessionType.md` (e3e6ffe, 计数 113 = 039ce17, 已推送), 离线文档同步并通过 `--verify-offline` (937e6a7, 已推送); 声明 4.39.0 (0a9da06, 含 smoke 夹具用例, 覆盖校验通过); Ace Editor 2.1.0 (663a806, 经宿主 `generate-editor-assets.mjs` 导入与再生成并校验) 与宿主补全源索引 (5e566a076). 声明与 Ace 两仓库按其惯例只提交不推送.
+- [~] (索引) 索引清单 `capabilities` 增加 `gallery` 协议版本. 进度 (2026-10-15): 插件在 gallery 服务上声明元数据 `org.autojs.plugin.gallery.CONTRACT_VERSION` (1) 与 `org.autojs.plugin.gallery.REQUIRES_HOST_VERSION` (5439), 不绑定即可读取. 索引生成器的契约字段按插件包而不是按引擎记录 (只有一组 `protocolApiMin` / `protocolApiMax`), 宿主插件中心也不读取 gallery 契约 (契约在绑定时校验, 不兼容时 `PLUGIN_INCOMPATIBLE`), 所以生成器读出这项元数据留待有使用方时再做; 3.4.0 的索引条目照旧记录 `requiresHostVersion` 5352 (文件管理器动作).
 
 ### 10.4 发布
 

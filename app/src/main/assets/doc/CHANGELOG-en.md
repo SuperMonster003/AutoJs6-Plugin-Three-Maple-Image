@@ -4,6 +4,17 @@
 
 ******
 
+## v3.4.0
+
+###### 2026/10/15
+
+* `Hint` The AutoJs6 script object gallery requires AutoJs6 6.8.0 (build 5439) or later; viewing, editing and converting in the file manager still require build 5352
+* `Hint` Through gallery a script only handles files it can access itself: AutoJs6 opens the images and hands them to the plugin, AutoJs6 writes the results, and a pick only returns images the script can read
+* `Added` Pick images from scripts: AutoJs6 scripts can call gallery.pick to open the 3-Maple Image picker and let you choose one or more images (the script can limit the count and the image types); the script receives each image's path, dimensions, size and capture time. Without photo access the plugin asks you first
+* `Added` View from scripts: gallery.view opens the images a script names in the 3-Maple Image viewer; the script learns which one you are looking at and can close the viewer
+* `Added` Edit from scripts: gallery.edit opens an image in the 3-Maple Image editor; after you save, AutoJs6 writes the result (by default next to the original as name_edited), and leaving without saving gives the script null
+* `Added` Convert from scripts: gallery.convert converts an image without showing anything, with the converter's options (format, quality, size, target file size, background color, keep EXIF), by default next to the original as name_converted
+
 ## v3.3.0
 
 ###### 2026/10/15

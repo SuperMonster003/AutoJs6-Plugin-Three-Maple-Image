@@ -31,6 +31,8 @@ In the file manager, `View as album` in a directory's menu opens that directory 
 
 Host build 5352 or later is required.
 
+AutoJs6 scripts can also use 3-Maple Image through the `gallery` object: `gallery.pick` opens the picker and returns the images you choose, `gallery.view` shows images in the viewer, `gallery.edit` opens the editor and AutoJs6 saves the result, and `gallery.convert` converts images without showing anything. AutoJs6 opens the images and writes the results itself, so a script only reaches files it can access; picking needs the plugin's photo access, which the picker asks for first. This requires AutoJs6 6.8.0 host build 5439 or later.
+
 Safety and privacy limits:
 
 - The selected source uses a temporary read-only `content` URI; direct siblings are opened only through the scoped host `readSiblings` session.

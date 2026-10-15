@@ -31,6 +31,8 @@ Dans le gestionnaire de fichiers, `Afficher comme album` dans le menu d'un dossi
 
 La version 5352 ou ultérieure de l'hôte est requise.
 
+Les scripts AutoJs6 peuvent aussi utiliser 3-Maple Image avec l'objet `gallery`: `gallery.pick` ouvre le sélecteur et renvoie les images choisies, `gallery.view` affiche des images dans la visionneuse, `gallery.edit` ouvre l'éditeur et AutoJs6 enregistre le résultat, et `gallery.convert` convertit des images sans rien afficher. AutoJs6 ouvre les images et écrit les résultats lui-même, un script n'atteint donc que les fichiers auxquels il a accès; la sélection a besoin de l'accès aux photos du plugin, que le sélecteur demande d'abord. Cette fonction nécessite la version 5439 ou ultérieure de l'hôte AutoJs6 6.8.0.
+
 Limites de sécurité et de confidentialité:
 
 - La source sélectionnée utilise un URI `content` temporaire en lecture seule; les voisins directs ne sont ouverts que par la session `readSiblings` limitée de l'hôte.

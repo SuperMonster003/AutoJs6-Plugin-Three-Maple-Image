@@ -5,6 +5,19 @@
   "changelog_label_improvement": "優化",
   "changelog_label_dependency": "相依性",
   "$data": {
+    "v3.4.0": {
+      "released_date": "2026/10/15",
+      "hint": [
+        "AutoJs6 指令碼物件 gallery 需要 AutoJs6 6.8.0 (建置版本 5439) 或更高版本; 檔案管理員中的檢視, 編輯和轉換仍只需要建置版本 5352",
+        "指令碼透過 gallery 只能處理它自己能存取的檔案: 圖片由 AutoJs6 開啟後交給外掛, 結果由 AutoJs6 寫入, 選圖結果只包含指令碼能讀取的圖片"
+      ],
+      "feature": [
+        "指令碼選圖: AutoJs6 指令碼可用 gallery.pick 開啟 3-Maple Image 的選圖介面, 讓你選一張或多張圖片 (指令碼可以限制數量和圖片類型), 指令碼取得圖片的路徑, 尺寸, 大小和拍攝時間; 外掛沒有相片權限時會先向你要求",
+        "指令碼檢視: gallery.view 用 3-Maple Image 的檢視器開啟指令碼指定的圖片, 指令碼可以知道你正在看第幾張, 也可以關閉檢視器",
+        "指令碼編輯: gallery.edit 用 3-Maple Image 的編輯器開啟一張圖片, 你儲存後由 AutoJs6 寫出結果 (預設在原圖旁另存為 名稱_edited), 離開而不儲存時指令碼得到 null",
+        "指令碼轉換: gallery.convert 不顯示介面, 按轉換器的選項 (格式, 品質, 尺寸, 目標檔案大小, 背景色, 保留 EXIF) 轉換圖片, 預設在原圖旁另存為 名稱_converted"
+      ]
+    },
     "v3.3.0": {
       "released_date": "2026/10/15",
       "hint": [

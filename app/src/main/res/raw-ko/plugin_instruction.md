@@ -31,6 +31,8 @@ HEIC와 HEIF에는 Android 9 이상이 필요하고 AVIF에는 Android 12 이상
 
 호스트 빌드 5352 이상이 필요합니다.
 
+AutoJs6 스크립트도 `gallery` 객체로 3-Maple Image 를 사용할 수 있습니다. `gallery.pick` 은 이미지 선택 화면을 열어 고른 이미지를 돌려주고, `gallery.view` 는 뷰어로 이미지를 보여 주며, `gallery.edit` 는 편집기를 열고 AutoJs6 가 결과를 저장하고, `gallery.convert` 는 화면 없이 이미지를 변환합니다. 이미지는 AutoJs6 가 열고 결과도 AutoJs6 가 기록하므로 스크립트는 자신이 접근할 수 있는 파일만 다룹니다. 이미지 선택에는 플러그인의 사진 접근 권한이 필요하며 선택 화면이 먼저 요청합니다. 이 기능에는 AutoJs6 6.8.0 호스트 빌드 5439 이상이 필요합니다.
+
 안전 및 개인정보 제한:
 
 - 선택한 원본은 임시 읽기 전용 `content` URI를 사용하고, 바로 이웃한 파일은 범위가 제한된 호스트 `readSiblings` 세션으로만 엽니다.

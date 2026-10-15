@@ -48,6 +48,9 @@ class GalleryScriptApiTest {
         )
         val service = services.single().serviceInfo
         assertEquals(GalleryPluginService::class.java.name, service.name)
+        val declared = context.packageManager.getServiceInfo(android.content.ComponentName(context, GalleryPluginService::class.java), PackageManager.GET_META_DATA).metaData
+        assertEquals(GalleryContract.CONTRACT_VERSION, declared.getInt("org.autojs.plugin.gallery.CONTRACT_VERSION"))
+        assertEquals(GalleryIds.REQUIRED_HOST_VERSION_CODE, declared.getInt("org.autojs.plugin.gallery.REQUIRES_HOST_VERSION").toLong())
         assertEquals(GalleryActions.PLUGIN_PERMISSION, service.permission)
         assertTrue(service.exported && service.enabled)
 

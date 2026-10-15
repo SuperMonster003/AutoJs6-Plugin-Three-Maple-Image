@@ -5,6 +5,19 @@
   "changelog_label_improvement": "Mejora",
   "changelog_label_dependency": "Dependencia",
   "$data": {
+    "v3.4.0": {
+      "released_date": "2026/10/15",
+      "hint": [
+        "El objeto de script de AutoJs6 gallery requiere AutoJs6 6.8.0 (compilación 5439) o posterior; ver, editar y convertir desde el administrador de archivos siguen requiriendo solo la compilación 5352",
+        "Con gallery, un script solo trata archivos a los que él mismo puede acceder: AutoJs6 abre las imágenes y se las entrega al plugin, AutoJs6 escribe los resultados y una selección solo devuelve imágenes que el script puede leer"
+      ],
+      "feature": [
+        "Seleccionar imágenes desde scripts: los scripts de AutoJs6 pueden llamar a gallery.pick para abrir el selector de 3-Maple Image y dejarle elegir una o varias imágenes (el script puede limitar la cantidad y los tipos de imagen); el script recibe la ruta, las dimensiones, el tamaño y la fecha de captura de cada imagen. Sin acceso a las fotos, el plugin se lo pide primero",
+        "Ver desde scripts: gallery.view abre en el visor de 3-Maple Image las imágenes que indica un script; el script sabe cuál está mirando y puede cerrar el visor",
+        "Editar desde scripts: gallery.edit abre una imagen en el editor de 3-Maple Image; cuando usted guarda, AutoJs6 escribe el resultado (por defecto junto al original como nombre_edited), y si sale sin guardar el script recibe null",
+        "Convertir desde scripts: gallery.convert convierte una imagen sin mostrar nada, con las opciones del convertidor (formato, calidad, tamaño, tamaño de archivo objetivo, color de fondo, conservar EXIF), por defecto junto al original como nombre_converted"
+      ]
+    },
     "v3.3.0": {
       "released_date": "2026/10/15",
       "hint": [

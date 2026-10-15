@@ -92,6 +92,7 @@ La lecture utilise des entrées en lecture seule. La retouche et la conversion c
 - Quatre modes de taille couvrent `Original`, `Pourcentage` (1-1000), `Personnalisé` avec verrouillage des proportions et `Côté long` (1920 px par défaut, sans agrandissement); JPEG peut remplir la transparence en blanc ou noir.
 - Le convertisseur et la conversion par lots partagent un même formulaire qui affiche en temps réel, en bas, la résolution de sortie, la taille estimée et le nom du fichier qui sera enregistré; le convertisseur peut aussi `Remplacer l'original`. La conservation EXIF sûre est désactivée par défaut; activée, elle garde des champs d'appareil bornés, normalise l'orientation et supprime toujours les aperçus intégrés; le GPS est retiré par défaut et, avec `Afficher la position` activé, `Conserver la position` peut être choisi.
 - Les changements de configuration conservent le canevas, les brouillons, l'historique annuler/rétablir et les tâches en cours. Depuis AutoJs6, les nouveaux fichiers et les remplacements passent par la session de l'hôte: ils sont préparés, relus pour vérification et publiés seulement ensuite, si bien qu'un échec ne laisse aucun fichier à moitié écrit; un remplacement peut être annulé pendant 8 secondes.
+- Les scripts AutoJs6 peuvent aussi utiliser 3-Maple Image avec l'objet `gallery`: `gallery.pick` ouvre le sélecteur et renvoie les images choisies, `gallery.view` affiche des images dans la visionneuse, `gallery.edit` ouvre l'éditeur et AutoJs6 enregistre le résultat, et `gallery.convert` convertit des images sans rien afficher. AutoJs6 ouvre les images et écrit les résultats lui-même, un script n'atteint donc que les fichiers auxquels il a accès; la sélection a besoin de l'accès aux photos du plugin, que le sélecteur demande d'abord. Cette fonction nécessite la version 5439 ou ultérieure de l'hôte AutoJs6 6.8.0.
 
 ******
 
@@ -306,6 +307,17 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
+#### v3.4.0
+
+###### 2026/10/15
+
+* `Note` L'objet de script AutoJs6 gallery nécessite AutoJs6 6.8.0 (build 5439) ou plus récent; afficher, modifier et convertir depuis le gestionnaire de fichiers ne demandent toujours que le build 5352
+* `Note` Avec gallery, un script ne traite que les fichiers auxquels il a lui-même accès: AutoJs6 ouvre les images et les transmet au plugin, AutoJs6 écrit les résultats, et une sélection ne renvoie que les images que le script peut lire
+* `Fonctionnalité` Sélection d'images depuis les scripts: les scripts AutoJs6 peuvent appeler gallery.pick pour ouvrir le sélecteur de 3-Maple Image et vous laisser choisir une ou plusieurs images (le script peut limiter le nombre et les types d'image); le script reçoit le chemin, les dimensions, la taille et la date de prise de vue de chaque image. Sans accès aux photos, le plugin vous le demande d'abord
+* `Fonctionnalité` Affichage depuis les scripts: gallery.view ouvre les images indiquées par un script dans la visionneuse de 3-Maple Image; le script sait quelle image vous regardez et peut fermer la visionneuse
+* `Fonctionnalité` Modification depuis les scripts: gallery.edit ouvre une image dans l'éditeur de 3-Maple Image; après votre enregistrement, AutoJs6 écrit le résultat (par défaut à côté de l'original sous le nom nom_edited), et si vous quittez sans enregistrer le script reçoit null
+* `Fonctionnalité` Conversion depuis les scripts: gallery.convert convertit une image sans rien afficher, avec les options du convertisseur (format, qualité, taille, taille de fichier cible, couleur de fond, conserver l'EXIF), par défaut à côté de l'original sous le nom nom_converted
+
 #### v3.3.0
 
 ###### 2026/10/15
@@ -350,17 +362,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 * `Correctif` Absence des actions de modification et de conversion des images dans le menu "Plus" des fichiers image du gestionnaire de fichiers AutoJs6
 * `Correctif` Sur Android 15, renommer ou supprimer des images sur une carte de stockage demandait une confirmation du système, même pour les images enregistrées par cette application
 * `Correctif` Sur un téléphone en paysage, un panneau d'outil de l'éditeur (comme Pinceau) pouvait remplir l'écran et masquer l'image et le bouton OK; les panneaux occupent désormais au plus la moitié de l'écran et le reste défile
-
-#### v3.1.2
-
-###### 2026/10/14
-
-* `Note` La conversion par lot depuis le gestionnaire de fichiers d'AutoJs6 nécessite une version d'AutoJs6 avec un bouton Plus dans la barre de sélection, que les versions publiées d'AutoJs6 n'ont pas encore; en attendant, convertissez par lot depuis les albums de ce plugin
-* `Fonctionnalité` Conversion par lot: sélectionnez des images dans un album et choisissez Plus > Convertir pour toutes les convertir avec les mêmes réglages (format, qualité, taille d'origine / pourcentage / grand côté, rotation dans le sens horaire, fond JPEG pour la transparence, conserver ou non les données EXIF sûres)
-* `Fonctionnalité` Les images converties par lot sont enregistrées à côté des originales sous le nom <nom>_converted et ne les remplacent jamais; pour les albums où Android n'autorise pas l'ajout d'images (comme Download), elles vont dans un dossier du même nom sous Pictures
-* `Fonctionnalité` Le lot affiche sa progression et peut être annulé à tout moment (l'image en cours est enregistrée entièrement ou pas du tout); les images qui n'ont pas pu être converties sont listées avec la raison et peuvent être réessayées avec les mêmes réglages
-* `Fonctionnalité` Dans le gestionnaire de fichiers d'AutoJs6, Convertir les images agit sur les images sélectionnées: les nouvelles images sont enregistrées à côté des originales, et seulement si toutes sont converties, donc un échec ne laisse aucun nouveau fichier
-* `Correctif` Après l'ouverture d'une image depuis un album, l'image suivante ou précédente restait parfois en chargement, et Imprimer restait indisponible
 
 ##### Historique complet
 

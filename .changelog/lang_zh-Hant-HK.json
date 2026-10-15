@@ -5,6 +5,19 @@
   "changelog_label_improvement": "優化",
   "changelog_label_dependency": "依賴",
   "$data": {
+    "v3.4.0": {
+      "released_date": "2026/10/15",
+      "hint": [
+        "AutoJs6 腳本物件 gallery 需要 AutoJs6 6.8.0 (構建版本 5439) 或更高版本; 檔案管理器中的檢視, 編輯和轉換仍只需要構建版本 5352",
+        "腳本透過 gallery 只能處理它自己能存取的檔案: 圖片由 AutoJs6 開啟後交給插件, 結果由 AutoJs6 寫入, 選圖結果只包含腳本能讀取的圖片"
+      ],
+      "feature": [
+        "腳本選圖: AutoJs6 腳本可用 gallery.pick 開啟 3-Maple Image 的選圖介面, 讓你選一張或多張圖片 (腳本可以限制數量和圖片類型), 腳本取得圖片的路徑, 尺寸, 大小和拍攝時間; 插件沒有相片權限時會先向你申請",
+        "腳本檢視: gallery.view 用 3-Maple Image 的檢視器開啟腳本指定的圖片, 腳本可以知道你正在看第幾張, 亦可以關閉檢視器",
+        "腳本編輯: gallery.edit 用 3-Maple Image 的編輯器開啟一張圖片, 你儲存後由 AutoJs6 寫出結果 (預設在原圖旁另存為 名稱_edited), 離開而不儲存時腳本得到 null",
+        "腳本轉換: gallery.convert 不顯示介面, 按轉換器的選項 (格式, 質素, 尺寸, 目標檔案大小, 背景色, 保留 EXIF) 轉換圖片, 預設在原圖旁另存為 名稱_converted"
+      ]
+    },
     "v3.3.0": {
       "released_date": "2026/10/15",
       "hint": [

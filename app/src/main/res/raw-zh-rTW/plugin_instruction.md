@@ -31,6 +31,8 @@ HEIC 與 HEIF 需要 Android 9 或更新版本, AVIF 需要 Android 12 或更新
 
 需要主程式建置版本 5352 或更新版本.
 
+AutoJs6 指令碼也可以透過 `gallery` 物件使用 3-Maple Image: `gallery.pick` 開啟選圖介面並傳回你選取的圖片, `gallery.view` 用檢視器顯示圖片, `gallery.edit` 開啟編輯器並由 AutoJs6 儲存結果, `gallery.convert` 不顯示介面地轉換圖片. 圖片由 AutoJs6 開啟, 結果也由 AutoJs6 寫入, 因此指令碼只能處理它自己能存取的檔案; 選圖需要外掛的相片權限, 選圖介面會先要求. 此功能需要 AutoJs6 6.8.0 主程式建置版本 5439 或更新版本.
+
 安全和隱私限制:
 
 - 選取來源檔案使用暫時唯讀 `content` URI; 同一目錄的直屬檔案只能透過限域的主程式 `readSiblings` 工作階段開啟.
