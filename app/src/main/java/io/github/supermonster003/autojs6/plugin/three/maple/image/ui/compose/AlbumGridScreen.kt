@@ -49,6 +49,8 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.SearchUiState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaAccessState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaPermissionAction
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaSort
+import android.content.res.Configuration
+import io.github.supermonster003.autojs6.plugin.three.maple.image.GridPolicy
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
 
 internal class AlbumGridCallbacks(
@@ -276,7 +278,12 @@ private fun AlbumGrid(
     home: HomeUiState,
     header: (@Composable () -> Unit)? = null,
 ) {
-    val columns = MapleGridDefaults.albumColumns(LocalConfiguration.current.screenWidthDp)
+    val configuration = LocalConfiguration.current
+    val columns = GridPolicy.albumColumns(
+        LocalGridSettings.current,
+        landscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE,
+        widthDp = configuration.screenWidthDp,
+    )
     val horizontal = MapleSettingsDefaults.horizontalPadding
     // Full-span rows (headers, tool rows) carry their own 24 dp inset, so the grid itself has no horizontal
     // content padding and the album cells pad their outer edges by column instead.

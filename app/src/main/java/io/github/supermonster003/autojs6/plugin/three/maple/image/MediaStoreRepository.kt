@@ -76,9 +76,12 @@ internal class MediaStoreRepository(
     private fun cachedScan(): List<MediaItem>? = cachedAll ?: sharedAll?.also { shared -> cachedAll = shared }
 
     /** Aggregation runs off the main thread: a library of tens of thousands of images takes a noticeable while. */
-    suspend fun loadBuckets(): List<MediaBucket> {
+    suspend fun loadBuckets(
+        order: AlbumCoverOrder = AlbumCoverOrder.NEWEST,
+        chosenCover: (AlbumPath) -> Long? = { null },
+    ): List<MediaBucket> {
         val all = loadAll()
-        return withContext(Dispatchers.Default) { MediaCatalog.buckets(all) }
+        return withContext(Dispatchers.Default) { MediaCatalog.buckets(all, order, chosenCover) }
     }
 
     /**

@@ -105,6 +105,8 @@ internal data class MediaGridUiState(
     val ownSort: Boolean = false,
     /** Search inside the album (ROADMAP 7.5): with a query the grid shows the whole album filtered by file name. */
     val query: String = "",
+    /** The open media album has a cover of its own (ROADMAP 9.2): the menu offers to go back to the default. */
+    val customCover: Boolean = false,
 ) {
     val selecting: Boolean get() = selection.isNotEmpty()
 }
@@ -132,7 +134,14 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     private var favoriteIds: Set<Long> = emptySet()
     private var favoriteOrder: Pair<MediaSort, List<MediaItem>>? = null
     private val _albums = MutableStateFlow(GalleryUiState(albumSort = preferences.albumSort))
-    private val _grid = MutableStateFlow(MediaGridUiState(columns = preferences.mediaColumns))
+    private val _gridSettings = MutableStateFlow(preferences.grid)
+
+    /** Album and media grid settings (ROADMAP 9.2); the home screen reloads them when it comes back. */
+    val gridSettings: StateFlow<GridSettings> = _gridSettings.asStateFlow()
+
+    /** The window is in landscape: the media grid uses its landscape columns. */
+    private var landscape = false
+    private val _grid = MutableStateFlow(MediaGridUiState(columns = currentColumns()))
     private var access: MediaPermissionResolution? = null
     private var gridJob: Job? = null
     private var reloadJob: Job? = null
@@ -273,11 +282,12 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             marks = runCatching { folderMarks.current() }.getOrDefault(marks)
             val resolution = access
             val buckets = if (resolution?.canReadMediaStore == true) {
-                var loaded = runCatching { media.loadBuckets() }.getOrNull()
+                val order = _gridSettings.value.albumCover
+                var loaded = runCatching { media.loadBuckets(order, preferences::customCover) }.getOrNull()
                 if (retryOnce && loaded.isNullOrEmpty()) {
                     delay(GRANT_SETTLE_MILLIS)
                     media.invalidate()
-                    loaded = runCatching { media.loadBuckets() }.getOrNull()
+                    loaded = runCatching { media.loadBuckets(order, preferences::customCover) }.getOrNull()
                 }
                 // A reload replaced by a newer one is cancelled; runCatching must not turn that into a failure.
                 ensureActive()
@@ -297,7 +307,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                     volume = bucket.volume,
                     pinned = marks.isPinned(path),
                     latestModifiedSeconds = bucket.latestModifiedSeconds,
-                    latestTakenMillis = bucket.cover.effectiveTakenMillis,
+                    latestTakenMillis = bucket.latestTakenMillis,
                 )
             }
             val folders = folderRepository.list().map { folder ->
@@ -323,7 +333,7 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
                     id = folder.id,
                     name = folder.name.ifEmpty { rootName },
                     count = folder.items.size,
-                    coverUri = folder.items.maxByOrNull { it.dateModifiedSeconds }?.contentUri,
+                    coverUri = GridPolicy.cover(folder.items, _gridSettings.value.albumCover, chosenId = null)?.contentUri,
                     subtitle = folder.path.relativePath,
                 )
             }
@@ -405,8 +415,9 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             groups = if (sameAlbum && sort == current.sort && grouping == current.grouping) current.groups else emptyList(),
             ownSort = preferences.hasOwnSort(album.kind, album.id),
             query = if (sameAlbum) current.query else "",
-            columns = preferences.mediaColumns,
+            columns = currentColumns(),
             refreshing = current.refreshing && sameAlbum,
+            customCover = album.kind == AlbumKind.MEDIA && preferences.customCover(album.path) != null,
             selection = if (sameAlbum) current.selection else emptySet(),
             // The favorites flow only emits on changes, so a fresh grid state must carry the current marks.
             favoriteIds = favoriteIds,
@@ -438,8 +449,51 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     /** Media grid columns (3..6), from the menu or a pinch; persisted for every album. */
     fun setColumns(columns: Int) {
         val clamped = GalleryPreferences.clampColumns(columns)
-        preferences.mediaColumns = clamped
+        if (landscape) {
+            val settings = _gridSettings.value.copy(mediaColumnsLandscape = clamped)
+            preferences.grid = settings
+            _gridSettings.value = settings
+        } else {
+            preferences.mediaColumns = clamped
+        }
         _grid.update { if (it.columns == clamped) it else it.copy(columns = clamped) }
+    }
+
+    private fun currentColumns(): Int = GridPolicy.mediaColumns(preferences.mediaColumns, _gridSettings.value, landscape)
+
+    /** The home screen's orientation (ROADMAP 9.2): portrait and landscape keep their own media columns. */
+    fun setLandscape(value: Boolean) {
+        if (landscape == value) return
+        landscape = value
+        val columns = currentColumns()
+        _grid.update { if (it.columns == columns) it else it.copy(columns = columns) }
+    }
+
+    /** Settings changed elsewhere: the grids follow at once, and a new cover order reloads the albums. */
+    fun refreshGridSettings() {
+        val settings = preferences.grid
+        val previous = _gridSettings.value
+        if (settings == previous && _grid.value.columns == currentColumns()) return
+        _gridSettings.value = settings
+        val columns = currentColumns()
+        _grid.update { if (it.columns == columns) it else it.copy(columns = columns) }
+        if (settings.albumCover != previous.albumCover) reload()
+    }
+
+    /** The one selected image becomes the open media album's cover (ROADMAP 9.2). */
+    fun setAlbumCoverFromSelection() {
+        val album = _grid.value.album?.takeIf { it.kind == AlbumKind.MEDIA } ?: return
+        val id = _grid.value.selection.singleOrNull() ?: return
+        preferences.setCustomCover(album.path, id)
+        _grid.update { it.copy(customCover = true, selection = emptySet()) }
+        reload()
+    }
+
+    fun resetAlbumCover() {
+        val album = _grid.value.album?.takeIf { it.kind == AlbumKind.MEDIA } ?: return
+        preferences.setCustomCover(album.path, null)
+        _grid.update { it.copy(customCover = false) }
+        reload()
     }
 
     fun loadMore() {

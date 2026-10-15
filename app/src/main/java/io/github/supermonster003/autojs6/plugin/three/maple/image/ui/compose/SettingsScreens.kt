@@ -27,7 +27,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import io.github.supermonster003.autojs6.plugin.three.maple.image.AlbumCoverOrder
+import io.github.supermonster003.autojs6.plugin.three.maple.image.GridSettings
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ThumbnailCorners
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ThumbnailSpacing
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ViewerDoubleTapZoom
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ViewerMaxZoom
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ViewerOrientation
@@ -42,6 +46,11 @@ internal data class SettingsSummaries(
     val launcherIcon: String,
 )
 
+/** The grid settings that open a choice (ROADMAP 9.2). */
+internal enum class GridChoice {
+    ALBUM_COLUMNS_PORTRAIT, ALBUM_COLUMNS_LANDSCAPE, MEDIA_COLUMNS_PORTRAIT, MEDIA_COLUMNS_LANDSCAPE, CORNERS, SPACING, COVER,
+}
+
 /** Settings page: the appearance group first, then the information group (design draft 7.2). */
 @Composable
 internal fun SettingsScreen(
@@ -51,6 +60,11 @@ internal fun SettingsScreen(
     onDarkMode: () -> Unit,
     onThemeColor: () -> Unit,
     onLauncherIcon: () -> Unit,
+    grid: GridSettings,
+    /** The media grid's portrait columns, kept apart from [grid] for the menu and the pinch. */
+    mediaColumns: Int,
+    onGridChange: (GridSettings) -> Unit,
+    onGridChoice: (GridChoice) -> Unit,
     viewer: ViewerSettings,
     onViewerChange: (ViewerSettings) -> Unit,
     onDoubleTapZoom: () -> Unit,
@@ -105,6 +119,7 @@ internal fun SettingsScreen(
                 onClick = onLauncherIcon,
                 modifier = Modifier.testTag("maple.settings.launcherIcon"),
             )
+            GridSettingsSection(grid, mediaColumns, onGridChange, onGridChoice)
             MapleSectionHeader(stringResource(R.string.standalone_settings_section_viewer))
             MapleSwitchRow(
                 title = stringResource(R.string.viewer_rotation_gesture_title),
@@ -422,6 +437,123 @@ private fun ReleaseEntry(entry: ReleaseHistoryEntry) {
             }
         }
     }
+}
+
+/** Settings > Albums and grid (ROADMAP 9.2). */
+@Composable
+private fun GridSettingsSection(grid: GridSettings, mediaColumns: Int, onGridChange: (GridSettings) -> Unit, onGridChoice: (GridChoice) -> Unit) {
+    MapleSectionHeader(stringResource(R.string.settings_section_grid))
+    val automatic = stringResource(R.string.grid_columns_automatic)
+    val albumPortrait = grid.albumColumnsPortrait?.let { stringResource(R.string.gallery_columns_value, it) } ?: automatic
+    val albumLandscape = grid.albumColumnsLandscape?.let { stringResource(R.string.gallery_columns_value, it) } ?: automatic
+    val mediaLandscape = grid.mediaColumnsLandscape?.let { stringResource(R.string.gallery_columns_value, it) }
+        ?: stringResource(R.string.grid_columns_same_as_portrait)
+    MapleSettingsRow(
+        title = stringResource(R.string.grid_album_columns_portrait_title),
+        summary = albumPortrait,
+        iconResource = R.drawable.ic_apps_24,
+        onClick = { onGridChoice(GridChoice.ALBUM_COLUMNS_PORTRAIT) },
+        modifier = Modifier.testTag("maple.settings.gridAlbumColumnsPortrait"),
+    )
+    MapleSettingsRow(
+        title = stringResource(R.string.grid_album_columns_landscape_title),
+        summary = albumLandscape,
+        iconResource = R.drawable.ic_apps_24,
+        onClick = { onGridChoice(GridChoice.ALBUM_COLUMNS_LANDSCAPE) },
+        modifier = Modifier.testTag("maple.settings.gridAlbumColumnsLandscape"),
+    )
+    MapleSettingsRow(
+        title = stringResource(R.string.grid_media_columns_portrait_title),
+        summary = stringResource(R.string.gallery_columns_value, mediaColumns),
+        iconResource = R.drawable.ic_perm_media_24,
+        onClick = { onGridChoice(GridChoice.MEDIA_COLUMNS_PORTRAIT) },
+        modifier = Modifier.testTag("maple.settings.gridMediaColumnsPortrait"),
+    )
+    MapleSettingsRow(
+        title = stringResource(R.string.grid_media_columns_landscape_title),
+        summary = mediaLandscape,
+        iconResource = R.drawable.ic_perm_media_24,
+        onClick = { onGridChoice(GridChoice.MEDIA_COLUMNS_LANDSCAPE) },
+        modifier = Modifier.testTag("maple.settings.gridMediaColumnsLandscape"),
+    )
+    MapleSettingsRow(
+        title = stringResource(R.string.grid_corners_title),
+        summary = stringResource(grid.corners.labelResource()),
+        iconResource = R.drawable.ic_shape_rectangle_24,
+        onClick = { onGridChoice(GridChoice.CORNERS) },
+        modifier = Modifier.testTag("maple.settings.gridCorners"),
+    )
+    MapleSettingsRow(
+        title = stringResource(R.string.grid_spacing_title),
+        summary = stringResource(grid.spacing.labelResource()),
+        iconResource = R.drawable.ic_select_all_24,
+        onClick = { onGridChoice(GridChoice.SPACING) },
+        modifier = Modifier.testTag("maple.settings.gridSpacing"),
+    )
+    MapleSwitchRow(
+        title = stringResource(R.string.grid_crop_square_title),
+        summary = stringResource(R.string.grid_crop_square_summary),
+        iconResource = R.drawable.ic_crop_24,
+        checked = grid.cropSquare,
+        onToggle = { onGridChange(grid.copy(cropSquare = it)) },
+        modifier = Modifier.testTag("maple.settings.gridCropSquare"),
+    )
+    MapleSwitchRow(
+        title = stringResource(R.string.grid_type_badges_title),
+        summary = stringResource(R.string.grid_type_badges_summary),
+        iconResource = R.drawable.ic_text_24,
+        checked = grid.typeBadges,
+        onToggle = { onGridChange(grid.copy(typeBadges = it)) },
+        modifier = Modifier.testTag("maple.settings.gridTypeBadges"),
+    )
+    MapleSwitchRow(
+        title = stringResource(R.string.grid_album_counts_title),
+        summary = stringResource(R.string.grid_album_counts_summary),
+        iconResource = R.drawable.ic_info_outline_24,
+        checked = grid.albumCounts,
+        onToggle = { onGridChange(grid.copy(albumCounts = it)) },
+        modifier = Modifier.testTag("maple.settings.gridAlbumCounts"),
+    )
+    MapleSettingsRow(
+        title = stringResource(R.string.grid_album_cover_title),
+        summary = stringResource(grid.albumCover.labelResource()),
+        iconResource = R.drawable.ic_image_24,
+        onClick = { onGridChoice(GridChoice.COVER) },
+        modifier = Modifier.testTag("maple.settings.gridAlbumCover"),
+    )
+    MapleSwitchRow(
+        title = stringResource(R.string.grid_single_line_names_title),
+        summary = stringResource(R.string.grid_single_line_names_summary),
+        iconResource = R.drawable.ic_text_24,
+        checked = grid.singleLineAlbumNames,
+        onToggle = { onGridChange(grid.copy(singleLineAlbumNames = it)) },
+        modifier = Modifier.testTag("maple.settings.gridSingleLineNames"),
+    )
+    MapleSwitchRow(
+        title = stringResource(R.string.grid_animated_thumbnails_title),
+        summary = stringResource(R.string.grid_animated_thumbnails_summary),
+        iconResource = R.drawable.ic_play_arrow_24,
+        checked = grid.animatedThumbnails,
+        onToggle = { onGridChange(grid.copy(animatedThumbnails = it)) },
+        modifier = Modifier.testTag("maple.settings.gridAnimatedThumbnails"),
+    )
+}
+
+internal fun ThumbnailCorners.labelResource(): Int = when (this) {
+    ThumbnailCorners.NONE -> R.string.grid_corners_none
+    ThumbnailCorners.SMALL -> R.string.grid_corners_small
+    ThumbnailCorners.LARGE -> R.string.grid_corners_large
+}
+
+internal fun ThumbnailSpacing.labelResource(): Int = when (this) {
+    ThumbnailSpacing.NONE -> R.string.grid_spacing_none
+    ThumbnailSpacing.NORMAL -> R.string.grid_spacing_normal
+    ThumbnailSpacing.WIDE -> R.string.grid_spacing_wide
+}
+
+internal fun AlbumCoverOrder.labelResource(): Int = when (this) {
+    AlbumCoverOrder.NEWEST -> R.string.grid_album_cover_newest
+    AlbumCoverOrder.OLDEST -> R.string.grid_album_cover_oldest
 }
 
 internal fun ViewerDoubleTapZoom.labelResource(): Int = when (this) {

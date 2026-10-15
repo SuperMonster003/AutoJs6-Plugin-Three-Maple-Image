@@ -217,7 +217,7 @@ internal class GalleryOperations(
     }
 
     /** What the bar offers for [state]'s album: authorized folders only share, delete, rename and show details. */
-    fun actionsFor(state: MediaGridUiState): MediaSelectionActions {
+    fun actionsFor(state: MediaGridUiState, onSetCover: (() -> Unit)? = null): MediaSelectionActions {
         val album = state.album ?: return MediaSelectionActions()
         // A hidden folder is read from disk for browsing: share and details only.
         if (album.kind == AlbumKind.HIDDEN) return MediaSelectionActions(onShare = ::share, onDetails = ::details)
@@ -231,6 +231,7 @@ internal class GalleryOperations(
             onRename = ::rename,
             onDetails = ::details,
             onConvert = if (library) ::convert else null,
+            onSetCover = if (album.kind == AlbumKind.MEDIA) onSetCover else null,
             favorited = library && state.selection.isNotEmpty() && state.favoriteIds.containsAll(state.selection),
         )
     }

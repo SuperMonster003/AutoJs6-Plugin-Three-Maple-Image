@@ -1,15 +1,18 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.annotation.VisibleForTesting
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.HostDirectoryCallbacks
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.HostDirectoryScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.HostDirectoryUiState
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.LocalGridSettings
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,10 +68,15 @@ class ExplorerDirectoryActivity : ConfiguredActivity() {
             onRetry = { open(currentPath) },
             thumbnail = ::thumbnailModel,
         )
-        state = state.copy(title = resolved.displayName, columns = GalleryPreferences(this).mediaColumns)
+        val preferences = GalleryPreferences(this)
+        val grid = preferences.grid
+        val landscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        state = state.copy(title = resolved.displayName, columns = GridPolicy.mediaColumns(preferences.mediaColumns, grid, landscape))
         setContent {
             MapleTheme(palette = appPalette) {
-                HostDirectoryScreen(state = state, callbacks = callbacks)
+                CompositionLocalProvider(LocalGridSettings provides grid) {
+                    HostDirectoryScreen(state = state, callbacks = callbacks)
+                }
             }
         }
         open(currentPath)

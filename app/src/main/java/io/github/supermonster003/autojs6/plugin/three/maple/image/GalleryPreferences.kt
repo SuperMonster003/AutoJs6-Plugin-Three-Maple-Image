@@ -17,9 +17,25 @@ internal class GalleryPreferences(private val preferences: SharedPreferences) {
         get() = preferences.getBoolean(KEY_SHOW_HIDDEN, false)
         set(value) = preferences.edit().putBoolean(KEY_SHOW_HIDDEN, value).apply()
 
+    /** The media grid's portrait columns (the menu and the pinch); [grid] may give landscape its own. */
     var mediaColumns: Int
         get() = clampColumns(preferences.getInt(KEY_COLUMNS, DEFAULT_COLUMNS))
         set(value) = preferences.edit().putInt(KEY_COLUMNS, clampColumns(value)).apply()
+
+    /** Album and media grid settings (ROADMAP 9.2). */
+    var grid: GridSettings
+        get() = GridSettings.read(preferences)
+        set(value) = GridSettings.write(preferences.edit(), value).apply()
+
+    /** An album's own cover (ROADMAP 9.2), by media id; null uses the cover order. */
+    fun customCover(path: AlbumPath): Long? =
+        coverKey(path).let { key -> if (preferences.contains(key)) preferences.getLong(key, 0L) else null }
+
+    fun setCustomCover(path: AlbumPath, mediaId: Long?) {
+        preferences.edit().apply { if (mediaId == null) remove(coverKey(path)) else putLong(coverKey(path), mediaId) }.apply()
+    }
+
+    private fun coverKey(path: AlbumPath): String = "$KEY_COVER_PREFIX${MediaCatalog.normalizedVolume(path.volume)}:${path.relativePath}"
 
     /** Sort used by media grids that have no memory of their own; updated whenever the user picks a sort. */
     var defaultSort: MediaSort
@@ -74,6 +90,7 @@ internal class GalleryPreferences(private val preferences: SharedPreferences) {
         const val DEFAULT_COLUMNS = 4
         private const val FILE_NAME = "gallery"
         private const val KEY_COLUMNS = "media_columns"
+        private const val KEY_COVER_PREFIX = "album_cover:"
         private const val KEY_DEFAULT_SORT = "default_sort"
         private const val KEY_RECENT_TARGETS = "recent_targets"
         const val MAX_RECENT_TARGETS = 5

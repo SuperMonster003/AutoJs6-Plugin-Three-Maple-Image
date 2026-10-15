@@ -48,9 +48,11 @@ internal data class MediaBucket(
     val name: String,
     val relativePath: String,
     val count: Int,
-    /** The most recent image of the album (capture time, then modification time, then id). */
+    /** The newest image (capture time, then modification time, then id), the oldest or the album's own choice. */
     val cover: MediaItem,
     val latestModifiedSeconds: Long,
+    /** The newest capture time, which the album order uses whatever the cover is. */
+    val latestTakenMillis: Long = cover.effectiveTakenMillis,
     val volume: String = MediaCatalog.PRIMARY_VOLUME,
 )
 
@@ -217,22 +219,31 @@ internal object MediaCatalog {
         return groups
     }
 
-    private val coverOrder: Comparator<MediaItem> =
+    internal val coverOrder: Comparator<MediaItem> =
         compareBy<MediaItem> { it.effectiveTakenMillis }.thenBy { it.dateModifiedSeconds }.thenBy { it.id }
 
-    /** Groups cataloged rows into albums; the newest album comes first. */
-    fun buckets(items: List<MediaItem>): List<MediaBucket> = items
+    /**
+     * Groups cataloged rows into albums; the newest album comes first. The cover is the album's [chosenCover] while
+     * that image is still in it, else the newest or the oldest image ([order], ROADMAP 9.2).
+     */
+    fun buckets(
+        items: List<MediaItem>,
+        order: AlbumCoverOrder = AlbumCoverOrder.NEWEST,
+        chosenCover: (AlbumPath) -> Long? = { null },
+    ): List<MediaBucket> = items
         .groupBy { it.bucketId }
         .map { (id, rows) ->
-            val cover = rows.maxWith(coverOrder)
+            val newest = rows.maxWith(coverOrder)
+            val cover = GridPolicy.cover(rows, order, chosenCover(AlbumPath(newest.volume, newest.relativePath))) ?: newest
             MediaBucket(
                 id = id,
-                name = cover.bucketName,
-                relativePath = cover.relativePath,
+                name = newest.bucketName,
+                relativePath = newest.relativePath,
                 count = rows.size,
                 cover = cover,
                 latestModifiedSeconds = rows.maxOf { it.dateModifiedSeconds },
-                volume = cover.volume,
+                volume = newest.volume,
+                latestTakenMillis = newest.effectiveTakenMillis,
             )
         }
         .let { sortBuckets(it, MediaSort.DEFAULT) }

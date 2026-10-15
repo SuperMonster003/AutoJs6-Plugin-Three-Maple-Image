@@ -21,6 +21,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,24 +36,27 @@ import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import io.github.supermonster003.autojs6.plugin.three.maple.image.GridSettings
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ThumbnailCorners
+
+/** The grid settings (ROADMAP 9.2) for every album and media grid below; screens without settings get the defaults. */
+internal val LocalGridSettings = compositionLocalOf { GridSettings() }
 
 internal object MapleGridDefaults {
     val albumCornerRadius = 4.dp
     val albumColumnSpacing = 12.dp
     val albumRowSpacing = 16.dp
-    val mediaGap = 2.dp
     const val MEDIA_COLUMNS = 4
 
-    /** Album columns by window width: 2 on phones, 3 on wide phones / small tablets, 4 on large tablets (design draft 8.1). */
-    fun albumColumns(widthDp: Int): Int = when {
-        widthDp >= 840 -> 4
-        widthDp >= 600 -> 3
-        else -> 2
-    }
+    /** The gap between media cells: 2 dp unless the grid settings choose another. */
+    val mediaGap: Dp
+        @Composable @ReadOnlyComposable get() = LocalGridSettings.current.spacing.dp.dp
 }
 
 /** Short type badge for formats worth calling out in a grid (design draft 8.2); null for plain JPEG / PNG / BMP. */
@@ -84,6 +89,7 @@ internal fun MapleAlbumCell(
     onClick: () -> Unit,
 ) {
     val canvas = MapleTheme.canvas
+    val settings = LocalGridSettings.current
     val inset = if (selectionMode) animateDpAsState(if (selected) SELECTED_INSET else 0.dp, label = "albumSelectionInset") else null
     Column(
         modifier = modifier
@@ -111,6 +117,7 @@ internal fun MapleAlbumCell(
                     model = coverModel,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
+                    requestBuilderTransform = { request -> if (settings.animatedThumbnails) request else request.dontAnimate() },
                     modifier = Modifier.fillMaxSize().then(
                         if (inset == null) Modifier else Modifier.graphicsLayer {
                             val scale = if (size.width > 0f) 1f - 2f * inset.value.toPx() / size.width else 1f
@@ -160,17 +167,20 @@ internal fun MapleAlbumCell(
             text = name,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface.disabledIf(!enabled),
-            maxLines = 1,
+            maxLines = if (settings.singleLineAlbumNames) 1 else 2,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier.padding(top = 8.dp).testTag("maple.album.name"),
         )
-        Text(
-            text = count,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.disabledIf(!enabled),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        if (settings.albumCounts) {
+            Text(
+                text = count,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.disabledIf(!enabled),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.testTag("maple.album.count"),
+            )
+        }
     }
 }
 
@@ -193,6 +203,7 @@ internal fun MapleMediaCell(
     onClick: () -> Unit,
 ) {
     val canvas = MapleTheme.canvas
+    val settings = LocalGridSettings.current
     // Outside selection mode the cell stays free of animation state, which keeps flinging a large album cheap. The
     // inset is read only while drawing (a layer scale), so animating it never recomposes or re-lays out the cells:
     // selecting all of a full screen stays one recomposition.
@@ -200,6 +211,7 @@ internal fun MapleMediaCell(
     Box(
         modifier = modifier
             .aspectRatio(1f)
+            .then(if (settings.corners == ThumbnailCorners.NONE) Modifier else Modifier.clip(RoundedCornerShape(settings.corners.dp.dp)))
             .background(if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant)
             .clickable(role = if (selectionMode) Role.Checkbox else Role.Button, onClick = onClick)
             .semantics {
@@ -211,7 +223,9 @@ internal fun MapleMediaCell(
         GlideImage(
             model = model,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            // Not cropped, the whole image fits inside the square (ROADMAP 9.2).
+            contentScale = if (settings.cropSquare) ContentScale.Crop else ContentScale.Fit,
+            requestBuilderTransform = { request -> if (settings.animatedThumbnails) request else request.dontAnimate() },
             modifier = Modifier.fillMaxSize().then(
                 if (inset == null) Modifier else Modifier.graphicsLayer {
                     val scale = if (size.width > 0f) 1f - 2f * inset.value.toPx() / size.width else 1f
@@ -236,7 +250,7 @@ internal fun MapleMediaCell(
                     .background(if (selected) MaterialTheme.colorScheme.onPrimary else canvas.scrim, CircleShape),
             )
         }
-        if (badge != null) {
+        if (badge != null && settings.typeBadges) {
             Text(
                 text = badge,
                 style = MaterialTheme.typography.labelMedium,

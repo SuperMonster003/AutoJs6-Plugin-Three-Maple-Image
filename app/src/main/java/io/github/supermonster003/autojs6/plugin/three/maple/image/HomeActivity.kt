@@ -1,12 +1,14 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.ReportDrawnWhen
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -20,11 +22,12 @@ import androidx.navigation.navArgument
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumGridCallbacks
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumGridScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.BatchConvertScreen
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.LocalGridSettings
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaGridCallbacks
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaGridScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.RecycleBinCallbacks
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.RecycleBinScreen
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaGridScreen
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -100,8 +103,11 @@ class HomeActivity : ConfiguredActivity() {
             onEndSearch = gallery::endSearch,
             onOpenSearchResult = ::openSearchResult,
         )
+        gallery.setLandscape(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
         setContent {
             MapleTheme(palette = appPalette) {
+                val gridSettings by gallery.gridSettings.collectAsState()
+                CompositionLocalProvider(LocalGridSettings provides gridSettings) {
                 val controller = rememberNavController()
                 navigate = { route -> controller.navigate(route) }
                 val albums by gallery.albums.collectAsState()
@@ -156,11 +162,12 @@ class HomeActivity : ConfiguredActivity() {
                                 onClearSelection = gallery::clearSelection,
                                 onSelectAll = gallery::selectAll,
                                 onInvertSelection = gallery::invertSelection,
+                                onResetCover = if (grid.customCover) gallery::resetAlbumCover else null,
                                 onUnhide = grid.album?.takeIf { it.kind == AlbumKind.HIDDEN }?.let { hidden ->
                                     { operations.unhideAlbum(hidden) { controller.popBackStack() } }
                                 },
                             ),
-                            selectionActions = operations.actionsFor(grid),
+                            selectionActions = operations.actionsFor(grid, onSetCover = gallery::setAlbumCoverFromSelection),
                             snackbarHostState = operations.snackbar,
                         )
                         operations.Dialogs()
@@ -207,6 +214,7 @@ class HomeActivity : ConfiguredActivity() {
                         operations.Dialogs()
                     }
                 }
+                }
             }
         }
         actions.refresh()
@@ -248,6 +256,8 @@ class HomeActivity : ConfiguredActivity() {
     override fun onResume() {
         super.onResume()
         updatePhotoAccess()
+        // Grid settings changed in the settings apply as soon as the grids are back (ROADMAP 9.2).
+        gallery.refreshGridSettings()
     }
 
     private fun updatePhotoAccess() {

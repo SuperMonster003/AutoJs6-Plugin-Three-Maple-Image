@@ -18,6 +18,7 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.Map
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleThemeColorDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleThemeColorLabels
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SettingsScreen
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.GridChoice
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.SettingsSummaries
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.labelResource
 import kotlinx.coroutines.launch
@@ -39,6 +40,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         data object DoubleTapZoom : SettingsDialog
         data object MaxZoom : SettingsDialog
         data object Orientation : SettingsDialog
+        data class Grid(val choice: GridChoice) : SettingsDialog
     }
 
     private lateinit var settingsStore: ApplicationSettingsStore
@@ -47,6 +49,9 @@ internal class AppSettingsActivity : ConfiguredActivity() {
     private var dialog by mutableStateOf<SettingsDialog?>(null)
     private var launcherIconSummary by mutableStateOf("")
     private var viewer by mutableStateOf(ViewerSettings())
+    private lateinit var gallery: GalleryPreferences
+    private var grid by mutableStateOf(GridSettings())
+    private var mediaColumns by mutableStateOf(GalleryPreferences.DEFAULT_COLUMNS)
     private var showLocation by mutableStateOf(false)
     private var extendedDetails by mutableStateOf(false)
     private var extendedDetailFields by mutableStateOf(ExtendedDetailsPolicy.SUGGESTED)
@@ -58,6 +63,9 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         settingsStore = ApplicationSettingsStore(applicationContext)
         settings = settingsStore.load()
         viewer = settings.viewer
+        gallery = GalleryPreferences(this)
+        grid = gallery.grid
+        mediaColumns = gallery.mediaColumns
         showLocation = settings.showLocation
         extendedDetails = settings.extendedDetails
         extendedDetailFields = settings.extendedDetailFields
@@ -79,6 +87,10 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     onDarkMode = { open(SettingsDialog.DarkMode) },
                     onThemeColor = { open(SettingsDialog.ThemeColor) },
                     onLauncherIcon = { open(SettingsDialog.LauncherIcon) },
+                    grid = grid,
+                    mediaColumns = mediaColumns,
+                    onGridChange = ::updateGrid,
+                    onGridChoice = { open(SettingsDialog.Grid(it)) },
                     viewer = viewer,
                     onViewerChange = ::updateViewer,
                     onDoubleTapZoom = { open(SettingsDialog.DoubleTapZoom) },
@@ -104,6 +116,11 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                 Dialogs()
             }
         }
+    }
+
+    private fun updateGrid(value: GridSettings) {
+        grid = value
+        gallery.grid = value
     }
 
     private fun updateViewer(value: ViewerSettings) {
@@ -164,7 +181,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
 
     @Composable
     private fun Dialogs() {
-        when (dialog) {
+        when (val current = dialog) {
             null -> Unit
             SettingsDialog.Language -> {
                 val values = AppLanguage.entries
@@ -228,6 +245,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     dismissText = getString(R.string.dialog_button_cancel),
                 )
             }
+            is SettingsDialog.Grid -> GridChoiceDialog(current.choice)
             SettingsDialog.Orientation -> {
                 val values = ViewerOrientation.entries
                 MapleChoiceDialog(
@@ -396,6 +414,56 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         AppLanguage.KOREAN -> R.string.standalone_language_ko
         AppLanguage.RUSSIAN -> R.string.standalone_language_ru
         AppLanguage.ARABIC -> R.string.standalone_language_ar
+    }
+
+    /** One choice of Settings > Albums and grid (ROADMAP 9.2): the options, the current one and what picking does. */
+    @Composable
+    private fun GridChoiceDialog(choice: GridChoice) {
+        val columns = { value: Int -> getString(R.string.gallery_columns_value, value) }
+        val albumRange = GridPolicy.MIN_ALBUM_COLUMNS..GridPolicy.MAX_ALBUM_COLUMNS
+        val mediaRange = GalleryPreferences.MIN_COLUMNS..GalleryPreferences.MAX_COLUMNS
+        val (title, options, selected) = when (choice) {
+            GridChoice.ALBUM_COLUMNS_PORTRAIT, GridChoice.ALBUM_COLUMNS_LANDSCAPE -> {
+                val current = if (choice == GridChoice.ALBUM_COLUMNS_PORTRAIT) grid.albumColumnsPortrait else grid.albumColumnsLandscape
+                Triple(
+                    getString(if (choice == GridChoice.ALBUM_COLUMNS_PORTRAIT) R.string.grid_album_columns_portrait_title else R.string.grid_album_columns_landscape_title),
+                    listOf(getString(R.string.grid_columns_automatic)) + albumRange.map(columns),
+                    current?.let { albumRange.indexOf(it) + 1 } ?: 0,
+                )
+            }
+            GridChoice.MEDIA_COLUMNS_PORTRAIT -> Triple(getString(R.string.grid_media_columns_portrait_title), mediaRange.map(columns), mediaRange.indexOf(mediaColumns))
+            GridChoice.MEDIA_COLUMNS_LANDSCAPE -> Triple(
+                getString(R.string.grid_media_columns_landscape_title),
+                listOf(getString(R.string.grid_columns_same_as_portrait)) + mediaRange.map(columns),
+                grid.mediaColumnsLandscape?.let { mediaRange.indexOf(it) + 1 } ?: 0,
+            )
+            GridChoice.CORNERS -> Triple(getString(R.string.grid_corners_title), ThumbnailCorners.entries.map { getString(it.labelResource()) }, grid.corners.ordinal)
+            GridChoice.SPACING -> Triple(getString(R.string.grid_spacing_title), ThumbnailSpacing.entries.map { getString(it.labelResource()) }, grid.spacing.ordinal)
+            GridChoice.COVER -> Triple(getString(R.string.grid_album_cover_title), AlbumCoverOrder.entries.map { getString(it.labelResource()) }, grid.albumCover.ordinal)
+        }
+        MapleChoiceDialog(
+            title = title,
+            options = options.map { MapleChoice(it, description = if (choice == GridChoice.COVER && it == options.first()) getString(R.string.grid_album_cover_own_hint) else null) },
+            selectedIndex = selected,
+            onDismissRequest = ::close,
+            onConfirm = { index ->
+                close()
+                when (choice) {
+                    GridChoice.ALBUM_COLUMNS_PORTRAIT -> updateGrid(grid.copy(albumColumnsPortrait = albumRange.toList().getOrNull(index - 1)))
+                    GridChoice.ALBUM_COLUMNS_LANDSCAPE -> updateGrid(grid.copy(albumColumnsLandscape = albumRange.toList().getOrNull(index - 1)))
+                    GridChoice.MEDIA_COLUMNS_PORTRAIT -> mediaRange.toList().getOrNull(index)?.let { value ->
+                        mediaColumns = value
+                        gallery.mediaColumns = value
+                    }
+                    GridChoice.MEDIA_COLUMNS_LANDSCAPE -> updateGrid(grid.copy(mediaColumnsLandscape = mediaRange.toList().getOrNull(index - 1)))
+                    GridChoice.CORNERS -> updateGrid(grid.copy(corners = ThumbnailCorners.entries[index]))
+                    GridChoice.SPACING -> updateGrid(grid.copy(spacing = ThumbnailSpacing.entries[index]))
+                    GridChoice.COVER -> updateGrid(grid.copy(albumCover = AlbumCoverOrder.entries[index]))
+                }
+            },
+            confirmText = getString(R.string.dialog_button_confirm),
+            dismissText = getString(R.string.dialog_button_cancel),
+        )
     }
 
     @StringRes
