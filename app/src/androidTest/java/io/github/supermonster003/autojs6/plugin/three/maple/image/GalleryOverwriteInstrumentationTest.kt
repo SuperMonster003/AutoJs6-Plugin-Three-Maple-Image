@@ -59,7 +59,12 @@ class GalleryOverwriteInstrumentationTest {
         cleanUp()
     }
 
-    private fun exists(tag: String): Boolean = compose.onAllNodes(hasTestTag(tag)).fetchSemanticsNodes().isNotEmpty()
+    // Between the viewer and the editor there is a moment without any Compose hierarchy: keep waiting through it.
+    private fun exists(tag: String): Boolean =
+        runCatching { compose.onAllNodes(hasTestTag(tag)).fetchSemanticsNodes().isNotEmpty() }.getOrDefault(false)
+
+    private fun shows(text: String): Boolean =
+        runCatching { compose.onAllNodes(hasText(text)).fetchSemanticsNodes().isNotEmpty() }.getOrDefault(false)
 
     private fun enabled(tag: String): Boolean = runCatching { compose.onNodeWithTag(tag).assertIsEnabled() }.isSuccess
 
@@ -89,7 +94,7 @@ class GalleryOverwriteInstrumentationTest {
 
             // Back in the viewer: the original now holds the rotated image, in the same row.
             val saved = context.getString(R.string.overwrite_saved)
-            compose.waitUntil(TIMEOUT) { compose.onAllNodes(hasText(saved)).fetchSemanticsNodes().isNotEmpty() }
+            compose.waitUntil(TIMEOUT) { shows(saved) }
             assertEquals(20 to 40, size(uri))
             val rows = runBlocking { MediaStoreRepository(context).also { it.invalidate() }.loadAll() }.filter { it.relativePath == relativePath() }
             assertEquals(listOf(item.id), rows.map { it.id })
@@ -122,7 +127,7 @@ class GalleryOverwriteInstrumentationTest {
             compose.waitUntil(TIMEOUT) { exists("maple.viewer.rotationHint.save") }
             compose.onNodeWithTag("maple.viewer.rotationHint.save").performClick()
             val saved = context.getString(R.string.viewer_rotation_saved)
-            compose.waitUntil(TIMEOUT) { compose.onAllNodes(hasText(saved)).fetchSemanticsNodes().isNotEmpty() }
+            compose.waitUntil(TIMEOUT) { shows(saved) }
             // JPEG: only the orientation tag changed, so the image now shows turned without being encoded again.
             assertEquals(androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90, orientation(uri))
             assertEquals(20 to 40, shownSize(uri))
