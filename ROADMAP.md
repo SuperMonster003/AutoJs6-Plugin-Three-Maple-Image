@@ -438,15 +438,15 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 | 编号 | 事项 | 拍板时机 | 建议 |
 | --- | --- | --- | --- |
-| Q1 | 编辑器取色是否对接 3-Color Picker: 需要 3-Color Picker 新增结果回传 (当前只写剪贴板), 并把屏幕坐标经编辑器逆矩阵映射到位图像素重新采样; 还是只做自研放大镜 (T16) | 进入 M4 前 | 3.2.0 只做自研; 对接作为 3-Color Picker 的独立需求另行排期 |
+| Q1 | 编辑器取色是否对接 3-Color Picker: 需要 3-Color Picker 新增结果回传 (当前只写剪贴板), 并把屏幕坐标经编辑器逆矩阵映射到位图像素重新采样; 还是只做自研放大镜 (T16) | 已按建议执行 (3.2.0): 只做自研放大镜取色 (T16, `41d56aa`); 3-Color Picker 对接未排期 | 3.2.0 只做自研; 对接作为 3-Color Picker 的独立需求另行排期 |
 | Q2 | 收藏存储: 本地表为主 (T9) 还是 Android 11+ 以系统 `IS_FAVORITE` 为主 | 已拍板 (2026-10-13): 本地收藏表为主, Android 11+ 提供可选的 "同步系统收藏" 开关 (T9 不变) | 本地为主 |
-| Q3 | 网格图像加载库: Coil 3 (T3 默认) 还是 Glide 单库 | M1.1 spike 后 | 以 spike 数据定 |
-| Q4 | Android 10 (API 29) 写路径: `requestLegacyExternalStorage` (T5) 还是逐文件 `RecoverableSecurityException` | M2.1 AVD 验证后 | 前者 |
+| Q3 | 网格图像加载库: Coil 3 (T3 默认) 还是 Glide 单库 | 已定 (2026-10-13, spike 后): Glide 单库, 网格用 glide-compose, Coil 依赖移除 (T3, 5.1) | 以 spike 数据定 |
+| Q4 | Android 10 (API 29) 写路径: `requestLegacyExternalStorage` (T5) 还是逐文件 `RecoverableSecurityException` | 已按建议执行 (3.0.0): 清单声明 `requestLegacyExternalStorage`, API 29 走 `java.io.File` (T5) | 前者 |
 | Q5 | 宿主 v24 形状: 新方法 `moveTargetsToTrashSubset` (T13) 还是放宽 `moveTargetsToTrash` 空输出语义 | 已拍板 (2026-10-13): 放宽 v16 `moveTargetsToTrash` 的空输出列表语义, 不新增方法 (T13 按推翻点改写) | 新方法, 保持 v16 语义不变 |
-| Q6 | 2.1.0 是否顺带把查看器切页改为 `HorizontalPager` (提前 M2 的 6.3) | 进入 M1.2 前 | 不提前, 2.1.0 严格功能不变 |
-| Q7 | 覆盖选项是否记忆 (T11) | 进入 M4.2 前 | 不记忆 |
+| Q6 | 2.1.0 是否顺带把查看器切页改为 `HorizontalPager` (提前 M2 的 6.3) | 已按建议执行 (2.1.0): 不提前, 2.1.0 仍由 `ZoomableImageView.onPageSwipe` 切页, 分页查看器随 3.0.0 (6.3) | 不提前, 2.1.0 严格功能不变 |
+| Q7 | 覆盖选项是否记忆 (T11) | 已按建议执行 (3.2.0): 覆盖选项不记忆, 只有配置变更后恢复的保存对话框保留本次选择 (T11) | 不记忆 |
 | Q8 | 自建回收站 (API 24-29) 的容量上限与清理策略细节 | 已拍板 (2026-10-13): 上限为可用空间的 10% 且不超过 2 GiB, 启动时与每次删除前清理, 超限先清最旧, 30 天过期照常 | 可用空间的 10% 且不超过 2 GiB, 启动时与删除前清理 |
-| Q9 | `gallery.pick` 在部分访问 (Android 14+) 状态下是否自动弹出系统 "管理所选照片" | 进入 M6 前 | 不自动弹, 返回 `PERMISSION_REQUIRED` 并附设置入口 |
+| Q9 | `gallery.pick` 在部分访问 (Android 14+) 状态下是否自动弹出系统 "管理所选照片" | 已拍板 (2026-10-15, 维护者确认 3.4.0 的实现): 部分访问时不自动弹出系统框, 直接列出已授权的照片, 顶部提示可管理所选照片, 离开按取消返回 null; 完全没有照片权限时先申请, 拒绝才返回 `PERMISSION_REQUIRED` (M6 契约评审第 6 项) | 不自动弹, 返回 `PERMISSION_REQUIRED` 并附设置入口 |
 | Q10 | 2.1.0 首页冷启动在 dexopt 后为 2.0.1 的 107-115% (API 28) / 110% (API 35), 首次安装状态 API 28 为 147% (设计稿 3.5 节): 按现状发布, 还是在 5.4 前再排一轮启动优化 (延后宿主设置查询, 精简首帧组件, 启动 profile 的 dex 布局优化) | 已拍板 (2026-10-13): 按现状发布 2.1.0, 启动优化列入 M2 (相册首页本就要重做) | 按现状发布 2.1.0, 启动优化列入 M2 (相册首页本就要重做) |
 | Q11 | 宿主入口删除的覆盖范围: v24 只允许移动请求目标. `view-images` 的每一页都是请求目标, 可以删除; 但 `view-image` 经 `readSiblings` 翻到的同级图片, 以及 `browse-directory` 列出的图片都不是请求目标. 选项: (a) 3.1.x 只在请求目标页显示删除按钮, 其他页不显示; (b) 宿主再加一版协议 (例如 `moveChildrenToTrash(targetId, relativePaths)`), 允许移动同级或目录下的图片, 并沿用身份复核与 v21 批次 | 已拍板 (2026-10-14): 先做 (a), 只在请求目标页显示删除; (b) 待维护者需要时再排 | 先做 (a); 若维护者希望从文件管理器打开单张图片后翻页也能删除, 再排 (b) |
 
