@@ -25,6 +25,7 @@ import kotlinx.coroutines.withTimeout
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
@@ -37,7 +38,7 @@ import kotlin.coroutines.resume
 
 /**
  * ROADMAP 8.2 on Android 11+: an image another app owns (here one the shell made) is overwritten only after the
- * system's `createWriteRequest` confirmation, which the test accepts.
+ * system's `createWriteRequest` confirmation, which the test accepts; the undo then writes without a second one.
  */
 @RunWith(AndroidJUnit4::class)
 class ForeignImageOverwriteInstrumentationTest {
@@ -89,6 +90,33 @@ class ForeignImageOverwriteInstrumentationTest {
         assertEquals(30 to 30, options.outWidth to options.outHeight)
     }
 
+    @Test fun undoingTheOverwriteDoesNotAskAgain() = runBlocking {
+        shell("mkdir -p ${directory.path}")
+        val path = File(directory, "shot.png").path
+        shell("screencap -p $path")
+        val uri = requireNotNull(scan(path)) { "The shell's image was not scanned" }
+        val original = File(context.cacheDir, "foreign-original-${UUID.randomUUID()}.png").also { files += it }
+        context.contentResolver.openInputStream(uri)!!.use { input -> original.outputStream().use { input.copyTo(it) } }
+        val edited = File(context.cacheDir, "foreign-${UUID.randomUUID()}.png").also { files += it }
+        val bitmap = Bitmap.createBitmap(30, 30, Bitmap.Config.ARGB_8888).apply { eraseColor(Color.BLUE) }
+        edited.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+
+        val write = CoroutineScope(Dispatchers.Main).async { coordinator.overwrite(uri) { edited.inputStream() } }
+        requireNotNull(device.wait(Until.findObject(By.text(Pattern.compile("(?i)allow|允许"))), CONFIRMATION_TIMEOUT)) {
+            "No write confirmation appeared"
+        }.click()
+        assertEquals(1, withTimeout(CONFIRMATION_TIMEOUT) { write.await() }.succeeded)
+
+        // The undo writes the original back under the grant the first confirmation left (ROADMAP 9.0).
+        val undo = CoroutineScope(Dispatchers.Main).async { coordinator.overwrite(uri) { original.inputStream() } }
+        val asked = device.wait(Until.findObject(By.text(Pattern.compile("(?i)allow|允许"))), SECOND_CONFIRMATION_WAIT)
+        asked?.click()
+        assertEquals(1, withTimeout(CONFIRMATION_TIMEOUT) { undo.await() }.succeeded)
+        assertEquals("the undo asked for a second confirmation", null, asked)
+        val restored = context.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
+        assertTrue(restored.contentEquals(original.readBytes()))
+    }
+
     private fun shell(command: String) {
         instrumentation.uiAutomation.executeShellCommand(command).close()
         Thread.sleep(SHELL_SETTLE_MILLIS)
@@ -105,6 +133,7 @@ class ForeignImageOverwriteInstrumentationTest {
 
     private companion object {
         const val CONFIRMATION_TIMEOUT = 15_000L
+        const val SECOND_CONFIRMATION_WAIT = 4_000L
         const val SHELL_SETTLE_MILLIS = 800L
     }
 }

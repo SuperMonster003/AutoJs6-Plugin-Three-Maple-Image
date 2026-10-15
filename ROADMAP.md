@@ -310,7 +310,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 9.0 3.2.0 的遗留 (维护者 2026-10-15 决定放到 3.2.0 之后)
 
-- [ ] (插件) Android 11+ 上撤销覆盖原图或旋转保存时, 不再为同一张图片重复弹出系统写入确认: 写入前先检查是否已有写入授权 (`checkUriPermission`), 已有则直接写; 无授权时才 `createWriteRequest`. 验收: API 30 / 33 instrumentation 覆盖 "覆盖 -> 撤销" 只确认一次; 冒烟脚本的确认计数从 4 次降到 2 次.
+- [x] (插件) Android 11+ 上撤销覆盖原图或旋转保存时, 不再为同一张图片重复弹出系统写入确认: 写入前先检查是否已有写入授权 (`checkUriPermission`), 已有则直接写; 无授权时才 `createWriteRequest`. 验收: API 30 / 33 instrumentation 覆盖 "覆盖 -> 撤销" 只确认一次; 冒烟脚本的确认计数从 4 次降到 2 次. 完成 (2026-10-15): `MediaWriteCoordinator.overwrite` 的系统确认路线先查 `checkUriPermission` (写入授权), 已有就直接写, 写失败或没有授权才 `createWriteRequest`. `ForeignImageOverwriteInstrumentationTest` 新增 "撤销不再询问" (shell 截图生成的别人的图片: 覆盖确认一次, 写回原内容时 4 秒内不得出现确认框, 字节完全还原), 去掉修复时失败, 修复后在 AVD API 33 / 30 通过; 冒烟 (AVD API 33) 的系统确认从 4 次降为 2 次 (只在覆盖和旋转保存时).
 
 ### 9.1 查看器附加功能
 

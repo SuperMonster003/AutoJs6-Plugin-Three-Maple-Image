@@ -9,12 +9,14 @@ import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Process
 import android.os.StatFs
 import android.provider.MediaStore
 import androidx.activity.ComponentActivity
@@ -363,8 +365,9 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
     /**
      * Writes [content] over the image behind [uri] (ROADMAP 8.2). A media library image takes the route of a rename:
      * the file on Android 7-10 (internal storage, with the storage permission), a direct write with all files
-     * access or for the app's own images, and one `createWriteRequest` confirmation otherwise. Any other document
-     * is written through its own write grant. The file is truncated first, so callers keep a backup.
+     * access or for the app's own images, and one `createWriteRequest` confirmation otherwise; the grant of that
+     * confirmation still holds for the undo, which therefore writes without asking again (ROADMAP 9.0). Any other
+     * document is written through its own write grant. The file is truncated first, so callers keep a backup.
      */
     suspend fun overwrite(uri: Uri, content: () -> InputStream): WriteOutcome {
         if (uri.authority != MediaStore.AUTHORITY) {
@@ -383,8 +386,11 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
                 // All files access may still be refused by the provider for another app's image: ask then.
                 (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && requestWrite(uri) && withContext(Dispatchers.IO) { writeOver(uri, content) })
             MediaWriteRoute.SYSTEM_REQUEST -> {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || !requestWrite(uri)) return WriteOutcome(cancelled = true)
-                withContext(Dispatchers.IO) { writeOver(uri, content) }
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return WriteOutcome(cancelled = true)
+                (hasWriteGrant(uri) && withContext(Dispatchers.IO) { writeOver(uri, content) }) || run {
+                    if (!requestWrite(uri)) return WriteOutcome(cancelled = true)
+                    withContext(Dispatchers.IO) { writeOver(uri, content) }
+                }
             }
             else -> false
         }
@@ -393,6 +399,11 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         path?.let { scan(listOf(it)) }
         return WriteOutcome(succeeded = 1)
     }
+
+    /** A write grant this process already holds for [uri], such as the one an earlier confirmation left. */
+    private fun hasWriteGrant(uri: Uri): Boolean =
+        activity.checkUriPermission(uri, Process.myPid(), Process.myUid(), Intent.FLAG_GRANT_WRITE_URI_PERMISSION) ==
+            PackageManager.PERMISSION_GRANTED
 
     @RequiresApi(Build.VERSION_CODES.R)
     private suspend fun requestWrite(uri: Uri): Boolean = systemRequest(MediaStore.createWriteRequest(resolver, listOf(uri)))
