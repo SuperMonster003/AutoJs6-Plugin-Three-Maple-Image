@@ -44,6 +44,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
@@ -58,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import io.github.supermonster003.autojs6.plugin.three.maple.image.DocumentTreeLimit
 import io.github.supermonster003.autojs6.plugin.three.maple.image.DocumentTreeWalker
 import io.github.supermonster003.autojs6.plugin.three.maple.image.GalleryPreferences
+import io.github.supermonster003.autojs6.plugin.three.maple.image.KeyboardPolicy
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaGridUiState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaGroup
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaGroupLayout
@@ -306,6 +310,8 @@ internal fun MediaGridScreen(
                     }
                 }
                 val startLabel = stringResource(R.string.selection_start)
+                // The cell with keyboard focus (ROADMAP 9.3): the delete key acts on it when nothing is selected.
+                var focusedId by remember { mutableStateOf<Long?>(null) }
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(state.columns),
                     state = gridState,
@@ -328,6 +334,15 @@ internal fun MediaGridScreen(
                             onAutoScroll = { autoScrollSpeed = it },
                             onEnd = callbacks.onDragEnd,
                         )
+                        .onPreviewKeyEvent { event ->
+                            val delete = selectionActions.onDelete
+                            if (event.type != KeyEventType.KeyDown || !KeyboardPolicy.isDelete(event.nativeKeyEvent.keyCode) || delete == null) {
+                                return@onPreviewKeyEvent false
+                            }
+                            if (!selecting) focusedId?.let(callbacks.onToggle) ?: return@onPreviewKeyEvent false
+                            delete()
+                            true
+                        }
                         .testTag("maple.media.grid"),
                 ) {
                     val cell: @Composable (MediaItem) -> Unit = { item ->
@@ -345,6 +360,7 @@ internal fun MediaGridScreen(
                                 callbacks.onDragEnd()
                             },
                             onLongClickLabel = startLabel,
+                            onFocusChange = { hasFocus -> if (hasFocus) focusedId = item.id else if (focusedId == item.id) focusedId = null },
                             onClick = { if (selecting) callbacks.onToggle(item.id) else callbacks.onOpen(item) },
                             modifier = Modifier.testTag("maple.media.item.${item.id}"),
                         )

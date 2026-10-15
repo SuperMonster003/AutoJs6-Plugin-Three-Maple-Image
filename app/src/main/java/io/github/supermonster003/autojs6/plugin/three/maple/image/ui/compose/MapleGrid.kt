@@ -2,6 +2,7 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -23,12 +24,19 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -36,7 +44,6 @@ import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -91,8 +98,10 @@ internal fun MapleAlbumCell(
     val canvas = MapleTheme.canvas
     val settings = LocalGridSettings.current
     val inset = if (selectionMode) animateDpAsState(if (selected) SELECTED_INSET else 0.dp, label = "albumSelectionInset") else null
+    var focused by remember { mutableStateOf(false) }
     Column(
         modifier = modifier
+            .onFocusChanged { focused = it.isFocused }
             .combinedClickable(
                 enabled = enabled,
                 role = if (selectionMode) Role.Checkbox else Role.Button,
@@ -109,6 +118,7 @@ internal fun MapleAlbumCell(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(1f)
+                .focusRing(focused, RoundedCornerShape(MapleGridDefaults.albumCornerRadius))
                 .clip(RoundedCornerShape(MapleGridDefaults.albumCornerRadius))
                 .background(if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant),
         ) {
@@ -200,10 +210,13 @@ internal fun MapleMediaCell(
     selected: Boolean = false,
     onLongClick: (() -> Unit)? = null,
     onLongClickLabel: String? = null,
+    /** Keyboard focus came or went (ROADMAP 9.3): the grid acts on the focused cell for the delete key. */
+    onFocusChange: ((Boolean) -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     val canvas = MapleTheme.canvas
     val settings = LocalGridSettings.current
+    var focused by remember { mutableStateOf(false) }
     // Outside selection mode the cell stays free of animation state, which keeps flinging a large album cheap. The
     // inset is read only while drawing (a layer scale), so animating it never recomposes or re-lays out the cells:
     // selecting all of a full screen stays one recomposition.
@@ -213,6 +226,12 @@ internal fun MapleMediaCell(
             .aspectRatio(1f)
             .then(if (settings.corners == ThumbnailCorners.NONE) Modifier else Modifier.clip(RoundedCornerShape(settings.corners.dp.dp)))
             .background(if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant)
+            .onFocusChanged { state ->
+                if (focused != state.isFocused) {
+                    focused = state.isFocused
+                    onFocusChange?.invoke(state.isFocused)
+                }
+            }
             .clickable(role = if (selectionMode) Role.Checkbox else Role.Button, onClick = onClick)
             .semantics {
                 contentDescription = description
@@ -250,6 +269,9 @@ internal fun MapleMediaCell(
                     .background(if (selected) MaterialTheme.colorScheme.onPrimary else canvas.scrim, CircleShape),
             )
         }
+        if (focused) {
+            Box(modifier = Modifier.matchParentSize().focusRing(true, RoundedCornerShape(settings.corners.dp.dp)))
+        }
         if (badge != null && settings.typeBadges) {
             Text(
                 text = badge,
@@ -265,6 +287,12 @@ internal fun MapleMediaCell(
     }
 }
 
+/** The keyboard focus ring of a grid cell (ROADMAP 9.3): 3 dp in the theme's primary color, inside the cell. */
+@Composable
+private fun Modifier.focusRing(focused: Boolean, shape: Shape): Modifier =
+    if (focused) border(FOCUS_RING_WIDTH, MaterialTheme.colorScheme.primary, shape) else this
+
+private val FOCUS_RING_WIDTH = 3.dp
 private val SELECTED_INSET = 10.dp
 private val SELECTED_CORNER = 8.dp
 

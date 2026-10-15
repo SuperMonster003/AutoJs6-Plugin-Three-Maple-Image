@@ -18,6 +18,7 @@ import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.Settings
 import android.text.format.Formatter
+import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -345,6 +346,33 @@ class ImageViewerActivity : ConfiguredActivity() {
             host.animation.reapplyRequestedPlayback()
             hosts.values.forEach { other -> if (other !== host) (other.view.drawable as? Animatable)?.stop() }
         }
+    }
+
+    /**
+     * Keyboard and D-pad (ROADMAP 9.3): left / right (and page up / down) turn pages, the delete keys ask to delete
+     * where the delete button would.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        // Paging keys always page and come before Compose, which would take them to move focus between the bar
+        // buttons; Tab and up / down still do that.
+        val direction = when (KeyboardPolicy.viewerAction(event.keyCode)) {
+            ViewerKeyAction.PREVIOUS -> ZoomableImageView.DIRECTION_PREVIOUS
+            ViewerKeyAction.NEXT -> ZoomableImageView.DIRECTION_NEXT
+            else -> null
+        }
+        if (direction != null) {
+            if (event.action == KeyEvent.ACTION_DOWN) flipPage(direction)
+            return true
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (KeyboardPolicy.viewerAction(keyCode) != ViewerKeyAction.DELETE || (uiState.management == null && !uiState.hostDelete)) {
+            return super.onKeyDown(keyCode, event)
+        }
+        if (event.repeatCount == 0) deleteCurrent()
+        return true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
