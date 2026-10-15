@@ -1,6 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.net.Uri
+import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
 import androidx.test.core.app.ActivityScenario
@@ -140,8 +141,11 @@ class ImageViewerExifInstrumentationTest {
         assertFalse(text.contains(String.format(Locale.ROOT, "%.4f", ExifJpegTestFixture.LATITUDE)))
         assertNull(state.mapUri)
         val metadata = state.metadataText
-        assertTrue(metadata.contains("32 bpp"))
-        assertTrue(metadata.contains("sRGB", ignoreCase = true))
+        // Bit depth and color space come from the decoder from Android 8.0 on.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            assertTrue(metadata.contains("32 bpp"))
+            assertTrue(metadata.contains("sRGB", ignoreCase = true))
+        }
         assertEquals(metadata, state.detailsSummary)
     }
 

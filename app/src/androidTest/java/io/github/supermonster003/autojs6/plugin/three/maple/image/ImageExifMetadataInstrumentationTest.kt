@@ -1,6 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.net.Uri
+import android.os.Build
 import android.os.ParcelFileDescriptor
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
@@ -28,10 +29,15 @@ class ImageExifMetadataInstrumentationTest {
             assertEquals(ExifJpegTestFixture.HEIGHT, metadata.height)
             assertEquals(file.length(), metadata.byteSize)
             assertNull(metadata.exif)
-            assertEquals(32, metadata.decodedColor?.bitsPerPixel)
-            assertTrue(
-                metadata.decodedColor?.colorSpaceName?.contains("sRGB", ignoreCase = true) == true,
-            )
+            // The decoder reports its pixel format and color space from Android 8.0 on.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                assertEquals(32, metadata.decodedColor?.bitsPerPixel)
+                assertTrue(
+                    metadata.decodedColor?.colorSpaceName?.contains("sRGB", ignoreCase = true) == true,
+                )
+            } else {
+                assertNull(metadata.decodedColor)
+            }
         }
     }
 

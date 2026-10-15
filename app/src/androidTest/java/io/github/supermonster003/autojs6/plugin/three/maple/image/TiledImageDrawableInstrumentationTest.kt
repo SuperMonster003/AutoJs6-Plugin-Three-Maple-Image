@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.RectF
 import android.net.Uri
+import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
 import androidx.test.core.app.ActivityScenario
@@ -18,6 +19,7 @@ import kotlin.math.abs
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -26,6 +28,7 @@ class TiledImageDrawableInstrumentationTest {
 
     @Test
     fun platformRegionDecoderAcceptsARealStaticHeicOnAndroidNineAndLater() {
+        assumeTrue("HEIC decoding starts with Android 9", Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val context = instrumentation.targetContext
         val file = File(context.cacheDir, "image-viewer-tiled-static.heic")

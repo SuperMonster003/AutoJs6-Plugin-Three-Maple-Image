@@ -250,6 +250,21 @@ internal class MediaWriteCoordinator(private val activity: ComponentActivity) {
         val moved = withContext(Dispatchers.IO) { to.walkTopDown().filter { it.isFile }.toList() }
         val old = moved.map { File(from, it.relativeTo(to).path).absolutePath }
         scan(old + moved.map { it.absolutePath })
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) withContext(Dispatchers.IO) { forgetMissing(old) }
+    }
+
+    /**
+     * Android 7's scanner can keep the row of a path whose file is gone (ROADMAP 9.4, seen on API 24): the album
+     * would stay listed under its old name with images that cannot open. Rows are dropped by exact path and only
+     * while no file is there, so nothing on the storage is touched.
+     */
+    @Suppress("DEPRECATION")
+    private fun forgetMissing(paths: List<String>) {
+        val files = MediaStore.Files.getContentUri("external")
+        for (path in paths) {
+            if (File(path).exists()) continue
+            runCatching { resolver.delete(files, "${MediaStore.MediaColumns.DATA}=?", arrayOf(path)) }
+        }
     }
 
     /** The directory of an album folder, when the app can name it (internal storage, or a mounted card on Android 11+). */

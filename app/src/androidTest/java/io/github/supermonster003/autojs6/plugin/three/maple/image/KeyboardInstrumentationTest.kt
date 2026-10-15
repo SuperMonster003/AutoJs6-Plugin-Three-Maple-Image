@@ -82,6 +82,16 @@ class KeyboardInstrumentationTest {
         compose.waitForIdle()
     }
 
+    /**
+     * Leaves touch mode as a keyboard user does. Newer versions take [Instrumentation.setInTouchMode] at once; older
+     * ones (API 24) tell the window only with a key, and the platform spends that first navigation key on leaving
+     * touch mode, so an up arrow goes first (it turns no page and focuses no cell).
+     */
+    private fun leaveTouchMode() {
+        instrumentation.setInTouchMode(false)
+        key(KeyEvent.KEYCODE_DPAD_UP)
+    }
+
     /** Keys go to the focused window, and a page turn needs the pager: a key sent before both are there is lost. */
     private fun ActivityScenario<ImageViewerActivity>.hasWindowFocus(): Boolean {
         var ready = false
@@ -109,7 +119,7 @@ class KeyboardInstrumentationTest {
             compose.waitUntil(TIMEOUT) { scenario.state().let { !it.loading && it.pageCount == 3 } && scenario.hasWindowFocus() }
             // In touch mode the platform spends the first arrow key on leaving it (a control takes focus) before any
             // app sees the key; a keyboard user is past that after one press.
-            instrumentation.setInTouchMode(false)
+            leaveTouchMode()
             key(KeyEvent.KEYCODE_DPAD_RIGHT)
             compose.waitUntil(TIMEOUT) { scenario.state().pageIndex == 1 }
             key(KeyEvent.KEYCODE_PAGE_DOWN)
@@ -148,7 +158,7 @@ class KeyboardInstrumentationTest {
             val focused = "maple.media.item.${ids[1]}"
             compose.waitUntil(TIMEOUT) { exists(focused) }
             // A real key press leaves touch mode, where clickable cells cannot take focus.
-            instrumentation.setInTouchMode(false)
+            leaveTouchMode()
             compose.onNodeWithTag(focused).performSemanticsAction(SemanticsActions.RequestFocus)
             compose.onNodeWithTag(focused).assertIsFocused()
             key(KeyEvent.KEYCODE_FORWARD_DEL)
