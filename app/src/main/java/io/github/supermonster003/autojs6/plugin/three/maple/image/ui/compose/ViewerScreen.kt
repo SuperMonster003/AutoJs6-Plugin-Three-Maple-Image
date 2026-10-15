@@ -71,6 +71,8 @@ internal data class ViewerUiState(
     val pageIndex: Int = 0,
     val pageCount: Int = 0,
     val metadataText: String = "",
+    /** Lines of the extended details (ROADMAP 9.1); empty shows [metadataText] instead. */
+    val extendedDetails: List<String> = emptyList(),
     val detailsSummary: String = "",
     val exifText: String = "",
     /** A `geo:` URI of where the image was taken, when "Show location" is on and the image has a position. */
@@ -294,19 +296,35 @@ internal fun ViewerScreen(
                             onSelect = callbacks.onSelectPage,
                         )
                     }
-                    Text(
-                        text = state.metadataText,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = canvas.onScrimMuted,
-                        textAlign = TextAlign.Center,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(canvas.scrim)
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .testTag("maple.viewer.metadata"),
-                    )
+                    if (state.extendedDetails.isEmpty()) {
+                        Text(
+                            text = state.metadataText,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = canvas.onScrimMuted,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(canvas.scrim)
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .testTag("maple.viewer.metadata"),
+                        )
+                    } else {
+                        // Below the strip in the same column: a long path wraps and lifts the strip, never covers it.
+                        Text(
+                            text = state.extendedDetails.joinToString("\n"),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = canvas.onScrimMuted,
+                            maxLines = EXTENDED_DETAILS_MAX_LINES,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(canvas.scrim)
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .testTag("maple.viewer.extendedDetails"),
+                        )
+                    }
                     MapleBottomActionBar(
                         overlay = true,
                         actions = listOf(
@@ -594,3 +612,6 @@ private fun ViewerTopBar(state: ViewerUiState, callbacks: ViewerCallbacks) {
         },
     )
 }
+
+/** Enough for a path that wraps a few times and the three detail lines (ROADMAP 9.1). */
+private const val EXTENDED_DETAILS_MAX_LINES = 10

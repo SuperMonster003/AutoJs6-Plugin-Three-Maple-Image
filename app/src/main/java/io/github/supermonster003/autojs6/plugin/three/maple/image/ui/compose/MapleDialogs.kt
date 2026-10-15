@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -23,6 +25,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -155,6 +158,82 @@ internal fun MapleChoiceDialog(
                     selected = index == pending,
                     onSelect = { pending = index },
                     modifier = Modifier.testTag("maple.choice.$index"),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Multiple-choice dialog with the semantics of [MapleChoiceDialog]: ticking a row only changes the pending set,
+ * [onConfirm] fires with it when confirmed (disabled options never join it), and while [requireOne] is set the
+ * confirm button waits for at least one option. The pending set survives configuration changes.
+ */
+@Composable
+internal fun MapleMultiChoiceDialog(
+    title: String,
+    options: List<MapleChoice>,
+    selected: Set<Int>,
+    onDismissRequest: () -> Unit,
+    onConfirm: (Set<Int>) -> Unit,
+    confirmText: String,
+    dismissText: String,
+    modifier: Modifier = Modifier,
+    requireOne: Boolean = true,
+) {
+    var pending by rememberSaveable(selected) { mutableStateOf(selected.sorted().toIntArray()) }
+    val chosen = pending.filter { it in options.indices && options[it].enabled }.toSet()
+    val valid = !requireOne || chosen.isNotEmpty()
+    MapleDialog(
+        title = title,
+        onDismissRequest = onDismissRequest,
+        confirmText = confirmText,
+        onConfirm = { if (valid) onConfirm(chosen) },
+        dismissText = dismissText,
+        confirmEnabled = valid,
+        modifier = modifier,
+    ) {
+        Column(modifier = Modifier.testTag("maple.multiChoice.list")) {
+            options.forEachIndexed { index, option ->
+                MapleCheckRow(
+                    option = option,
+                    checked = index in chosen,
+                    onCheckedChange = { checked ->
+                        pending = (if (checked) pending.toSet() + index else pending.toSet() - index).sorted().toIntArray()
+                    },
+                    modifier = Modifier.testTag("maple.multiChoice.$index"),
+                )
+            }
+        }
+    }
+}
+
+/** One checkbox row of a multiple-choice list. */
+@Composable
+internal fun MapleCheckRow(option: MapleChoice, checked: Boolean, onCheckedChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+    val minHeight = if (option.description.isNullOrEmpty()) 56.dp else 72.dp
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .toggleable(value = checked, enabled = option.enabled, role = Role.Checkbox, onValueChange = onCheckedChange)
+            .defaultMinSize(minHeight = minHeight)
+            .padding(horizontal = MapleDialogDefaults.contentPadding, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(checked = checked, onCheckedChange = null, enabled = option.enabled)
+        Spacer(Modifier.width(16.dp))
+        Column {
+            Text(
+                text = option.label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface.disabledIf(!option.enabled),
+            )
+            if (!option.description.isNullOrEmpty()) {
+                Text(
+                    text = option.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.disabledIf(!option.enabled),
+                    modifier = Modifier.padding(top = 4.dp),
                 )
             }
         }

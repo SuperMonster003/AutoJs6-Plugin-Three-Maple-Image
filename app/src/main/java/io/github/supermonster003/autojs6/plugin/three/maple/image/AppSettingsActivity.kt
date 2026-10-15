@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleChoice
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleChoiceDialog
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleMultiChoiceDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleThemeColorDialog
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleThemeColorLabels
@@ -33,6 +34,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         data object DarkMode : SettingsDialog
         data object ThemeColor : SettingsDialog
         data object LauncherIcon : SettingsDialog
+        data object ExtendedDetailFields : SettingsDialog
     }
 
     private lateinit var settingsStore: ApplicationSettingsStore
@@ -43,6 +45,8 @@ internal class AppSettingsActivity : ConfiguredActivity() {
     private var viewerRotationGesture by mutableStateOf(true)
     private var viewerRotationSave by mutableStateOf(true)
     private var showLocation by mutableStateOf(false)
+    private var extendedDetails by mutableStateOf(false)
+    private var extendedDetailFields by mutableStateOf(ExtendedDetailsPolicy.SUGGESTED)
     private var recycleBinEnabled by mutableStateOf(true)
     private var syncSystemFavorites by mutableStateOf(false)
 
@@ -53,6 +57,8 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         viewerRotationGesture = settings.viewerRotationGesture
         viewerRotationSave = settings.viewerRotationSave
         showLocation = settings.showLocation
+        extendedDetails = settings.extendedDetails
+        extendedDetailFields = settings.extendedDetailFields
         recycleBinEnabled = settings.recycleBinEnabled
         syncSystemFavorites = settings.syncSystemFavorites
         hostResult = AutoJs6HostSettingsClient.query(this)
@@ -77,6 +83,11 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     onViewerRotationSave = ::updateViewerRotationSave,
                     showLocation = showLocation,
                     onShowLocation = ::updateShowLocation,
+                    extendedDetails = extendedDetails,
+                    onExtendedDetails = ::updateExtendedDetails,
+                    extendedDetailFields = ExtendedDetailField.entries.filter { it in extendedDetailFields }
+                        .joinToString(", ") { getString(it.labelResource()) },
+                    onExtendedDetailFields = { open(SettingsDialog.ExtendedDetailFields) },
                     recycleBinEnabled = recycleBinEnabled,
                     onRecycleBinEnabled = ::updateRecycleBinEnabled,
                     syncSystemFavorites = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) syncSystemFavorites else null,
@@ -108,6 +119,21 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         showLocation = enabled
         settings = settings.copy(showLocation = enabled)
         settingsStore.saveShowLocation(enabled)
+    }
+
+    private fun updateExtendedDetails(enabled: Boolean) {
+        extendedDetails = enabled
+        settings = settings.copy(extendedDetails = enabled)
+        settingsStore.saveExtendedDetails(enabled)
+    }
+
+    /** The location stays chosen while "Show location" is off; it just cannot be picked then. */
+    private fun updateExtendedDetailFields(chosen: Set<ExtendedDetailField>) {
+        val kept = extendedDetailFields.filterNot { ExtendedDetailsPolicy.available(it, showLocation) }
+        val fields = chosen + kept
+        extendedDetailFields = fields
+        settings = settings.copy(extendedDetailFields = fields)
+        settingsStore.saveExtendedDetailFields(fields)
     }
 
     private fun updateRecycleBinEnabled(enabled: Boolean) {
@@ -153,6 +179,25 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     selectedIndex = values.indexOf(settings.language),
                     onDismissRequest = ::close,
                     onConfirm = { index -> close(); saveSettings(settings.copy(language = values[index])) },
+                    confirmText = getString(R.string.dialog_button_confirm),
+                    dismissText = getString(R.string.dialog_button_cancel),
+                )
+            }
+            SettingsDialog.ExtendedDetailFields -> {
+                val fields = ExtendedDetailField.entries
+                MapleMultiChoiceDialog(
+                    title = getString(R.string.settings_extended_detail_fields_title),
+                    options = fields.map { field ->
+                        val available = ExtendedDetailsPolicy.available(field, showLocation)
+                        MapleChoice(
+                            label = getString(field.labelResource()),
+                            description = if (available) null else getString(R.string.extended_field_location_unavailable),
+                            enabled = available,
+                        )
+                    },
+                    selected = fields.indices.filter { fields[it] in extendedDetailFields }.toSet(),
+                    onDismissRequest = ::close,
+                    onConfirm = { indices -> close(); updateExtendedDetailFields(indices.map(fields::get).toSet()) },
                     confirmText = getString(R.string.dialog_button_confirm),
                     dismissText = getString(R.string.dialog_button_cancel),
                 )
@@ -313,6 +358,20 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         AppLanguage.KOREAN -> R.string.standalone_language_ko
         AppLanguage.RUSSIAN -> R.string.standalone_language_ru
         AppLanguage.ARABIC -> R.string.standalone_language_ar
+    }
+
+    @StringRes
+    private fun ExtendedDetailField.labelResource(): Int = when (this) {
+        ExtendedDetailField.PATH -> R.string.extended_field_path
+        ExtendedDetailField.RESOLUTION -> R.string.extended_field_resolution
+        ExtendedDetailField.SIZE -> R.string.extended_field_size
+        ExtendedDetailField.TAKEN -> R.string.extended_field_taken
+        ExtendedDetailField.MODIFIED -> R.string.extended_field_modified
+        ExtendedDetailField.CAMERA -> R.string.extended_field_camera
+        ExtendedDetailField.EXPOSURE -> R.string.extended_field_exposure
+        ExtendedDetailField.FOCAL_LENGTH -> R.string.extended_field_focal_length
+        ExtendedDetailField.ISO -> R.string.extended_field_iso
+        ExtendedDetailField.LOCATION -> R.string.extended_field_location
     }
 
     // endregion

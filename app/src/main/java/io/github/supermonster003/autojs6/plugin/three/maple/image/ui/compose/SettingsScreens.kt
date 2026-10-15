@@ -53,6 +53,11 @@ internal fun SettingsScreen(
     onViewerRotationSave: (Boolean) -> Unit,
     showLocation: Boolean,
     onShowLocation: (Boolean) -> Unit,
+    extendedDetails: Boolean,
+    onExtendedDetails: (Boolean) -> Unit,
+    /** The chosen fields, for the summary of the row that opens the choice. */
+    extendedDetailFields: String,
+    onExtendedDetailFields: () -> Unit,
     recycleBinEnabled: Boolean,
     onRecycleBinEnabled: (Boolean) -> Unit,
     /** Null hides the row (before Android 11). */
@@ -119,6 +124,22 @@ internal fun SettingsScreen(
                 checked = showLocation,
                 onToggle = onShowLocation,
                 modifier = Modifier.testTag("maple.settings.showLocation"),
+            )
+            MapleSwitchRow(
+                title = stringResource(R.string.settings_extended_details_title),
+                summary = stringResource(R.string.settings_extended_details_summary),
+                iconResource = R.drawable.ic_info_outline_24,
+                checked = extendedDetails,
+                onToggle = onExtendedDetails,
+                modifier = Modifier.testTag("maple.settings.extendedDetails"),
+            )
+            MapleSettingsRow(
+                title = stringResource(R.string.settings_extended_detail_fields_title),
+                summary = extendedDetailFields,
+                iconResource = R.drawable.ic_tune_24,
+                onClick = onExtendedDetailFields,
+                enabled = extendedDetails,
+                modifier = Modifier.testTag("maple.settings.extendedDetailFields"),
             )
             MapleSectionHeader(stringResource(R.string.standalone_settings_section_storage))
             MapleSettingsRow(

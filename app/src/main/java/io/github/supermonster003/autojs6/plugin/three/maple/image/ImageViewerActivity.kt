@@ -46,6 +46,8 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.Vie
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerPagerUi
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.ViewerUiState
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -101,6 +103,10 @@ class ImageViewerActivity : ConfiguredActivity() {
     /** "Show location" (ROADMAP 9.1, T14): the details show the position and offer a map. */
     private var showLocation = false
 
+    /** Extended details (ROADMAP 9.1): the chosen fields replace the metadata line while it is on. */
+    private var extendedDetails = false
+    private var extendedDetailFields = emptySet<ExtendedDetailField>()
+
     // Slideshow (ROADMAP 9.1): the dialog draft, the running plan and the timer of the next slide.
     private var slideshowDialog by mutableStateOf<SlideshowDialogState?>(null)
     private var slideshowPlan: SlideshowPlan? = null
@@ -155,6 +161,8 @@ class ImageViewerActivity : ConfiguredActivity() {
             rotationGestureEnabled = settings.viewerRotationGesture
             rotationSaveEnabled = settings.viewerRotationSave
             showLocation = settings.showLocation
+            extendedDetails = settings.extendedDetails
+            extendedDetailFields = settings.extendedDetailFields
         }
         operations = GalleryOperations(this, viewerTarget)
         val callbacks = ViewerCallbacks(
@@ -305,8 +313,13 @@ class ImageViewerActivity : ConfiguredActivity() {
             rotationGestureEnabled = enabled
             hosts.values.forEach { host -> host.view.rotationGestureEnabled = enabled }
         }
-        if (settings.showLocation != showLocation) {
+        val detailsChanged = settings.showLocation != showLocation ||
+            settings.extendedDetails != extendedDetails ||
+            settings.extendedDetailFields != extendedDetailFields
+        if (detailsChanged) {
             showLocation = settings.showLocation
+            extendedDetails = settings.extendedDetails
+            extendedDetailFields = settings.extendedDetailFields
             if (source != null) syncCurrentPage(pageChanged = false)
         }
     }
@@ -843,6 +856,11 @@ class ImageViewerActivity : ConfiguredActivity() {
             pageCount = source.pages.size,
             slideshowAvailable = source.pages.size > 1,
             metadataText = metadataText,
+            extendedDetails = if (extendedDetails && metadata != null) {
+                ExtendedDetailsPolicy.lines(extendedDetailFields, extendedDetailValues(index, page, metadata), showLocation)
+            } else {
+                emptyList()
+            },
             detailsSummary = metadataText,
             exifText = metadata?.exif?.let(::formatExifDetails) ?: getString(R.string.exif_unavailable),
             mapUri = metadata?.exif?.location?.takeIf { showLocation }?.geoUri(),
@@ -1227,6 +1245,38 @@ class ImageViewerActivity : ConfiguredActivity() {
             getString(R.string.metadata_summary_with_color, request.mimeType, size, resolution, decodedColor)
         }
     }
+
+    private fun extendedDetailValues(index: Int, page: ImageViewerPage, metadata: ImageMetadata): ExtendedDetailValues {
+        val item = source?.items?.getOrNull(index)
+        val exif = metadata.exif
+        val locale = Locale.getDefault()
+        val taken = ImageExifValueFormatter.capturedAt(exif?.capturedAt) ?: item?.dateTakenMillis?.let(::formatDetailTime)
+        return ExtendedDetailValues(
+            // Media library pages know their folder, host pages their place in the directory; others only the name.
+            path = item?.let { it.relativePath + it.displayName }
+                ?: page.hostRelativePath?.takeIf { it.isNotEmpty() }
+                ?: page.image.displayName,
+            resolution = if (metadata.width != null && metadata.height != null) {
+                getString(R.string.metadata_resolution, metadata.width, metadata.height)
+            } else {
+                null
+            },
+            size = Formatter.formatFileSize(this, metadata.byteSize),
+            taken = taken?.let { getString(R.string.extended_taken, it) },
+            modified = item?.dateModifiedSeconds?.takeIf { it > 0 }
+                ?.let { formatDetailTime(it * 1000L) }
+                ?.let { getString(R.string.extended_modified, it) },
+            camera = exif?.let { ImageExifValueFormatter.device(it.make, it.model) },
+            exposure = exif?.let { ImageExifValueFormatter.shutterAndAperture(it, locale) },
+            focalLength = exif?.let { ImageExifValueFormatter.focalLength(it, locale) },
+            iso = exif?.let(ImageExifValueFormatter::iso),
+            location = exif?.location?.decimal(),
+        )
+    }
+
+    /** The format of the EXIF capture time, so both times of a page read alike. */
+    private fun formatDetailTime(millis: Long): String =
+        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT).format(Date(millis))
 
     private fun formatDecodedColor(metadata: ImageDecodedColorMetadata?): String? = metadata?.let {
         buildList {

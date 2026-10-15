@@ -44,6 +44,9 @@ internal data class ApplicationSettings(
      * the location (ROADMAP 9.1, T14). Off by default: everything then behaves as before, the location is removed.
      */
     val showLocation: Boolean = false,
+    /** Chosen fields as text over the bottom of the viewer (ROADMAP 9.1); off by default, the choice stays when off. */
+    val extendedDetails: Boolean = false,
+    val extendedDetailFields: Set<ExtendedDetailField> = ExtendedDetailsPolicy.SUGGESTED,
     /** Deletes go to the recycle bin first (ROADMAP 7.2, on by default); off deletes for good after a confirmation. */
     val recycleBinEnabled: Boolean = true,
     /** Android 11+: favorites are also marked in the media library (ROADMAP 7.4, off by default). */
@@ -174,6 +177,10 @@ internal class ApplicationSettingsStore(context: Context) {
         viewerRotationGesture = preferences.getBoolean(KEY_VIEWER_ROTATION_GESTURE, true),
         viewerRotationSave = preferences.getBoolean(KEY_VIEWER_ROTATION_SAVE, true),
         showLocation = preferences.getBoolean(KEY_SHOW_LOCATION, false),
+        extendedDetails = preferences.getBoolean(KEY_EXTENDED_DETAILS, false),
+        extendedDetailFields = preferences.getString(KEY_EXTENDED_DETAIL_FIELDS, null)
+            ?.let(ExtendedDetailsPolicy::decode)
+            ?: ExtendedDetailsPolicy.SUGGESTED,
         recycleBinEnabled = preferences.getBoolean(KEY_RECYCLE_BIN_ENABLED, true),
         syncSystemFavorites = preferences.getBoolean(KEY_SYNC_SYSTEM_FAVORITES, false),
     )
@@ -190,6 +197,8 @@ internal class ApplicationSettingsStore(context: Context) {
             .putBoolean(KEY_VIEWER_ROTATION_GESTURE, settings.viewerRotationGesture)
             .putBoolean(KEY_VIEWER_ROTATION_SAVE, settings.viewerRotationSave)
             .putBoolean(KEY_SHOW_LOCATION, settings.showLocation)
+            .putBoolean(KEY_EXTENDED_DETAILS, settings.extendedDetails)
+            .putString(KEY_EXTENDED_DETAIL_FIELDS, ExtendedDetailsPolicy.encode(settings.extendedDetailFields))
             .putBoolean(KEY_RECYCLE_BIN_ENABLED, settings.recycleBinEnabled)
             .putBoolean(KEY_SYNC_SYSTEM_FAVORITES, settings.syncSystemFavorites)
             .putLong(KEY_REVISION, revision() + 1L)
@@ -207,6 +216,14 @@ internal class ApplicationSettingsStore(context: Context) {
 
     fun saveShowLocation(enabled: Boolean) {
         preferences.edit().putBoolean(KEY_SHOW_LOCATION, enabled).apply()
+    }
+
+    fun saveExtendedDetails(enabled: Boolean) {
+        preferences.edit().putBoolean(KEY_EXTENDED_DETAILS, enabled).apply()
+    }
+
+    fun saveExtendedDetailFields(fields: Set<ExtendedDetailField>) {
+        preferences.edit().putString(KEY_EXTENDED_DETAIL_FIELDS, ExtendedDetailsPolicy.encode(fields)).apply()
     }
 
     /** Like the rotation gesture, the recycle bin switch does not change appearance. */
@@ -229,6 +246,8 @@ internal class ApplicationSettingsStore(context: Context) {
         const val KEY_VIEWER_ROTATION_GESTURE = "viewer-rotation-gesture"
         const val KEY_VIEWER_ROTATION_SAVE = "viewer-rotation-save"
         const val KEY_SHOW_LOCATION = "show-location"
+        const val KEY_EXTENDED_DETAILS = "extended-details"
+        const val KEY_EXTENDED_DETAIL_FIELDS = "extended-detail-fields"
         const val KEY_RECYCLE_BIN_ENABLED = "recycle-bin-enabled"
         const val KEY_SYNC_SYSTEM_FAVORITES = "sync-system-favorites"
         const val KEY_REVISION = "revision"

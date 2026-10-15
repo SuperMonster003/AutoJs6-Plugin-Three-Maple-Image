@@ -283,14 +283,20 @@ internal object ImageExifValueFormatter {
     }
 
     fun exposure(metadata: ImageExifMetadata, locale: Locale): String? {
-        val parts = buildList {
-            metadata.exposureTimeSeconds?.let { add(formatExposureTime(it, locale)) }
-            metadata.apertureFNumber?.let { add("f/${formatNumber(it, locale)}") }
-            metadata.sensitivityIso?.let { add("ISO $it") }
-            metadata.focalLengthMm?.let { add("${formatNumber(it, locale)} mm") }
-        }
+        val parts = listOfNotNull(shutterAndAperture(metadata, locale), iso(metadata), focalLength(metadata, locale))
         return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
     }
+
+    /** "1/125 s · f/1.8", either part alone, or null (the extended details' exposure, ROADMAP 9.1). */
+    fun shutterAndAperture(metadata: ImageExifMetadata, locale: Locale): String? = listOfNotNull(
+        metadata.exposureTimeSeconds?.let { formatExposureTime(it, locale) },
+        metadata.apertureFNumber?.let { "f/${formatNumber(it, locale)}" },
+    ).takeIf { it.isNotEmpty() }?.joinToString(" · ")
+
+    fun iso(metadata: ImageExifMetadata): String? = metadata.sensitivityIso?.let { "ISO $it" }
+
+    fun focalLength(metadata: ImageExifMetadata, locale: Locale): String? =
+        metadata.focalLengthMm?.let { "${formatNumber(it, locale)} mm" }
 
     internal fun formatExposureTime(seconds: Double, locale: Locale): String {
         if (seconds < 1.0) {
