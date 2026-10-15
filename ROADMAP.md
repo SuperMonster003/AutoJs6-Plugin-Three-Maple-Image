@@ -360,7 +360,7 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 ### 10.2 插件服务
 
 - [x] (插件) `GalleryPluginService` (`org.autojs.plugin.GALLERY`, `org.autojs.permission.PLUGIN` 保护): 会话管理, token 校验, `PickerActivity` / 查看器 / 编辑器的脚本启动模式 (返回结果而非写回宿主事务), `convert` 无 UI 路径复用转换策略与 PFD 输入输出. 验收: `GalleryServiceContractTest` instrumentation (非法 token, 重复会话, 超时). 完成 (2026-10-15): 新包 `scriptapi` (`GalleryPluginService`, 调用方守卫 (宿主包名 + 同签名, debug 允许自身 uid), 128 位一次性令牌, 进程内一次一个会话 (新会话以 `replaced` 结束旧会话, 60 s 未认领 `timeout`), `GallerySessionActivity` (导出, 插件权限, 独立任务) 认领令牌后启动选图页 / 现有查看器 / 现有独立编辑器并在其下收集结果; 查看器只加一行翻页钩子, 图片经不导出的 `gallery-images` Provider 按需复制到缓存后读取; 编辑器沿用独立编辑会话, 脚本的 format / quality / keepExif / keepLocation 作为保存对话框初始值, 保存后写入宿主目标描述符; `convert` 复用 `ImageBitmapIO` 转换管线 (尺寸模式, 目标大小, PNG 优化, EXIF 选择)). 测试: `GalleryScriptApiTest` (Robolectric 7 项: 清单, 身份与能力, 请求范围, 令牌, 尺寸) 与 `GalleryServiceContractTest` (7 项: 身份, 转换与错误, 令牌一次性, 替换与超时, 查看器 open/page/close, 编辑器真实保存写入目标, 选图返回 MediaStore 图片路径) 在 AVD API 30 与 API 24 通过; 受影响的既有 instrumentation 20 项通过.
-- [~] (插件) 结果与权限边界: `pick` 返回绝对路径仅限 MediaStore 项 (插件自身已授权) 或脚本通过宿主传入的路径; 无权限时 `pick` 返回 `PERMISSION_REQUIRED` 并可打开设置页; 不扩大脚本访问范围 (T17). 验收: 用例覆盖三种权限状态. 进度 (2026-10-15): 选图页 (`GalleryPickerActivity`, 复用 `GalleryViewModel` 与媒体网格的选图模式: 单选点按即返回, 多选用确认栏, `maxCount` 上限提示, MIME 过滤时整册加载) 只列 "所有图片", 收藏与媒体库相册 (授权文件夹与隐藏相册没有脚本可读的路径, 不列出); 无权限时启动即申请 (含部分照片), 拒绝或无法再申请时离开都返回 `PERMISSION_REQUIRED`, 可从空状态打开设置页; 路径取 MediaStore `DATA`, 主存储退回 `RELATIVE_PATH` 拼接, 宿主再按脚本可读性过滤. 完整授权已有设备用例; 部分授权与拒绝两种状态的用例待补.
+- [x] (插件) 结果与权限边界: `pick` 返回绝对路径仅限 MediaStore 项 (插件自身已授权) 或脚本通过宿主传入的路径; 无权限时 `pick` 返回 `PERMISSION_REQUIRED` 并可打开设置页; 不扩大脚本访问范围 (T17). 验收: 用例覆盖三种权限状态. 进度 (2026-10-15): 选图页 (`GalleryPickerActivity`, 复用 `GalleryViewModel` 与媒体网格的选图模式: 单选点按即返回, 多选用确认栏, `maxCount` 上限提示, MIME 过滤时整册加载) 只列 "所有图片", 收藏与媒体库相册 (授权文件夹与隐藏相册没有脚本可读的路径, 不列出); 无权限时启动即申请 (含部分照片), 拒绝或无法再申请时离开都返回 `PERMISSION_REQUIRED`, 可从空状态打开设置页; 路径取 MediaStore `DATA`, 主存储退回 `RELATIVE_PATH` 拼接, 宿主再按脚本可读性过滤. 三种状态都有设备用例: 完整授权 (`GalleryServiceContractTest`), 拒绝 (`GalleryPickerPermissionInstrumentationTest`, 返回 `PERMISSION_REQUIRED`) 与 Android 14+ 部分授权 (同一类, 不再申请, 显示管理所选照片的提示, 离开即取消), 在 AVD API 37 新装后通过 (c8e7e9c).
 
 ### 10.3 文档与声明
 
@@ -369,8 +369,8 @@ M1 (Compose 基础设施, 主题, 页面迁移)
 
 ### 10.4 发布
 
-- [ ] (测试) 宿主 + 插件联调: 示例脚本在 QV770340J7 与 968e9f18 跑通 pick / view / edit / convert.
-- [ ] (发布) 按 P1-P6 发布 v3.4.0 与对应宿主版本; changelog 写明脚本 API 的权限边界.
+- [~] (测试) 宿主 + 插件联调: 示例脚本在 QV770340J7 与 968e9f18 跑通 pick / view / edit / convert. 进度 (2026-10-15): 模拟器上完成 (宿主 debug 5439 + 插件, `GalleryScriptApiTest` 4 项: 转换, 查看器跟随与关闭, 选图 / 编辑取消, 缺插件). 真机需要装上带 gallery 的宿主构建 (5439 或更高) 后补做.
+- [x] (发布) 按 P1-P6 发布 v3.4.0 与对应宿主版本; changelog 写明脚本 API 的权限边界. 完成 (2026-10-15): tag `v3.4.0` = c8e7e9c, versionCode 198, Release Latest (APK + SHA256SUMS, 下载复核通过), 官方索引 198.json (27e8476); 门禁, CI, API 37 全量 instrumentation 与 5 台真机 + AVD 37 最终包冒烟见 `docs/release/v3.4.0.md`. 宿主侧 (契约, 客户端, 脚本对象, 测试, 补全索引) 均为本地提交, 待维护者合并并发布带 5439 的宿主.
 
 验收条件: 四个调用在宿主已安装并启用插件时可用, 缺失时错误清晰; 脚本不能借 API 读取其本身无权访问的文件; 文档, d.ts, 离线文档与 Ace 声明同步.
 
