@@ -97,6 +97,44 @@ class ExifMetadataPolicyTest {
     }
 
     @Test
+    fun theLocationTravelsSeparatelyAndIsWrittenOnlyWhenSelected() {
+        val metadata = sourceMetadata()
+        assertTrue(metadata.hasLocation)
+        assertFalse(metadata.writesLocation)
+        assertFalse(metadata.attributes.keys.any { it.startsWith("GPS") })
+        assertNotNull(metadata.location[ExifInterface.TAG_GPS_LATITUDE])
+        assertTrue(metadata.select(capture = false, location = false).isEmpty)
+
+        val bitmap = paletteBitmap(96, 64)
+        try {
+            ImageOutputFormat.entries.forEach { format ->
+                val onlyLocation = exifOf(encode(bitmap, format, metadata = metadata.select(capture = false, location = true)), format)
+                val latLong = requireNotNull(onlyLocation.latLong) { "$format lost the location" }
+                assertEquals(format.toString(), 31.2304, latLong[0], 1e-4)
+                assertEquals(format.toString(), 121.4737, latLong[1], 1e-4)
+                assertNull(format.toString(), onlyLocation.getAttribute(ExifInterface.TAG_MAKE))
+
+                val both = exifOf(encode(bitmap, format, metadata = metadata.select(capture = true, location = true)), format)
+                assertNotNull(format.toString(), both.latLong)
+                assertEquals(format.toString(), CAMERA_MAKE, both.getAttribute(ExifInterface.TAG_MAKE))
+
+                val captureOnly = exifOf(encode(bitmap, format, metadata = metadata.select(capture = true, location = false)), format)
+                assertNull(format.toString(), captureOnly.latLong)
+                assertEquals(format.toString(), CAMERA_MAKE, captureOnly.getAttribute(ExifInterface.TAG_MAKE))
+            }
+            assertNoStagedFilesRemain()
+        } finally {
+            bitmap.recycle()
+        }
+    }
+
+    private fun exifOf(encoded: EncodedOutput, format: ImageOutputFormat): ExifInterface {
+        val output = File(temporaryDirectory, "location-${System.nanoTime()}.${format.extension}")
+        FileOutputStream(output).use { it.write(encoded.bytes) }
+        return ExifInterface(output.absolutePath)
+    }
+
+    @Test
     fun metadataPreservationIsOptInAndDefaultsToNoExifOutput() {
         val bitmap = texturedBitmap(80, 60)
         try {

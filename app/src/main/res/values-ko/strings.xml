@@ -17,6 +17,7 @@
     <string name="action_more">더보기</string>
     <string name="action_move">이동</string>
     <string name="action_open_external">다른 앱으로 열기</string>
+    <string name="action_open_in_map">지도에서 열기</string>
     <string name="action_pause_animation">애니메이션 일시중지</string>
     <string name="action_pin">고정</string>
     <string name="action_print">인쇄 / PDF로 저장</string>
@@ -88,6 +89,7 @@
     <string name="error_image_decoder_unavailable">이 기기의 시스템 디코더는 %1$s 이미지를 표시할 수 없습니다</string>
     <string name="error_image_format_requires_android">이 기기에서 %1$s 이미지를 표시하려면 Android %2$d 이상이 필요합니다</string>
     <string name="error_no_external_viewer">사용 가능한 다른 이미지 뷰어가 없습니다</string>
+    <string name="error_no_map_app">지도를 열 수 있는 앱이 없습니다</string>
     <string name="error_print_failed">인쇄 문서를 만들 수 없습니다</string>
     <string name="excluded_folders_empty">제외한 폴더가 없습니다</string>
     <string name="excluded_folders_empty_body">앨범 목록에서 앨범을 길게 누르고 제외를 선택하세요.</string>
@@ -99,6 +101,7 @@
     <string name="exif_device">기기: %1$s</string>
     <string name="exif_exposure">노출: %1$s</string>
     <string name="exif_gps_present">GPS 메타데이터 있음 · 좌표 숨김</string>
+    <string name="exif_location">위치: %1$s</string>
     <string name="exif_orientation">방향: %1$s</string>
     <string name="exif_orientation_clockwise">시계 방향 %1$d°</string>
     <string name="exif_orientation_mirrored">좌우 반전</string>
@@ -217,6 +220,9 @@
     <string name="image_editor_save_follow_source">원본 형식 따르기(%1$s)</string>
     <string name="image_editor_save_keep_exif">촬영 정보 유지</string>
     <string name="image_editor_save_keep_exif_summary">카메라, 날짜, 노출 정보는 유지되고 위치 정보는 항상 삭제됩니다</string>
+    <string name="image_editor_save_keep_exif_summary_short">카메라, 날짜, 노출 설정 유지</string>
+    <string name="image_editor_save_keep_location">위치 정보 유지</string>
+    <string name="image_editor_save_keep_location_summary">새 이미지에 촬영 장소의 좌표가 포함되므로 공유하기 전에 확인하세요. 끄면 위치가 제거됩니다</string>
     <string name="image_editor_save_new_name">새 파일: %1$s</string>
     <string name="image_editor_save_overwrite">원본에 덮어쓰기</string>
     <string name="image_editor_save_overwrite_summary">형식은 그대로 유지됩니다. 저장 직후 실행 취소할 수 있습니다</string>
@@ -307,6 +313,8 @@
     <string name="selection_start">선택</string>
     <string name="settings_recycle_bin_summary">삭제한 사진은 30일 동안 보관되며 복원할 수 있습니다. 끄면 삭제 시 영구 삭제됩니다</string>
     <string name="settings_recycle_bin_title">휴지통</string>
+    <string name="settings_show_location_summary">상세 정보에 촬영 장소의 좌표를 표시하고 지도에서 열 수 있습니다. 저장하거나 변환할 때 위치를 유지할지 선택할 수 있습니다</string>
+    <string name="settings_show_location_title">위치 정보 표시</string>
     <string name="settings_sync_favorites_summary">시스템 미디어 라이브러리에도 즐겨찾기를 표시해 다른 갤러리 앱에서도 볼 수 있습니다. 켜면 기존 즐겨찾기를 가져옵니다</string>
     <string name="settings_sync_favorites_title">시스템 즐겨찾기 동기화</string>
     <string name="sort_section_direction">순서</string>
@@ -414,6 +422,7 @@
     <string name="text_image_conversion_percentage_hint">백분율</string>
     <string name="text_image_conversion_preserve_exif">안전한 EXIF 메타데이터 유지</string>
     <string name="text_image_conversion_preserve_exif_helper">카메라 및 촬영 정보는 유지합니다. 방향은 정규화하고 GPS 위치, 포함된 미리보기 및 안전하게 검사할 수 없는 메타데이터는 항상 제거합니다.</string>
+    <string name="text_image_conversion_preserve_exif_helper_short">카메라 및 촬영 정보는 유지합니다. 방향은 정규화하고 포함된 미리보기 및 안전하게 검사할 수 없는 메타데이터는 항상 제거합니다.</string>
     <string name="text_image_conversion_quality">품질</string>
     <string name="text_image_conversion_resize">크기 조정</string>
     <string name="text_image_conversion_target_file_size">목표 파일 크기</string>

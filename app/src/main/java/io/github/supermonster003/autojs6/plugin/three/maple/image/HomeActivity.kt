@@ -180,6 +180,8 @@ class HomeActivity : ConfiguredActivity() {
                                 operations.startBatch()
                             },
                             onBack = { controller.popBackStack() },
+                            // Shared preferences stay in memory once loaded, so reading them here costs nothing.
+                            showLocation = ApplicationSettingsStore(this@HomeActivity).load().showLocation,
                         )
                     }
                     composable(ROUTE_RECYCLE_BIN) {

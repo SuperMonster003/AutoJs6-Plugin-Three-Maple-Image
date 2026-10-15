@@ -25,6 +25,8 @@ internal data class BatchConversionSettings(
     /** Clockwise, one of [BatchConversionPolicy.ROTATIONS]. */
     val rotationDegrees: Int = 0,
     val preserveExif: Boolean = false,
+    /** Keep where each original was taken (ROADMAP 9.1, T14); offered only with "Show location" on. */
+    val preserveLocation: Boolean = false,
     val jpegBackgroundBlack: Boolean = false,
 ) {
     companion object {
@@ -110,7 +112,9 @@ internal object BatchConversionPolicy {
             targetSize = turned,
             jpegBackgroundColor = if (settings.jpegBackgroundBlack) JPEG_BACKGROUND_BLACK else ImageConversionOptions.DEFAULT_JPEG_BACKGROUND_COLOR,
             webpLossless = ImageOutputEncodingPolicy.usesWebpLossless(settings.format, settings.webpLossless, sdkInt),
-            preservedExifMetadata = source.preservableExifMetadata.takeIf { settings.preserveExif },
+            preservedExifMetadata = source.preservableExifMetadata
+                .select(capture = settings.preserveExif, location = settings.preserveLocation)
+                .takeIf { !it.isEmpty },
         )
         return BatchItemPlan.Ready(size, settings.rotationDegrees, options)
     }

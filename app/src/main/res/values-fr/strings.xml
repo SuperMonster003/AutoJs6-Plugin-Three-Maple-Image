@@ -17,6 +17,7 @@
     <string name="action_more">Plus</string>
     <string name="action_move">Déplacer</string>
     <string name="action_open_external">Ouvrir avec une autre application</string>
+    <string name="action_open_in_map">Ouvrir dans une carte</string>
     <string name="action_pause_animation">Mettre l\'animation en pause</string>
     <string name="action_pin">Épingler</string>
     <string name="action_print">Imprimer / enregistrer en PDF</string>
@@ -88,6 +89,7 @@
     <string name="error_image_decoder_unavailable">Le décodeur système de cet appareil ne peut pas afficher les images %1$s</string>
     <string name="error_image_format_requires_android">Les images %1$s nécessitent Android %2$d ou version ultérieure sur cet appareil</string>
     <string name="error_no_external_viewer">Aucune autre visionneuse d\'images n\'est disponible</string>
+    <string name="error_no_map_app">Aucune application ne peut ouvrir une carte</string>
     <string name="error_print_failed">Impossible de créer le document d\'impression</string>
     <string name="excluded_folders_empty">Aucun dossier exclu</string>
     <string name="excluded_folders_empty_body">Appuyez longuement sur un album dans la liste des albums et choisissez Exclure.</string>
@@ -99,6 +101,7 @@
     <string name="exif_device">Appareil : %1$s</string>
     <string name="exif_exposure">Exposition : %1$s</string>
     <string name="exif_gps_present">Métadonnées GPS présentes · coordonnées masquées</string>
+    <string name="exif_location">Position: %1$s</string>
     <string name="exif_orientation">Orientation : %1$s</string>
     <string name="exif_orientation_clockwise">%1$d° dans le sens horaire</string>
     <string name="exif_orientation_mirrored">En miroir</string>
@@ -217,6 +220,9 @@
     <string name="image_editor_save_follow_source">Conserver le format source (%1$s)</string>
     <string name="image_editor_save_keep_exif">Conserver les infos de prise de vue</string>
     <string name="image_editor_save_keep_exif_summary">L\'appareil, la date et l\'exposition sont conservés; la position est toujours supprimée</string>
+    <string name="image_editor_save_keep_exif_summary_short">L\'appareil, la date et l\'exposition sont conservés</string>
+    <string name="image_editor_save_keep_location">Conserver la position</string>
+    <string name="image_editor_save_keep_location_summary">La nouvelle image contient les coordonnées du lieu de prise de vue, attention avant de la partager; décochée, la position est retirée</string>
     <string name="image_editor_save_new_name">Nouveau fichier : %1$s</string>
     <string name="image_editor_save_overwrite">Remplacer l\'original</string>
     <string name="image_editor_save_overwrite_summary">Le format reste le même. Vous pouvez annuler juste après l\'enregistrement</string>
@@ -307,6 +313,8 @@
     <string name="selection_start">Sélectionner</string>
     <string name="settings_recycle_bin_summary">Les photos supprimées sont conservées 30 jours et peuvent être restaurées; désactivée, la suppression est définitive</string>
     <string name="settings_recycle_bin_title">Corbeille</string>
+    <string name="settings_show_location_summary">Affiche dans les détails les coordonnées du lieu de prise de vue et les ouvre dans une carte; l\'enregistrement et la conversion peuvent alors conserver la position</string>
+    <string name="settings_show_location_title">Afficher la position</string>
     <string name="settings_sync_favorites_summary">Marque aussi les favoris dans la médiathèque du système pour que les autres galeries les voient; l\'activation importe les favoris existants</string>
     <string name="settings_sync_favorites_title">Synchroniser les favoris du système</string>
     <string name="sort_section_direction">Ordre</string>
@@ -414,6 +422,7 @@
     <string name="text_image_conversion_percentage_hint">Pourcentage</string>
     <string name="text_image_conversion_preserve_exif">Conserver les métadonnées EXIF sûres</string>
     <string name="text_image_conversion_preserve_exif_helper">Les données de l\'appareil et de prise de vue sont conservées. L\'orientation est normalisée; la position GPS, les aperçus intégrés et les métadonnées qui ne peuvent pas être contrôlées de manière sûre sont toujours supprimés.</string>
+    <string name="text_image_conversion_preserve_exif_helper_short">Les données de l\'appareil et de prise de vue sont conservées. L\'orientation est normalisée; les aperçus intégrés et les métadonnées qui ne peuvent pas être contrôlées de manière sûre sont toujours supprimés.</string>
     <string name="text_image_conversion_quality">Qualité</string>
     <string name="text_image_conversion_resize">Redimensionner</string>
     <string name="text_image_conversion_target_file_size">Taille de fichier cible</string>

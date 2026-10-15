@@ -12,14 +12,40 @@ internal data class SourceExifSnapshot(
     val preservableMetadata: PreservedExifMetadata = PreservedExifMetadata.EMPTY,
 )
 
+/**
+ * Capture details that may be copied into an output, and separately the location of the original (ROADMAP 9.1,
+ * T14). The location is carried along but written only when [includesLocation], which only [select] turns on: an
+ * output keeps its location solely on an explicit choice.
+ */
 internal class PreservedExifMetadata private constructor(
     attributes: Map<String, String>,
-    private val encodedValueBytes: Long,
+    location: Map<String, String>,
+    val includesLocation: Boolean,
 ) {
 
     val attributes: Map<String, String> = Collections.unmodifiableMap(LinkedHashMap(attributes))
+
+    /** GPS tags of the original, empty when it has no usable position. */
+    val location: Map<String, String> = Collections.unmodifiableMap(LinkedHashMap(location))
+
+    /** Nothing would be written. */
     val isEmpty: Boolean
-        get() = attributes.isEmpty()
+        get() = attributes.isEmpty() && !writesLocation
+
+    /** The original has a position that an output could keep. */
+    val hasLocation: Boolean
+        get() = location.isNotEmpty()
+
+    val writesLocation: Boolean
+        get() = includesLocation && location.isNotEmpty()
+
+    private val encodedValueBytes: Long
+        get() = (attributes.values + if (writesLocation) location.values else emptyList())
+            .sumOf { value -> value.toByteArray(Charsets.UTF_8).size.toLong() }
+
+    /** What an output keeps: the capture details, the location, both or neither. */
+    fun select(capture: Boolean, location: Boolean): PreservedExifMetadata =
+        PreservedExifMetadata(if (capture) attributes else emptyMap(), this.location, includesLocation = location)
 
     fun estimatedEncodedOverhead(format: ImageOutputFormat): Long {
         if (isEmpty) return 0L
@@ -28,18 +54,16 @@ internal class PreservedExifMetadata private constructor(
             ImageOutputFormat.PNG -> PNG_CONTAINER_OVERHEAD_BYTES
             ImageOutputFormat.WEBP -> WEBP_CONTAINER_OVERHEAD_BYTES
         }
-        return encodedValueBytes + attributes.size.toLong() * ESTIMATED_IFD_ENTRY_BYTES + containerOverhead
+        val entries = attributes.size + if (writesLocation) location.size else 0
+        return encodedValueBytes + entries.toLong() * ESTIMATED_IFD_ENTRY_BYTES + containerOverhead
     }
 
     companion object {
-        val EMPTY = PreservedExifMetadata(emptyMap(), 0L)
+        val EMPTY = PreservedExifMetadata(emptyMap(), emptyMap(), includesLocation = false)
 
-        internal fun from(attributes: Map<String, String>): PreservedExifMetadata {
-            if (attributes.isEmpty()) return EMPTY
-            val encodedValueBytes = attributes.values.sumOf { value ->
-                value.toByteArray(Charsets.UTF_8).size.toLong()
-            }
-            return PreservedExifMetadata(attributes, encodedValueBytes)
+        internal fun from(attributes: Map<String, String>, location: Map<String, String> = emptyMap()): PreservedExifMetadata {
+            if (attributes.isEmpty() && location.isEmpty()) return EMPTY
+            return PreservedExifMetadata(attributes, location, includesLocation = false)
         }
 
         private const val ESTIMATED_IFD_ENTRY_BYTES = 20L
@@ -76,12 +100,26 @@ internal object ExifMetadataPolicy {
         metadata.attributes.forEach(exif::setAttribute)
         REMOVED_OPAQUE_TAGS.forEach { tag -> exif.setAttribute(tag, null) }
         GPS_TAGS.forEach { tag -> exif.setAttribute(tag, null) }
+        if (metadata.writesLocation) metadata.location.forEach(exif::setAttribute)
         exif.setAttribute(
             ExifInterface.TAG_ORIENTATION,
             ExifInterface.ORIENTATION_NORMAL.toString(),
         )
         exif.saveAttributes()
-        verifySanitized(file)
+        verifySanitized(file, keepsLocation = metadata.writesLocation)
+    }
+
+    /** The position tags of [exif], only when it holds a valid latitude and longitude; bounded like the details. */
+    private fun extractLocation(exif: ExifInterface): Map<String, String> {
+        val latLong = exif.latLong ?: return emptyMap()
+        if (!GeoPosition.isValid(latLong[0], latLong[1])) return emptyMap()
+        val location = linkedMapOf<String, String>()
+        for (tag in LOCATION_TAGS) {
+            val value = exif.getAttribute(tag) ?: continue
+            if (value.toByteArray(Charsets.UTF_8).size > MAX_ATTRIBUTE_BYTES) continue
+            location[tag] = value
+        }
+        return location
     }
 
     private fun extractPreservableMetadata(exif: ExifInterface): PreservedExifMetadata {
@@ -96,10 +134,10 @@ internal object ExifMetadataPolicy {
             attributes[tag] = value
             totalBytes += valueBytes
         }
-        return PreservedExifMetadata.from(attributes)
+        return PreservedExifMetadata.from(attributes, extractLocation(exif))
     }
 
-    private fun verifySanitized(file: File) {
+    private fun verifySanitized(file: File, keepsLocation: Boolean) {
         val exif = ExifInterface(file.absolutePath)
         val orientation = exif.getAttributeInt(
             ExifInterface.TAG_ORIENTATION,
@@ -108,7 +146,9 @@ internal object ExifMetadataPolicy {
         if (orientation != ExifInterface.ORIENTATION_NORMAL) {
             throw IOException("Output EXIF orientation was not normalized")
         }
-        if (exif.latLong != null || GPS_TAGS.any { exif.getAttribute(it) != null }) {
+        if (keepsLocation) {
+            if (exif.latLong == null) throw IOException("Output EXIF lost the location it was asked to keep")
+        } else if (exif.latLong != null || GPS_TAGS.any { exif.getAttribute(it) != null }) {
             throw IOException("Output EXIF still contains GPS metadata")
         }
         if (REMOVED_OPAQUE_TAGS.any { exif.getAttribute(it) != null }) {
@@ -195,6 +235,21 @@ internal object ExifMetadataPolicy {
         ExifInterface.TAG_XMP,
         ExifInterface.TAG_MAKER_NOTE,
         ExifInterface.TAG_USER_COMMENT,
+    )
+
+    /** What a kept location consists of: the position, altitude, time and heading of the fix. */
+    private val LOCATION_TAGS = listOf(
+        ExifInterface.TAG_GPS_LATITUDE_REF,
+        ExifInterface.TAG_GPS_LATITUDE,
+        ExifInterface.TAG_GPS_LONGITUDE_REF,
+        ExifInterface.TAG_GPS_LONGITUDE,
+        ExifInterface.TAG_GPS_ALTITUDE_REF,
+        ExifInterface.TAG_GPS_ALTITUDE,
+        ExifInterface.TAG_GPS_TIMESTAMP,
+        ExifInterface.TAG_GPS_DATESTAMP,
+        ExifInterface.TAG_GPS_IMG_DIRECTION_REF,
+        ExifInterface.TAG_GPS_IMG_DIRECTION,
+        ExifInterface.TAG_GPS_H_POSITIONING_ERROR,
     )
 
     private val GPS_TAGS = listOf(

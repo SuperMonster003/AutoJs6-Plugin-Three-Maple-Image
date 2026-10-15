@@ -2,6 +2,7 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextEquals
@@ -127,6 +128,50 @@ class EditorDialogsTest {
         }
         compose.onNodeWithTag("maple.editor.save.overwrite").assertDoesNotExist()
         compose.onNodeWithTag("maple.editor.save.keepExif").assertDoesNotExist()
+    }
+
+    @Test
+    fun theLocationIsOfferedOnlyWithShowLocationAndAnOverwriteDoesNotKeepIt() {
+        val state = EditorSaveDialogState(
+            formatLabels = listOf("Follow source (JPEG)", "JPEG", "PNG", "WebP"),
+            formatIndex = 0,
+            quality = 92,
+            webpLossless = false,
+            overwriteAvailable = true,
+            keepExifAvailable = true,
+            keepLocationAvailable = true,
+        )
+        compose.setContent {
+            MapleTheme(palette = testPalette()) {
+                EditorSaveDialog(state = state, onDismissRequest = {}, onConfirm = {})
+            }
+        }
+        compose.onNodeWithTag("maple.editor.save.keepLocation").performScrollTo().assertIsOff()
+        compose.onNodeWithTag("maple.editor.save.overwrite").performScrollTo().performClick()
+        compose.waitForIdle()
+        assertTrue(state.keepExif)
+        assertFalse("the location stays off with an overwrite", state.keepLocation)
+        compose.onNodeWithTag("maple.editor.save.keepLocation").performScrollTo().performClick()
+        compose.waitForIdle()
+        assertTrue(state.keepLocation)
+    }
+
+    @Test
+    fun withoutShowLocationThereIsNoLocationSwitch() {
+        val state = EditorSaveDialogState(
+            formatLabels = listOf("Follow source (JPEG)", "JPEG", "PNG", "WebP"),
+            formatIndex = 0,
+            quality = 92,
+            webpLossless = false,
+            keepExifAvailable = true,
+        )
+        compose.setContent {
+            MapleTheme(palette = testPalette()) {
+                EditorSaveDialog(state = state, onDismissRequest = {}, onConfirm = {})
+            }
+        }
+        compose.onNodeWithTag("maple.editor.save.keepExif").assertExists()
+        compose.onNodeWithTag("maple.editor.save.keepLocation").assertDoesNotExist()
     }
 
     @Test

@@ -1,6 +1,7 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.app.ActivityManager
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ComponentName
 import android.content.ComponentCallbacks2
@@ -9,6 +10,7 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
@@ -87,6 +89,9 @@ class ImageViewerActivity : ConfiguredActivity() {
     private var hostTrashBusy = false
     private val hostTrashedTargetIds = linkedSetOf<String>()
     private var rotationSaveEnabled = true
+
+    /** "Show location" (ROADMAP 9.1, T14): the details show the position and offer a map. */
+    private var showLocation = false
     private var rotationSaveBusy = false
     private val rotationWritable = mutableMapOf<String, Boolean>()
     private val rotationChecks = mutableSetOf<String>()
@@ -126,6 +131,7 @@ class ImageViewerActivity : ConfiguredActivity() {
         ApplicationSettingsStore(this).load().let { settings ->
             rotationGestureEnabled = settings.viewerRotationGesture
             rotationSaveEnabled = settings.viewerRotationSave
+            showLocation = settings.showLocation
         }
         operations = GalleryOperations(this, viewerTarget)
         val callbacks = ViewerCallbacks(
@@ -138,6 +144,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             onOpenWith = ::openWithAnotherApp,
             onResetZoom = { hideZoomIndicator(); currentHost()?.view?.resetZoom(); syncRotationHint() },
             onPrint = ::printImage,
+            onOpenMap = ::openMap,
             onReleaseHistory = ::showReleaseHistory,
             onToggleAnimation = { currentHost()?.animation?.toggle() },
             onPageChanged = ::onPagerPageChanged,
@@ -253,10 +260,15 @@ class ImageViewerActivity : ConfiguredActivity() {
 
     override fun onResume() {
         super.onResume()
-        val enabled = ApplicationSettingsStore(this).load().viewerRotationGesture
+        val settings = ApplicationSettingsStore(this).load()
+        val enabled = settings.viewerRotationGesture
         if (enabled != rotationGestureEnabled) {
             rotationGestureEnabled = enabled
             hosts.values.forEach { host -> host.view.rotationGestureEnabled = enabled }
+        }
+        if (settings.showLocation != showLocation) {
+            showLocation = settings.showLocation
+            if (source != null) syncCurrentPage(pageChanged = false)
         }
     }
 
@@ -684,6 +696,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             metadataText = metadataText,
             detailsSummary = metadataText,
             exifText = metadata?.exif?.let(::formatExifDetails) ?: getString(R.string.exif_unavailable),
+            mapUri = metadata?.exif?.location?.takeIf { showLocation }?.geoUri(),
             detailsAvailable = detailsAvailable,
             detailsExpanded = expanded,
             loading = host?.loading ?: true,
@@ -1077,6 +1090,16 @@ class ImageViewerActivity : ConfiguredActivity() {
         }.takeIf { fields -> fields.isNotEmpty() }?.joinToString(" · ")
     }
 
+    /** Opens the position of the current image in a map app (ROADMAP 9.1, T14). */
+    private fun openMap() {
+        val uri = uiState.mapUri ?: return
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.error_no_map_app, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun formatExifDetails(exif: ImageExifMetadata): String? {
         val lines = buildList {
             ImageExifValueFormatter.capturedAt(exif.capturedAt)?.let { capturedAt ->
@@ -1091,7 +1114,12 @@ class ImageViewerActivity : ConfiguredActivity() {
             exif.orientation?.let { orientation ->
                 add(getString(R.string.exif_orientation, formatExifOrientation(orientation)))
             }
-            if (exif.hasGpsMetadata) add(getString(R.string.exif_gps_present))
+            val location = exif.location?.takeIf { showLocation }
+            if (location != null) {
+                add(getString(R.string.exif_location, "${location.decimal()} (${location.degreesMinutesSeconds()})"))
+            } else if (exif.hasGpsMetadata) {
+                add(getString(R.string.exif_gps_present))
+            }
         }
         return lines.takeIf { it.isNotEmpty() }?.joinToString("\n")
     }

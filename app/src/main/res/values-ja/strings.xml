@@ -17,6 +17,7 @@
     <string name="action_more">その他</string>
     <string name="action_move">移動</string>
     <string name="action_open_external">別のアプリで開く</string>
+    <string name="action_open_in_map">地図で開く</string>
     <string name="action_pause_animation">アニメーションを一時停止</string>
     <string name="action_pin">固定</string>
     <string name="action_print">印刷 / PDF に保存</string>
@@ -88,6 +89,7 @@
     <string name="error_image_decoder_unavailable">このデバイスのシステムデコーダーでは %1$s 画像を表示できません</string>
     <string name="error_image_format_requires_android">%1$s 画像をこのデバイスで表示するには Android %2$d 以降が必要です</string>
     <string name="error_no_external_viewer">ほかの画像ビューアーを利用できません</string>
+    <string name="error_no_map_app">地図を開けるアプリがありません</string>
     <string name="error_print_failed">印刷ドキュメントを作成できませんでした</string>
     <string name="excluded_folders_empty">除外したフォルダーはありません</string>
     <string name="excluded_folders_empty_body">アルバム一覧でアルバムを長押しして 除外 を選びます.</string>
@@ -99,6 +101,7 @@
     <string name="exif_device">撮影機器: %1$s</string>
     <string name="exif_exposure">露出: %1$s</string>
     <string name="exif_gps_present">GPS メタデータあり · 座標は非表示</string>
+    <string name="exif_location">位置: %1$s</string>
     <string name="exif_orientation">向き: %1$s</string>
     <string name="exif_orientation_clockwise">時計回り %1$d°</string>
     <string name="exif_orientation_mirrored">反転</string>
@@ -217,6 +220,9 @@
     <string name="image_editor_save_follow_source">元の形式に従う (%1$s)</string>
     <string name="image_editor_save_keep_exif">撮影情報を残す</string>
     <string name="image_editor_save_keep_exif_summary">カメラ, 日時, 露出は残り, 位置情報は常に削除されます</string>
+    <string name="image_editor_save_keep_exif_summary_short">カメラ, 日時, 露出設定を残します</string>
+    <string name="image_editor_save_keep_location">位置情報を残す</string>
+    <string name="image_editor_save_keep_location_summary">新しい画像に撮影場所の座標が含まれます. 共有する前にご注意ください. オフのときは位置を削除します</string>
     <string name="image_editor_save_new_name">新しいファイル: %1$s</string>
     <string name="image_editor_save_overwrite">元の画像に上書き</string>
     <string name="image_editor_save_overwrite_summary">形式はそのままです. 保存直後に元に戻せます</string>
@@ -307,6 +313,8 @@
     <string name="selection_start">選択</string>
     <string name="settings_recycle_bin_summary">削除した写真は 30 日間保管され, 復元できます. オフにすると削除は完全削除になります</string>
     <string name="settings_recycle_bin_title">ゴミ箱</string>
+    <string name="settings_show_location_summary">詳細に撮影場所の座標を表示し, 地図で開けます. 保存と変換では位置を残すかを選べます</string>
+    <string name="settings_show_location_title">位置情報を表示</string>
     <string name="settings_sync_favorites_summary">システムのメディアライブラリにもお気に入りを記録し, 他のギャラリーアプリでも表示されます. オンにすると既存のお気に入りを取り込みます</string>
     <string name="settings_sync_favorites_title">システムのお気に入りと同期</string>
     <string name="sort_section_direction">順序</string>
@@ -414,6 +422,7 @@
     <string name="text_image_conversion_percentage_hint">パーセント</string>
     <string name="text_image_conversion_preserve_exif">安全な EXIF メタデータを保持</string>
     <string name="text_image_conversion_preserve_exif_helper">カメラと撮影情報を保持します. 向きは正規化され, GPS 位置情報, 埋め込みプレビュー, 安全に検査できないメタデータは常に削除されます.</string>
+    <string name="text_image_conversion_preserve_exif_helper_short">カメラと撮影情報を保持します. 向きは正規化され, 埋め込みプレビューと安全に検査できないメタデータは常に削除されます.</string>
     <string name="text_image_conversion_quality">画質</string>
     <string name="text_image_conversion_resize">サイズ変更</string>
     <string name="text_image_conversion_target_file_size">目標ファイルサイズ</string>

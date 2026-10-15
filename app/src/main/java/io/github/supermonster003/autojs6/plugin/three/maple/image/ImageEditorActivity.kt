@@ -864,6 +864,9 @@ open class ImageEditorActivity : ConfiguredActivity() {
             keepExif = initial.keepExif,
             overwriteAvailable = overwriteFormat != null,
             keepExifAvailable = !sourceInfo.preservableExifMetadata.isEmpty,
+            keepLocation = draft?.keepLocation == true,
+            keepLocationAvailable = ApplicationSettingsStore(this).load().showLocation &&
+                sourceInfo.preservableExifMetadata.hasLocation,
         )
         // Only a dialog restored after a configuration change keeps its overwrite choice (T11: never remembered).
         state.overwrite = draft?.overwrite == true && overwriteFormat != null
@@ -906,9 +909,10 @@ open class ImageEditorActivity : ConfiguredActivity() {
             quality = state.quality,
             webpLossless = state.webpLossless && state.losslessAvailable,
             keepExif = state.keepExif && state.keepExifAvailable,
+            keepLocation = state.keepLocation && state.keepLocationAvailable,
             overwrite = state.overwrite && state.overwriteAvailable,
         )
-        saveOptions = options.copy(overwrite = false)
+        saveOptions = options.copy(overwrite = false, keepLocation = false)
         savedWithOverwrite = options.overwrite
         saveDialog = null
         syncDialogFlag()
@@ -995,6 +999,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
                 quality = state.quality,
                 webpLossless = state.webpLossless,
                 keepExif = state.keepExif,
+                keepLocation = state.keepLocation,
                 overwrite = state.overwrite,
             )
         },

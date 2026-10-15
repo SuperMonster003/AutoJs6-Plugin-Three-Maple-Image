@@ -42,6 +42,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
     private var launcherIconSummary by mutableStateOf("")
     private var viewerRotationGesture by mutableStateOf(true)
     private var viewerRotationSave by mutableStateOf(true)
+    private var showLocation by mutableStateOf(false)
     private var recycleBinEnabled by mutableStateOf(true)
     private var syncSystemFavorites by mutableStateOf(false)
 
@@ -51,6 +52,7 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         settings = settingsStore.load()
         viewerRotationGesture = settings.viewerRotationGesture
         viewerRotationSave = settings.viewerRotationSave
+        showLocation = settings.showLocation
         recycleBinEnabled = settings.recycleBinEnabled
         syncSystemFavorites = settings.syncSystemFavorites
         hostResult = AutoJs6HostSettingsClient.query(this)
@@ -73,6 +75,8 @@ internal class AppSettingsActivity : ConfiguredActivity() {
                     onViewerRotationGesture = ::updateViewerRotationGesture,
                     viewerRotationSave = viewerRotationSave,
                     onViewerRotationSave = ::updateViewerRotationSave,
+                    showLocation = showLocation,
+                    onShowLocation = ::updateShowLocation,
                     recycleBinEnabled = recycleBinEnabled,
                     onRecycleBinEnabled = ::updateRecycleBinEnabled,
                     syncSystemFavorites = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) syncSystemFavorites else null,
@@ -98,6 +102,12 @@ internal class AppSettingsActivity : ConfiguredActivity() {
         viewerRotationSave = enabled
         settings = settings.copy(viewerRotationSave = enabled)
         settingsStore.saveViewerRotationSave(enabled)
+    }
+
+    private fun updateShowLocation(enabled: Boolean) {
+        showLocation = enabled
+        settings = settings.copy(showLocation = enabled)
+        settingsStore.saveShowLocation(enabled)
     }
 
     private fun updateRecycleBinEnabled(enabled: Boolean) {

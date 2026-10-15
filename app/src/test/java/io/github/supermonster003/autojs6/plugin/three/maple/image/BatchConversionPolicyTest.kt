@@ -107,7 +107,10 @@ class BatchConversionPolicyTest {
         val metadata = PreservedExifMetadata.from(mapOf("Make" to "Maple", "Model" to "Test"))
         val source = landscape.copy(preservableExifMetadata = metadata)
         assertNull(ready(BatchConversionSettings(), source).options.preservedExifMetadata)
-        assertSame(metadata, ready(BatchConversionSettings(preserveExif = true), source).options.preservedExifMetadata)
+        assertEquals(metadata.attributes, ready(BatchConversionSettings(preserveExif = true), source).options.preservedExifMetadata?.attributes)
+        val located = landscape.copy(preservableExifMetadata = PreservedExifMetadata.from(mapOf("Make" to "Maple"), mapOf("GPSLatitude" to "1/1,0/1,0/1")))
+        assertEquals(false, ready(BatchConversionSettings(preserveExif = true), located).options.preservedExifMetadata?.writesLocation)
+        assertEquals(true, ready(BatchConversionSettings(preserveLocation = true), located).options.preservedExifMetadata?.writesLocation)
 
         assertEquals(ImageConversionOptions.DEFAULT_JPEG_BACKGROUND_COLOR, ready(BatchConversionSettings()).options.jpegBackgroundColor)
         assertEquals(-0x1000000, ready(BatchConversionSettings(jpegBackgroundBlack = true)).options.jpegBackgroundColor)

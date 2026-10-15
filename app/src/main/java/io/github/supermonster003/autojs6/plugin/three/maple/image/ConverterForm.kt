@@ -173,7 +173,9 @@ internal class ConverterFormEvaluator(
             sourcePaletteColorCount = sourceInfo.pngPaletteColorCount,
         ),
         targetFileSizeBytes = targetFileSizeBytes,
-        preservedExifMetadata = sourceInfo.preservableExifMetadata.takeIf { draft.preserveExifMetadata },
+        preservedExifMetadata = sourceInfo.preservableExifMetadata
+            .select(capture = draft.preserveExifMetadata, location = draft.preserveLocation)
+            .takeIf { !it.isEmpty },
     )
 
     private companion object {

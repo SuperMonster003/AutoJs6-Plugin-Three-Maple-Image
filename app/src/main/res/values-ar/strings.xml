@@ -17,6 +17,7 @@
     <string name="action_more">المزيد</string>
     <string name="action_move">نقل</string>
     <string name="action_open_external">فتح بتطبيق اخر</string>
+    <string name="action_open_in_map">فتح في الخريطة</string>
     <string name="action_pause_animation">إيقاف الحركة مؤقتا</string>
     <string name="action_pin">تثبيت</string>
     <string name="action_print">طباعة / حفظ PDF</string>
@@ -88,6 +89,7 @@
     <string name="error_image_decoder_unavailable">يتعذر على برنامج فك ترميز النظام في هذا الجهاز عرض صور %1$s</string>
     <string name="error_image_format_requires_android">تتطلب صور %1$s نظام Android %2$d أو أحدث على هذا الجهاز</string>
     <string name="error_no_external_viewer">لا يتوفر عارض صور اخر</string>
+    <string name="error_no_map_app">لا يوجد تطبيق يمكنه فتح الخريطة</string>
     <string name="error_print_failed">تعذر إنشاء مستند الطباعة</string>
     <string name="excluded_folders_empty">لا توجد مجلدات مستبعدة</string>
     <string name="excluded_folders_empty_body">اضغط مطولا على ألبوم في قائمة الألبومات واختر استبعاد.</string>
@@ -99,6 +101,7 @@
     <string name="exif_device">الجهاز: %1$s</string>
     <string name="exif_exposure">التعريض: %1$s</string>
     <string name="exif_gps_present">بيانات GPS الوصفية موجودة · الإحداثيات مخفية</string>
+    <string name="exif_location">الموقع: %1$s</string>
     <string name="exif_orientation">الاتجاه: %1$s</string>
     <string name="exif_orientation_clockwise">%1$d° مع عقارب الساعة</string>
     <string name="exif_orientation_mirrored">معكوسة</string>
@@ -217,6 +220,9 @@
     <string name="image_editor_save_follow_source">اتباع تنسيق المصدر (%1$s)</string>
     <string name="image_editor_save_keep_exif">الاحتفاظ بتفاصيل الالتقاط</string>
     <string name="image_editor_save_keep_exif_summary">تبقى الكاميرا والتاريخ والتعريض, ويُزال الموقع دائما</string>
+    <string name="image_editor_save_keep_exif_summary_short">تبقى الكاميرا والتاريخ وإعدادات التعريض</string>
+    <string name="image_editor_save_keep_location">الاحتفاظ بالموقع</string>
+    <string name="image_editor_save_keep_location_summary">ستحمل الصورة الجديدة إحداثيات مكان الالتقاط, فانتبه قبل المشاركة; وعند إلغاء التحديد يزال الموقع</string>
     <string name="image_editor_save_new_name">ملف جديد: %1$s</string>
     <string name="image_editor_save_overwrite">استبدال الصورة الأصلية</string>
     <string name="image_editor_save_overwrite_summary">يبقى التنسيق كما هو, ويمكنك التراجع مباشرة بعد الحفظ</string>
@@ -307,6 +313,8 @@
     <string name="selection_start">تحديد</string>
     <string name="settings_recycle_bin_summary">تحفظ الصور المحذوفة 30 يوما ويمكن استعادتها; عند الإيقاف يكون الحذف نهائيا</string>
     <string name="settings_recycle_bin_title">سلة المحذوفات</string>
+    <string name="settings_show_location_summary">يعرض في التفاصيل إحداثيات مكان الالتقاط ويفتحها في الخريطة, ويتيح عند الحفظ والتحويل الاحتفاظ بالموقع</string>
+    <string name="settings_show_location_title">إظهار الموقع</string>
     <string name="settings_sync_favorites_summary">يضع علامة المفضلة في مكتبة وسائط النظام أيضا لتراها تطبيقات المعرض الأخرى; عند التشغيل تستورد المفضلة الموجودة</string>
     <string name="settings_sync_favorites_title">مزامنة مفضلة النظام</string>
     <string name="sort_section_direction">الاتجاه</string>
@@ -414,6 +422,7 @@
     <string name="text_image_conversion_percentage_hint">النسبة المئوية</string>
     <string name="text_image_conversion_preserve_exif">الاحتفاظ ببيانات EXIF الآمنة</string>
     <string name="text_image_conversion_preserve_exif_helper">يتم الاحتفاظ ببيانات الكاميرا والتصوير. يُطبّع الاتجاه, وتُزال دائمًا بيانات موقع GPS والمعاينات المضمنة والبيانات الوصفية التي لا يمكن فحصها بأمان.</string>
+    <string name="text_image_conversion_preserve_exif_helper_short">يتم الاحتفاظ ببيانات الكاميرا والتصوير. يُطبّع الاتجاه, وتُزال دائمًا المعاينات المضمنة والبيانات الوصفية التي لا يمكن فحصها بأمان.</string>
     <string name="text_image_conversion_quality">الجودة</string>
     <string name="text_image_conversion_resize">تغيير الحجم</string>
     <string name="text_image_conversion_target_file_size">حجم الملف المستهدف</string>

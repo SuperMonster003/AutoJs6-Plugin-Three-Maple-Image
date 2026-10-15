@@ -7,7 +7,9 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import java.io.File
+import java.util.Locale
 import org.autojs.plugin.explorer.api.IExplorerActionHostSession
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -18,9 +20,63 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ImageViewerExifInstrumentationTest {
 
+    private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
+
+    private fun showLocation(enabled: Boolean) = ApplicationSettingsStore(context).saveShowLocation(enabled)
+
+    @After fun resetShowLocation() = showLocation(false)
+
     @Test
     fun detailsPanelShowsSafeExifFieldsAndRestoresExpandedState() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        // "Show location" off (the default): only the presence of GPS data is mentioned, never the coordinates.
+        showLocation(false)
+        withExifViewer { scenario ->
+            awaitDetailsPanel(scenario, expanded = false)
+            awaitImageReady(scenario)
+            assertTransientZoomIndicator(scenario)
+            scenario.onActivity { activity ->
+                assertFalse(activity.viewerStateForTesting.detailsExpanded)
+                activity.toggleDetailsForTesting()
+                assertDetailsAreSafe(activity)
+            }
+
+            scenario.recreate()
+
+            awaitDetailsPanel(scenario, expanded = true)
+            scenario.onActivity { activity ->
+                assertDetailsAreSafe(activity)
+                activity.toggleDetailsForTesting()
+                assertFalse(activity.viewerStateForTesting.detailsExpanded)
+            }
+        }
+    }
+
+    @Test
+    fun withShowLocationTheDetailsGiveThePositionAndAMap() {
+        showLocation(true)
+        withExifViewer { scenario ->
+            awaitDetailsPanel(scenario, expanded = false)
+            scenario.onActivity { activity ->
+                val state = activity.viewerStateForTesting
+                val decimal = String.format(Locale.ROOT, "%.4f", ExifJpegTestFixture.LATITUDE)
+                assertTrue(state.exifText, state.exifText.contains(decimal))
+                assertTrue(state.exifText, state.exifText.contains("\"N") && state.exifText.contains("\"W"))
+                assertFalse(state.exifText.contains(activity.getString(R.string.exif_gps_present)))
+                assertTrue(state.mapUri.orEmpty(), state.mapUri.orEmpty().startsWith("geo:$decimal"))
+            }
+            // Switched off again while the viewer is open: back to the plain mention on resume.
+            showLocation(false)
+            scenario.moveToState(androidx.lifecycle.Lifecycle.State.STARTED)
+            scenario.moveToState(androidx.lifecycle.Lifecycle.State.RESUMED)
+            scenario.onActivity { activity ->
+                val state = activity.viewerStateForTesting
+                assertTrue(state.exifText.contains(activity.getString(R.string.exif_gps_present)))
+                assertNull(state.mapUri)
+            }
+        }
+    }
+
+    private fun withExifViewer(block: (ActivityScenario<ImageViewerActivity>) -> Unit) {
         val file = File(context.cacheDir, "image-viewer-activity-exif.jpg")
         ExifJpegTestFixture.writeCompleteTo(file)
         val session = object : IExplorerActionHostSession.Default() {
@@ -59,25 +115,7 @@ class ImageViewerExifInstrumentationTest {
             )
             ActivityScenario.launchActivityForResult<ImageViewerActivity>(
                 ImageViewerContract.viewerIntent(context, request),
-            ).use { scenario ->
-                awaitDetailsPanel(scenario, expanded = false)
-                awaitImageReady(scenario)
-                assertTransientZoomIndicator(scenario)
-                scenario.onActivity { activity ->
-                    assertFalse(activity.viewerStateForTesting.detailsExpanded)
-                    activity.toggleDetailsForTesting()
-                    assertDetailsAreSafe(activity)
-                }
-
-                scenario.recreate()
-
-                awaitDetailsPanel(scenario, expanded = true)
-                scenario.onActivity { activity ->
-                    assertDetailsAreSafe(activity)
-                    activity.toggleDetailsForTesting()
-                    assertFalse(activity.viewerStateForTesting.detailsExpanded)
-                }
-            }
+            ).use(block)
         } finally {
             HostSessionImageRegistry.unregister(token)
             file.delete()
@@ -99,6 +137,8 @@ class ImageViewerExifInstrumentationTest {
         assertTrue(text.contains(activity.getString(R.string.exif_gps_present)))
         assertFalse(text.contains(ExifJpegTestFixture.LATITUDE.toString()))
         assertFalse(text.contains(ExifJpegTestFixture.LONGITUDE.toString()))
+        assertFalse(text.contains(String.format(Locale.ROOT, "%.4f", ExifJpegTestFixture.LATITUDE)))
+        assertNull(state.mapUri)
         val metadata = state.metadataText
         assertTrue(metadata.contains("32 bpp"))
         assertTrue(metadata.contains("sRGB", ignoreCase = true))

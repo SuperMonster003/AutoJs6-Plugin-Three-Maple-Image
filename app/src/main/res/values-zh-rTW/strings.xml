@@ -17,6 +17,7 @@
     <string name="action_more">更多</string>
     <string name="action_move">移動</string>
     <string name="action_open_external">使用其他應用程式開啟</string>
+    <string name="action_open_in_map">在地圖中開啟</string>
     <string name="action_pause_animation">暫停動畫</string>
     <string name="action_pin">置頂</string>
     <string name="action_print">列印 / 儲存 PDF</string>
@@ -88,6 +89,7 @@
     <string name="error_image_decoder_unavailable">此裝置的系統解碼器無法顯示 %1$s 圖片</string>
     <string name="error_image_format_requires_android">此裝置需要 Android %2$d 或更新版本才能顯示 %1$s 圖片</string>
     <string name="error_no_external_viewer">沒有可用的其他圖片檢視器</string>
+    <string name="error_no_map_app">沒有可以開啟地圖的應用程式</string>
     <string name="error_print_failed">無法建立列印文件</string>
     <string name="excluded_folders_empty">沒有排除的資料夾</string>
     <string name="excluded_folders_empty_body">在相簿清單中長按相簿, 選擇 排除 即可.</string>
@@ -99,6 +101,7 @@
     <string name="exif_device">裝置: %1$s</string>
     <string name="exif_exposure">曝光: %1$s</string>
     <string name="exif_gps_present">存在 GPS 中繼資料 · 座標已隱藏</string>
+    <string name="exif_location">位置: %1$s</string>
     <string name="exif_orientation">方向: %1$s</string>
     <string name="exif_orientation_clockwise">順時針 %1$d°</string>
     <string name="exif_orientation_mirrored">已鏡像</string>
@@ -217,6 +220,9 @@
     <string name="image_editor_save_follow_source">沿用來源格式 (%1$s)</string>
     <string name="image_editor_save_keep_exif">保留拍攝資訊</string>
     <string name="image_editor_save_keep_exif_summary">相機, 日期與曝光參數保留; 位置資訊始終移除</string>
+    <string name="image_editor_save_keep_exif_summary_short">相機, 日期與曝光參數保留</string>
+    <string name="image_editor_save_keep_location">保留位置資訊</string>
+    <string name="image_editor_save_keep_location_summary">新圖片會帶有拍攝地點的座標, 分享前請留意; 未勾選時位置會被移除</string>
     <string name="image_editor_save_new_name">新檔案: %1$s</string>
     <string name="image_editor_save_overwrite">覆蓋原圖</string>
     <string name="image_editor_save_overwrite_summary">格式不變, 儲存後可以立即復原</string>
@@ -307,6 +313,8 @@
     <string name="selection_start">選取</string>
     <string name="settings_recycle_bin_summary">刪除的相片保留 30 天, 期間可以還原; 關閉後刪除即永久刪除</string>
     <string name="settings_recycle_bin_title">資源回收筒</string>
+    <string name="settings_show_location_summary">在詳細資訊中顯示拍攝地點的座標, 可在地圖中開啟; 儲存和轉換時可選擇保留位置</string>
+    <string name="settings_show_location_title">顯示位置資訊</string>
     <string name="settings_sync_favorites_summary">同時在系統媒體庫中標記收藏, 其他圖庫應用程式也能看到; 開啟時匯入系統中已有的收藏</string>
     <string name="settings_sync_favorites_title">同步系統收藏</string>
     <string name="sort_section_direction">順序</string>
@@ -414,6 +422,7 @@
     <string name="text_image_conversion_percentage_hint">百分比</string>
     <string name="text_image_conversion_preserve_exif">保留安全的 EXIF 中繼資料</string>
     <string name="text_image_conversion_preserve_exif_helper">保留相機與拍攝參數; 方向會正規化, GPS 位置, 內嵌預覽與無法安全檢查的中繼資料一律移除.</string>
+    <string name="text_image_conversion_preserve_exif_helper_short">保留相機與拍攝參數; 方向會正規化, 內嵌預覽與無法安全檢查的中繼資料一律移除.</string>
     <string name="text_image_conversion_quality">品質</string>
     <string name="text_image_conversion_resize">調整尺寸</string>
     <string name="text_image_conversion_target_file_size">目標檔案大小</string>

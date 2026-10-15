@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -69,6 +71,8 @@ internal data class ViewerUiState(
     val metadataText: String = "",
     val detailsSummary: String = "",
     val exifText: String = "",
+    /** A `geo:` URI of where the image was taken, when "Show location" is on and the image has a position. */
+    val mapUri: String? = null,
     val loading: Boolean = true,
     val errorText: String? = null,
     val controlsVisible: Boolean = true,
@@ -106,6 +110,7 @@ internal class ViewerCallbacks(
     val onOpenWith: () -> Unit,
     val onResetZoom: () -> Unit,
     val onPrint: () -> Unit,
+    val onOpenMap: () -> Unit = {},
     val onReleaseHistory: () -> Unit,
     val onToggleAnimation: () -> Unit,
     /** The pager settled on or crossed into another page. */
@@ -362,6 +367,16 @@ internal fun ViewerScreen(state: ViewerUiState, pager: ViewerPagerUi?, callbacks
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.testTag("maple.viewer.exif"),
                 )
+                if (state.mapUri != null) {
+                    TextButton(
+                        onClick = callbacks.onOpenMap,
+                        modifier = Modifier.padding(top = 8.dp).defaultMinSize(minHeight = 48.dp).testTag("maple.viewer.openMap"),
+                    ) {
+                        Icon(painterResource(R.drawable.ic_location_on_24), contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(R.string.action_open_in_map))
+                    }
+                }
                 Spacer(Modifier.height(24.dp))
                 Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
             }

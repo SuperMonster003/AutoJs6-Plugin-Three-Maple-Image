@@ -264,6 +264,7 @@ open class ImageConverterActivity : ConfiguredActivity() {
             formatIndex = formats.indexOf(formEvaluator.format(draft)),
             maxTargetKibibytes = formEvaluator.maxTargetKibibytes(),
             overwriteAvailable = formEvaluator.overwriteFormat != null,
+            locationAvailable = ApplicationSettingsStore(this).load().showLocation && sourceInfo.preservableExifMetadata.hasLocation,
             overwriteFormatIndex = formats.indexOf(formEvaluator.overwriteFormat),
         )
         return true

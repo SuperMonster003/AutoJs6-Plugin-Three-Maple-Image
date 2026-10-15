@@ -13,8 +13,13 @@ internal data class EditorSaveOptions(
     val format: EditorSaveFormat = EditorSaveFormat.FOLLOW_SOURCE,
     val quality: Int = ImageConversionOptions.DEFAULT_QUALITY,
     val webpLossless: Boolean = false,
-    /** Keep the camera and capture details of the original (never its location), as the converter offers. */
+    /** Keep the camera and capture details of the original, as the converter offers. */
     val keepExif: Boolean = false,
+    /**
+     * Keep where the original was taken (ROADMAP 9.1, T14); offered only with "Show location" on, and like
+     * [overwrite] never remembered for the next save.
+     */
+    val keepLocation: Boolean = false,
     /** Replace the original instead of creating a new file (D3); never remembered, each save dialog starts off. */
     val overwrite: Boolean = false,
 ) {
@@ -97,7 +102,8 @@ internal object EditorSavePolicy {
                 requested = saveOptions.webpLossless,
                 sdkInt = sdkInt,
             ),
-            preservedExifMetadata = preservableExif.takeIf { saveOptions.keepExif && !it.isEmpty },
+            preservedExifMetadata = preservableExif.select(capture = saveOptions.keepExif, location = saveOptions.keepLocation)
+                .takeIf { !it.isEmpty },
         )
     }
 }

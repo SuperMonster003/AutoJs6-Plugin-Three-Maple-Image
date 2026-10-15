@@ -254,6 +254,7 @@ class HostBatchConverterActivity : ConfiguredActivity() {
             model.attach(resolved)
         }
         val count = model.request?.targets?.size ?: 0
+        val showLocation = ApplicationSettingsStore(this).load().showLocation
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() = leave()
         })
@@ -269,6 +270,7 @@ class HostBatchConverterActivity : ConfiguredActivity() {
                     onStart = model::start,
                     onBack = ::leave,
                     enabled = stage == HostBatchStage.Editing,
+                    showLocation = showLocation,
                 ) {
                     when (val current = stage) {
                         is HostBatchStage.Running -> BatchProgressDialog(

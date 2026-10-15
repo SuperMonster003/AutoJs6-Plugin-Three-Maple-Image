@@ -72,6 +72,9 @@ internal class EditorSaveDialogState(
     val overwriteAvailable: Boolean = false,
     /** The original has capture details worth keeping; the switch is hidden otherwise. */
     val keepExifAvailable: Boolean = false,
+    keepLocation: Boolean = false,
+    /** "Show location" is on and the original has a position (ROADMAP 9.1, T14); the switch is hidden otherwise. */
+    val keepLocationAvailable: Boolean = false,
 ) {
     var formatIndex by mutableIntStateOf(formatIndex)
     var quality by mutableIntStateOf(quality)
@@ -83,6 +86,9 @@ internal class EditorSaveDialogState(
     /** Set once the user touched "keep capture details": switching overwrite on no longer changes it then. */
     var keepExifTouched = false
     var overwrite by mutableStateOf(false)
+
+    /** Off unless chosen: switching overwrite on does not keep the location (ROADMAP 9.1). */
+    var keepLocation by mutableStateOf(keepLocation)
 
     /** "New file: photo_edited.jpg" or "Replaces: photo.jpg". */
     var fileNote by mutableStateOf("")
@@ -224,10 +230,22 @@ internal fun EditorSaveDialog(
         if (state.keepExifAvailable) {
             MapleSwitchRow(
                 title = stringResource(R.string.image_editor_save_keep_exif),
-                summary = stringResource(R.string.image_editor_save_keep_exif_summary),
+                // With the location switch below, the location is no longer "always removed".
+                summary = stringResource(
+                    if (state.keepLocationAvailable) R.string.image_editor_save_keep_exif_summary_short else R.string.image_editor_save_keep_exif_summary,
+                ),
                 checked = state.keepExif,
                 onToggle = { state.keepExif = it; state.keepExifTouched = true; state.onChanged() },
                 modifier = Modifier.testTag("maple.editor.save.keepExif"),
+            )
+        }
+        if (state.keepLocationAvailable) {
+            MapleSwitchRow(
+                title = stringResource(R.string.image_editor_save_keep_location),
+                summary = stringResource(R.string.image_editor_save_keep_location_summary),
+                checked = state.keepLocation,
+                onToggle = { state.keepLocation = it; state.onChanged() },
+                modifier = Modifier.testTag("maple.editor.save.keepLocation"),
             )
         }
         if (state.overwriteAvailable) {

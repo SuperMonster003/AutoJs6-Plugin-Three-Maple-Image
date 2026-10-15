@@ -585,6 +585,8 @@ internal data class ConversionDialogDraft(
     val targetFileSizeKibibytes: String = ImageTargetFileSizePolicy.DEFAULT_TARGET_KIBIBYTES.toString(),
     val longEdge: String = ImageConversionSizing.DEFAULT_LONG_EDGE.toString(),
     val preserveExifMetadata: Boolean = false,
+    /** Keep where the original was taken (ROADMAP 9.1, T14); never remembered beyond the open converter. */
+    val preserveLocation: Boolean = false,
     /** Replace the original (ROADMAP 8.3); never remembered beyond the open converter. */
     val overwrite: Boolean = false,
     /** The user switched "keep EXIF" themselves: overwriting no longer switches it along. */

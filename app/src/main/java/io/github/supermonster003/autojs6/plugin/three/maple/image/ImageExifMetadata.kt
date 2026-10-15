@@ -18,7 +18,10 @@ internal data class ImageExifOrientation(
         get() = rotationDegrees == 90 || rotationDegrees == 270
 }
 
-/** Privacy-conscious EXIF subset. GPS coordinates are deliberately never retained. */
+/**
+ * Privacy-conscious EXIF subset. The position is read for the details, which show it only when "Show location" is on
+ * (ROADMAP 9.1, T14); otherwise they only mention that GPS data exists, as before.
+ */
 internal data class ImageExifMetadata(
     val capturedAt: String?,
     val make: String?,
@@ -29,6 +32,7 @@ internal data class ImageExifMetadata(
     val focalLengthMm: Double?,
     val orientation: ImageExifOrientation?,
     val hasGpsMetadata: Boolean,
+    val location: GeoPosition? = null,
 )
 
 /**
@@ -155,6 +159,7 @@ internal object ImageExifMetadataReader {
                 )
             }
         val hasGpsMetadata = GPS_TAGS.any(exif::hasAttribute)
+        val location = runCatching { exif.latLong }.getOrNull()?.let { GeoPosition.of(it[0], it[1]) }
 
         return ImageExifMetadata(
             capturedAt = capturedAt,
@@ -166,6 +171,7 @@ internal object ImageExifMetadataReader {
             focalLengthMm = focalLength,
             orientation = orientation,
             hasGpsMetadata = hasGpsMetadata,
+            location = location,
         ).takeIf { metadata ->
             metadata.capturedAt != null ||
                 metadata.make != null ||

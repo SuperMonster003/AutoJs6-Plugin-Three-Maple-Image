@@ -169,4 +169,23 @@ class EditorSavePolicyTest {
         )
         assertEquals(null, empty.preservedExifMetadata)
     }
+
+    @Test
+    fun theLocationIsKeptOnlyWhenAsked() {
+        val metadata = PreservedExifMetadata.from(mapOf("Make" to "Maple"), mapOf("GPSLatitude" to "31/1,13/1,4950/100"))
+        fun options(keepExif: Boolean, keepLocation: Boolean) = EditorSavePolicy.conversionOptions(
+            saveOptions = EditorSaveOptions(keepExif = keepExif, keepLocation = keepLocation),
+            detectedMimeType = "image/jpeg",
+            allowedOutputMimeTypes = allMimeTypes,
+            targetSize = ImagePixelSize(10, 10),
+            sdkInt = 33,
+            preservableExif = metadata,
+        ).preservedExifMetadata
+        assertEquals(false, options(keepExif = true, keepLocation = false)?.writesLocation)
+        assertEquals(true, options(keepExif = true, keepLocation = true)?.writesLocation)
+        // The location alone is kept without the capture details.
+        assertEquals(emptyMap<String, String>(), options(keepExif = false, keepLocation = true)?.attributes)
+        assertEquals(true, options(keepExif = false, keepLocation = true)?.writesLocation)
+        assertEquals(null, options(keepExif = false, keepLocation = false))
+    }
 }

@@ -58,6 +58,7 @@ internal class ConverterFormState(draft: ConversionDialogDraft) {
     var targetFileSizeEnabled by mutableStateOf(draft.targetFileSizeEnabled)
     var targetFileSizeKibibytes by mutableStateOf(draft.targetFileSizeKibibytes)
     var preserveExifMetadata by mutableStateOf(draft.preserveExifMetadata)
+    var preserveLocation by mutableStateOf(draft.preserveLocation)
     var overwrite by mutableStateOf(draft.overwrite)
     var preserveExifTouched by mutableStateOf(draft.preserveExifTouched)
 
@@ -75,6 +76,7 @@ internal class ConverterFormState(draft: ConversionDialogDraft) {
         targetFileSizeKibibytes = targetFileSizeKibibytes,
         longEdge = longEdge,
         preserveExifMetadata = preserveExifMetadata,
+        preserveLocation = preserveLocation,
         overwrite = overwrite,
         preserveExifTouched = preserveExifTouched,
     )
@@ -91,6 +93,8 @@ internal data class ConverterUiModel(
     val maxTargetKibibytes: Long = 0L,
     /** "Overwrite the original" is offered, and the index of the original's format it locks to. */
     val overwriteAvailable: Boolean = false,
+    /** "Show location" is on and the original has a position (ROADMAP 9.1, T14). */
+    val locationAvailable: Boolean = false,
     val overwriteFormatIndex: Int = -1,
     /** The host replaced the original; the bar offers its undo until the converter closes (ROADMAP 8.3). */
     val replacementUndo: Boolean = false,
@@ -270,7 +274,8 @@ private fun Form(
         ConversionJpegBackgroundSection(form.jpegBackgroundBlack, { form.jpegBackgroundBlack = it }, enabled, tag)
     }
     Spacer(Modifier.height(8.dp))
-    ConversionExifRow(form.preserveExifMetadata, callbacks.onPreserveExif, enabled, tag)
+    ConversionExifRow(form.preserveExifMetadata, callbacks.onPreserveExif, enabled, tag, locationShown = model.locationAvailable)
+    if (model.locationAvailable) ConversionLocationRow(form.preserveLocation, { form.preserveLocation = it }, enabled, tag)
     if (model.overwriteAvailable) ConversionOverwriteRow(form.overwrite, callbacks.onOverwrite, enabled, tag)
 }
 

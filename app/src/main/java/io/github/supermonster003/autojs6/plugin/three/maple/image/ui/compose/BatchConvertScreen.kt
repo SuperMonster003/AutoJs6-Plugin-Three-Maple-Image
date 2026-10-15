@@ -42,6 +42,8 @@ internal fun BatchConvertScreen(
     onStart: () -> Unit,
     onBack: () -> Unit,
     enabled: Boolean = true,
+    /** "Show location" is on: the form offers to keep the location (ROADMAP 9.1, T14). */
+    showLocation: Boolean = false,
     dialogs: @Composable () -> Unit = {},
 ) {
     val error = BatchConversionPolicy.settingsError(settings)
@@ -58,7 +60,7 @@ internal fun BatchConvertScreen(
         },
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())) {
-            BatchConvertForm(settings, error, onChange, enabled)
+            BatchConvertForm(settings, error, onChange, enabled, showLocation)
             Text(
                 text = note,
                 style = MaterialTheme.typography.bodyMedium,
@@ -77,6 +79,7 @@ private fun BatchConvertForm(
     error: BatchSettingsError?,
     onChange: (BatchConversionSettings) -> Unit,
     enabled: Boolean,
+    showLocation: Boolean,
 ) {
     val sdk = Build.VERSION.SDK_INT
     val formats = ImageOutputFormat.entries
@@ -130,7 +133,8 @@ private fun BatchConvertForm(
         ConversionJpegBackgroundSection(settings.jpegBackgroundBlack, { onChange(settings.copy(jpegBackgroundBlack = it)) }, enabled, tag)
     }
     Spacer(Modifier.height(8.dp))
-    ConversionExifRow(settings.preserveExif, { onChange(settings.copy(preserveExif = it)) }, enabled, tag)
+    ConversionExifRow(settings.preserveExif, { onChange(settings.copy(preserveExif = it)) }, enabled, tag, locationShown = showLocation)
+    if (showLocation) ConversionLocationRow(settings.preserveLocation, { onChange(settings.copy(preserveLocation = it)) }, enabled, tag)
 }
 
 

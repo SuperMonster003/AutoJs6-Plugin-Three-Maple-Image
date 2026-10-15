@@ -17,6 +17,7 @@
     <string name="action_more">More</string>
     <string name="action_move">Move</string>
     <string name="action_open_external">Open with another app</string>
+    <string name="action_open_in_map">Open in map</string>
     <string name="action_pause_animation">Pause animation</string>
     <string name="action_pin">Pin</string>
     <string name="action_print">Print / Save PDF</string>
@@ -88,6 +89,7 @@
     <string name="error_image_decoder_unavailable">The system decoder on this device cannot display %1$s images</string>
     <string name="error_image_format_requires_android">%1$s images require Android %2$d or later on this device</string>
     <string name="error_no_external_viewer">No other image viewer is available</string>
+    <string name="error_no_map_app">No app can open a map</string>
     <string name="error_print_failed">The print document could not be created</string>
     <string name="excluded_folders_empty">No excluded folders</string>
     <string name="excluded_folders_empty_body">Long-press an album in the album list and choose Exclude.</string>
@@ -99,6 +101,7 @@
     <string name="exif_device">Device: %1$s</string>
     <string name="exif_exposure">Exposure: %1$s</string>
     <string name="exif_gps_present">GPS metadata present · coordinates hidden</string>
+    <string name="exif_location">Location: %1$s</string>
     <string name="exif_orientation">Orientation: %1$s</string>
     <string name="exif_orientation_clockwise">%1$d° clockwise</string>
     <string name="exif_orientation_mirrored">Mirrored</string>
@@ -217,6 +220,9 @@
     <string name="image_editor_save_follow_source">Follow source (%1$s)</string>
     <string name="image_editor_save_keep_exif">Keep capture details</string>
     <string name="image_editor_save_keep_exif_summary">Camera, date and exposure stay; the location is always removed</string>
+    <string name="image_editor_save_keep_exif_summary_short">Camera, date and exposure stay</string>
+    <string name="image_editor_save_keep_location">Keep location</string>
+    <string name="image_editor_save_keep_location_summary">The new image carries the coordinates of where it was taken, so mind them before sharing; unchecked, the location is removed</string>
     <string name="image_editor_save_new_name">New file: %1$s</string>
     <string name="image_editor_save_overwrite">Overwrite the original</string>
     <string name="image_editor_save_overwrite_summary">Keeps its format. You can undo it right after saving</string>
@@ -307,6 +313,8 @@
     <string name="selection_start">Select</string>
     <string name="settings_recycle_bin_summary">Deleted photos are kept for 30 days and can be restored; when off, deleting removes them for good</string>
     <string name="settings_recycle_bin_title">Recycle bin</string>
+    <string name="settings_show_location_summary">Show where a photo was taken in its details and open it in a map; saving and converting can then keep the location</string>
+    <string name="settings_show_location_title">Show location</string>
     <string name="settings_sync_favorites_summary">Also marks favorites in the system media library so other gallery apps see them; turning it on imports the favorites already there</string>
     <string name="settings_sync_favorites_title">Sync system favorites</string>
     <string name="sort_section_direction">Order</string>
@@ -414,6 +422,7 @@
     <string name="text_image_conversion_percentage_hint">Percentage</string>
     <string name="text_image_conversion_preserve_exif">Preserve safe EXIF metadata</string>
     <string name="text_image_conversion_preserve_exif_helper">Camera and capture details are kept. Orientation is normalized; GPS location, embedded previews, and metadata that cannot be safely inspected are always removed.</string>
+    <string name="text_image_conversion_preserve_exif_helper_short">Camera and capture details are kept. Orientation is normalized; embedded previews and metadata that cannot be safely inspected are always removed.</string>
     <string name="text_image_conversion_quality">Quality</string>
     <string name="text_image_conversion_resize">Resize</string>
     <string name="text_image_conversion_target_file_size">Target file size</string>

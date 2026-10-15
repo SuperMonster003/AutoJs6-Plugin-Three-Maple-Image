@@ -186,14 +186,36 @@ internal fun ConversionJpegBackgroundSection(black: Boolean, onChange: (Boolean)
 }
 
 @Composable
-internal fun ConversionExifRow(checked: Boolean, onToggle: (Boolean) -> Unit, enabled: Boolean, tagPrefix: String) {
+internal fun ConversionExifRow(
+    checked: Boolean,
+    onToggle: (Boolean) -> Unit,
+    enabled: Boolean,
+    tagPrefix: String,
+    /** The location row follows, so the helper does not claim the location is always removed. */
+    locationShown: Boolean = false,
+) {
     MapleSwitchRow(
         title = stringResource(R.string.text_image_conversion_preserve_exif),
-        summary = stringResource(R.string.text_image_conversion_preserve_exif_helper),
+        summary = stringResource(
+            if (locationShown) R.string.text_image_conversion_preserve_exif_helper_short else R.string.text_image_conversion_preserve_exif_helper,
+        ),
         checked = checked,
         onToggle = onToggle,
         enabled = enabled,
         modifier = Modifier.testTag("$tagPrefix.exif"),
+    )
+}
+
+/** "Keep location" (ROADMAP 9.1, T14): only shown with "Show location" on; off unless chosen. */
+@Composable
+internal fun ConversionLocationRow(checked: Boolean, onToggle: (Boolean) -> Unit, enabled: Boolean, tagPrefix: String) {
+    MapleSwitchRow(
+        title = stringResource(R.string.image_editor_save_keep_location),
+        summary = stringResource(R.string.image_editor_save_keep_location_summary),
+        checked = checked,
+        onToggle = onToggle,
+        enabled = enabled,
+        modifier = Modifier.testTag("$tagPrefix.location"),
     )
 }
 

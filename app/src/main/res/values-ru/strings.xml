@@ -17,6 +17,7 @@
     <string name="action_more">Ещё</string>
     <string name="action_move">Переместить</string>
     <string name="action_open_external">Открыть в другом приложении</string>
+    <string name="action_open_in_map">Открыть на карте</string>
     <string name="action_pause_animation">Приостановить анимацию</string>
     <string name="action_pin">Закрепить</string>
     <string name="action_print">Печать / сохранить PDF</string>
@@ -88,6 +89,7 @@
     <string name="error_image_decoder_unavailable">Системный декодер этого устройства не может отобразить изображения %1$s</string>
     <string name="error_image_format_requires_android">Для изображений %1$s на этом устройстве требуется Android %2$d или новее</string>
     <string name="error_no_external_viewer">Другого средства просмотра изображений нет</string>
+    <string name="error_no_map_app">Нет приложения, которое может открыть карту</string>
     <string name="error_print_failed">Не удалось создать документ для печати</string>
     <string name="excluded_folders_empty">Нет исключённых папок</string>
     <string name="excluded_folders_empty_body">Нажмите и удерживайте альбом в списке альбомов и выберите Исключить.</string>
@@ -99,6 +101,7 @@
     <string name="exif_device">Устройство: %1$s</string>
     <string name="exif_exposure">Экспозиция: %1$s</string>
     <string name="exif_gps_present">Есть метаданные GPS · координаты скрыты</string>
+    <string name="exif_location">Местоположение: %1$s</string>
     <string name="exif_orientation">Ориентация: %1$s</string>
     <string name="exif_orientation_clockwise">%1$d° по часовой стрелке</string>
     <string name="exif_orientation_mirrored">Зеркально</string>
@@ -217,6 +220,9 @@
     <string name="image_editor_save_follow_source">Как в исходном файле (%1$s)</string>
     <string name="image_editor_save_keep_exif">Сохранить данные съёмки</string>
     <string name="image_editor_save_keep_exif_summary">Камера, дата и экспозиция сохраняются; местоположение всегда удаляется</string>
+    <string name="image_editor_save_keep_exif_summary_short">Сохраняются камера, дата и экспозиция</string>
+    <string name="image_editor_save_keep_location">Сохранить местоположение</string>
+    <string name="image_editor_save_keep_location_summary">Новое изображение будет содержать координаты места съёмки, учитывайте это перед отправкой; если снять отметку, местоположение удаляется</string>
     <string name="image_editor_save_new_name">Новый файл: %1$s</string>
     <string name="image_editor_save_overwrite">Перезаписать оригинал</string>
     <string name="image_editor_save_overwrite_summary">Формат не меняется. Сразу после сохранения можно отменить</string>
@@ -307,6 +313,8 @@
     <string name="selection_start">Выбрать</string>
     <string name="settings_recycle_bin_summary">Удалённые фото хранятся 30 дней, их можно восстановить; если выключено, удаление необратимо</string>
     <string name="settings_recycle_bin_title">Корзина</string>
+    <string name="settings_show_location_summary">Показывает в сведениях координаты места съёмки и открывает их на карте; при сохранении и преобразовании можно сохранить местоположение</string>
+    <string name="settings_show_location_title">Показывать местоположение</string>
     <string name="settings_sync_favorites_summary">Избранное отмечается и в системной медиатеке, его видят другие галереи; при включении импортируется уже существующее избранное</string>
     <string name="settings_sync_favorites_title">Синхронизировать системное избранное</string>
     <string name="sort_section_direction">Порядок</string>
@@ -414,6 +422,7 @@
     <string name="text_image_conversion_percentage_hint">Процент</string>
     <string name="text_image_conversion_preserve_exif">Сохранять безопасные метаданные EXIF</string>
     <string name="text_image_conversion_preserve_exif_helper">Данные камеры и съёмки сохраняются. Ориентация нормализуется; GPS-координаты, встроенные миниатюры и метаданные, которые нельзя безопасно проверить, всегда удаляются.</string>
+    <string name="text_image_conversion_preserve_exif_helper_short">Данные камеры и съёмки сохраняются. Ориентация нормализуется; встроенные миниатюры и метаданные, которые нельзя безопасно проверить, всегда удаляются.</string>
     <string name="text_image_conversion_quality">Качество</string>
     <string name="text_image_conversion_resize">Изменить размер</string>
     <string name="text_image_conversion_target_file_size">Целевой размер файла</string>
