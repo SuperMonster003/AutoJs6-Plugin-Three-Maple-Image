@@ -206,6 +206,7 @@
     <string name="hide_confirm_message">각 폴더에 .nomedia 파일을 넣습니다. 이 갤러리와 다른 갤러리 모두 이미지를 더 이상 표시하지 않으며 파일은 삭제되지 않습니다. 설정 > 숨긴 폴더에서 확인하거나 다시 표시할 수 있습니다.</string>
     <string name="hide_needs_access_message">숨기려면 앨범 폴더에 .nomedia 파일을 써야 하므로 모든 파일 접근이 필요합니다. 설정 > 저장공간 권한에서 켜세요.</string>
     <string name="hide_needs_access_title">모든 파일 접근 필요</string>
+    <string name="home_pick_album">앨범을 선택하면 여기에 이미지가 표시됩니다</string>
     <string name="host_directory_empty">이 폴더에 이미지가 없습니다</string>
     <string name="host_directory_folder">폴더</string>
     <string name="host_directory_limit">처음 %1$d개 항목만 표시합니다</string>

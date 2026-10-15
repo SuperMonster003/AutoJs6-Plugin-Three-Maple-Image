@@ -206,6 +206,7 @@
     <string name="hide_confirm_message">Un fichier .nomedia est placé dans chaque dossier: ni cette galerie ni les autres n\'afficheront ses images, et rien n\'est supprimé. Paramètres > Dossiers masqués les liste et les affiche à nouveau.</string>
     <string name="hide_needs_access_message">Masquer écrit un fichier .nomedia dans le dossier de l\'album, ce qui demande l\'accès à tous les fichiers. Activez-le dans Paramètres > Autorisation de stockage.</string>
     <string name="hide_needs_access_title">Accès à tous les fichiers requis</string>
+    <string name="home_pick_album">Choisissez un album pour voir ses images ici</string>
     <string name="host_directory_empty">Aucune image dans ce dossier</string>
     <string name="host_directory_folder">Dossier</string>
     <string name="host_directory_limit">Seules les %1$d premières entrées sont affichées</string>

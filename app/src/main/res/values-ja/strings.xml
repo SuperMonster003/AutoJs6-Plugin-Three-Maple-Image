@@ -206,6 +206,7 @@
     <string name="hide_confirm_message">各フォルダーに .nomedia ファイルを置きます. このギャラリーでも他のギャラリーでも画像が表示されなくなりますが, ファイルは削除されません. 設定 > 非表示のフォルダー で確認や再表示ができます.</string>
     <string name="hide_needs_access_message">非表示にするにはアルバムのフォルダーに .nomedia ファイルを書き込むため, すべてのファイルへのアクセス が必要です. 設定 > ストレージ権限 でオンにしてください.</string>
     <string name="hide_needs_access_title">すべてのファイルへのアクセスが必要です</string>
+    <string name="home_pick_album">アルバムを選ぶとここに画像が表示されます</string>
     <string name="host_directory_empty">このフォルダーに画像はありません</string>
     <string name="host_directory_folder">フォルダー</string>
     <string name="host_directory_limit">先頭の %1$d 項目のみ表示しています</string>

@@ -206,6 +206,7 @@
     <string name="hide_confirm_message">A .nomedia file goes into each folder: this gallery and other galleries stop showing its images, and nothing is deleted. Settings > Hidden folders lists them and shows them again.</string>
     <string name="hide_needs_access_message">Hiding writes a .nomedia file into the album folder, which needs All files access. Turn it on in Settings > Storage permission.</string>
     <string name="hide_needs_access_title">All files access needed</string>
+    <string name="home_pick_album">Pick an album to see its images here</string>
     <string name="host_directory_empty">No images in this folder</string>
     <string name="host_directory_folder">Folder</string>
     <string name="host_directory_limit">Only the first %1$d entries are listed</string>

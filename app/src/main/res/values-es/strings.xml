@@ -206,6 +206,7 @@
     <string name="hide_confirm_message">Se coloca un archivo .nomedia en cada carpeta: ni esta galería ni otras mostrarán sus imágenes, y no se elimina nada. Ajustes > Carpetas ocultas las lista y las vuelve a mostrar.</string>
     <string name="hide_needs_access_message">Para ocultar se escribe un archivo .nomedia en la carpeta del álbum, lo que requiere acceso a todos los archivos. Actívelo en Ajustes > Permiso de almacenamiento.</string>
     <string name="hide_needs_access_title">Se necesita acceso a todos los archivos</string>
+    <string name="home_pick_album">Elige un álbum para ver aquí sus imágenes</string>
     <string name="host_directory_empty">No hay imágenes en esta carpeta</string>
     <string name="host_directory_folder">Carpeta</string>
     <string name="host_directory_limit">Solo se muestran las primeras %1$d entradas</string>

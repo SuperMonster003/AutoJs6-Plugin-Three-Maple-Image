@@ -2,6 +2,7 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.content.ComponentName
 import android.content.Intent
+import android.view.KeyEvent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.hasTestTag
@@ -74,6 +75,10 @@ class StandaloneHomeInstrumentationTest {
                 compose.onNodeWithTag(tag).assertIsDisplayed().assertIsEnabled()
             }
             assertTrue(compose.onAllNodes(hasTestTag("maple.gallery.sort")).fetchSemanticsNodes().isNotEmpty())
+            // An open menu outlives the activity as a stray Compose root in this process; a later test that resizes
+            // the display would then wait for it forever.
+            InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
+            compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag("maple.gallery.menu.settings")).fetchSemanticsNodes().isEmpty() }
         }
     }
 }

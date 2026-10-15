@@ -206,6 +206,7 @@
     <string name="hide_confirm_message">В каждую папку будет добавлен файл .nomedia: ни эта, ни другие галереи больше не покажут её изображения, ничего не удаляется. Список и возврат: Настройки > Скрытые папки.</string>
     <string name="hide_needs_access_message">Чтобы скрыть альбом, в его папку записывается файл .nomedia, для этого нужен доступ ко всем файлам. Включите его в Настройки > Разрешение хранилища.</string>
     <string name="hide_needs_access_title">Нужен доступ ко всем файлам</string>
+    <string name="home_pick_album">Выберите альбом, чтобы увидеть здесь его изображения</string>
     <string name="host_directory_empty">В этой папке нет изображений</string>
     <string name="host_directory_folder">Папка</string>
     <string name="host_directory_limit">Показаны только первые %1$d записей</string>

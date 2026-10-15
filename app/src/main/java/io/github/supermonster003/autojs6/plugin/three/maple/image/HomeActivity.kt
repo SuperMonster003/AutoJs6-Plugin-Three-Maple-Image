@@ -8,10 +8,27 @@ import androidx.activity.compose.ReportDrawnWhen
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
@@ -22,7 +39,9 @@ import androidx.navigation.navArgument
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumGridCallbacks
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.AlbumGridScreen
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.BatchConvertScreen
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.LayoutOverrides
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.LocalGridSettings
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleEmptyState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MapleTheme
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaGridCallbacks
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose.MediaGridScreen
@@ -80,7 +99,7 @@ class HomeActivity : ConfiguredActivity() {
         operations = GalleryOperations(this, galleryTarget, recycleBin)
         if (savedInstanceState == null) requestPhotoAccessOnce()
         val callbacks = AlbumGridCallbacks(
-            onOpenAlbum = { album -> navigate?.invoke("album/${album.kind.name}/${album.id}") },
+            onOpenAlbum = { album -> openAlbum?.invoke(album) },
             onAlbumSort = gallery::setAlbumSort,
             onGrant = ::requestPhotoAccess,
             onManageSelected = ::requestPhotoAccess,
@@ -113,20 +132,102 @@ class HomeActivity : ConfiguredActivity() {
                 val albums by gallery.albums.collectAsState()
                 val grid by gallery.grid.collectAsState()
                 val search by gallery.search.collectAsState()
+                // Wide windows (ROADMAP 9.3) show albums and the open album side by side; the album open in the pane
+                // survives a fold or a resize into the single-pane album page and back.
+                val twoPane = LayoutOverrides.twoPane ?: (LocalConfiguration.current.screenWidthDp >= TWO_PANE_MIN_WIDTH_DP)
+                var paneOpen by rememberSaveable { mutableStateOf(false) }
+                SideEffect {
+                    openAlbum = { album ->
+                        if (twoPane) {
+                            gallery.clearSelection()
+                            gallery.setGridQuery("")
+                            gallery.openAlbum(album)
+                            paneOpen = true
+                        } else {
+                            controller.navigate("album/${album.kind.name}/${album.id}")
+                        }
+                    }
+                }
+                @Composable
+                fun MediaPage(onBack: () -> Unit) {
+                    MediaGridScreen(
+                        state = grid,
+                        callbacks = MediaGridCallbacks(
+                            onBack = {
+                                gallery.clearSelection()
+                                gallery.setGridQuery("")
+                                onBack()
+                            },
+                            onOpen = ::openImage,
+                            onQuery = gallery::setGridQuery,
+                            onLoadMore = gallery::loadMore,
+                            onSort = { sort, grouping, thisAlbumOnly -> gallery.setGridSort(sort, grouping, thisAlbumOnly) },
+                            onRevealed = gallery::clearReveal,
+                            onColumns = gallery::setColumns,
+                            onRefresh = gallery::refreshGrid,
+                            onToggle = gallery::toggleSelection,
+                            onDragStart = gallery::beginDragSelection,
+                            onDragTo = gallery::dragSelectionTo,
+                            onDragEnd = gallery::endDragSelection,
+                            onClearSelection = gallery::clearSelection,
+                            onSelectAll = gallery::selectAll,
+                            onInvertSelection = gallery::invertSelection,
+                            onResetCover = if (grid.customCover) gallery::resetAlbumCover else null,
+                            onUnhide = grid.album?.takeIf { it.kind == AlbumKind.HIDDEN }?.let { hidden ->
+                                { operations.unhideAlbum(hidden) { onBack() } }
+                            },
+                        ),
+                        selectionActions = operations.actionsFor(grid, onSetCover = gallery::setAlbumCoverFromSelection),
+                        snackbarHostState = operations.snackbar,
+                    )
+                }
                 NavHost(navController = controller, startDestination = ROUTE_ALBUMS) {
                     composable(ROUTE_ALBUMS) {
                         // Reports "Fully drawn" once the album list (or the no-permission state) is on screen: the
                         // startup metric of the large library check (ROADMAP 6.5).
                         ReportDrawnWhen { !albums.loading }
-                        AlbumGridScreen(
-                            state = albums,
-                            home = actions.uiState,
-                            callbacks = callbacks,
-                            albumActions = operations.albumActionsFor(albums),
-                            snackbarHostState = operations.snackbar,
-                            search = search,
-                            mediaColumns = grid.columns,
-                        )
+                        val albumGrid: @Composable () -> Unit = {
+                            AlbumGridScreen(
+                                state = albums,
+                                home = actions.uiState,
+                                callbacks = callbacks,
+                                albumActions = operations.albumActionsFor(albums),
+                                snackbarHostState = operations.snackbar,
+                                search = search,
+                                mediaColumns = grid.columns,
+                            )
+                        }
+                        if (twoPane) {
+                            Row(modifier = Modifier.fillMaxSize()) {
+                                Box(modifier = Modifier.weight(ALBUM_PANE_WEIGHT).fillMaxHeight().testTag("maple.home.albumPane")) { albumGrid() }
+                                VerticalDivider()
+                                Box(modifier = Modifier.weight(1f - ALBUM_PANE_WEIGHT).fillMaxHeight().testTag("maple.home.mediaPane")) {
+                                    if (paneOpen && grid.album != null) {
+                                        MediaPage(onBack = { paneOpen = false })
+                                    } else {
+                                        Box(
+                                            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+                                            contentAlignment = Alignment.Center,
+                                        ) {
+                                            MapleEmptyState(
+                                                title = stringResource(R.string.home_pick_album),
+                                                icon = painterResource(R.drawable.ic_perm_media_24),
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            albumGrid()
+                            // Folded or narrowed with an album open beside the albums: it carries on as its own page.
+                            LaunchedEffect(Unit) {
+                                val open = grid.album
+                                if (paneOpen && open != null) {
+                                    paneOpen = false
+                                    controller.navigate("album/${open.kind.name}/${open.id}")
+                                }
+                            }
+                        }
                         actions.Dialogs()
                         operations.Dialogs()
                     }
@@ -140,36 +241,14 @@ class HomeActivity : ConfiguredActivity() {
                             val album = gallery.findAlbum(kind, id)
                             if (album != null && grid.album?.id != id) gallery.openAlbum(album)
                         }
-                        MediaGridScreen(
-                            state = grid,
-                            callbacks = MediaGridCallbacks(
-                                onBack = {
-                                    gallery.clearSelection()
-                                    gallery.setGridQuery("")
-                                    controller.popBackStack()
-                                },
-                                onOpen = ::openImage,
-                                onQuery = gallery::setGridQuery,
-                                onLoadMore = gallery::loadMore,
-                                onSort = { sort, grouping, thisAlbumOnly -> gallery.setGridSort(sort, grouping, thisAlbumOnly) },
-                                onRevealed = gallery::clearReveal,
-                                onColumns = gallery::setColumns,
-                                onRefresh = gallery::refreshGrid,
-                                onToggle = gallery::toggleSelection,
-                                onDragStart = gallery::beginDragSelection,
-                                onDragTo = gallery::dragSelectionTo,
-                                onDragEnd = gallery::endDragSelection,
-                                onClearSelection = gallery::clearSelection,
-                                onSelectAll = gallery::selectAll,
-                                onInvertSelection = gallery::invertSelection,
-                                onResetCover = if (grid.customCover) gallery::resetAlbumCover else null,
-                                onUnhide = grid.album?.takeIf { it.kind == AlbumKind.HIDDEN }?.let { hidden ->
-                                    { operations.unhideAlbum(hidden) { controller.popBackStack() } }
-                                },
-                            ),
-                            selectionActions = operations.actionsFor(grid, onSetCover = gallery::setAlbumCoverFromSelection),
-                            snackbarHostState = operations.snackbar,
-                        )
+                        // Unfolded or widened on an album page: the albums come back beside it.
+                        LaunchedEffect(twoPane) {
+                            if (twoPane) {
+                                paneOpen = true
+                                controller.popBackStack(ROUTE_ALBUMS, inclusive = false)
+                            }
+                        }
+                        MediaPage(onBack = { controller.popBackStack() })
                         operations.Dialogs()
                     }
                     composable(ROUTE_BATCH_CONVERT) {
@@ -221,6 +300,9 @@ class HomeActivity : ConfiguredActivity() {
     }
 
     private var navigate: ((String) -> Unit)? = null
+
+    /** Opens an album as its own page, or beside the albums in a wide window (ROADMAP 9.3). */
+    private var openAlbum: ((AlbumSummary) -> Unit)? = null
 
     /** The media grid selection as the operations see it. */
     private val galleryTarget = object : OperationTarget {
@@ -357,6 +439,10 @@ class HomeActivity : ConfiguredActivity() {
     private companion object {
         const val ROUTE_ALBUMS = "albums"
         const val ROUTE_ALBUM = "album/{kind}/{id}"
+
+        /** From this window width (expanded, ROADMAP 9.3) the albums and the open album share the screen. */
+        const val TWO_PANE_MIN_WIDTH_DP = 840
+        const val ALBUM_PANE_WEIGHT = 0.4f
         const val ROUTE_RECYCLE_BIN = "recycle-bin"
         const val ROUTE_BATCH_CONVERT = "batch-convert"
     }

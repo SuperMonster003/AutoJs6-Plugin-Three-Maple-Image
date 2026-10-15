@@ -43,6 +43,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,6 +52,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -198,13 +202,42 @@ internal fun ViewerScreen(
             key(pager) { ViewerPager(pager, callbacks.onPageChanged) }
         }
         Box(modifier = Modifier.fillMaxSize().graphicsLayer { alpha = slideshowVeil() }.background(Color.Black))
+        // Landscape (ROADMAP 9.3): the thumbnail strip stands at the side, between the top bar and the bottom area.
+        val configuration = LocalConfiguration.current
+        val sideStrip = LayoutOverrides.sideStrip ?: (configuration.screenWidthDp > configuration.screenHeightDp)
+        val showStrip = state.thumbnailStrip && pager != null && pager.pageCount > 1
+        val density = LocalDensity.current
+        var topHeight by remember { mutableIntStateOf(0) }
+        var bottomHeight by remember { mutableIntStateOf(0) }
         AnimatedVisibility(
             visible = state.controlsVisible,
             enter = fadeIn(),
             exit = fadeOut(),
-            modifier = Modifier.align(Alignment.TopCenter),
+            modifier = Modifier.align(Alignment.TopCenter).onSizeChanged { topHeight = it.height },
         ) {
             ViewerTopBar(state, callbacks)
+        }
+        if (sideStrip && showStrip && pager != null) {
+            AnimatedVisibility(
+                visible = state.controlsVisible,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = with(density) { topHeight.toDp() }, bottom = with(density) { bottomHeight.toDp() })
+                    .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.End))
+                    .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.End)),
+            ) {
+                MapleThumbnailStrip(
+                    count = pager.pageCount,
+                    current = state.pageIndex,
+                    key = pager.pageKey,
+                    model = pager.thumbnail,
+                    description = pager.thumbnailDescription,
+                    onSelect = callbacks.onSelectPage,
+                    vertical = true,
+                )
+            }
         }
         MapleZoomIndicator(
             text = state.zoomIndicatorText.orEmpty(),
@@ -213,12 +246,13 @@ internal fun ViewerScreen(
                 .align(Alignment.TopEnd)
                 .windowInsetsPadding(WindowInsets.statusBars)
                 .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
-                .padding(top = 80.dp, end = 16.dp),
+                .padding(top = 80.dp, end = if (sideStrip && showStrip) 80.dp else 16.dp),
         )
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal)),
+                .windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
+                .onSizeChanged { bottomHeight = it.height },
             horizontalAlignment = Alignment.End,
         ) {
             if (snackbarHostState != null) {
@@ -290,7 +324,7 @@ internal fun ViewerScreen(
                             }
                         }
                     }
-                    if (state.thumbnailStrip && pager != null && pager.pageCount > 1) {
+                    if (!sideStrip && showStrip && pager != null) {
                         MapleThumbnailStrip(
                             count = pager.pageCount,
                             current = state.pageIndex,

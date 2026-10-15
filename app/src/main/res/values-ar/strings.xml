@@ -206,6 +206,7 @@
     <string name="hide_confirm_message">سيوضع ملف .nomedia في كل مجلد: لن يعرض هذا المعرض ولا غيره صوره, ولن يحذف أي شيء. تعرضها الإعدادات > المجلدات المخفية ويمكن إظهارها مجددا من هناك.</string>
     <string name="hide_needs_access_message">الإخفاء يكتب ملف .nomedia في مجلد الألبوم, ولذلك يلزم الوصول الى كل الملفات. فعله من الإعدادات > اذن التخزين.</string>
     <string name="hide_needs_access_title">يلزم الوصول الى كل الملفات</string>
+    <string name="home_pick_album">اختر ألبوما لعرض صوره هنا</string>
     <string name="host_directory_empty">لا توجد صور في هذا المجلد</string>
     <string name="host_directory_folder">مجلد</string>
     <string name="host_directory_limit">يُعرض أول %1$d عنصرًا فقط</string>

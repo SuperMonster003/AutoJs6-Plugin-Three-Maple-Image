@@ -1,8 +1,10 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -36,22 +38,21 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import io.github.supermonster003.autojs6.plugin.three.maple.image.AlbumKind
 import io.github.supermonster003.autojs6.plugin.three.maple.image.AlbumSummary
 import io.github.supermonster003.autojs6.plugin.three.maple.image.GalleryPreferences
 import io.github.supermonster003.autojs6.plugin.three.maple.image.GalleryUiState
-import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaItem
-import io.github.supermonster003.autojs6.plugin.three.maple.image.SearchUiState
+import io.github.supermonster003.autojs6.plugin.three.maple.image.GridPolicy
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaAccessState
+import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaItem
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaPermissionAction
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaSort
-import android.content.res.Configuration
-import io.github.supermonster003.autojs6.plugin.three.maple.image.GridPolicy
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
+import io.github.supermonster003.autojs6.plugin.three.maple.image.SearchUiState
 
 internal class AlbumGridCallbacks(
     val onOpenAlbum: (AlbumSummary) -> Unit,
@@ -278,93 +279,97 @@ private fun AlbumGrid(
     home: HomeUiState,
     header: (@Composable () -> Unit)? = null,
 ) {
-    val configuration = LocalConfiguration.current
-    val columns = GridPolicy.albumColumns(
-        LocalGridSettings.current,
-        landscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE,
-        widthDp = configuration.screenWidthDp,
-    )
-    val horizontal = MapleSettingsDefaults.horizontalPadding
-    // Full-span rows (headers, tool rows) carry their own 24 dp inset, so the grid itself has no horizontal
-    // content padding and the album cells pad their outer edges by column instead.
-    fun cellPadding(index: Int): PaddingValues = PaddingValues(
-        start = if (index % columns == 0) horizontal else 0.dp,
-        end = if (index % columns == columns - 1) horizontal else 0.dp,
-    )
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(columns),
-        contentPadding = PaddingValues(bottom = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(MapleGridDefaults.albumColumnSpacing),
-        verticalArrangement = Arrangement.spacedBy(MapleGridDefaults.albumRowSpacing),
-        modifier = Modifier.fillMaxSize().testTag("maple.gallery.grid"),
-    ) {
-        if (header != null) {
-            item(key = "header.explanation", span = { GridItemSpan(maxLineSpan) }) { header() }
-        }
-        // The favorites album leads the albums while it has images (ROADMAP 7.0).
-        val albums = listOfNotNull(state.favorites) + state.albums
-        if (albums.isNotEmpty()) {
-            item(key = "header.albums", span = { GridItemSpan(maxLineSpan) }) {
-                MapleSectionHeader(stringResource(R.string.gallery_section_albums))
+    BoxWithConstraints {
+        val widthDp = maxWidth.value.toInt()
+        val configuration = LocalConfiguration.current
+        // The width the grid really has: beside the open album in a wide window (ROADMAP 9.3) that is the album pane.
+        val columns = GridPolicy.albumColumns(
+            LocalGridSettings.current,
+            landscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE,
+            widthDp = widthDp,
+        )
+        val horizontal = MapleSettingsDefaults.horizontalPadding
+        // Full-span rows (headers, tool rows) carry their own 24 dp inset, so the grid itself has no horizontal
+        // content padding and the album cells pad their outer edges by column instead.
+        fun cellPadding(index: Int): PaddingValues = PaddingValues(
+            start = if (index % columns == 0) horizontal else 0.dp,
+            end = if (index % columns == columns - 1) horizontal else 0.dp,
+        )
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(columns),
+            contentPadding = PaddingValues(bottom = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(MapleGridDefaults.albumColumnSpacing),
+            verticalArrangement = Arrangement.spacedBy(MapleGridDefaults.albumRowSpacing),
+            modifier = Modifier.fillMaxSize().testTag("maple.gallery.grid"),
+        ) {
+            if (header != null) {
+                item(key = "header.explanation", span = { GridItemSpan(maxLineSpan) }) { header() }
             }
-            itemsIndexed(albums, key = { _, album -> "${album.kind.name.lowercase()}.${album.id}" }) { index, album ->
-                AlbumCell(album, state, callbacks, Modifier.padding(cellPadding(index)))
-            }
-        }
-        if (state.folders.isNotEmpty()) {
-            item(key = "header.folders", span = { GridItemSpan(maxLineSpan) }) {
-                MapleSectionHeader(stringResource(R.string.storage_section_folders))
-            }
-            itemsIndexed(state.folders, key = { _, album -> "folder.${album.id}" }) { index, album ->
-                AlbumCell(album, state, callbacks, Modifier.padding(cellPadding(index)))
-            }
-        }
-        if (state.hidden.isNotEmpty()) {
-            item(key = "header.hidden", span = { GridItemSpan(maxLineSpan) }) {
-                MapleSectionHeader(stringResource(R.string.hidden_folders_title))
-            }
-            itemsIndexed(state.hidden, key = { _, album -> "hidden.${album.id}" }) { index, album ->
-                AlbumCell(album, state, callbacks, Modifier.padding(cellPadding(index)))
-            }
-        }
-        if (showTools) {
-            item(key = "header.tools", span = { GridItemSpan(maxLineSpan) }) {
-                MapleSectionHeader(stringResource(R.string.gallery_section_tools))
-            }
-            item(key = "tool.edit", span = { GridItemSpan(maxLineSpan) }) {
-                MapleSettingsRow(
-                    title = stringResource(R.string.action_edit_image),
-                    summary = stringResource(R.string.standalone_home_edit_summary),
-                    iconResource = R.drawable.ic_edit_24,
-                    enabled = !home.working,
-                    onClick = callbacks.onEditImage,
-                    modifier = Modifier.testTag("maple.gallery.tool.edit"),
-                )
-            }
-            item(key = "tool.convert", span = { GridItemSpan(maxLineSpan) }) {
-                MapleSettingsRow(
-                    title = stringResource(R.string.action_convert_image),
-                    summary = stringResource(R.string.standalone_home_convert_summary),
-                    iconResource = R.drawable.ic_swap_horiz_24,
-                    enabled = !home.working,
-                    onClick = callbacks.onConvertImage,
-                    modifier = Modifier.testTag("maple.gallery.tool.convert"),
-                )
-            }
-            if (home.pendingOutputName != null) {
-                item(key = "tool.save", span = { GridItemSpan(maxLineSpan) }) {
-                    MapleSettingsRow(
-                        title = stringResource(R.string.standalone_home_save_output),
-                        summary = stringResource(R.string.standalone_home_pending_summary, home.pendingOutputName),
-                        iconResource = R.drawable.ic_download_24,
-                        enabled = !home.working,
-                        onClick = callbacks.onSaveOutput,
-                        modifier = Modifier.testTag("maple.gallery.tool.saveOutput"),
-                    )
+            // The favorites album leads the albums while it has images (ROADMAP 7.0).
+            val albums = listOfNotNull(state.favorites) + state.albums
+            if (albums.isNotEmpty()) {
+                item(key = "header.albums", span = { GridItemSpan(maxLineSpan) }) {
+                    MapleSectionHeader(stringResource(R.string.gallery_section_albums))
+                }
+                itemsIndexed(albums, key = { _, album -> "${album.kind.name.lowercase()}.${album.id}" }) { index, album ->
+                    AlbumCell(album, state, callbacks, Modifier.padding(cellPadding(index)))
                 }
             }
+            if (state.folders.isNotEmpty()) {
+                item(key = "header.folders", span = { GridItemSpan(maxLineSpan) }) {
+                    MapleSectionHeader(stringResource(R.string.storage_section_folders))
+                }
+                itemsIndexed(state.folders, key = { _, album -> "folder.${album.id}" }) { index, album ->
+                    AlbumCell(album, state, callbacks, Modifier.padding(cellPadding(index)))
+                }
+            }
+            if (state.hidden.isNotEmpty()) {
+                item(key = "header.hidden", span = { GridItemSpan(maxLineSpan) }) {
+                    MapleSectionHeader(stringResource(R.string.hidden_folders_title))
+                }
+                itemsIndexed(state.hidden, key = { _, album -> "hidden.${album.id}" }) { index, album ->
+                    AlbumCell(album, state, callbacks, Modifier.padding(cellPadding(index)))
+                }
+            }
+            if (showTools) {
+                item(key = "header.tools", span = { GridItemSpan(maxLineSpan) }) {
+                    MapleSectionHeader(stringResource(R.string.gallery_section_tools))
+                }
+                item(key = "tool.edit", span = { GridItemSpan(maxLineSpan) }) {
+                    MapleSettingsRow(
+                        title = stringResource(R.string.action_edit_image),
+                        summary = stringResource(R.string.standalone_home_edit_summary),
+                        iconResource = R.drawable.ic_edit_24,
+                        enabled = !home.working,
+                        onClick = callbacks.onEditImage,
+                        modifier = Modifier.testTag("maple.gallery.tool.edit"),
+                    )
+                }
+                item(key = "tool.convert", span = { GridItemSpan(maxLineSpan) }) {
+                    MapleSettingsRow(
+                        title = stringResource(R.string.action_convert_image),
+                        summary = stringResource(R.string.standalone_home_convert_summary),
+                        iconResource = R.drawable.ic_swap_horiz_24,
+                        enabled = !home.working,
+                        onClick = callbacks.onConvertImage,
+                        modifier = Modifier.testTag("maple.gallery.tool.convert"),
+                    )
+                }
+                if (home.pendingOutputName != null) {
+                    item(key = "tool.save", span = { GridItemSpan(maxLineSpan) }) {
+                        MapleSettingsRow(
+                            title = stringResource(R.string.standalone_home_save_output),
+                            summary = stringResource(R.string.standalone_home_pending_summary, home.pendingOutputName),
+                            iconResource = R.drawable.ic_download_24,
+                            enabled = !home.working,
+                            onClick = callbacks.onSaveOutput,
+                            modifier = Modifier.testTag("maple.gallery.tool.saveOutput"),
+                        )
+                    }
+                }
+            }
+            item(key = "footer", span = { GridItemSpan(maxLineSpan) }) { Spacer(Modifier.height(8.dp)) }
         }
-        item(key = "footer", span = { GridItemSpan(maxLineSpan) }) { Spacer(Modifier.height(8.dp)) }
     }
 }
 
