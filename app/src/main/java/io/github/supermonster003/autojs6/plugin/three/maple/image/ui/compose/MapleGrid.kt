@@ -49,8 +49,11 @@ import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import io.github.supermonster003.autojs6.plugin.three.maple.image.GridSettings
+import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaItem
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ThumbnailCorners
+import java.text.DateFormat
+import java.util.Date
 
 /** The grid settings (ROADMAP 9.2) for every album and media grid below; screens without settings get the defaults. */
 internal val LocalGridSettings = compositionLocalOf { GridSettings() }
@@ -74,6 +77,13 @@ internal fun mediaTypeBadge(mimeType: String): String? = when (mimeType.lowercas
     "image/webp" -> "WEBP"
     else -> null
 }
+
+/**
+ * What TalkBack reads for a media cell (ROADMAP 9.4): the file name and the day it was taken (the modification day
+ * without a capture time), such as "IMG_0001.jpg, Oct 15, 2026" with a medium date of the user's locale.
+ */
+internal fun mediaCellDescription(item: MediaItem, dateFormat: DateFormat): String =
+    item.displayName + ", " + dateFormat.format(Date(item.effectiveTakenMillis))
 
 /**
  * Album cell: square cover with 4 dp corners, optional corner badge, name (16 sp) and count (14 sp). In selection

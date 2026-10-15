@@ -334,11 +334,12 @@ internal fun ViewerScreen(
                             onSelect = callbacks.onSelectPage,
                         )
                     }
+                    // Full white: on the plain scrim over a bright image the muted white is not readable (ROADMAP 9.4).
                     if (state.extendedDetails.isEmpty()) {
                         Text(
                             text = state.metadataText,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = canvas.onScrimMuted,
+                            color = canvas.onScrim,
                             textAlign = TextAlign.Center,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
@@ -353,7 +354,7 @@ internal fun ViewerScreen(
                         Text(
                             text = state.extendedDetails.joinToString("\n"),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = canvas.onScrimMuted,
+                            color = canvas.onScrim,
                             maxLines = EXTENDED_DETAILS_MAX_LINES,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier

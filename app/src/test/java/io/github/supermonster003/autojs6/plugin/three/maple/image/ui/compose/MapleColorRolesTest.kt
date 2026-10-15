@@ -68,6 +68,23 @@ class MapleColorRolesTest {
         }
     }
 
+    /** Design draft 11 / ROADMAP 9.4: overlay text stays readable whatever the image under it; pure white is the worst. */
+    @Test fun overlayTextStaysReadableOverAnyImage() {
+        val white = 0xFFFFFFFF.toInt()
+        val black = 0xFF000000.toInt()
+        for (image in listOf(white, 0xFFFFEB3B.toInt(), 0xFF808080.toInt(), black)) {
+            val scrim = MapleColorRoles.composite(black, MapleColorRoles.SCRIM_ALPHA, image)
+            val strong = MapleColorRoles.composite(black, MapleColorRoles.SCRIM_STRONG_ALPHA, image)
+            val muted = MapleColorRoles.composite(white, MapleColorRoles.ON_SCRIM_MUTED_ALPHA, strong)
+            assertTrue("white on the scrim over $image", AppColorPolicy.contrastRatio(white, scrim) >= 4.5)
+            assertTrue("muted white on the strong scrim over $image", AppColorPolicy.contrastRatio(muted, strong) >= 4.5)
+        }
+        // Why secondary text in the viewer bars is full white: the muted white falls short on the plain scrim.
+        val scrimOverWhite = MapleColorRoles.composite(black, MapleColorRoles.SCRIM_ALPHA, white)
+        val mutedOverWhite = MapleColorRoles.composite(white, MapleColorRoles.ON_SCRIM_MUTED_ALPHA, scrimOverWhite)
+        assertTrue(AppColorPolicy.contrastRatio(mutedOverWhite, scrimOverWhite) < 4.5)
+    }
+
     @Test fun compositeBlendsBetweenBackgroundAndForeground() {
         val red = 0xFFFF0000.toInt()
         val white = 0xFFFFFFFF.toInt()

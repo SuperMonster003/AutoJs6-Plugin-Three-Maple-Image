@@ -37,6 +37,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -53,6 +54,7 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaItem
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaSearch
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
 import io.github.supermonster003.autojs6.plugin.three.maple.image.SearchUiState
+import java.text.DateFormat
 
 /** One-line search field for the top bar (ROADMAP 7.5): focused on appear, the keyboard's search key closes it. */
 @Composable
@@ -94,6 +96,8 @@ internal fun SearchResults(
     modifier: Modifier = Modifier,
 ) {
     val empty = search.albums.isEmpty() && search.items.isEmpty()
+    val locale = LocalConfiguration.current.locales[0]
+    val dateFormat = remember(locale) { DateFormat.getDateInstance(DateFormat.MEDIUM, locale) }
     if (!empty && Log.isLoggable(GalleryViewModel.SEARCH_LOG_TAG, Log.DEBUG)) {
         LaunchedEffect(search.albums, search.items) {
             withFrameNanos { }
@@ -158,9 +162,10 @@ internal fun SearchResults(
                 }
                 items(search.items, key = { it.id }) { item ->
                     val model = remember(item.contentUri) { Uri.parse(item.contentUri) }
+                    val description = remember(item.displayName, item.effectiveTakenMillis, dateFormat) { mediaCellDescription(item, dateFormat) }
                     MapleMediaCell(
                         model = model,
-                        description = item.displayName,
+                        description = description,
                         badge = mediaTypeBadge(item.mimeType),
                         onClick = { onOpenImage(item) },
                         modifier = Modifier.testTag("maple.search.item.${item.id}"),

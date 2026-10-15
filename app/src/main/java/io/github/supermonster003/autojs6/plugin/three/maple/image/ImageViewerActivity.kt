@@ -31,6 +31,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.MotionDurationScale
 import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -83,8 +84,11 @@ class ImageViewerActivity : ConfiguredActivity() {
     private var favoriteIds: Set<Long> = emptySet()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
-    /** Pager animations need a frame clock, which the plain main dispatcher does not carry. */
-    private val frameScope = CoroutineScope(SupervisorJob() + AndroidUiDispatcher.Main)
+    /**
+     * Pager and slideshow animations need a frame clock, which the plain main dispatcher does not carry, and the
+     * system animation scale, so that they finish at once with "Remove animations" (ROADMAP 9.4).
+     */
+    private val frameScope = CoroutineScope(SupervisorJob() + AndroidUiDispatcher.Main + SystemMotionDurationScale(this))
     private var sourceJob: Job? = null
     private var pageJumpJob: Job? = null
     private var zoomIndicatorJob: Job? = null
@@ -448,6 +452,11 @@ class ImageViewerActivity : ConfiguredActivity() {
     /** The zoomable surface of the current page, or null while the page list is still being enumerated. */
     @VisibleForTesting
     internal fun currentImageViewForTesting(): ZoomableImageView? = currentHost()?.view
+
+    /** The animation scale the viewer's own page turns and slideshow fades run with. */
+    @get:VisibleForTesting
+    internal val motionScaleForTesting: Float
+        get() = frameScope.coroutineContext[MotionDurationScale]?.scaleFactor ?: 1f
 
     @VisibleForTesting
     internal fun toggleDetailsForTesting() = setExifDetailsExpanded(!uiState.detailsExpanded)

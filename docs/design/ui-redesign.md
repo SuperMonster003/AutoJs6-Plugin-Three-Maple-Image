@@ -898,7 +898,7 @@ Simple Gallery 的 "高级编辑器" (第三方 SDK 界面, 仅作形态参考):
 - 装饰图标 `importantForAccessibility=no` (Compose: 不设 `contentDescription`); 设置行整行一个焦点, 右箭头与开关不单独聚焦 (规范第 4 节).
 - 状态行与 Snackbar 为 live region (polite); 倍率提示不读 (现有 `importantForAccessibility=no`).
 - 焦点顺序: 顶栏 -> 内容 -> 底栏; 键盘 / D-pad 可达, 焦点环使用主题色 2 dp.
-- 对比度: 页面文字 >= 4.5:1. 浮层按最差情况 (底图为纯白) 验证: `scrim` 55% 与 #FFFFFF 混合后的有效底色为 #737373, 白字 (`onScrim`) 对它的对比度约 4.7:1 达标, 但 70% 白 (`onScrimMuted`, 有效色约 #D5D5D5) 只有约 3.2:1 不达标; 因此元数据所在的顶栏 / 底栏在当前图像偏亮时自动提升为 `scrimStrong` (75%, 有效底色 #404040, 白字约 10.4:1, 70% 白约 6.7:1). 实现为按当前页缩略图的平均亮度选择 scrim 档位 (评审问题 R8).
+- 对比度: 页面文字 >= 4.5:1. 浮层按最差情况 (底图为纯白) 验证: `scrim` 55% 与 #FFFFFF 混合后的有效底色为 #737373, 白字 (`onScrim`) 对它的对比度约 4.7:1 达标, 但 70% 白 (`onScrimMuted`, 有效色约 #D5D5D5) 只有约 3.2:1 不达标; 因此元数据所在的顶栏 / 底栏在当前图像偏亮时自动提升为 `scrimStrong` (75%, 有效底色 #404040, 白字约 10.4:1, 70% 白约 6.1:1). 实现为按当前页缩略图的平均亮度选择 scrim 档位 (评审问题 R8). 实现 (3.3.0, ROADMAP 9.4) 改为更简单且不依赖图像内容的做法: 查看器顶栏副标题, 底部元数据与扩展详情这些压在 `scrim` 上的次要文字一律用 `onScrim` (纯白, 最坏情况约 4.7:1), `onScrimMuted` 只用在 `scrimStrong` 或不透明画布上 (编辑器 / 壁纸参数面板, 最坏情况约 6.1:1); 透明度常量在 `MapleColorRoles` (`SCRIM_ALPHA` 等), `MapleColorRolesTest.overlayTextStaysReadableOverAnyImage` 按白, 黄, 灰, 黑四种底图验证.
 - 大字号 (系统 200%) 下: 底部图标按钮标签允许 2 行, 编辑器工具标签允许省略号但 `contentDescription` 完整.
 
 ---

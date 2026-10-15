@@ -182,6 +182,9 @@ dependencies {
     androidTestImplementation(libs.test.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
+    // The checks Accessibility Scanner runs, over the accessibility nodes of the plugin's screens (ROADMAP 9.4).
+    androidTestImplementation(libs.test.accessibility.framework)
+    androidTestImplementation(libs.test.accessibility.guava)
 }
 
 tasks {

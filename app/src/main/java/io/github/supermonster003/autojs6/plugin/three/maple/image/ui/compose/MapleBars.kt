@@ -83,7 +83,8 @@ internal fun MapleTopBar(
                     Text(
                         subtitle,
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (overlay) canvas.onScrimMuted else MaterialTheme.colorScheme.onSurfaceVariant,
+                        // Full white over the image: the muted white is not readable on the plain scrim over a bright image.
+                        color = if (overlay) canvas.onScrim else MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )

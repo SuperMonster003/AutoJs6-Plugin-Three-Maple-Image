@@ -310,6 +310,8 @@ internal fun MediaGridScreen(
                     }
                 }
                 val startLabel = stringResource(R.string.selection_start)
+                val locale = LocalConfiguration.current.locales[0]
+                val dateFormat = remember(locale) { DateFormat.getDateInstance(DateFormat.MEDIUM, locale) }
                 // The cell with keyboard focus (ROADMAP 9.3): the delete key acts on it when nothing is selected.
                 var focusedId by remember { mutableStateOf<Long?>(null) }
                 LazyVerticalGrid(
@@ -349,9 +351,10 @@ internal fun MediaGridScreen(
                         // A remembered Uri keeps the cell skippable when a page is appended (a fresh Uri instance
                         // would recompose every visible cell).
                         val model = remember(item.contentUri) { Uri.parse(item.contentUri) }
+                        val description = remember(item.displayName, item.effectiveTakenMillis, dateFormat) { mediaCellDescription(item, dateFormat) }
                         MapleMediaCell(
                             model = model,
-                            description = item.displayName,
+                            description = description,
                             badge = mediaTypeBadge(item.mimeType),
                             selectionMode = selecting,
                             selected = item.id in state.selection,
@@ -386,8 +389,6 @@ internal fun MediaGridScreen(
                         GroupHeader(group, Modifier.align(Alignment.TopCenter).testTag("maple.media.stickyGroup"))
                     }
                 }
-                val locale = LocalConfiguration.current.locales[0]
-                val dateFormat = remember(locale) { DateFormat.getDateInstance(DateFormat.MEDIUM, locale) }
                 MapleFastScroller(
                     gridState = gridState,
                     itemCount = layout.gridCount,

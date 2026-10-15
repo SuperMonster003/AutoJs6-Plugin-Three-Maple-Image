@@ -2,6 +2,7 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.ParcelFileDescriptor
 import android.view.WindowManager
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
@@ -75,6 +76,34 @@ class SlideshowInstrumentationTest {
 
     private fun exists(tag: String): Boolean =
         runCatching { compose.onAllNodes(hasTestTag(tag)).fetchSemanticsNodes().isNotEmpty() }.getOrDefault(false)
+
+    private fun shell(command: String): String {
+        val descriptor = InstrumentationRegistry.getInstrumentation().uiAutomation.executeShellCommand(command)
+        return ParcelFileDescriptor.AutoCloseInputStream(descriptor).bufferedReader().use { it.readText() }.trim()
+    }
+
+    /**
+     * ROADMAP 9.4: the page turns and fades the viewer runs itself (keys, the slideshow) follow "Remove animations"
+     * like the Compose animations of its screens.
+     */
+    @Test fun theViewersOwnAnimationsFollowTheSystemAnimationScale() {
+        val original = shell("settings get global animator_duration_scale")
+        try {
+            launch().use { scenario ->
+                compose.waitUntil(TIMEOUT) { scenario.state().pageCount == 3 }
+                for (scale in listOf("0.0", "0.5")) {
+                    shell("settings put global animator_duration_scale $scale")
+                    compose.waitUntil(TIMEOUT) {
+                        var current = -1f
+                        scenario.onActivity { current = it.motionScaleForTesting }
+                        current == scale.toFloat()
+                    }
+                }
+            }
+        } finally {
+            shell(if (original == "null" || original.isEmpty()) "settings delete global animator_duration_scale" else "settings put global animator_duration_scale $original")
+        }
+    }
 
     @Test fun aShowMovesOnPausesOnATapAndEndsOnTheLastPage() {
         launch().use { scenario ->

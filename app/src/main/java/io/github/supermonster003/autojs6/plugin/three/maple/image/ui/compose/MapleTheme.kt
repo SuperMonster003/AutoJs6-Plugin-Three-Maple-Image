@@ -125,11 +125,11 @@ private fun MapleColorRoles.toColorScheme(): ColorScheme {
 private fun MapleColorRoles.toCanvasTokens(): MapleCanvasTokens = MapleCanvasTokens(
     viewerCanvas = Color.Black,
     editorCanvas = Color(0xFF121212),
-    scrim = Color.Black.copy(alpha = 0.55f),
-    scrimStrong = Color.Black.copy(alpha = 0.75f),
+    scrim = Color.Black.copy(alpha = MapleColorRoles.SCRIM_ALPHA / 255f),
+    scrimStrong = Color.Black.copy(alpha = MapleColorRoles.SCRIM_STRONG_ALPHA / 255f),
     onScrim = Color.White,
-    onScrimMuted = Color.White.copy(alpha = 0.70f),
-    onScrimDisabled = Color.White.copy(alpha = 0.38f),
+    onScrimMuted = Color.White.copy(alpha = MapleColorRoles.ON_SCRIM_MUTED_ALPHA / 255f),
+    onScrimDisabled = Color.White.copy(alpha = MapleColorRoles.ON_SCRIM_DISABLED_ALPHA / 255f),
     accentOnScrim = Color(accentOnDark),
     errorOnScrim = Color(0xFFFFB4AB),
 )

@@ -30,6 +30,16 @@ internal data class MapleColorRoles(
         /** Tinted selection surface: primary at 11% composited over the surface (design draft 5.1). */
         const val PRIMARY_CONTAINER_ALPHA = 0x1C
 
+        /**
+         * Viewer and editor overlays (design draft 5.2), alphas out of 255: black scrims at 55% and 75%, white text
+         * at 70% (secondary) and 38% (disabled). Over a pure white image white text on the 55% scrim stays at 4.7:1,
+         * the 70% white only reaches 3.2:1, so secondary text sits on the 75% scrim (design draft 11, ROADMAP 9.4).
+         */
+        const val SCRIM_ALPHA = 140
+        const val SCRIM_STRONG_ALPHA = 191
+        const val ON_SCRIM_MUTED_ALPHA = 179
+        const val ON_SCRIM_DISABLED_ALPHA = 97
+
         fun from(palette: AppThemePalette): MapleColorRoles = MapleColorRoles(
             isDark = palette.isDark,
             primary = palette.primary,
