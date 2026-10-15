@@ -67,6 +67,7 @@ class KeyboardInstrumentationTest {
     }
 
     @After fun restore() {
+        instrumentation.setInTouchMode(true)
         store.save(original)
         if (!originalRequested) record.reset()
         directory.deleteRecursively()
@@ -106,6 +107,9 @@ class KeyboardInstrumentationTest {
             ImageViewerContract.viewerIntent(context, ImageViewerLaunchRequest.explicitSelection(pages)),
         ).use { scenario ->
             compose.waitUntil(TIMEOUT) { scenario.state().let { !it.loading && it.pageCount == 3 } && scenario.hasWindowFocus() }
+            // In touch mode the platform spends the first arrow key on leaving it (a control takes focus) before any
+            // app sees the key; a keyboard user is past that after one press.
+            instrumentation.setInTouchMode(false)
             key(KeyEvent.KEYCODE_DPAD_RIGHT)
             compose.waitUntil(TIMEOUT) { scenario.state().pageIndex == 1 }
             key(KeyEvent.KEYCODE_PAGE_DOWN)
