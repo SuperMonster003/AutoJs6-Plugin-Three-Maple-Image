@@ -4,6 +4,30 @@
 
 ******
 
+## v3.3.0
+
+###### 2026/10/15
+
+* `Aviso` Los ajustes se reorganizan en Apariencia, Álbumes y cuadrícula, Visor, Edición y salida, Gestión de medios, Almacenamiento y Acerca de; se conservan las opciones que ya tenía
+* `Aviso` La ubicación sigue oculta de forma predeterminada y se sigue eliminando al guardar; active Ajustes > Visor > Mostrar ubicación cuando la necesite
+* `Función` Presentación: menú del visor (arriba a la derecha) > Presentación, con intervalo (de 1 a 60 segundos), en orden o aleatorio, reproducir al revés, repetir, incluir GIF animados y una transición (Ninguna, Fundido, Deslizar); mientras se reproduce, los botones se ocultan y la pantalla sigue encendida, y un toque la pausa
+* `Función` Establecer como fondo de pantalla: menú del visor > Establecer como fondo de pantalla; un marco de recorte con la forma de la pantalla elige qué se muestra, en la Pantalla de inicio, la Pantalla de bloqueo o Ambas
+* `Función` Compartir una copia: menú del visor > Compartir una copia comparte una copia a tamaño completo sin metadatos (cámara, fecha, ubicación, etc.) o una copia más pequeña según su lado largo (1080, 1920 o un número de píxeles personalizado); el menú añade también Editar con otra aplicación
+* `Función` Mostrar ubicación (Ajustes > Visor): los detalles muestran las coordenadas del lugar donde se tomó una foto, con Abrir en el mapa; mientras está activado, al guardar desde el editor, el convertidor y la conversión por lotes se ofrece Conservar la ubicación
+* `Función` Detalles ampliados (Ajustes > Visor): los detalles elegidos se muestran como texto en la parte inferior del visor y se ocultan con los botones: ruta, resolución, tamaño del archivo, fecha de captura, fecha de modificación, cámara, obturador y apertura, distancia focal, ISO y ubicación
+* `Función` Gestos del visor (Ajustes > Visor): Zoom con un dedo (toque dos veces, mantenga el dedo y arrastre hacia arriba o hacia abajo), al tocar dos veces ampliar a 2,5x o a píxeles reales, zoom máximo (5x, 10x o píxeles reales), tocar los bordes para pasar de página, deslizar hacia abajo para cerrar, deslizar a la izquierda para el brillo
+* `Función` Pantalla del visor (Ajustes > Visor): orientación de la pantalla (seguir el sistema, mantener la orientación al abrir, según la forma de la imagen), fondo negro, brillo máximo, ocultar las barras del sistema, mantener la pantalla encendida, tira de miniaturas, máxima calidad
+* `Función` Álbumes y cuadrícula (Ajustes > Álbumes y cuadrícula): columnas de álbumes y de imágenes (por separado en vertical y en horizontal), esquinas y espacio de las miniaturas, recortar miniaturas en cuadrado, etiquetas de tipo de archivo, número de imágenes, nombres de álbumes en una línea, reproducir miniaturas animadas y portadas de álbumes con la imagen más reciente o la más antigua; un álbum también puede tener la suya: seleccione una imagen del álbum y elija Más > Usar como portada del álbum
+* `Función` Tabletas, plegables y horizontal: en una ventana lo bastante ancha, la pantalla de inicio muestra los álbumes a la izquierda y el álbum abierto a la derecha; en horizontal, la tira de miniaturas del visor pasa al lado derecho; al plegar, desplegar, girar o usar la pantalla dividida, el álbum abierto se mantiene
+* `Función` Teclados y mandos a distancia: la imagen o el álbum con el foco en una cuadrícula tiene un contorno visible; en el visor, las flechas izquierda y derecha y Page Up / Page Down pasan de página; la tecla de borrar (Retroceso o Supr) elimina la imagen actual y, en una cuadrícula de imágenes, las seleccionadas o la que tiene el foco
+* `Corrección` En Android 11 y posteriores, deshacer una sobrescritura o una rotación guardada pedía dos veces la confirmación del sistema para la misma imagen
+* `Corrección` Al tocar dos veces y arrastrar para hacer zoom, la imagen saltaba primero a 2,5x antes de empezar el zoom
+* `Corrección` En Android 7, cambiar el nombre de un álbum dejaba en la lista un álbum con el nombre anterior cuyas imágenes no se podían abrir
+* `Mejora` Lectores de pantalla (TalkBack): cada imagen de una cuadrícula lee su nombre de archivo y su fecha; los títulos de los grupos de ajustes son encabezados para saltar entre ellos
+* `Mejora` El texto de la barra superior y de la parte inferior del visor es ahora blanco puro, así que se lee bien también sobre imágenes claras
+* `Mejora` Con Quitar animaciones activado en el sistema, los cambios de página con teclas y las transiciones de la presentación en el visor tampoco se animan
+* `Mejora` El tamaño de la caché de miniaturas sigue el espacio libre del teléfono (menor cuando queda poco espacio, como máximo 250 MB); cuando falta memoria o la aplicación lleva un rato en segundo plano, la galería libera la memoria que ocupa
+
 ## v3.2.0
 
 ###### 2026/10/15

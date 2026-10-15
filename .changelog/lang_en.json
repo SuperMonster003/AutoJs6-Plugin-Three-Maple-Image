@@ -5,6 +5,36 @@
   "changelog_label_improvement": "Improved",
   "changelog_label_dependency": "Dependency",
   "$data": {
+    "v3.3.0": {
+      "released_date": "2026/10/15",
+      "hint": [
+        "The settings are regrouped into Appearance, Albums and grid, Viewer, Editing and output, Media management, Storage and About; your existing choices are kept",
+        "Location is still hidden by default and still removed when saving; turn on Settings > Viewer > Show location when you need it"
+      ],
+      "feature": [
+        "Slideshow: viewer menu (top right) > Slideshow, with an interval (1 to 60 seconds), in order or random, play backwards, loop, include animated GIFs, and a transition (None, Fade, Slide); while it plays the buttons hide and the screen stays on, and a tap pauses it",
+        "Set as wallpaper: viewer menu > Set as wallpaper; a crop frame with the shape of the screen chooses what shows, on the Home screen, the Lock screen or Both",
+        "Share a copy: viewer menu > Share a copy shares a full-size copy without metadata (camera, date, location and so on) or a copy made smaller by its long edge (1080, 1920 or a custom number of pixels); the menu also adds Edit with another app",
+        "Show location (Settings > Viewer): the details show the coordinates of where a photo was taken, with Open in map; while it is on, saving from the editor, the converter and batch conversion offers Keep location",
+        "Extended details (Settings > Viewer): the chosen details show as text at the bottom of the viewer and hide with the buttons: path, resolution, file size, date taken, date modified, camera, shutter and aperture, focal length, ISO and location",
+        "Viewer gestures (Settings > Viewer): One-finger zoom (double tap, keep the finger down and drag up or down), double tap zooms to 2.5x or actual pixels, maximum zoom (5x, 10x or actual pixels), tap the edges to turn pages, swipe down to close, swipe on the left for brightness",
+        "Viewer display (Settings > Viewer): screen orientation (follow the system, keep the orientation it opened in, follow the image shape), black background, maximum brightness, hide the system bars, keep the screen on, thumbnail strip, highest quality",
+        "Albums and grid (Settings > Albums and grid): album and image columns (separately for portrait and landscape), thumbnail corners and spacing, crop thumbnails to squares, file type badges, image counts, album names on one line, play animated thumbnails, and album covers from the newest or the oldest image; an album can also have its own: select one image in it and choose More > Set as album cover",
+        "Tablets, foldables and landscape: in a wide enough window the home screen shows the albums on the left and the open album on the right; in landscape the viewer's thumbnail strip moves to the right side; folding, unfolding, rotating or split screen keeps the open album",
+        "Keyboards and remote controls: the focused image or album in a grid has a clear outline; in the viewer the left and right arrow keys and Page Up / Page Down turn pages; the delete key (Backspace or Delete) deletes the current image, and in an image grid the selected or the focused images"
+      ],
+      "fix": [
+        "On Android 11 and later, undoing an overwrite or a saved rotation asked for the system confirmation twice for the same image",
+        "Double tapping and dragging to zoom first jumped to 2.5x before zooming",
+        "On Android 7, renaming an album left an album with the old name in the list, whose images could not open"
+      ],
+      "improvement": [
+        "Screen readers (TalkBack): each image in a grid reads its file name and date; the settings group titles are headings to jump between",
+        "The text in the viewer's top bar and at its bottom is now pure white, so it stays readable over bright images",
+        "With Remove animations turned on in the system, page turns by key and slideshow transitions in the viewer no longer animate either",
+        "The thumbnail cache size follows the phone's free space (smaller when space is low, at most 250 MB); when memory runs low or the app has been in the background for a while, the gallery releases the memory it holds"
+      ]
+    },
     "v3.2.0": {
       "released_date": "2026/10/15",
       "hint": [

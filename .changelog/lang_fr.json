@@ -5,6 +5,36 @@
   "changelog_label_improvement": "Amélioration",
   "changelog_label_dependency": "Dépendance",
   "$data": {
+    "v3.3.0": {
+      "released_date": "2026/10/15",
+      "hint": [
+        "Les paramètres sont regroupés en Apparence, Albums et grille, Visionneuse, Édition et sortie, Gestion des médias, Stockage et À propos; vos choix actuels sont conservés",
+        "La position reste masquée par défaut et toujours retirée à l'enregistrement; activez Paramètres > Visionneuse > Afficher la position si vous en avez besoin"
+      ],
+      "feature": [
+        "Diaporama: menu de la visionneuse (en haut à droite) > Diaporama, avec un intervalle (de 1 à 60 secondes), dans l'ordre ou aléatoire, lecture à l'envers, en boucle, GIF animés inclus ou non, et une transition (Aucune, Fondu, Glisser); pendant la lecture, les boutons se masquent et l'écran reste allumé, et un toucher le met en pause",
+        "Définir comme fond d'écran: menu de la visionneuse > Définir comme fond d'écran; un cadre de recadrage à la forme de l'écran choisit ce qui s'affiche, sur l'Écran d'accueil, l'Écran de verrouillage ou Les deux",
+        "Partager une copie: menu de la visionneuse > Partager une copie partage une copie en taille réelle sans métadonnées (appareil photo, date, position, etc.) ou une copie réduite selon son grand côté (1080, 1920 ou un nombre de pixels personnalisé); le menu ajoute aussi Modifier avec une autre application",
+        "Afficher la position (Paramètres > Visionneuse): les détails montrent les coordonnées du lieu de prise de vue d'une photo, avec Ouvrir dans une carte; tant que l'option est active, l'enregistrement depuis l'éditeur, le convertisseur et la conversion par lots propose Conserver la position",
+        "Détails étendus (Paramètres > Visionneuse): les détails choisis s'affichent en texte en bas de la visionneuse et se masquent avec les boutons: chemin, résolution, taille du fichier, date de prise de vue, date de modification, appareil photo, vitesse et ouverture, focale, ISO et position",
+        "Gestes de la visionneuse (Paramètres > Visionneuse): Zoom à un doigt (double toucher, garder le doigt posé et glisser vers le haut ou le bas), le double toucher agrandit à 2,5x ou en pixels réels, zoom maximal (5x, 10x ou pixels réels), toucher les bords pour tourner les pages, balayer vers le bas pour fermer, balayer à gauche pour la luminosité",
+        "Affichage de la visionneuse (Paramètres > Visionneuse): orientation de l'écran (suivre le système, garder l'orientation d'ouverture, selon la forme de l'image), fond noir, luminosité maximale, masquer les barres système, garder l'écran allumé, bande de vignettes, qualité maximale",
+        "Albums et grille (Paramètres > Albums et grille): colonnes des albums et des images (séparément en portrait et en paysage), coins et espacement des vignettes, vignettes recadrées en carré, badges de type de fichier, nombre d'images, noms d'albums sur une ligne, vignettes animées, et couvertures d'albums avec l'image la plus récente ou la plus ancienne; un album peut aussi avoir la sienne: sélectionnez une image de l'album puis Plus > Définir comme couverture",
+        "Tablettes, pliables et paysage: dans une fenêtre assez large, l'accueil montre les albums à gauche et l'album ouvert à droite; en paysage, la bande de vignettes de la visionneuse passe sur le côté droit; plier, déplier, tourner l'appareil ou partager l'écran conserve l'album ouvert",
+        "Claviers et télécommandes: l'image ou l'album qui a le focus dans une grille a un contour bien visible; dans la visionneuse, les flèches gauche et droite et Page Up / Page Down tournent les pages; la touche d'effacement (Retour arrière ou Suppr) supprime l'image affichée et, dans une grille d'images, les images sélectionnées ou celle qui a le focus"
+      ],
+      "fix": [
+        "Sur Android 11 et versions ultérieures, annuler un remplacement ou une rotation enregistrée demandait deux fois la confirmation du système pour la même image",
+        "Le zoom par double toucher puis glissement sautait d'abord à 2,5x avant de zoomer",
+        "Sous Android 7, renommer un album laissait dans la liste un album à l'ancien nom dont les images ne s'ouvraient pas"
+      ],
+      "improvement": [
+        "Lecteurs d'écran (TalkBack): chaque image d'une grille annonce son nom de fichier et sa date; les titres des groupes de paramètres sont des en-têtes entre lesquels on peut sauter",
+        "Le texte de la barre supérieure et du bas de la visionneuse est désormais blanc pur, donc lisible aussi sur des images claires",
+        "Avec Supprimer les animations activé dans le système, les changements de page au clavier et les transitions du diaporama dans la visionneuse ne sont plus animés non plus",
+        "La taille du cache des vignettes suit l'espace libre du téléphone (plus petite quand il reste peu de place, 250 Mo au plus); quand la mémoire manque ou que l'application est en arrière-plan depuis un moment, la galerie libère la mémoire qu'elle occupe"
+      ]
+    },
     "v3.2.0": {
       "released_date": "2026/10/15",
       "hint": [
