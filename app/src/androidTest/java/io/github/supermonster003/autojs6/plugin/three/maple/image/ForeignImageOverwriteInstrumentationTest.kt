@@ -58,6 +58,7 @@ class ForeignImageOverwriteInstrumentationTest {
 
     @Before fun setUp() {
         assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        TestScreen.awake()
         scenario = ActivityScenario.launch(ComponentActivity::class.java)
         scenario.onActivity { coordinator = MediaWriteCoordinator(it) }
     }
@@ -81,8 +82,7 @@ class ForeignImageOverwriteInstrumentationTest {
         edited.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
 
         val write = CoroutineScope(Dispatchers.Main).async { coordinator.overwrite(uri) { edited.inputStream() } }
-        val allow = device.wait(Until.findObject(By.text(Pattern.compile("(?i)allow|允许"))), CONFIRMATION_TIMEOUT)
-        requireNotNull(allow) { "No write confirmation appeared" }.click()
+        awaitConfirmation().click()
         assertEquals(1, withTimeout(CONFIRMATION_TIMEOUT) { write.await() }.succeeded)
 
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -102,9 +102,7 @@ class ForeignImageOverwriteInstrumentationTest {
         edited.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
 
         val write = CoroutineScope(Dispatchers.Main).async { coordinator.overwrite(uri) { edited.inputStream() } }
-        requireNotNull(device.wait(Until.findObject(By.text(Pattern.compile("(?i)allow|允许"))), CONFIRMATION_TIMEOUT)) {
-            "No write confirmation appeared"
-        }.click()
+        awaitConfirmation().click()
         assertEquals(1, withTimeout(CONFIRMATION_TIMEOUT) { write.await() }.succeeded)
 
         // The undo writes the original back under the grant the first confirmation left (ROADMAP 9.0).
@@ -115,6 +113,10 @@ class ForeignImageOverwriteInstrumentationTest {
         assertEquals("the undo asked for a second confirmation", null, asked)
         val restored = context.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
         assertTrue(restored.contentEquals(original.readBytes()))
+    }
+
+    private fun awaitConfirmation() = requireNotNull(device.wait(Until.findObject(By.text(Pattern.compile("(?i)allow|允许"))), CONFIRMATION_TIMEOUT)) {
+        "No write confirmation appeared; ${TestScreen.summary()}"
     }
 
     private fun shell(command: String) {

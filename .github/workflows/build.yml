@@ -74,4 +74,9 @@ jobs:
           arch: x86_64
           profile: pixel_7
           disable-animations: true
-          script: bash ./gradlew --max-workers=2 -Pautojs.gradle.build.number.auto.increment.enabled=false -Pautojs.gradle.build.time.update.enabled=false :app:connectedDebugAndroidTest --stacktrace
+          # The screen must stay lit and unlocked: system confirmations need it, and Glide pauses for a stopped activity.
+          script: |
+            adb shell svc power stayon true
+            adb shell settings put system screen_off_timeout 2147483647
+            adb shell wm dismiss-keyguard
+            bash ./gradlew --max-workers=2 -Pautojs.gradle.build.number.auto.increment.enabled=false -Pautojs.gradle.build.time.update.enabled=false :app:connectedDebugAndroidTest --stacktrace

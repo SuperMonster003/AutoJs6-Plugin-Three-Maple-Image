@@ -51,6 +51,7 @@ class GalleryOverwriteInstrumentationTest {
     private val folder = "MapleGalleryOverwrite${System.currentTimeMillis()}"
 
     @Before fun markPermissionAsked() {
+        TestScreen.awake()
         MediaPermissionRecordStore(context).markRequested()
     }
 
