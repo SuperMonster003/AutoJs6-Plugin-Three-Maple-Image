@@ -8,6 +8,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
@@ -27,7 +29,9 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeFalse
+import org.junit.Assume.assumeTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CopyOnWriteArrayList
@@ -45,6 +49,12 @@ class GalleryPickerPermissionInstrumentationTest {
     private val instrumentation get() = InstrumentationRegistry.getInstrumentation()
     private val context get() = instrumentation.targetContext
     private val device by lazy { UiDevice.getInstance(instrumentation) }
+
+    @get:Rule
+    val compose = createEmptyComposeRule()
+
+    private fun bannerShown(): Boolean =
+        runCatching { compose.onAllNodes(hasTestTag("maple.pick.banner")).fetchSemanticsNodes().isNotEmpty() }.getOrDefault(false)
     private var connection: ServiceConnection? = null
     private lateinit var plugin: IGalleryPlugin
 
@@ -104,6 +114,31 @@ class GalleryPickerPermissionInstrumentationTest {
             found = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED).any { it is GalleryPickerActivity }
         }
         return found
+    }
+
+    /**
+     * Android 14+ partial access (only `READ_MEDIA_VISUAL_USER_SELECTED`, granted beforehand with `pm grant`): the
+     * picker lists without asking, offers to manage the selection, and leaving it is a plain cancel.
+     */
+    @Test fun aPickerWithPartialAccessListsWithoutAskingAndLeavingCancels() {
+        assumeTrue("Android 14 or later", Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+        val granted = { permission: String -> context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED }
+        assumeTrue("partial access only", granted("android.permission.READ_MEDIA_VISUAL_USER_SELECTED") && !granted(MediaPermissionPolicy.readPermission(Build.VERSION.SDK_INT)))
+        val recorder = Recorder()
+        val session = plugin.openPicker(Bundle().apply { putInt(GalleryContract.KEY_CONTRACT_VERSION, GalleryContract.CONTRACT_VERSION) }, recorder)
+        context.startActivity(
+            Intent(GalleryActions.SESSION_ACTIVITY_ACTION)
+                .setComponent(ComponentName(context, GallerySessionActivity::class.java))
+                .putExtra(GalleryActions.EXTRA_SESSION_TOKEN, session.state.getString(GalleryContract.KEY_SESSION_TOKEN))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+        )
+        recorder.await(GalleryContract.EVENT_OPEN)
+        compose.waitUntil(10_000) { bannerShown() || permissionDialogOnTop() }
+        assertTrue("partial access must not ask again", !permissionDialogOnTop())
+        assertTrue("the partial access banner is shown", bannerShown())
+        device.pressBack()
+        assertEquals(GalleryContract.REASON_USER, recorder.await(GalleryContract.EVENT_CLOSE).getString(GalleryContract.KEY_REASON))
+        assertTrue("leaving is not an error", recorder.events.none { it.getString(GalleryContract.KEY_EVENT) == GalleryContract.EVENT_ERROR })
     }
 
     @Test fun aRefusedPickerAnswersPermissionRequired() {
