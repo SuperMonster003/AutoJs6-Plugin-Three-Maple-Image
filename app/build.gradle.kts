@@ -167,6 +167,8 @@ dependencies {
     debugImplementation(libs.compose.ui.test.manifest)
     // ROADMAP T3: Glide stays the single image pipeline; its Compose integration drives grids and thumbnail strips.
     implementation(libs.glide.compose)
+    // The app's Glide module (thumbnail disk cache sized by free space, ROADMAP 9.4).
+    ksp(libs.glide.ksp)
     implementation(libs.navigation.compose)
     // ROADMAP T8: favorites, excluded / pinned folders and the API 24-29 recycle bin index.
     implementation(libs.room.runtime)

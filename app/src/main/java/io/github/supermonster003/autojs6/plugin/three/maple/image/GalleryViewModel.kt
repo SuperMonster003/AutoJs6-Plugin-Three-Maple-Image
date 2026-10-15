@@ -1,6 +1,8 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.app.Application
+import android.content.ComponentCallbacks2
+import android.content.res.Configuration
 import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -162,7 +164,26 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
     private var visible = false
     private var stale = false
 
+    /**
+     * Under memory pressure the library scan and folder listings are dropped (ROADMAP 9.4); the shown lists stay,
+     * the next page or reload scans again.
+     */
+    private val memoryCallbacks = object : ComponentCallbacks2 {
+        override fun onTrimMemory(level: Int) {
+            if (!MemoryTrimPolicy.releasesCaches(level)) return
+            media.invalidate()
+            folderRepository.invalidateCache()
+            favoriteOrder = null
+        }
+
+        override fun onConfigurationChanged(newConfig: Configuration) = Unit
+
+        @Deprecated("Deprecated in Java")
+        override fun onLowMemory() = onTrimMemory(ComponentCallbacks2.TRIM_MEMORY_COMPLETE)
+    }
+
     init {
+        application.registerComponentCallbacks(memoryCallbacks)
         viewModelScope.launch {
             media.changes().collect {
                 folderRepository.invalidateCache()
@@ -237,6 +258,11 @@ internal class GalleryViewModel(application: Application) : AndroidViewModel(app
             stale = false
             reloadAfterChange()
         }
+    }
+
+    override fun onCleared() {
+        getApplication<Application>().unregisterComponentCallbacks(memoryCallbacks)
+        super.onCleared()
     }
 
     private fun reloadAfterChange() {
