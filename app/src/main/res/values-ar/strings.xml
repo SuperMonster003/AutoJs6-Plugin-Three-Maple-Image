@@ -365,7 +365,10 @@
     <string name="settings_extended_details_title">تفاصيل موسعة</string>
     <string name="settings_recycle_bin_summary">تحفظ الصور المحذوفة 30 يوما ويمكن استعادتها; عند الإيقاف يكون الحذف نهائيا</string>
     <string name="settings_recycle_bin_title">سلة المحذوفات</string>
+    <string name="settings_section_about">حول</string>
+    <string name="settings_section_edit_output">التحرير والإخراج</string>
     <string name="settings_section_grid">الألبومات والشبكة</string>
+    <string name="settings_section_media_management">إدارة الوسائط</string>
     <string name="settings_show_location_summary">يعرض في التفاصيل إحداثيات مكان الالتقاط ويفتحها في الخريطة, ويتيح عند الحفظ والتحويل الاحتفاظ بالموقع</string>
     <string name="settings_show_location_title">إظهار الموقع</string>
     <string name="settings_sync_favorites_summary">يضع علامة المفضلة في مكتبة وسائط النظام أيضا لتراها تطبيقات المعرض الأخرى; عند التشغيل تستورد المفضلة الموجودة</string>
@@ -439,7 +442,6 @@
     <string name="standalone_settings_language">اللغة</string>
     <string name="standalone_settings_saved">تم حفظ إعدادات التطبيق</string>
     <string name="standalone_settings_section_appearance">المظهر</string>
-    <string name="standalone_settings_section_information">المعلومات</string>
     <string name="standalone_settings_section_storage">التخزين</string>
     <string name="standalone_settings_section_viewer">العارض</string>
     <string name="standalone_settings_theme_color">لون السمة</string>

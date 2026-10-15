@@ -365,7 +365,10 @@
     <string name="settings_extended_details_title">扩展详情</string>
     <string name="settings_recycle_bin_summary">删除的照片保留 30 天, 期间可以恢复; 关闭后删除即永久删除</string>
     <string name="settings_recycle_bin_title">回收站</string>
+    <string name="settings_section_about">关于</string>
+    <string name="settings_section_edit_output">编辑与输出</string>
     <string name="settings_section_grid">相册与网格</string>
+    <string name="settings_section_media_management">媒体管理</string>
     <string name="settings_show_location_summary">在详情中显示拍摄地点的坐标, 可在地图中打开; 保存和转换时可选择保留位置</string>
     <string name="settings_show_location_title">显示位置信息</string>
     <string name="settings_sync_favorites_summary">同时在系统媒体库中标记收藏, 其他图库应用也能看到; 开启时导入系统中已有的收藏</string>
@@ -439,7 +442,6 @@
     <string name="standalone_settings_language">语言</string>
     <string name="standalone_settings_saved">应用设置已保存</string>
     <string name="standalone_settings_section_appearance">外观</string>
-    <string name="standalone_settings_section_information">信息</string>
     <string name="standalone_settings_section_storage">存储</string>
     <string name="standalone_settings_section_viewer">查看器</string>
     <string name="standalone_settings_theme_color">主题色</string>

@@ -1,5 +1,9 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -10,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -36,6 +41,34 @@ class AppSettingsComposeInstrumentationTest {
             R.string.standalone_release_history_title, R.string.standalone_about_title,
         )) {
             compose.onNodeWithText(context.getString(resource)).performScrollTo().assertIsDisplayed()
+        }
+    }
+
+    /** ROADMAP 9.2: the groups follow the agreed order, and a screen reader can jump between them as headings. */
+    @Test fun theGroupsComeInTheAgreedOrderAsHeadings() {
+        val headings = compose.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)).fetchSemanticsNodes()
+            .sortedBy { it.positionInRoot.y }
+            .map { it.config[SemanticsProperties.Text].joinToString() }
+        val expected = listOf(
+            R.string.standalone_settings_section_appearance, R.string.settings_section_grid, R.string.standalone_settings_section_viewer,
+            R.string.settings_section_edit_output, R.string.settings_section_media_management, R.string.standalone_settings_section_storage,
+            R.string.settings_section_about,
+        ).map(context::getString)
+        assertEquals(expected, headings)
+    }
+
+    /** Every row is one stop for a screen reader: its title read out, one tap (or toggle) to act, nothing nested. */
+    @Test fun everyRowIsOneScreenReaderStop() {
+        val rows = compose.onAllNodes(SemanticsMatcher("a settings row") { node ->
+            node.config.getOrNull(SemanticsProperties.TestTag)?.startsWith("maple.settings.") == true
+        }).fetchSemanticsNodes()
+        assertTrue("rows: ${rows.size}", rows.size >= 30)
+        for (row in rows) {
+            val tag = row.config[SemanticsProperties.TestTag]
+            val text = row.config.getOrNull(SemanticsProperties.Text).orEmpty().joinToString()
+            assertTrue("$tag reads its title", text.isNotBlank())
+            assertTrue("$tag acts on a tap", row.config.contains(SemanticsActions.OnClick))
+            assertTrue("$tag is one merged stop", row.config.isMergingSemanticsOfDescendants)
         }
     }
 

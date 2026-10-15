@@ -365,7 +365,10 @@
     <string name="settings_extended_details_title">Extended details</string>
     <string name="settings_recycle_bin_summary">Deleted photos are kept for 30 days and can be restored; when off, deleting removes them for good</string>
     <string name="settings_recycle_bin_title">Recycle bin</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_section_edit_output">Editing and output</string>
     <string name="settings_section_grid">Albums and grid</string>
+    <string name="settings_section_media_management">Media management</string>
     <string name="settings_show_location_summary">Show where a photo was taken in its details and open it in a map; saving and converting can then keep the location</string>
     <string name="settings_show_location_title">Show location</string>
     <string name="settings_sync_favorites_summary">Also marks favorites in the system media library so other gallery apps see them; turning it on imports the favorites already there</string>
@@ -439,7 +442,6 @@
     <string name="standalone_settings_language">Language</string>
     <string name="standalone_settings_saved">Application settings saved</string>
     <string name="standalone_settings_section_appearance">Appearance</string>
-    <string name="standalone_settings_section_information">Information</string>
     <string name="standalone_settings_section_storage">Storage</string>
     <string name="standalone_settings_section_viewer">Viewer</string>
     <string name="standalone_settings_theme_color">Theme color</string>

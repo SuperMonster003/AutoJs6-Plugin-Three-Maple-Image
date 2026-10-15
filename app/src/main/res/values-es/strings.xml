@@ -365,7 +365,10 @@
     <string name="settings_extended_details_title">Detalles ampliados</string>
     <string name="settings_recycle_bin_summary">Las fotos eliminadas se guardan 30 días y se pueden restaurar; desactivada, eliminar es definitivo</string>
     <string name="settings_recycle_bin_title">Papelera</string>
+    <string name="settings_section_about">Acerca de</string>
+    <string name="settings_section_edit_output">Edición y salida</string>
     <string name="settings_section_grid">Álbumes y cuadrícula</string>
+    <string name="settings_section_media_management">Gestión de medios</string>
     <string name="settings_show_location_summary">Muestra en los detalles las coordenadas del lugar de la foto y las abre en un mapa; al guardar y convertir se puede conservar la ubicación</string>
     <string name="settings_show_location_title">Mostrar ubicación</string>
     <string name="settings_sync_favorites_summary">También marca los favoritos en la biblioteca multimedia del sistema para que otras galerías los vean; al activarlo se importan los favoritos existentes</string>
@@ -439,7 +442,6 @@
     <string name="standalone_settings_language">Idioma</string>
     <string name="standalone_settings_saved">Ajustes de la aplicación guardados</string>
     <string name="standalone_settings_section_appearance">Apariencia</string>
-    <string name="standalone_settings_section_information">Información</string>
     <string name="standalone_settings_section_storage">Almacenamiento</string>
     <string name="standalone_settings_section_viewer">Visor</string>
     <string name="standalone_settings_theme_color">Color del tema</string>

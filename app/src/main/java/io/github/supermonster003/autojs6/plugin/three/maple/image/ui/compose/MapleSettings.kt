@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
@@ -40,7 +41,7 @@ internal object MapleSettingsDefaults {
     const val CHEVRON_ALPHA = 0.6f
 }
 
-/** Group title: 14 sp medium, secondary text color, 24 / 8 dp vertical padding. */
+/** Group title: 14 sp medium, secondary text color, 24 / 8 dp vertical padding; a heading for screen readers. */
 @Composable
 internal fun MapleSectionHeader(title: String, modifier: Modifier = Modifier) {
     Text(
@@ -48,6 +49,7 @@ internal fun MapleSectionHeader(title: String, modifier: Modifier = Modifier) {
         style = MaterialTheme.typography.labelLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier
+            .semantics { heading() }
             .fillMaxWidth()
             .padding(
                 start = MapleSettingsDefaults.horizontalPadding,

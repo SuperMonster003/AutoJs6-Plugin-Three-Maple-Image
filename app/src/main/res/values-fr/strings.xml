@@ -365,7 +365,10 @@
     <string name="settings_extended_details_title">Détails étendus</string>
     <string name="settings_recycle_bin_summary">Les photos supprimées sont conservées 30 jours et peuvent être restaurées; désactivée, la suppression est définitive</string>
     <string name="settings_recycle_bin_title">Corbeille</string>
+    <string name="settings_section_about">À propos</string>
+    <string name="settings_section_edit_output">Édition et sortie</string>
     <string name="settings_section_grid">Albums et grille</string>
+    <string name="settings_section_media_management">Gestion des médias</string>
     <string name="settings_show_location_summary">Affiche dans les détails les coordonnées du lieu de prise de vue et les ouvre dans une carte; l\'enregistrement et la conversion peuvent alors conserver la position</string>
     <string name="settings_show_location_title">Afficher la position</string>
     <string name="settings_sync_favorites_summary">Marque aussi les favoris dans la médiathèque du système pour que les autres galeries les voient; l\'activation importe les favoris existants</string>
@@ -439,7 +442,6 @@
     <string name="standalone_settings_language">Langue</string>
     <string name="standalone_settings_saved">Paramètres de l\'application enregistrés</string>
     <string name="standalone_settings_section_appearance">Apparence</string>
-    <string name="standalone_settings_section_information">Informations</string>
     <string name="standalone_settings_section_storage">Stockage</string>
     <string name="standalone_settings_section_viewer">Visionneuse</string>
     <string name="standalone_settings_theme_color">Couleur du thème</string>

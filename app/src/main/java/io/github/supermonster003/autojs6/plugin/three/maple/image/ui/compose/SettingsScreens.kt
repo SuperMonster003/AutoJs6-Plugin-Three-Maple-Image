@@ -51,7 +51,10 @@ internal enum class GridChoice {
     ALBUM_COLUMNS_PORTRAIT, ALBUM_COLUMNS_LANDSCAPE, MEDIA_COLUMNS_PORTRAIT, MEDIA_COLUMNS_LANDSCAPE, CORNERS, SPACING, COVER,
 }
 
-/** Settings page: the appearance group first, then the information group (design draft 7.2). */
+/**
+ * Settings page (design draft 7.2, ROADMAP 9.2): appearance (the four rows first), albums and grid, viewer, editing
+ * and output, media management, storage, about.
+ */
 @Composable
 internal fun SettingsScreen(
     summaries: SettingsSummaries,
@@ -128,14 +131,6 @@ internal fun SettingsScreen(
                 checked = viewer.rotationGesture,
                 onToggle = { onViewerChange(viewer.copy(rotationGesture = it)) },
                 modifier = Modifier.testTag("maple.settings.viewerRotation"),
-            )
-            MapleSwitchRow(
-                title = stringResource(R.string.viewer_rotation_save_title),
-                summary = stringResource(R.string.viewer_rotation_save_summary),
-                iconResource = R.drawable.ic_save_24,
-                checked = viewer.rotationSave,
-                onToggle = { onViewerChange(viewer.copy(rotationSave = it)) },
-                modifier = Modifier.testTag("maple.settings.viewerRotationSave"),
             )
             MapleSwitchRow(
                 title = stringResource(R.string.viewer_one_finger_zoom_title),
@@ -262,14 +257,16 @@ internal fun SettingsScreen(
                 enabled = extendedDetails,
                 modifier = Modifier.testTag("maple.settings.extendedDetailFields"),
             )
-            MapleSectionHeader(stringResource(R.string.standalone_settings_section_storage))
-            MapleSettingsRow(
-                title = stringResource(R.string.storage_permission_title),
-                summary = stringResource(R.string.storage_permission_summary),
-                iconResource = R.drawable.ic_folder_24,
-                onClick = onStoragePermission,
-                modifier = Modifier.testTag("maple.settings.storage"),
+            MapleSectionHeader(stringResource(R.string.settings_section_edit_output))
+            MapleSwitchRow(
+                title = stringResource(R.string.viewer_rotation_save_title),
+                summary = stringResource(R.string.viewer_rotation_save_summary),
+                iconResource = R.drawable.ic_save_24,
+                checked = viewer.rotationSave,
+                onToggle = { onViewerChange(viewer.copy(rotationSave = it)) },
+                modifier = Modifier.testTag("maple.settings.viewerRotationSave"),
             )
+            MapleSectionHeader(stringResource(R.string.settings_section_media_management))
             MapleSettingsRow(
                 title = stringResource(R.string.excluded_folders_title),
                 summary = stringResource(R.string.excluded_folders_row_summary),
@@ -302,7 +299,15 @@ internal fun SettingsScreen(
                     modifier = Modifier.testTag("maple.settings.syncFavorites"),
                 )
             }
-            MapleSectionHeader(stringResource(R.string.standalone_settings_section_information))
+            MapleSectionHeader(stringResource(R.string.standalone_settings_section_storage))
+            MapleSettingsRow(
+                title = stringResource(R.string.storage_permission_title),
+                summary = stringResource(R.string.storage_permission_summary),
+                iconResource = R.drawable.ic_folder_24,
+                onClick = onStoragePermission,
+                modifier = Modifier.testTag("maple.settings.storage"),
+            )
+            MapleSectionHeader(stringResource(R.string.settings_section_about))
             MapleSettingsRow(
                 title = stringResource(R.string.standalone_release_history_title),
                 summary = stringResource(R.string.standalone_update_release_history_summary),

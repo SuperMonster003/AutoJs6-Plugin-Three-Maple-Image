@@ -365,7 +365,10 @@
     <string name="settings_extended_details_title">詳細情報の表示</string>
     <string name="settings_recycle_bin_summary">削除した写真は 30 日間保管され, 復元できます. オフにすると削除は完全削除になります</string>
     <string name="settings_recycle_bin_title">ゴミ箱</string>
+    <string name="settings_section_about">情報</string>
+    <string name="settings_section_edit_output">編集と出力</string>
     <string name="settings_section_grid">アルバムとグリッド</string>
+    <string name="settings_section_media_management">メディアの管理</string>
     <string name="settings_show_location_summary">詳細に撮影場所の座標を表示し, 地図で開けます. 保存と変換では位置を残すかを選べます</string>
     <string name="settings_show_location_title">位置情報を表示</string>
     <string name="settings_sync_favorites_summary">システムのメディアライブラリにもお気に入りを記録し, 他のギャラリーアプリでも表示されます. オンにすると既存のお気に入りを取り込みます</string>
@@ -439,7 +442,6 @@
     <string name="standalone_settings_language">言語</string>
     <string name="standalone_settings_saved">アプリ設定を保存しました</string>
     <string name="standalone_settings_section_appearance">外観</string>
-    <string name="standalone_settings_section_information">情報</string>
     <string name="standalone_settings_section_storage">ストレージ</string>
     <string name="standalone_settings_section_viewer">ビューアー</string>
     <string name="standalone_settings_theme_color">テーマ色</string>

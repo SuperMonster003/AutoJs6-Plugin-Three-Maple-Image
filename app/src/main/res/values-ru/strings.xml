@@ -365,7 +365,10 @@
     <string name="settings_extended_details_title">Расширенные сведения</string>
     <string name="settings_recycle_bin_summary">Удалённые фото хранятся 30 дней, их можно восстановить; если выключено, удаление необратимо</string>
     <string name="settings_recycle_bin_title">Корзина</string>
+    <string name="settings_section_about">О приложении</string>
+    <string name="settings_section_edit_output">Редактирование и вывод</string>
     <string name="settings_section_grid">Альбомы и сетка</string>
+    <string name="settings_section_media_management">Управление медиа</string>
     <string name="settings_show_location_summary">Показывает в сведениях координаты места съёмки и открывает их на карте; при сохранении и преобразовании можно сохранить местоположение</string>
     <string name="settings_show_location_title">Показывать местоположение</string>
     <string name="settings_sync_favorites_summary">Избранное отмечается и в системной медиатеке, его видят другие галереи; при включении импортируется уже существующее избранное</string>
@@ -439,7 +442,6 @@
     <string name="standalone_settings_language">Язык</string>
     <string name="standalone_settings_saved">Настройки приложения сохранены</string>
     <string name="standalone_settings_section_appearance">Оформление</string>
-    <string name="standalone_settings_section_information">Информация</string>
     <string name="standalone_settings_section_storage">Хранилище</string>
     <string name="standalone_settings_section_viewer">Просмотр</string>
     <string name="standalone_settings_theme_color">Цвет темы</string>
