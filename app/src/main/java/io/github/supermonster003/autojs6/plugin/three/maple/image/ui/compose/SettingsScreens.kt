@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import io.github.supermonster003.autojs6.plugin.three.maple.image.AlbumCoverOrder
 import io.github.supermonster003.autojs6.plugin.three.maple.image.GridSettings
@@ -354,7 +355,7 @@ internal fun AboutScreen(versionName: String, onBack: () -> Unit, onSources: () 
             Spacer(Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleLarge.copy(textDirection = TextDirection.Content),
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
             )

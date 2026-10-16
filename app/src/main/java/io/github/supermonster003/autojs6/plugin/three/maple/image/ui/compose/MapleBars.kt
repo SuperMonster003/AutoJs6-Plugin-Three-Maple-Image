@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
@@ -78,7 +79,13 @@ internal fun MapleTopBar(
                 return@TopAppBar
             }
             Column {
-                Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                // Content direction: a Latin title (3-Maple Image, a file name) keeps its order in RTL locales.
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleLarge.copy(textDirection = TextDirection.Content),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
                 if (!subtitle.isNullOrEmpty()) {
                     Text(
                         subtitle,
