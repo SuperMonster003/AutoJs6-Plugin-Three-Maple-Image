@@ -5,6 +5,15 @@
   "changelog_label_improvement": "优化",
   "changelog_label_dependency": "依赖",
   "$data": {
+    "v3.4.1": {
+      "released_date": "2026/11/04",
+      "fix": [
+        "阿拉伯语界面标题中的 3-Maple Image 和文件名排列顺序错误的问题"
+      ],
+      "improvement": [
+        "发行历史条目支持键盘逐项聚焦, 屏幕阅读器可按完整版本朗读"
+      ]
+    },
     "v3.4.0": {
       "released_date": "2026/10/15",
       "hint": [

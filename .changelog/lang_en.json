@@ -5,6 +5,15 @@
   "changelog_label_improvement": "Improved",
   "changelog_label_dependency": "Dependency",
   "$data": {
+    "v3.4.1": {
+      "released_date": "2026/11/04",
+      "fix": [
+        "3-Maple Image and file names appeared in the wrong order in Arabic interface titles"
+      ],
+      "improvement": [
+        "Release history entries support keyboard focus and are read as complete versions by screen readers"
+      ]
+    },
     "v3.4.0": {
       "released_date": "2026/10/15",
       "hint": [

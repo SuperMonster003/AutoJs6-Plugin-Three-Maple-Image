@@ -4,6 +4,13 @@
 
 ******
 
+## v3.4.1
+
+###### 2026/11/04
+
+* `Fixed` 3-Maple Image and file names appeared in the wrong order in Arabic interface titles
+* `Improved` Release history entries support keyboard focus and are read as complete versions by screen readers
+
 ## v3.4.0
 
 ###### 2026/10/15

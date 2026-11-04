@@ -5,6 +5,15 @@
   "changelog_label_improvement": "改善",
   "changelog_label_dependency": "依存関係",
   "$data": {
+    "v3.4.1": {
+      "released_date": "2026/11/04",
+      "fix": [
+        "アラビア語の画面タイトルで 3-Maple Image とファイル名の表示順序が乱れる問題"
+      ],
+      "improvement": [
+        "リリース履歴の各項目にキーボードでフォーカスでき, スクリーンリーダーはバージョンごとにまとめて読み上げる"
+      ]
+    },
     "v3.4.0": {
       "released_date": "2026/10/15",
       "hint": [

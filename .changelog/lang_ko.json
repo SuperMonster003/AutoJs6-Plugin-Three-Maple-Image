@@ -5,6 +5,15 @@
   "changelog_label_improvement": "개선",
   "changelog_label_dependency": "의존성",
   "$data": {
+    "v3.4.1": {
+      "released_date": "2026/11/04",
+      "fix": [
+        "아랍어 인터페이스 제목에서 3-Maple Image와 파일 이름의 표시 순서가 잘못되는 문제"
+      ],
+      "improvement": [
+        "출시 기록의 각 항목에 키보드로 초점을 맞출 수 있으며 화면 읽기 프로그램이 버전별 내용을 함께 읽음"
+      ]
+    },
     "v3.4.0": {
       "released_date": "2026/10/15",
       "hint": [

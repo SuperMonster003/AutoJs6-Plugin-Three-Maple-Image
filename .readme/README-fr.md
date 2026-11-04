@@ -307,6 +307,13 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
+#### v3.4.1
+
+###### 2026/11/04
+
+* `Correctif` Ordre incorrect de 3-Maple Image et des noms de fichiers dans les titres de l'interface arabe
+* `Amélioration` Les entrées de l'historique des versions acceptent le focus clavier et sont lues par version complète par les lecteurs d'écran
+
 #### v3.4.0
 
 ###### 2026/10/15
@@ -341,27 +348,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 * `Amélioration` Le texte de la barre supérieure et du bas de la visionneuse est désormais blanc pur, donc lisible aussi sur des images claires
 * `Amélioration` Avec Supprimer les animations activé dans le système, les changements de page au clavier et les transitions du diaporama dans la visionneuse ne sont plus animés non plus
 * `Amélioration` La taille du cache des vignettes suit l'espace libre du téléphone (plus petite quand il reste peu de place, 250 Mo au plus); quand la mémoire manque ou que l'application est en arrière-plan depuis un moment, la galerie libère la mémoire qu'elle occupe
-
-#### v3.2.0
-
-###### 2026/10/15
-
-* `Note` Nécessite AutoJs6 6.8.0 (une version de développement du 2026-10-15 ou ultérieure, ou une version stable, avec un numéro de build de 5352 ou plus); les versions de développement antérieures également numérotées 5352 ne suffisent pas
-* `Note` Les hôtes sans protocole v24 ignorent toutes les actions du gestionnaire de fichiers de ce plugin, y compris l'affichage d'une image ou des images sélectionnées, la navigation dans un dossier comme album, l'édition, la conversion et la conversion par lots
-* `Note` Le remplacement de l'original peut être annulé une fois, depuis sa notification: lors d'une modification ou d'une conversion dans cette application, une sauvegarde de l'original est gardée jusqu'au remplacement suivant (les images de plus de 256 MiB préviennent d'abord que l'annulation est impossible); depuis le gestionnaire de fichiers AutoJs6, l'annulation reste possible pendant 8 secondes
-* `Fonctionnalité` Éditeur repensé: la barre du haut propose Annuler, Rétablir, Comparer (maintenez appuyé pour voir l'original) et Enregistrer; les outils sont regroupés en Transformer, Ajuster, Filtres, Dessiner, Annoter et Texte; le canevas se zoome à deux doigts et se fait glisser
-* `Fonctionnalité` Filtres: 14 (par exemple Mono, Sépia, Vintage, Pellicule, Délavé), avec une intensité réglable, combinables avec les réglages
-* `Fonctionnalité` Ajuster gagne Exposition, Teinte, Hautes lumières, Ombres, Netteté et Vignette
-* `Fonctionnalité` Transformer gagne Redimensionner: en pourcentage, selon le grand côté ou avec une largeur et une hauteur choisies (proportions verrouillables)
-* `Fonctionnalité` Annoter: rectangles, ellipses, flèches et lignes, tracés en faisant glisser sur l'image puis déplaçables et redimensionnables; rectangles et ellipses peuvent être en contour ou pleins
-* `Fonctionnalité` Appui long sur le canevas pour prélever une couleur: une loupe montre les pixels sous le doigt et la valeur de la couleur, qui devient celle du pinceau et des annotations au relâchement
-* `Fonctionnalité` L'enregistrement propose Remplacer l'original (désactivé par défaut) et Conserver les infos de prise de vue (appareil, date et réglages d'exposition; la position est toujours retirée), et affiche le nom du fichier qui sera enregistré
-* `Fonctionnalité` Les images pivotées peuvent être enregistrées depuis la visionneuse: un JPEG ne reçoit qu'une nouvelle balise d'orientation, sans recompression; PNG et WebP sont réencodés. Désactivable dans Paramètres > Visionneuse > Proposer d'enregistrer les rotations
-* `Fonctionnalité` Le convertisseur utilise le même écran de réglages que la conversion par lots et peut lui aussi remplacer l'original
-* `Fonctionnalité` Depuis le gestionnaire de fichiers AutoJs6: Modifier l'image et Convertir l'image peuvent remplacer l'original; Afficher l'image peut supprimer les images ouvertes ou sélectionnées, qui vont dans la Corbeille d'AutoJs6 et se récupèrent avec Annuler (les autres images du dossier atteintes en balayant ne peuvent pas être supprimées)
-* `Correctif` Absence des actions de modification et de conversion des images dans le menu "Plus" des fichiers image du gestionnaire de fichiers AutoJs6
-* `Correctif` Sur Android 15, renommer ou supprimer des images sur une carte de stockage demandait une confirmation du système, même pour les images enregistrées par cette application
-* `Correctif` Sur un téléphone en paysage, un panneau d'outil de l'éditeur (comme Pinceau) pouvait remplir l'écran et masquer l'image et le bouton OK; les panneaux occupent désormais au plus la moitié de l'écran et le reste défile
 
 ##### Historique complet
 

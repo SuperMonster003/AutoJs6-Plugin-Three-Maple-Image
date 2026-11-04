@@ -4,6 +4,13 @@
 
 ******
 
+## v3.4.1
+
+###### 2026/11/04
+
+* `Correctif` Ordre incorrect de 3-Maple Image et des noms de fichiers dans les titres de l'interface arabe
+* `Amélioration` Les entrées de l'historique des versions acceptent le focus clavier et sont lues par version complète par les lecteurs d'écran
+
 ## v3.4.0
 
 ###### 2026/10/15

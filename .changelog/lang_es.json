@@ -5,6 +5,15 @@
   "changelog_label_improvement": "Mejora",
   "changelog_label_dependency": "Dependencia",
   "$data": {
+    "v3.4.1": {
+      "released_date": "2026/11/04",
+      "fix": [
+        "Orden incorrecto de 3-Maple Image y los nombres de archivo en los títulos de la interfaz árabe"
+      ],
+      "improvement": [
+        "Las entradas del historial de versiones admiten el foco del teclado y los lectores de pantalla leen cada versión completa"
+      ]
+    },
     "v3.4.0": {
       "released_date": "2026/10/15",
       "hint": [
