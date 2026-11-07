@@ -307,6 +307,12 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v3.4.3
+
+###### 2026/11/07
+
+* `Corrección` En el administrador de archivos de AutoJs6, las opciones "Ver como álbum" y "Convertir imágenes" de este plugin ya no aparecen en inglés en los demás idiomas de la interfaz
+
 #### v3.4.2
 
 ###### 2026/11/07
@@ -319,17 +325,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 * `Corrección` Orden incorrecto de 3-Maple Image y los nombres de archivo en los títulos de la interfaz árabe
 * `Mejora` Las entradas del historial de versiones admiten el foco del teclado y los lectores de pantalla leen cada versión completa
-
-#### v3.4.0
-
-###### 2026/10/15
-
-* `Aviso` El objeto de script de AutoJs6 gallery requiere AutoJs6 6.8.0 (compilación 5439) o posterior; ver, editar y convertir desde el administrador de archivos siguen requiriendo solo la compilación 5352
-* `Aviso` Con gallery, un script solo trata archivos a los que él mismo puede acceder: AutoJs6 abre las imágenes y se las entrega al plugin, AutoJs6 escribe los resultados y una selección solo devuelve imágenes que el script puede leer
-* `Función` Seleccionar imágenes desde scripts: los scripts de AutoJs6 pueden llamar a gallery.pick para abrir el selector de 3-Maple Image y dejarle elegir una o varias imágenes (el script puede limitar la cantidad y los tipos de imagen); el script recibe la ruta, las dimensiones, el tamaño y la fecha de captura de cada imagen. Sin acceso a las fotos, el plugin se lo pide primero
-* `Función` Ver desde scripts: gallery.view abre en el visor de 3-Maple Image las imágenes que indica un script; el script sabe cuál está mirando y puede cerrar el visor
-* `Función` Editar desde scripts: gallery.edit abre una imagen en el editor de 3-Maple Image; cuando usted guarda, AutoJs6 escribe el resultado (por defecto junto al original como nombre_edited), y si sale sin guardar el script recibe null
-* `Función` Convertir desde scripts: gallery.convert convierte una imagen sin mostrar nada, con las opciones del convertidor (formato, calidad, tamaño, tamaño de archivo objetivo, color de fondo, conservar EXIF), por defecto junto al original como nombre_converted
 
 ##### Historial completo
 

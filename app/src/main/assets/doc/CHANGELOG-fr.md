@@ -4,6 +4,12 @@
 
 ******
 
+## v3.4.3
+
+###### 2026/11/07
+
+* `Correctif` Dans le gestionnaire de fichiers d'AutoJs6, les options "Afficher comme album" et "Convertir les images" de ce plugin ne s'affichent plus en anglais dans les autres langues de l'interface
+
 ## v3.4.2
 
 ###### 2026/11/07

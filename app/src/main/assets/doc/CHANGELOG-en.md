@@ -4,6 +4,12 @@
 
 ******
 
+## v3.4.3
+
+###### 2026/11/07
+
+* `Fixed` In the AutoJs6 file manager, the options "View as album" and "Convert images" of this plugin no longer appear in English in other interface languages
+
 ## v3.4.2
 
 ###### 2026/11/07

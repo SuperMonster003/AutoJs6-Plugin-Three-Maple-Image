@@ -4,6 +4,12 @@
 
 ******
 
+## v3.4.3
+
+###### 2026/11/07
+
+* `Corrección` En el administrador de archivos de AutoJs6, las opciones "Ver como álbum" y "Convertir imágenes" de este plugin ya no aparecen en inglés en los demás idiomas de la interfaz
+
 ## v3.4.2
 
 ###### 2026/11/07

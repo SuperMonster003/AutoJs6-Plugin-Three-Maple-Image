@@ -5,6 +5,12 @@
   "changelog_label_improvement": "Amélioration",
   "changelog_label_dependency": "Dépendance",
   "$data": {
+    "v3.4.3": {
+      "released_date": "2026/11/07",
+      "fix": [
+        "Dans le gestionnaire de fichiers d'AutoJs6, les options \"Afficher comme album\" et \"Convertir les images\" de ce plugin ne s'affichent plus en anglais dans les autres langues de l'interface"
+      ]
+    },
     "v3.4.2": {
       "released_date": "2026/11/07",
       "improvement": [
