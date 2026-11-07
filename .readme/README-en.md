@@ -180,7 +180,7 @@ It takes 4 steps from installation to your first image:
 1. Launch 3-Maple Image on its own to browse the device's albums (photo access is requested once on the first launch); the menu at the top right still opens a chosen image for viewing, editing or conversion and saves the result to a destination you pick.
 2. Open AutoJs6, enter the `Plugin center`, locate `3-Maple Image`, and enable it.
 3. In the AutoJs6 file manager, locate any supported image file (such as `screenshot.png`).
-4. Tap the file. The image opens in the dedicated viewer. Choose `View as album` in a folder's menu to see the images of that folder as a grid.
+4. Tap the file. The image opens in the dedicated viewer. Choose `View as album` in a folder's menu to see the images of that folder as a grid. From AutoJs6 6.8.1 this item is in the submenu `3-Maple Image`.
 
 Inside the viewer: at 1x, swipe left or right to move to the previous or next supported image in the same folder. Pinch to zoom around your fingers (1x to 5x), drag with one finger to pan, and double-tap to switch between fit-to-screen and a 2.5x zoom centered on the touch point. The current multiplier appears while pinching and briefly after a double-tap. Tap `Rotate` for a view-only quarter turn; an active zoom is preserved, while `Reset zoom` in the top-right menu restores both the original orientation and fitted size. Animated GIFs show a floating `Pause animation` / `Resume animation` button, while static images do not. Tapping the image hides or reveals the overlay bars, and `Details` opens a bottom sheet with the file facts and EXIF fields. `Share` and `Open with` are available on the originally opened image; they are disabled on session-only sibling pages because those pages intentionally have no transferable content URI. Images opened from the standalone home or from another app also offer `Edit`, which opens the editor and lets you save the result; host entries and sibling pages do not. For images opened from an album, the heart in the top bar favorites the current image, `Delete` in the bottom bar moves it to the recycle bin (with undo), and `Open with`, `Rename`, `Move` and `Copy` are in the top-right menu. When the original can be written back, the bar shown after rotating offers `Save`. From AutoJs6, the image opened by tapping and every image of an opened selection show `Delete` in the bottom bar (moves it to the AutoJs6 Trash, with undo), and `Open with` moves to the top-right menu. The top-right menu also offers `Slideshow`, `Set as wallpaper`, `Share a copy` and `Edit with another app` (when the current image can be handed to other apps); gestures and display options are in `Settings` > `Viewer`.
 
@@ -226,7 +226,7 @@ Deleted images go to the recycle bin first and can be restored from `Recycle bin
 
 **The file menu does not show `Edit image` and `Convert image`?**
 
-Check the following in order: the AutoJs6 version code is at least 5352; the plugin is enabled in the `Plugin center`; and the file extension or MIME type is in the supported list. If any of the three fails, the menu actions will not appear. Since 3.2.0 the plugin declares explorer-action protocol 24; an AutoJs6 that does not support it ignores all of the plugin's menu actions (including `View image` and `View as album`), so update AutoJs6. Editing and converting from the gallery and the standalone home screen are not affected. In 3.1.2 and earlier an omission kept these two actions hidden even when all three conditions were met; update to 3.2.0.
+From AutoJs6 6.8.1 the two items are in the submenu `3-Maple Image` of the file menu. Check the following in order: the AutoJs6 version code is at least 5352; the plugin is enabled in the `Plugin center`; and the file extension or MIME type is in the supported list. If any of the three fails, the menu actions will not appear. Since 3.2.0 the plugin declares explorer-action protocol 24; an AutoJs6 that does not support it ignores all of the plugin's menu actions (including `View image` and `View as album`), so update AutoJs6. Editing and converting from the gallery and the standalone home screen are not affected. In 3.1.2 and earlier an omission kept these two actions hidden even when all three conditions were met; update to 3.2.0.
 
 **Opening fails with `Unable to read image information` or the screen flashes and closes?**
 
@@ -307,6 +307,12 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v3.4.2
+
+###### 2026/11/07
+
+* `Improved` The AutoJs6 file manager groups the menu options of this plugin under the submenu "3-Maple Image", named as in the Plugin Center (requires AutoJs6 6.8.1 or later)
+
 #### v3.4.1
 
 ###### 2026/11/04
@@ -324,30 +330,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 * `Added` View from scripts: gallery.view opens the images a script names in the 3-Maple Image viewer; the script learns which one you are looking at and can close the viewer
 * `Added` Edit from scripts: gallery.edit opens an image in the 3-Maple Image editor; after you save, AutoJs6 writes the result (by default next to the original as name_edited), and leaving without saving gives the script null
 * `Added` Convert from scripts: gallery.convert converts an image without showing anything, with the converter's options (format, quality, size, target file size, background color, keep EXIF), by default next to the original as name_converted
-
-#### v3.3.0
-
-###### 2026/10/15
-
-* `Hint` The settings are regrouped into Appearance, Albums and grid, Viewer, Editing and output, Media management, Storage and About; your existing choices are kept
-* `Hint` Location is still hidden by default and still removed when saving; turn on Settings > Viewer > Show location when you need it
-* `Added` Slideshow: viewer menu (top right) > Slideshow, with an interval (1 to 60 seconds), in order or random, play backwards, loop, include animated GIFs, and a transition (None, Fade, Slide); while it plays the buttons hide and the screen stays on, and a tap pauses it
-* `Added` Set as wallpaper: viewer menu > Set as wallpaper; a crop frame with the shape of the screen chooses what shows, on the Home screen, the Lock screen or Both
-* `Added` Share a copy: viewer menu > Share a copy shares a full-size copy without metadata (camera, date, location and so on) or a copy made smaller by its long edge (1080, 1920 or a custom number of pixels); the menu also adds Edit with another app
-* `Added` Show location (Settings > Viewer): the details show the coordinates of where a photo was taken, with Open in map; while it is on, saving from the editor, the converter and batch conversion offers Keep location
-* `Added` Extended details (Settings > Viewer): the chosen details show as text at the bottom of the viewer and hide with the buttons: path, resolution, file size, date taken, date modified, camera, shutter and aperture, focal length, ISO and location
-* `Added` Viewer gestures (Settings > Viewer): One-finger zoom (double tap, keep the finger down and drag up or down), double tap zooms to 2.5x or actual pixels, maximum zoom (5x, 10x or actual pixels), tap the edges to turn pages, swipe down to close, swipe on the left for brightness
-* `Added` Viewer display (Settings > Viewer): screen orientation (follow the system, keep the orientation it opened in, follow the image shape), black background, maximum brightness, hide the system bars, keep the screen on, thumbnail strip, highest quality
-* `Added` Albums and grid (Settings > Albums and grid): album and image columns (separately for portrait and landscape), thumbnail corners and spacing, crop thumbnails to squares, file type badges, image counts, album names on one line, play animated thumbnails, and album covers from the newest or the oldest image; an album can also have its own: select one image in it and choose More > Set as album cover
-* `Added` Tablets, foldables and landscape: in a wide enough window the home screen shows the albums on the left and the open album on the right; in landscape the viewer's thumbnail strip moves to the right side; folding, unfolding, rotating or split screen keeps the open album
-* `Added` Keyboards and remote controls: the focused image or album in a grid has a clear outline; in the viewer the left and right arrow keys and Page Up / Page Down turn pages; the delete key (Backspace or Delete) deletes the current image, and in an image grid the selected or the focused images
-* `Fixed` On Android 11 and later, undoing an overwrite or a saved rotation asked for the system confirmation twice for the same image
-* `Fixed` Double tapping and dragging to zoom first jumped to 2.5x before zooming
-* `Fixed` On Android 7, renaming an album left an album with the old name in the list, whose images could not open
-* `Improved` Screen readers (TalkBack): each image in a grid reads its file name and date; the settings group titles are headings to jump between
-* `Improved` The text in the viewer's top bar and at its bottom is now pure white, so it stays readable over bright images
-* `Improved` With Remove animations turned on in the system, page turns by key and slideshow transitions in the viewer no longer animate either
-* `Improved` The thumbnail cache size follows the phone's free space (smaller when space is low, at most 250 MB); when memory runs low or the app has been in the background for a while, the gallery releases the memory it holds
 
 ##### Full history
 

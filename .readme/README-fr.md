@@ -180,7 +180,7 @@ Il faut 4 étapes entre l'installation et la première image affichée:
 1. Lancez 3-Maple Image seule pour parcourir les albums de l'appareil (l'accès aux photos est demandé une fois au premier lancement); le menu en haut à droite permet toujours d'ouvrir une image choisie pour l'afficher, la retoucher ou la convertir et d'enregistrer le résultat à l'emplacement choisi.
 2. Ouvrez AutoJs6, accédez au `Centre des plugins`, repérez `3-Maple Image` et activez-la.
 3. Dans le gestionnaire de fichiers d'AutoJs6, localisez un fichier image pris en charge (par exemple `screenshot.png`).
-4. Touchez le fichier. L'image s'ouvre dans la visionneuse dédiée. Choisissez `Afficher comme album` dans le menu d'un dossier pour voir ses images en grille.
+4. Touchez le fichier. L'image s'ouvre dans la visionneuse dédiée. Choisissez `Afficher comme album` dans le menu d'un dossier pour voir ses images en grille. À partir d'AutoJs6 6.8.1, cette entrée se trouve dans le sous-menu `3-Maple Image`.
 
 Dans la visionneuse: à l'échelle 1x, glissez à gauche ou à droite pour passer à l'image prise en charge précédente ou suivante du même dossier. Pincez pour zoomer autour de vos doigts (1x à 5x), faites glisser un doigt pour vous déplacer et double-touchez pour basculer entre l'ajustement à l'écran et un zoom 2,5x centré sur le point touché. Le facteur actuel apparaît pendant le pincement et brièvement après un double toucher. Touchez `Pivoter` pour ne faire pivoter que la vue; le zoom actif est conservé, tandis que `Réinitialiser le zoom`, dans le menu en haut à droite, rétablit l'orientation d'origine et l'ajustement. Les GIF animés affichent un bouton flottant `Mettre l'animation en pause` / `Reprendre l'animation`, absent pour les images statiques. Toucher l'image masque ou affiche les barres en surimpression, et `Détails` ouvre un panneau inférieur avec les informations du fichier et les champs EXIF. `Partager` et `Ouvrir avec` restent disponibles sur l'image ouverte initialement; ces actions sont désactivées pour les pages voisines de session, qui ne possèdent volontairement aucun content URI transférable. Les images ouvertes depuis l'accueil autonome ou depuis une autre application proposent aussi `Modifier`, qui ouvre l'éditeur et permet d'enregistrer le résultat; les entrées de l'hôte et les pages voisines ne le proposent pas. Pour les images ouvertes depuis un album, le coeur de la barre du haut ajoute l'image courante aux favoris, `Supprimer` dans la barre du bas l'envoie à la corbeille (avec annulation), et `Ouvrir avec`, `Renommer`, `Déplacer` et `Copier` se trouvent dans le menu en haut à droite. Quand l'original peut être réécrit, la barre affichée après une rotation propose `Enregistrer`. Depuis AutoJs6, l'image ouverte en la touchant et chaque image d'une sélection ouverte affichent `Supprimer` dans la barre du bas (envoi dans la Corbeille d'AutoJs6, avec annulation), et `Ouvrir avec` passe dans le menu en haut à droite. Le menu en haut à droite propose aussi `Diaporama`, `Définir comme fond d'écran`, `Partager une copie` et `Modifier avec une autre application` (quand l'image affichée peut être confiée à d'autres applications); les gestes et l'affichage se règlent dans `Paramètres` > `Visionneuse`.
 
@@ -226,7 +226,7 @@ Les images supprimées passent d'abord par la corbeille et peuvent être restaur
 
 **Le menu du fichier n'affiche pas `Modifier l'image` et `Convertir l'image`?**
 
-Vérifiez dans l'ordre: le code de version d'AutoJs6 est au moins 5352; le plugin est activé dans le `Centre des plugins`; l'extension du fichier ou son type MIME figure dans la liste prise en charge. Si l'une des trois conditions manque, les actions n'apparaissent pas. Depuis la 3.2.0, le plugin déclare le protocole explorer-action 24; un AutoJs6 qui ne le prend pas en charge ignore toutes les actions de menu du plugin (y compris `Afficher l'image` et `Parcourir comme album`), mettez donc AutoJs6 à jour. L'édition et la conversion depuis la galerie et l'écran d'accueil autonome ne sont pas concernées. Jusqu'à la 3.1.2 incluse, un oubli masquait ces deux actions même quand les trois conditions étaient remplies; passez à la 3.2.0.
+À partir d'AutoJs6 6.8.1, ces deux entrées se trouvent dans le sous-menu `3-Maple Image` du menu du fichier. Vérifiez dans l'ordre: le code de version d'AutoJs6 est au moins 5352; le plugin est activé dans le `Centre des plugins`; l'extension du fichier ou son type MIME figure dans la liste prise en charge. Si l'une des trois conditions manque, les actions n'apparaissent pas. Depuis la 3.2.0, le plugin déclare le protocole explorer-action 24; un AutoJs6 qui ne le prend pas en charge ignore toutes les actions de menu du plugin (y compris `Afficher l'image` et `Parcourir comme album`), mettez donc AutoJs6 à jour. L'édition et la conversion depuis la galerie et l'écran d'accueil autonome ne sont pas concernées. Jusqu'à la 3.1.2 incluse, un oubli masquait ces deux actions même quand les trois conditions étaient remplies; passez à la 3.2.0.
 
 **L'ouverture échoue avec `Impossible de lire les informations de l'image` ou l'écran se ferme aussitôt?**
 
@@ -307,6 +307,12 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
+#### v3.4.2
+
+###### 2026/11/07
+
+* `Amélioration` Le gestionnaire de fichiers d'AutoJs6 regroupe les options de menu de ce plugin dans le sous-menu "3-Maple Image", nommé comme dans le Centre des plugins (AutoJs6 6.8.1 ou ultérieur requis)
+
 #### v3.4.1
 
 ###### 2026/11/04
@@ -324,30 +330,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 * `Fonctionnalité` Affichage depuis les scripts: gallery.view ouvre les images indiquées par un script dans la visionneuse de 3-Maple Image; le script sait quelle image vous regardez et peut fermer la visionneuse
 * `Fonctionnalité` Modification depuis les scripts: gallery.edit ouvre une image dans l'éditeur de 3-Maple Image; après votre enregistrement, AutoJs6 écrit le résultat (par défaut à côté de l'original sous le nom nom_edited), et si vous quittez sans enregistrer le script reçoit null
 * `Fonctionnalité` Conversion depuis les scripts: gallery.convert convertit une image sans rien afficher, avec les options du convertisseur (format, qualité, taille, taille de fichier cible, couleur de fond, conserver l'EXIF), par défaut à côté de l'original sous le nom nom_converted
-
-#### v3.3.0
-
-###### 2026/10/15
-
-* `Note` Les paramètres sont regroupés en Apparence, Albums et grille, Visionneuse, Édition et sortie, Gestion des médias, Stockage et À propos; vos choix actuels sont conservés
-* `Note` La position reste masquée par défaut et toujours retirée à l'enregistrement; activez Paramètres > Visionneuse > Afficher la position si vous en avez besoin
-* `Fonctionnalité` Diaporama: menu de la visionneuse (en haut à droite) > Diaporama, avec un intervalle (de 1 à 60 secondes), dans l'ordre ou aléatoire, lecture à l'envers, en boucle, GIF animés inclus ou non, et une transition (Aucune, Fondu, Glisser); pendant la lecture, les boutons se masquent et l'écran reste allumé, et un toucher le met en pause
-* `Fonctionnalité` Définir comme fond d'écran: menu de la visionneuse > Définir comme fond d'écran; un cadre de recadrage à la forme de l'écran choisit ce qui s'affiche, sur l'Écran d'accueil, l'Écran de verrouillage ou Les deux
-* `Fonctionnalité` Partager une copie: menu de la visionneuse > Partager une copie partage une copie en taille réelle sans métadonnées (appareil photo, date, position, etc.) ou une copie réduite selon son grand côté (1080, 1920 ou un nombre de pixels personnalisé); le menu ajoute aussi Modifier avec une autre application
-* `Fonctionnalité` Afficher la position (Paramètres > Visionneuse): les détails montrent les coordonnées du lieu de prise de vue d'une photo, avec Ouvrir dans une carte; tant que l'option est active, l'enregistrement depuis l'éditeur, le convertisseur et la conversion par lots propose Conserver la position
-* `Fonctionnalité` Détails étendus (Paramètres > Visionneuse): les détails choisis s'affichent en texte en bas de la visionneuse et se masquent avec les boutons: chemin, résolution, taille du fichier, date de prise de vue, date de modification, appareil photo, vitesse et ouverture, focale, ISO et position
-* `Fonctionnalité` Gestes de la visionneuse (Paramètres > Visionneuse): Zoom à un doigt (double toucher, garder le doigt posé et glisser vers le haut ou le bas), le double toucher agrandit à 2,5x ou en pixels réels, zoom maximal (5x, 10x ou pixels réels), toucher les bords pour tourner les pages, balayer vers le bas pour fermer, balayer à gauche pour la luminosité
-* `Fonctionnalité` Affichage de la visionneuse (Paramètres > Visionneuse): orientation de l'écran (suivre le système, garder l'orientation d'ouverture, selon la forme de l'image), fond noir, luminosité maximale, masquer les barres système, garder l'écran allumé, bande de vignettes, qualité maximale
-* `Fonctionnalité` Albums et grille (Paramètres > Albums et grille): colonnes des albums et des images (séparément en portrait et en paysage), coins et espacement des vignettes, vignettes recadrées en carré, badges de type de fichier, nombre d'images, noms d'albums sur une ligne, vignettes animées, et couvertures d'albums avec l'image la plus récente ou la plus ancienne; un album peut aussi avoir la sienne: sélectionnez une image de l'album puis Plus > Définir comme couverture
-* `Fonctionnalité` Tablettes, pliables et paysage: dans une fenêtre assez large, l'accueil montre les albums à gauche et l'album ouvert à droite; en paysage, la bande de vignettes de la visionneuse passe sur le côté droit; plier, déplier, tourner l'appareil ou partager l'écran conserve l'album ouvert
-* `Fonctionnalité` Claviers et télécommandes: l'image ou l'album qui a le focus dans une grille a un contour bien visible; dans la visionneuse, les flèches gauche et droite et Page Up / Page Down tournent les pages; la touche d'effacement (Retour arrière ou Suppr) supprime l'image affichée et, dans une grille d'images, les images sélectionnées ou celle qui a le focus
-* `Correctif` Sur Android 11 et versions ultérieures, annuler un remplacement ou une rotation enregistrée demandait deux fois la confirmation du système pour la même image
-* `Correctif` Le zoom par double toucher puis glissement sautait d'abord à 2,5x avant de zoomer
-* `Correctif` Sous Android 7, renommer un album laissait dans la liste un album à l'ancien nom dont les images ne s'ouvraient pas
-* `Amélioration` Lecteurs d'écran (TalkBack): chaque image d'une grille annonce son nom de fichier et sa date; les titres des groupes de paramètres sont des en-têtes entre lesquels on peut sauter
-* `Amélioration` Le texte de la barre supérieure et du bas de la visionneuse est désormais blanc pur, donc lisible aussi sur des images claires
-* `Amélioration` Avec Supprimer les animations activé dans le système, les changements de page au clavier et les transitions du diaporama dans la visionneuse ne sont plus animés non plus
-* `Amélioration` La taille du cache des vignettes suit l'espace libre du téléphone (plus petite quand il reste peu de place, 250 Mo au plus); quand la mémoire manque ou que l'application est en arrière-plan depuis un moment, la galerie libère la mémoire qu'elle occupe
 
 ##### Historique complet
 

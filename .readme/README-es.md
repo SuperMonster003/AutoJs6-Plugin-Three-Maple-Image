@@ -180,7 +180,7 @@ Desde la instalación hasta la primera imagen hay 4 pasos:
 1. Abra 3-Maple Image por sí sola para recorrer los álbumes del dispositivo (pide acceso a fotos una vez en el primer arranque); el menú de la esquina superior derecha sigue permitiendo abrir, editar o convertir una imagen elegida y guardar el resultado en el destino que elija.
 2. Abra AutoJs6, entre en el `Centro de plugins`, localice `3-Maple Image` y actívelo.
 3. En el gestor de archivos de AutoJs6, localice cualquier archivo de imagen compatible (por ejemplo `screenshot.png`).
-4. Toque el archivo. La imagen se abre en el visor dedicado. Elija `Ver como álbum` en el menú de una carpeta para ver sus imágenes en cuadrícula.
+4. Toque el archivo. La imagen se abre en el visor dedicado. Elija `Ver como álbum` en el menú de una carpeta para ver sus imágenes en cuadrícula. A partir de AutoJs6 6.8.1, esta entrada está en el submenú `3-Maple Image`.
 
 Dentro del visor: a escala 1x, deslice a izquierda o derecha para pasar a la imagen compatible anterior o siguiente de la misma carpeta. Pellizque para hacer zoom alrededor de los dedos (de 1x a 5x), arrastre con un dedo para desplazarse y haga doble toque para alternar entre el ajuste a pantalla y un zoom de 2,5x centrado en el punto tocado. El aumento actual aparece durante el pellizco y brevemente después de un doble toque. Toque `Girar` para girar solo la vista; se conserva el zoom activo, mientras que `Restablecer zoom`, en el menú superior derecho, recupera tanto la orientación original como el ajuste. Los GIF animados muestran un botón flotante `Pausar animación` / `Reanudar animación`; las imágenes estáticas no. Tocar la imagen oculta o muestra las barras superpuestas, y `Detalles` abre un panel inferior con los datos del archivo y los campos EXIF. `Compartir` y `Abrir con` están disponibles en la imagen abierta inicialmente; se desactivan en las páginas hermanas de sesión porque estas no tienen intencionadamente un content URI transferible. Las imágenes abiertas desde el inicio independiente o desde otra aplicación ofrecen además `Editar`, que abre el editor y permite guardar el resultado; las entradas del host y las páginas hermanas no lo ofrecen. En las imágenes abiertas desde un álbum, el corazón de la barra superior marca la imagen actual como favorita, `Eliminar` en la barra inferior la envía a la papelera (con opción de deshacer), y `Abrir con`, `Cambiar nombre`, `Mover` y `Copiar` están en el menú superior derecho. Cuando se puede escribir en el original, la barra que aparece tras girar ofrece `Guardar`. Desde AutoJs6, la imagen abierta tocándola y cada imagen de una selección abierta muestran `Eliminar` en la barra inferior (la envía a la Papelera de AutoJs6, con opción de deshacer), y `Abrir con` pasa al menú superior derecho. El menú superior derecho también ofrece `Presentación`, `Establecer como fondo de pantalla`, `Compartir una copia` y `Editar con otra aplicación` (cuando la imagen actual se puede pasar a otras aplicaciones); los gestos y la forma de mostrar están en `Ajustes` > `Visor`.
 
@@ -226,7 +226,7 @@ Las imágenes eliminadas van primero a la papelera y se pueden restaurar desde `
 
 **El menú del archivo no muestra `Editar imagen` y `Convertir imagen`?**
 
-Compruebe en orden: que el código de versión de AutoJs6 sea al menos 5352; que el complemento esté activado en el `Centro de plugins`; y que la extensión del archivo o su tipo MIME figure en la lista compatible. Si falla cualquiera de las tres condiciones, las acciones no aparecen. Desde la 3.2.0 el complemento declara el protocolo explorer-action 24; un AutoJs6 que no lo admite ignora todas las acciones de menú del complemento (incluidas `Ver imagen` y `Ver como álbum`), así que actualiza AutoJs6. Editar y convertir desde la galería y la pantalla de inicio independiente no se ven afectados. En la 3.1.2 y anteriores, un descuido ocultaba estas dos acciones aunque se cumplieran las tres condiciones; actualiza a la 3.2.0.
+A partir de AutoJs6 6.8.1, estas dos entradas están en el submenú `3-Maple Image` del menú del archivo. Compruebe en orden: que el código de versión de AutoJs6 sea al menos 5352; que el complemento esté activado en el `Centro de plugins`; y que la extensión del archivo o su tipo MIME figure en la lista compatible. Si falla cualquiera de las tres condiciones, las acciones no aparecen. Desde la 3.2.0 el complemento declara el protocolo explorer-action 24; un AutoJs6 que no lo admite ignora todas las acciones de menú del complemento (incluidas `Ver imagen` y `Ver como álbum`), así que actualiza AutoJs6. Editar y convertir desde la galería y la pantalla de inicio independiente no se ven afectados. En la 3.1.2 y anteriores, un descuido ocultaba estas dos acciones aunque se cumplieran las tres condiciones; actualiza a la 3.2.0.
 
 **Al abrir aparece `No se puede leer la información de la imagen` o la pantalla se cierra al instante?**
 
@@ -307,6 +307,12 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v3.4.2
+
+###### 2026/11/07
+
+* `Mejora` El administrador de archivos de AutoJs6 agrupa las opciones de menú de este plugin en el submenú "3-Maple Image", con el mismo nombre que en el Centro de plugins (requiere AutoJs6 6.8.1 o posterior)
+
 #### v3.4.1
 
 ###### 2026/11/04
@@ -324,30 +330,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 * `Función` Ver desde scripts: gallery.view abre en el visor de 3-Maple Image las imágenes que indica un script; el script sabe cuál está mirando y puede cerrar el visor
 * `Función` Editar desde scripts: gallery.edit abre una imagen en el editor de 3-Maple Image; cuando usted guarda, AutoJs6 escribe el resultado (por defecto junto al original como nombre_edited), y si sale sin guardar el script recibe null
 * `Función` Convertir desde scripts: gallery.convert convierte una imagen sin mostrar nada, con las opciones del convertidor (formato, calidad, tamaño, tamaño de archivo objetivo, color de fondo, conservar EXIF), por defecto junto al original como nombre_converted
-
-#### v3.3.0
-
-###### 2026/10/15
-
-* `Aviso` Los ajustes se reorganizan en Apariencia, Álbumes y cuadrícula, Visor, Edición y salida, Gestión de medios, Almacenamiento y Acerca de; se conservan las opciones que ya tenía
-* `Aviso` La ubicación sigue oculta de forma predeterminada y se sigue eliminando al guardar; active Ajustes > Visor > Mostrar ubicación cuando la necesite
-* `Función` Presentación: menú del visor (arriba a la derecha) > Presentación, con intervalo (de 1 a 60 segundos), en orden o aleatorio, reproducir al revés, repetir, incluir GIF animados y una transición (Ninguna, Fundido, Deslizar); mientras se reproduce, los botones se ocultan y la pantalla sigue encendida, y un toque la pausa
-* `Función` Establecer como fondo de pantalla: menú del visor > Establecer como fondo de pantalla; un marco de recorte con la forma de la pantalla elige qué se muestra, en la Pantalla de inicio, la Pantalla de bloqueo o Ambas
-* `Función` Compartir una copia: menú del visor > Compartir una copia comparte una copia a tamaño completo sin metadatos (cámara, fecha, ubicación, etc.) o una copia más pequeña según su lado largo (1080, 1920 o un número de píxeles personalizado); el menú añade también Editar con otra aplicación
-* `Función` Mostrar ubicación (Ajustes > Visor): los detalles muestran las coordenadas del lugar donde se tomó una foto, con Abrir en el mapa; mientras está activado, al guardar desde el editor, el convertidor y la conversión por lotes se ofrece Conservar la ubicación
-* `Función` Detalles ampliados (Ajustes > Visor): los detalles elegidos se muestran como texto en la parte inferior del visor y se ocultan con los botones: ruta, resolución, tamaño del archivo, fecha de captura, fecha de modificación, cámara, obturador y apertura, distancia focal, ISO y ubicación
-* `Función` Gestos del visor (Ajustes > Visor): Zoom con un dedo (toque dos veces, mantenga el dedo y arrastre hacia arriba o hacia abajo), al tocar dos veces ampliar a 2,5x o a píxeles reales, zoom máximo (5x, 10x o píxeles reales), tocar los bordes para pasar de página, deslizar hacia abajo para cerrar, deslizar a la izquierda para el brillo
-* `Función` Pantalla del visor (Ajustes > Visor): orientación de la pantalla (seguir el sistema, mantener la orientación al abrir, según la forma de la imagen), fondo negro, brillo máximo, ocultar las barras del sistema, mantener la pantalla encendida, tira de miniaturas, máxima calidad
-* `Función` Álbumes y cuadrícula (Ajustes > Álbumes y cuadrícula): columnas de álbumes y de imágenes (por separado en vertical y en horizontal), esquinas y espacio de las miniaturas, recortar miniaturas en cuadrado, etiquetas de tipo de archivo, número de imágenes, nombres de álbumes en una línea, reproducir miniaturas animadas y portadas de álbumes con la imagen más reciente o la más antigua; un álbum también puede tener la suya: seleccione una imagen del álbum y elija Más > Usar como portada del álbum
-* `Función` Tabletas, plegables y horizontal: en una ventana lo bastante ancha, la pantalla de inicio muestra los álbumes a la izquierda y el álbum abierto a la derecha; en horizontal, la tira de miniaturas del visor pasa al lado derecho; al plegar, desplegar, girar o usar la pantalla dividida, el álbum abierto se mantiene
-* `Función` Teclados y mandos a distancia: la imagen o el álbum con el foco en una cuadrícula tiene un contorno visible; en el visor, las flechas izquierda y derecha y Page Up / Page Down pasan de página; la tecla de borrar (Retroceso o Supr) elimina la imagen actual y, en una cuadrícula de imágenes, las seleccionadas o la que tiene el foco
-* `Corrección` En Android 11 y posteriores, deshacer una sobrescritura o una rotación guardada pedía dos veces la confirmación del sistema para la misma imagen
-* `Corrección` Al tocar dos veces y arrastrar para hacer zoom, la imagen saltaba primero a 2,5x antes de empezar el zoom
-* `Corrección` En Android 7, cambiar el nombre de un álbum dejaba en la lista un álbum con el nombre anterior cuyas imágenes no se podían abrir
-* `Mejora` Lectores de pantalla (TalkBack): cada imagen de una cuadrícula lee su nombre de archivo y su fecha; los títulos de los grupos de ajustes son encabezados para saltar entre ellos
-* `Mejora` El texto de la barra superior y de la parte inferior del visor es ahora blanco puro, así que se lee bien también sobre imágenes claras
-* `Mejora` Con Quitar animaciones activado en el sistema, los cambios de página con teclas y las transiciones de la presentación en el visor tampoco se animan
-* `Mejora` El tamaño de la caché de miniaturas sigue el espacio libre del teléfono (menor cuando queda poco espacio, como máximo 250 MB); cuando falta memoria o la aplicación lleva un rato en segundo plano, la galería libera la memoria que ocupa
 
 ##### Historial completo
 

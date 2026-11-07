@@ -41,4 +41,29 @@ class ExplorerActionServiceTest {
             RuntimeEnvironment.getApplication().getString(R.string.plugin_requires_host_version),
         )
     }
+
+    /**
+     * Host Explorer Action protocol v27: the catalog names the plugin's first-level menu after its display name, under
+     * the two catalog-level keys the host reads from catalogs of every protocol version.
+     */
+    @Test
+    fun theCatalogNamesTheFirstLevelMenuAfterThePlugin() {
+        val catalog = threeMapleImageActionCatalog()
+
+        assertEquals("app_name", catalog.getString("menuGroupLabelResourceName"))
+        assertEquals("3-Maple Image", catalog.getString("menuGroupLabelFallback"))
+        assertEquals(24, catalog.getInt(ExplorerActionCatalogKeys.PROTOCOL_VERSION))
+        assertEquals(
+            setOf(
+                ExplorerActionCatalogKeys.PROTOCOL_VERSION,
+                "menuGroupLabelResourceName",
+                "menuGroupLabelFallback",
+                ExplorerActionCatalogKeys.ACTIONS,
+            ),
+            catalog.keySet(),
+        )
+        val application = RuntimeEnvironment.getApplication()
+        val resourceId = application.resources.getIdentifier("app_name", "string", application.packageName)
+        assertEquals("3-Maple Image", application.getString(resourceId))
+    }
 }

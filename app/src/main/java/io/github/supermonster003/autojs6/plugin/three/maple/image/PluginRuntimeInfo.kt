@@ -30,6 +30,17 @@ internal object ThreeMapleImagePlugin {
         "io.github.supermonster003.autojs6.plugin.three.maple.image.ExplorerActionActivity"
     const val ACTION_PRIORITY = 100
 
+    /**
+     * The name of the plugin's first-level menu in the AutoJs6 file manager (host Explorer Action protocol v27): the
+     * display name, as in the Plugin Center. The bundled explorer-action-api predates v27 and has no constants for
+     * the two catalog-level keys, hence the literal key names. Hosts from 6.8.1 read them from catalogs of every
+     * protocol version and older hosts ignore unknown keys, so [PROTOCOL_VERSION] and [REQUIRED_HOST_VERSION] stay.
+     */
+    const val MENU_GROUP_LABEL_RESOURCE_NAME_KEY = "menuGroupLabelResourceName"
+    const val MENU_GROUP_LABEL_FALLBACK_KEY = "menuGroupLabelFallback"
+    const val MENU_GROUP_LABEL_RESOURCE_NAME = "app_name"
+    const val MENU_GROUP_LABEL_FALLBACK = "3-Maple Image"
+
     /** ROADMAP 6.4: overflow action of a single directory that opens it as an album through the host session. */
     const val BROWSE_DIRECTORY_ACTION_ID = "browse-directory"
     const val BROWSE_DIRECTORY_LABEL_RESOURCE_NAME = "action_browse_directory"

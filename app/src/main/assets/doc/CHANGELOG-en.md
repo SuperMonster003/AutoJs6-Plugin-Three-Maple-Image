@@ -4,6 +4,12 @@
 
 ******
 
+## v3.4.2
+
+###### 2026/11/07
+
+* `Improved` The AutoJs6 file manager groups the menu options of this plugin under the submenu "3-Maple Image", named as in the Plugin Center (requires AutoJs6 6.8.1 or later)
+
 ## v3.4.1
 
 ###### 2026/11/04

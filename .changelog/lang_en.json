@@ -5,6 +5,12 @@
   "changelog_label_improvement": "Improved",
   "changelog_label_dependency": "Dependency",
   "$data": {
+    "v3.4.2": {
+      "released_date": "2026/11/07",
+      "improvement": [
+        "The AutoJs6 file manager groups the menu options of this plugin under the submenu \"3-Maple Image\", named as in the Plugin Center (requires AutoJs6 6.8.1 or later)"
+      ]
+    },
     "v3.4.1": {
       "released_date": "2026/11/04",
       "fix": [
