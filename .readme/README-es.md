@@ -307,6 +307,12 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v3.4.4
+
+###### 2026/11/16
+
+* `Corrección` Los ajustes de apariencia indicaban que AutoJs6 no estaba disponible aunque estuviera instalado y habilitado, lo que impedía seguir su idioma, modo nocturno y color del tema
+
 #### v3.4.3
 
 ###### 2026/11/07
@@ -318,13 +324,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 ###### 2026/11/07
 
 * `Mejora` El administrador de archivos de AutoJs6 agrupa las opciones de menú de este plugin en el submenú "3-Maple Image", con el mismo nombre que en el Centro de plugins (requiere AutoJs6 6.8.1 o posterior)
-
-#### v3.4.1
-
-###### 2026/11/04
-
-* `Corrección` Orden incorrecto de 3-Maple Image y los nombres de archivo en los títulos de la interfaz árabe
-* `Mejora` Las entradas del historial de versiones admiten el foco del teclado y los lectores de pantalla leen cada versión completa
 
 ##### Historial completo
 

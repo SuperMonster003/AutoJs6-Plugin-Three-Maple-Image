@@ -307,6 +307,12 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v3.4.4
+
+###### 2026/11/16
+
+* `Fixed` Appearance settings reported AutoJs6 as unavailable even when installed and enabled, preventing its language, night mode and theme color from being followed
+
 #### v3.4.3
 
 ###### 2026/11/07
@@ -318,13 +324,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 ###### 2026/11/07
 
 * `Improved` The AutoJs6 file manager groups the menu options of this plugin under the submenu "3-Maple Image", named as in the Plugin Center (requires AutoJs6 6.8.1 or later)
-
-#### v3.4.1
-
-###### 2026/11/04
-
-* `Fixed` 3-Maple Image and file names appeared in the wrong order in Arabic interface titles
-* `Improved` Release history entries support keyboard focus and are read as complete versions by screen readers
 
 ##### Full history
 

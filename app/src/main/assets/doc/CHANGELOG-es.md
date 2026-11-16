@@ -4,6 +4,12 @@
 
 ******
 
+## v3.4.4
+
+###### 2026/11/16
+
+* `Corrección` Los ajustes de apariencia indicaban que AutoJs6 no estaba disponible aunque estuviera instalado y habilitado, lo que impedía seguir su idioma, modo nocturno y color del tema
+
 ## v3.4.3
 
 ###### 2026/11/07

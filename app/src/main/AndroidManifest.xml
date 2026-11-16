@@ -20,6 +20,12 @@
         <meta-data android:name="org.autojs.plugin.contract.NATIVE_PAGE_ALIGNMENT" android:value="16384" />
         <meta-data android:name="org.autojs.plugin.WAKE_ACTIVITY" android:value=".WakeActivity" />
         <meta-data android:name="org.autojs.plugin.info.AUTHOR" android:value="@string/plugin_author" />
+        <service android:name=".PluginInfoService" android:exported="true" android:permission="org.autojs.permission.PLUGIN">
+            <intent-filter>
+                <action android:name="org.autojs.plugin.INFO" />
+                <category android:name="three-maple-image" />
+            </intent-filter>
+        </service>
         <provider android:name=".HostSessionImageProvider" android:authorities="io.github.supermonster003.autojs6.plugin.three.maple.image.host-images" android:exported="false" android:grantUriPermissions="false" />
         <activity android:name=".WakeActivity" android:excludeFromRecents="true" android:exported="true" android:finishOnTaskLaunch="true" android:permission="org.autojs.permission.PLUGIN" android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>

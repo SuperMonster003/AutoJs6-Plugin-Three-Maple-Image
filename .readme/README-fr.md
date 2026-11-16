@@ -307,6 +307,12 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
+#### v3.4.4
+
+###### 2026/11/16
+
+* `Correctif` Les paramètres d'apparence indiquaient qu'AutoJs6 était indisponible même après son installation et son activation, empêchant de suivre sa langue, son mode nuit et sa couleur de thème
+
 #### v3.4.3
 
 ###### 2026/11/07
@@ -318,13 +324,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 ###### 2026/11/07
 
 * `Amélioration` Le gestionnaire de fichiers d'AutoJs6 regroupe les options de menu de ce plugin dans le sous-menu "3-Maple Image", nommé comme dans le Centre des plugins (AutoJs6 6.8.1 ou ultérieur requis)
-
-#### v3.4.1
-
-###### 2026/11/04
-
-* `Correctif` Ordre incorrect de 3-Maple Image et des noms de fichiers dans les titres de l'interface arabe
-* `Amélioration` Les entrées de l'historique des versions acceptent le focus clavier et sont lues par version complète par les lecteurs d'écran
 
 ##### Historique complet
 

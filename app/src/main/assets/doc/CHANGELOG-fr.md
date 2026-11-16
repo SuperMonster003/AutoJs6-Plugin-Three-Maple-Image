@@ -4,6 +4,12 @@
 
 ******
 
+## v3.4.4
+
+###### 2026/11/16
+
+* `Correctif` Les paramètres d'apparence indiquaient qu'AutoJs6 était indisponible même après son installation et son activation, empêchant de suivre sa langue, son mode nuit et sa couleur de thème
+
 ## v3.4.3
 
 ###### 2026/11/07

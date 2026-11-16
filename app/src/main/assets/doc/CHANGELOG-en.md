@@ -4,6 +4,12 @@
 
 ******
 
+## v3.4.4
+
+###### 2026/11/16
+
+* `Fixed` Appearance settings reported AutoJs6 as unavailable even when installed and enabled, preventing its language, night mode and theme color from being followed
+
 ## v3.4.3
 
 ###### 2026/11/07
