@@ -59,9 +59,17 @@ The Debug test runner depends on Kotlin runtime classes that release shrinking
 may remove. Therefore the signed release was checked with a separate, read-only
 framework probe, not by claiming that the Debug runner passed against the release.
 
-The phone remained securely locked during verification. No settings-dialog visual
-or click-through pass is claimed. Image editing, conversion, ColorOS activation
-and other business flows were not part of this fix's device regression.
+After the user unlocked QV770340J7 on 2026-11-17, the installed release was also
+checked through its launcher, overflow menu and Settings page. The Language,
+Night mode and Theme color dialogs all showed the Follow AutoJs6 option without
+the unavailable/fallback subtitle. Theme color displayed `#FFDEAD`; the settings
+summary showed Follow AutoJs6 with light mode. The existing explicit Simplified
+Chinese language selection was preserved. Every dialog was closed with Cancel,
+and the complete visible settings summaries were identical before and after.
+Screenshots were visually inspected and the UI hierarchy assertions passed.
+
+Image editing, conversion, ColorOS activation and other business flows were not
+part of this fix's device regression.
 
 ## Local artifacts
 
@@ -69,7 +77,9 @@ and other business flows were not part of this fix's device regression.
 - `.bak/host-settings-20261116/` retains the original APK, package states, build
   log, workspace audit JSON, Debug instrumentation results and before/after release
   probe output. The framework probe source and build script are in its `probe/`
-  subdirectory. These local artifacts are ignored by Git.
+  subdirectory. `maple-settings-ui.png`, `maple-language-ui.png`,
+  `maple-night-ui.png` and `maple-theme-ui.png` retain the unlocked visual checks,
+  with matching UI XML dumps. These local artifacts are ignored by Git.
 
 The 3-Stack counterpart is 3.1.3 (134), validated on BH900ASK9E (API 28) with the
 same host version and the same before/after admission result.
