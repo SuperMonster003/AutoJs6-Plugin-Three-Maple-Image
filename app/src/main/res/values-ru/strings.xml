@@ -505,6 +505,8 @@
     <string name="text_image_conversion_output_resolution_unavailable">Выходное разрешение: -</string>
     <string name="text_image_conversion_percentage">Процент</string>
     <string name="text_image_conversion_percentage_hint">Процент</string>
+    <string name="text_image_conversion_png_lossy">Сжатие с потерями</string>
+    <string name="text_image_conversion_png_lossy_summary">Допускает небольшие отличия цвета ради меньшего размера файла</string>
     <string name="text_image_conversion_preserve_exif">Сохранять безопасные метаданные EXIF</string>
     <string name="text_image_conversion_preserve_exif_helper">Данные камеры и съёмки сохраняются. Ориентация нормализуется; GPS-координаты, встроенные миниатюры и метаданные, которые нельзя безопасно проверить, всегда удаляются.</string>
     <string name="text_image_conversion_preserve_exif_helper_short">Данные камеры и съёмки сохраняются. Ориентация нормализуется; встроенные миниатюры и метаданные, которые нельзя безопасно проверить, всегда удаляются.</string>

@@ -19,6 +19,8 @@ internal data class BatchConversionSettings(
     val format: ImageOutputFormat = ImageOutputFormat.JPEG,
     val quality: Int = ImageConversionOptions.DEFAULT_QUALITY,
     val webpLossless: Boolean = false,
+    /** "Lossy compression" of PNG output; the quality only applies to PNG while it is on. */
+    val pngLossy: Boolean = false,
     val resizeMode: ImageResizeMode = ImageResizeMode.ORIGINAL,
     val percentage: String = DEFAULT_PERCENTAGE,
     val longEdge: String = ImageConversionSizing.DEFAULT_LONG_EDGE.toString(),
@@ -83,8 +85,15 @@ internal object BatchConversionPolicy {
     fun losslessVisible(settings: BatchConversionSettings, sdkInt: Int): Boolean =
         settings.format == ImageOutputFormat.WEBP && ImageOutputEncodingPolicy.isWebpLosslessAvailable(sdkInt)
 
+    fun pngLossyVisible(settings: BatchConversionSettings): Boolean = settings.format == ImageOutputFormat.PNG
+
     fun qualityEnabled(settings: BatchConversionSettings, sdkInt: Int): Boolean =
-        ImageOutputEncodingPolicy.qualityEnabled(settings.format, settings.webpLossless, sdkInt)
+        ImageOutputEncodingPolicy.qualityEnabled(
+            format = settings.format,
+            webpLosslessRequested = settings.webpLossless,
+            sdkInt = sdkInt,
+            pngLossyRequested = settings.pngLossy,
+        )
 
     /**
      * The plan for one image whose upright size and EXIF are in [source]; [withinMemoryBudget] says whether the
@@ -112,6 +121,7 @@ internal object BatchConversionPolicy {
             targetSize = turned,
             jpegBackgroundColor = if (settings.jpegBackgroundBlack) JPEG_BACKGROUND_BLACK else ImageConversionOptions.DEFAULT_JPEG_BACKGROUND_COLOR,
             webpLossless = ImageOutputEncodingPolicy.usesWebpLossless(settings.format, settings.webpLossless, sdkInt),
+            pngLossy = ImageOutputEncodingPolicy.usesPngLossy(settings.format, settings.pngLossy),
             preservedExifMetadata = source.preservableExifMetadata
                 .select(capture = settings.preserveExif, location = settings.preserveLocation)
                 .takeIf { !it.isEmpty },

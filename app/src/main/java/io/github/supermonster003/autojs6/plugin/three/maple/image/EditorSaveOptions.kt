@@ -13,6 +13,8 @@ internal data class EditorSaveOptions(
     val format: EditorSaveFormat = EditorSaveFormat.FOLLOW_SOURCE,
     val quality: Int = ImageConversionOptions.DEFAULT_QUALITY,
     val webpLossless: Boolean = false,
+    /** "Lossy compression" of PNG output; the quality only applies to PNG while it is on. */
+    val pngLossy: Boolean = false,
     /** Keep the camera and capture details of the original, as the converter offers. */
     val keepExif: Boolean = false,
     /**
@@ -102,6 +104,7 @@ internal object EditorSavePolicy {
                 requested = saveOptions.webpLossless,
                 sdkInt = sdkInt,
             ),
+            pngLossy = ImageOutputEncodingPolicy.usesPngLossy(outputFormat, saveOptions.pngLossy),
             preservedExifMetadata = preservableExif.select(capture = saveOptions.keepExif, location = saveOptions.keepLocation)
                 .takeIf { !it.isEmpty },
         )

@@ -505,6 +505,8 @@
     <string name="text_image_conversion_output_resolution_unavailable">دقة الإخراج: -</string>
     <string name="text_image_conversion_percentage">النسبة المئوية</string>
     <string name="text_image_conversion_percentage_hint">النسبة المئوية</string>
+    <string name="text_image_conversion_png_lossy">ضغط مع فقدان</string>
+    <string name="text_image_conversion_png_lossy_summary">يسمح بفروق لونية طفيفة لتصغير حجم الملف</string>
     <string name="text_image_conversion_preserve_exif">الاحتفاظ ببيانات EXIF الآمنة</string>
     <string name="text_image_conversion_preserve_exif_helper">يتم الاحتفاظ ببيانات الكاميرا والتصوير. يُطبّع الاتجاه, وتُزال دائمًا بيانات موقع GPS والمعاينات المضمنة والبيانات الوصفية التي لا يمكن فحصها بأمان.</string>
     <string name="text_image_conversion_preserve_exif_helper_short">يتم الاحتفاظ ببيانات الكاميرا والتصوير. يُطبّع الاتجاه, وتُزال دائمًا المعاينات المضمنة والبيانات الوصفية التي لا يمكن فحصها بأمان.</string>

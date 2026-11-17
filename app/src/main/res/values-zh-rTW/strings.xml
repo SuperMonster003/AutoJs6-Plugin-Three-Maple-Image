@@ -505,6 +505,8 @@
     <string name="text_image_conversion_output_resolution_unavailable">輸出解析度: -</string>
     <string name="text_image_conversion_percentage">百分比</string>
     <string name="text_image_conversion_percentage_hint">百分比</string>
+    <string name="text_image_conversion_png_lossy">有損壓縮</string>
+    <string name="text_image_conversion_png_lossy_summary">允許細微色差以減小檔案大小</string>
     <string name="text_image_conversion_preserve_exif">保留安全的 EXIF 中繼資料</string>
     <string name="text_image_conversion_preserve_exif_helper">保留相機與拍攝參數; 方向會正規化, GPS 位置, 內嵌預覽與無法安全檢查的中繼資料一律移除.</string>
     <string name="text_image_conversion_preserve_exif_helper_short">保留相機與拍攝參數; 方向會正規化, 內嵌預覽與無法安全檢查的中繼資料一律移除.</string>

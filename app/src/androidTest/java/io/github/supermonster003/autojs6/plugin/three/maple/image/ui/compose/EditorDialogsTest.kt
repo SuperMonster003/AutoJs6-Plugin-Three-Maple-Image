@@ -79,6 +79,14 @@ class EditorDialogsTest {
         compose.waitForIdle()
         assertTrue(state.webpLossless)
         assertEquals(2, changes)
+        // "Lossy compression" appears for PNG output only; the Activity decides when that is.
+        compose.onNodeWithTag("maple.editor.save.pngLossy").assertDoesNotExist()
+        state.pngLossyAvailable = true
+        compose.waitForIdle()
+        compose.onNodeWithTag("maple.editor.save.pngLossy").performScrollTo().assertIsOff().performClick()
+        compose.waitForIdle()
+        assertTrue(state.pngLossy)
+        assertEquals(3, changes)
     }
 
     @Test

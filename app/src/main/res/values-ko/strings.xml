@@ -505,6 +505,8 @@
     <string name="text_image_conversion_output_resolution_unavailable">출력 해상도: -</string>
     <string name="text_image_conversion_percentage">백분율</string>
     <string name="text_image_conversion_percentage_hint">백분율</string>
+    <string name="text_image_conversion_png_lossy">손실 압축</string>
+    <string name="text_image_conversion_png_lossy_summary">미세한 색 차이를 허용하여 파일 크기를 줄입니다</string>
     <string name="text_image_conversion_preserve_exif">안전한 EXIF 메타데이터 유지</string>
     <string name="text_image_conversion_preserve_exif_helper">카메라 및 촬영 정보는 유지합니다. 방향은 정규화하고 GPS 위치, 포함된 미리보기 및 안전하게 검사할 수 없는 메타데이터는 항상 제거합니다.</string>
     <string name="text_image_conversion_preserve_exif_helper_short">카메라 및 촬영 정보는 유지합니다. 방향은 정규화하고 포함된 미리보기 및 안전하게 검사할 수 없는 메타데이터는 항상 제거합니다.</string>

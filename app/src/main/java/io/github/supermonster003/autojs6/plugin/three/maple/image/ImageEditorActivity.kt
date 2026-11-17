@@ -862,6 +862,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
             formatIndex = formats.indexOf(initial.format).coerceAtLeast(0),
             quality = initial.quality.coerceIn(ImageConversionOptions.MIN_QUALITY, EditorDialogDefaults.QUALITY_MAX),
             webpLossless = initial.webpLossless && ImageOutputEncodingPolicy.isWebpLosslessAvailable(Build.VERSION.SDK_INT),
+            pngLossy = initial.pngLossy,
             keepExif = initial.keepExif,
             overwriteAvailable = overwriteFormat != null,
             keepExifAvailable = !sourceInfo.preservableExifMetadata.isEmpty,
@@ -895,10 +896,12 @@ open class ImageEditorActivity : ConfiguredActivity() {
         state.fileNote = getString(if (state.overwrite) R.string.image_editor_save_replaces_name else R.string.image_editor_save_new_name, name)
         state.losslessAvailable = effectiveFormat == ImageOutputFormat.WEBP &&
             ImageOutputEncodingPolicy.isWebpLosslessAvailable(Build.VERSION.SDK_INT)
+        state.pngLossyAvailable = effectiveFormat == ImageOutputFormat.PNG
         state.qualityEnabled = ImageOutputEncodingPolicy.qualityEnabled(
             format = effectiveFormat,
             webpLosslessRequested = state.webpLossless && state.losslessAvailable,
             sdkInt = Build.VERSION.SDK_INT,
+            pngLossyRequested = state.pngLossy,
         )
     }
 
@@ -909,6 +912,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
             format = formats.getOrElse(state.formatIndex) { formats.first() },
             quality = state.quality,
             webpLossless = state.webpLossless && state.losslessAvailable,
+            pngLossy = state.pngLossy,
             keepExif = state.keepExif && state.keepExifAvailable,
             keepLocation = state.keepLocation && state.keepLocationAvailable,
             overwrite = state.overwrite && state.overwriteAvailable,
@@ -999,6 +1003,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
                 format = formats.getOrElse(state.formatIndex) { EditorSaveFormat.FOLLOW_SOURCE },
                 quality = state.quality,
                 webpLossless = state.webpLossless,
+                pngLossy = state.pngLossy,
                 keepExif = state.keepExif,
                 keepLocation = state.keepLocation,
                 overwrite = state.overwrite,

@@ -64,6 +64,19 @@ internal fun ConversionLosslessRow(checked: Boolean, onToggle: (Boolean) -> Unit
     )
 }
 
+/** "Lossy compression" of PNG output: off keeps every pixel, on puts the quality slider in charge. */
+@Composable
+internal fun ConversionPngLossyRow(checked: Boolean, onToggle: (Boolean) -> Unit, enabled: Boolean, tagPrefix: String) {
+    MapleSwitchRow(
+        title = stringResource(R.string.text_image_conversion_png_lossy),
+        summary = stringResource(R.string.text_image_conversion_png_lossy_summary),
+        checked = checked,
+        onToggle = onToggle,
+        enabled = enabled,
+        modifier = Modifier.testTag("$tagPrefix.pngLossy"),
+    )
+}
+
 /** The inputs of a resize mode, with the error of each field (null when it is fine). */
 internal class ConversionResizeFields(
     val percentage: String,

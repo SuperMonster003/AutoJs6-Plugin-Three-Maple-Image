@@ -3,6 +3,7 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image.scriptapi
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import io.github.supermonster003.autojs6.plugin.three.maple.image.EditorSaveFormat
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageOutputFormat
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ImagePixelSize
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaItem
@@ -122,7 +123,10 @@ class GalleryScriptApiTest {
         assertEquals(100, convert.width)
         assertNull(convert.height)
         violation { ScriptRequests.convert(Bundle().apply { putString(GalleryContract.KEY_FORMAT, "gif") }) }
-        violation { ScriptRequests.convert(Bundle().apply { putString(GalleryContract.KEY_FORMAT, "png"); putLong(GalleryContract.KEY_TARGET_BYTES, 1000L) }) }
+        // A target size makes PNG output lossy; only lossless output has no size to aim for.
+        assertEquals(1000L, ScriptRequests.convert(Bundle().apply { putString(GalleryContract.KEY_FORMAT, "png"); putLong(GalleryContract.KEY_TARGET_BYTES, 1000L) }).targetBytes)
+        violation { ScriptRequests.convert(Bundle().apply { putBoolean(GalleryContract.KEY_LOSSLESS, true); putLong(GalleryContract.KEY_TARGET_BYTES, 1000L) }) }
+        violation { ScriptRequests.convert(Bundle().apply { putLong(GalleryContract.KEY_TARGET_BYTES, 0L) }) }
         violation { ScriptRequests.convert(Bundle().apply { putString(GalleryContract.KEY_SIZE_MODE, GalleryContract.SIZE_PERCENT) }) }
         violation { ScriptRequests.convert(Bundle().apply { putString(GalleryContract.KEY_SIZE_MODE, GalleryContract.SIZE_CUSTOM); putInt(GalleryContract.KEY_WIDTH, 10); putBoolean(GalleryContract.KEY_KEEP_ASPECT_RATIO, false) }) }
     }
@@ -156,6 +160,25 @@ class GalleryScriptApiTest {
         assertEquals(ImageOutputFormat.PNG, ScriptConverter.outputFormat(null, "image/png"))
         assertEquals(ImageOutputFormat.JPEG, ScriptConverter.outputFormat(null, "image/heic"))
         assertEquals(ImageOutputFormat.WEBP, ScriptConverter.outputFormat(GalleryContract.FORMAT_WEBP, "image/png"))
+    }
+
+    @Test
+    fun aQualityOrATargetSizeMakesPngOutputLossy() {
+        fun request(quality: Int? = null, targetBytes: Long? = null) =
+            ConvertRequest(null, EncodeRequest(quality = quality), targetBytes = targetBytes)
+        assertFalse(ScriptConverter.usesPngLossy(ImageOutputFormat.PNG, request()))
+        assertTrue(ScriptConverter.usesPngLossy(ImageOutputFormat.PNG, request(quality = 80)))
+        assertTrue(ScriptConverter.usesPngLossy(ImageOutputFormat.PNG, request(targetBytes = 4096L)))
+        assertFalse(ScriptConverter.usesPngLossy(ImageOutputFormat.JPEG, request(quality = 80)))
+        assertFalse(ScriptConverter.usesPngLossy(ImageOutputFormat.WEBP, request(targetBytes = 4096L)))
+
+        // The editor's save dialog starts with "Lossy compression" on when the script named a quality.
+        assertFalse(GallerySessionActivity.saveDefaults(EncodeRequest(format = GalleryContract.FORMAT_PNG)).pngLossy)
+        val lossy = GallerySessionActivity.saveDefaults(EncodeRequest(format = GalleryContract.FORMAT_PNG, quality = 70))
+        assertTrue(lossy.pngLossy)
+        assertEquals(70, lossy.quality)
+        assertEquals(EditorSaveFormat.PNG, lossy.format)
+        assertTrue(GallerySessionActivity.saveDefaults(EncodeRequest(quality = 70)).pngLossy)
     }
 
     @Test

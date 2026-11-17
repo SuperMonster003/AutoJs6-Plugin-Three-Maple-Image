@@ -123,11 +123,13 @@ internal object ImageTargetFileSizePolicy {
         webpLosslessRequested: Boolean,
         sdkInt: Int,
         maxOutputBytes: Long,
+        pngLossyRequested: Boolean = false,
     ): Boolean = maxTargetKibibytes(maxOutputBytes) >= 1L &&
         ImageOutputEncodingPolicy.supportsTargetFileSize(
             format = format,
             webpLosslessRequested = webpLosslessRequested,
             sdkInt = sdkInt,
+            pngLossyRequested = pngLossyRequested,
         )
 
     fun maxTargetKibibytes(maxOutputBytes: Long): Long =

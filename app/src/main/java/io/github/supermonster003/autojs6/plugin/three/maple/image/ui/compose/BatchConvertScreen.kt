@@ -96,6 +96,9 @@ private fun BatchConvertForm(
     if (BatchConversionPolicy.losslessVisible(settings, sdk)) {
         ConversionLosslessRow(settings.webpLossless, { onChange(settings.copy(webpLossless = it)) }, enabled, tag)
     }
+    if (BatchConversionPolicy.pngLossyVisible(settings)) {
+        ConversionPngLossyRow(settings.pngLossy, { onChange(settings.copy(pngLossy = it)) }, enabled, tag)
+    }
     ConversionResizeSection(
         modes = BatchConversionPolicy.RESIZE_MODES,
         mode = settings.resizeMode,

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
@@ -183,10 +184,75 @@ class GalleryServiceContractTest {
         val refused = plugin.convert(readOnly(broken), writable(File(directory, "t2.bin")), request())
         assertEquals(GalleryErrorCodes.DECODE_FAILED, refused.getString(GalleryContract.KEY_ERROR_CODE))
         val invalid = plugin.convert(readOnly(source), writable(File(directory, "t3.bin")), request {
-            putString(GalleryContract.KEY_FORMAT, GalleryContract.FORMAT_PNG)
+            putString(GalleryContract.KEY_FORMAT, GalleryContract.FORMAT_WEBP)
+            putBoolean(GalleryContract.KEY_LOSSLESS, true)
             putLong(GalleryContract.KEY_TARGET_BYTES, 1000L)
         })
         assertEquals(GalleryErrorCodes.INVALID_ARGUMENT, invalid.getString(GalleryContract.KEY_ERROR_CODE))
+    }
+
+    @Test fun aQualityOrATargetSizeMakesTheConvertedPngLossy() {
+        val width = 640
+        val height = 480
+        val source = File(directory, "photo.png")
+        val original = IntArray(width * height)
+        Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).let { bitmap ->
+            var seed = 20261117L
+            for (index in original.indices) {
+                seed = seed * 6364136223846793005L + 1442695040888963407L
+                val noise = (seed ushr 33).toInt()
+                val x = index % width
+                val y = index / width
+                original[index] = Color.rgb(
+                    (x * 255 / width + (noise and 7) - 4).coerceIn(0, 255),
+                    (y * 255 / height + ((noise ushr 3) and 7) - 4).coerceIn(0, 255),
+                    ((x + y) * 255 / (width + height) + ((noise ushr 6) and 7) - 4).coerceIn(0, 255),
+                )
+            }
+            bitmap.setPixels(original, 0, width, 0, 0, width, height)
+            bitmap.setHasAlpha(false)
+            source.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            bitmap.recycle()
+        }
+
+        fun convert(name: String, build: Bundle.() -> Unit): File {
+            val target = File(directory, name).apply { createNewFile() }
+            val answer = plugin.convert(readOnly(source), writable(target), request(build))
+            assertNull(answer.getString(GalleryContract.KEY_ERROR_MESSAGE), answer.getString(GalleryContract.KEY_ERROR_CODE))
+            assertEquals("image/png", answer.getString(GalleryContract.KEY_MIME_TYPE))
+            assertEquals(target.length(), answer.getLong(GalleryContract.KEY_SIZE))
+            return target
+        }
+
+        fun largestDifference(file: File): Int {
+            val decoded = requireNotNull(BitmapFactory.decodeFile(file.path))
+            val pixels = IntArray(width * height).also { decoded.getPixels(it, 0, width, 0, 0, width, height) }
+            decoded.recycle()
+            var largest = 0
+            for (index in pixels.indices) {
+                for (shift in intArrayOf(24, 16, 8, 0)) {
+                    largest = maxOf(largest, kotlin.math.abs(((pixels[index] ushr shift) and 0xFF) - ((original[index] ushr shift) and 0xFF)))
+                }
+            }
+            return largest
+        }
+
+        // Without a quality the output follows the PNG source and keeps every pixel, as before.
+        val lossless = convert("lossless.bin") {}
+        assertEquals(0, largestDifference(lossless))
+        assertEquals(0, largestDifference(convert("full.bin") { putInt(GalleryContract.KEY_QUALITY, 100) }))
+
+        val lossy = convert("lossy.bin") { putInt(GalleryContract.KEY_QUALITY, 50) }
+        assertTrue("lossless ${lossless.length()}, lossy ${lossy.length()}", lossy.length() < lossless.length() * 3 / 4)
+        assertTrue(largestDifference(lossy) in 1..requireNotNull(PngLossyPolicy.level(50)).maxTolerance)
+
+        val targetBytes = (lossy.length() + lossless.length()) / 2
+        val sized = convert("sized.bin") {
+            putString(GalleryContract.KEY_FORMAT, GalleryContract.FORMAT_PNG)
+            putLong(GalleryContract.KEY_TARGET_BYTES, targetBytes)
+        }
+        assertTrue("target $targetBytes, written ${sized.length()}", sized.length() in lossy.length()..targetBytes)
+        assertTrue(largestDifference(sized) in 1..requireNotNull(PngLossyPolicy.level(50)).maxTolerance)
     }
 
     @Test fun aNewSessionReplacesTheOldOneAndUnclaimedSessionsTimeOut() {

@@ -55,9 +55,10 @@ internal class ScriptConverter(private val context: Context) {
                 throw ContractViolation(GalleryErrorCodes.LIMIT_EXCEEDED, "the conversion needs more memory than this device allows")
             }
             val lossless = ImageOutputEncodingPolicy.usesWebpLossless(format, request.lossless, Build.VERSION.SDK_INT)
+            val pngLossy = usesPngLossy(format, request)
             val targetBytes = request.targetBytes?.also {
-                if (!ImageOutputEncodingPolicy.supportsTargetFileSize(format, lossless, Build.VERSION.SDK_INT)) {
-                    throw ContractViolation(GalleryErrorCodes.INVALID_ARGUMENT, "targetBytes applies to JPEG and lossy WebP output, not ${format.displayName}")
+                if (!ImageOutputEncodingPolicy.supportsTargetFileSize(format, lossless, Build.VERSION.SDK_INT, pngLossy)) {
+                    throw ContractViolation(GalleryErrorCodes.INVALID_ARGUMENT, "targetBytes does not apply to lossless ${format.displayName} output")
                 }
             }
             val quality = (request.encode.quality ?: ImageConversionOptions.DEFAULT_QUALITY)
@@ -71,6 +72,7 @@ internal class ScriptConverter(private val context: Context) {
                 targetSize = targetSize,
                 jpegBackgroundColor = request.background ?: ImageConversionOptions.DEFAULT_JPEG_BACKGROUND_COLOR,
                 webpLossless = lossless,
+                pngLossy = pngLossy,
                 pngPaletteColorCountHint = info.pngPaletteColorCount.takeIf { format == ImageOutputFormat.PNG },
                 targetFileSizeBytes = targetBytes,
                 preservedExifMetadata = exif,
@@ -134,6 +136,10 @@ internal class ScriptConverter(private val context: Context) {
             null -> ImageOutputFormat.entries.firstOrNull { it.mimeType == sourceMimeType } ?: ImageOutputFormat.JPEG
             else -> throw ContractViolation(GalleryErrorCodes.UNSUPPORTED_FORMAT, "cannot write $requested")
         }
+
+        /** PNG stays lossless unless the script names a quality or a target size; either one makes it lossy. */
+        fun usesPngLossy(format: ImageOutputFormat, request: ConvertRequest): Boolean =
+            format == ImageOutputFormat.PNG && (request.encode.quality != null || request.targetBytes != null)
 
         /**
          * The output size: the converter's own modes, where the custom size keeps the aspect ratio by

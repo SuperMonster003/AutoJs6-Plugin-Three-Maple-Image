@@ -505,6 +505,8 @@
     <string name="text_image_conversion_output_resolution_unavailable">出力解像度: -</string>
     <string name="text_image_conversion_percentage">パーセント</string>
     <string name="text_image_conversion_percentage_hint">パーセント</string>
+    <string name="text_image_conversion_png_lossy">非可逆圧縮</string>
+    <string name="text_image_conversion_png_lossy_summary">わずかな色の差を許容してファイルを小さくします</string>
     <string name="text_image_conversion_preserve_exif">安全な EXIF メタデータを保持</string>
     <string name="text_image_conversion_preserve_exif_helper">カメラと撮影情報を保持します. 向きは正規化され, GPS 位置情報, 埋め込みプレビュー, 安全に検査できないメタデータは常に削除されます.</string>
     <string name="text_image_conversion_preserve_exif_helper_short">カメラと撮影情報を保持します. 向きは正規化され, 埋め込みプレビューと安全に検査できないメタデータは常に削除されます.</string>

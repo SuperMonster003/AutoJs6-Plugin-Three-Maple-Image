@@ -94,6 +94,7 @@ internal object StandaloneImageWork {
 
     private fun saveDefaultsJson(options: EditorSaveOptions): JSONObject = JSONObject()
         .put("format", options.format.name).put("quality", options.quality).put("lossless", options.webpLossless)
+        .put("pngLossy", options.pngLossy)
         .put("keepExif", options.keepExif).put("keepLocation", options.keepLocation)
 
     private fun saveDefaults(json: JSONObject): EditorSaveOptions? = runCatching {
@@ -101,6 +102,7 @@ internal object StandaloneImageWork {
             format = EditorSaveFormat.valueOf(json.getString("format")),
             quality = json.getInt("quality"),
             webpLossless = json.optBoolean("lossless", false),
+            pngLossy = json.optBoolean("pngLossy", false),
             keepExif = json.optBoolean("keepExif", false),
             keepLocation = json.optBoolean("keepLocation", false),
         )

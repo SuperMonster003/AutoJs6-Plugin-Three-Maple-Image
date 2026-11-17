@@ -267,9 +267,13 @@ internal object ImageBitmapIO {
                 format = options.format,
                 webpLosslessRequested = options.webpLossless,
                 sdkInt = Build.VERSION.SDK_INT,
+                pngLossyRequested = options.pngLossy,
             ),
-        ) { "Target file size mode requires JPEG or lossy WebP output" }
+        ) { "Target file size mode requires JPEG, lossy WebP or lossy PNG output" }
 
+        if (options.format == ImageOutputFormat.PNG) {
+            return selectPngTargetFileSize(bitmap, options, targetBytes, maxOutputBytes, temporaryDirectory)
+        }
         val encodedBitmap = prepareBitmapForEncoding(bitmap, options)
         try {
             val minimumQuality = ImageConversionOptions.MIN_QUALITY
@@ -298,6 +302,40 @@ internal object ImageBitmapIO {
         } finally {
             if (encodedBitmap !== bitmap) encodedBitmap.recycle()
         }
+    }
+
+    /**
+     * The target file size search for PNG. Only eleven qualities encode differently (100 and one per lossy level),
+     * so the search runs over their ranks instead of all hundred values and encodes each at most once.
+     */
+    private fun selectPngTargetFileSize(
+        bitmap: Bitmap,
+        options: ImageConversionOptions,
+        targetBytes: Long,
+        maxOutputBytes: Long,
+        temporaryDirectory: File?,
+    ): ImageTargetFileSizeResult {
+        val qualities = PngLossyPolicy.DISTINCT_QUALITIES.asReversed()
+        val result = ImageTargetFileSizeSearch.search(
+            targetBytes = targetBytes,
+            minQuality = 1,
+            maxQuality = qualities.size,
+        ) { rank ->
+            val candidate = options.copy(quality = qualities[rank - 1], targetFileSizeBytes = null)
+            try {
+                measurePreparedOutput(
+                    bitmap = bitmap,
+                    options = candidate,
+                    maxOutputBytes = maxOutputBytes,
+                    pngPalettePlan = preparePngPalettePlan(bitmap, candidate),
+                    temporaryDirectory = temporaryDirectory,
+                )
+            } catch (error: OutputLimitExceededException) {
+                if (rank == 1) throw error
+                maxOutputBytes + 1L
+            }
+        }
+        return result.copy(quality = qualities[result.quality - 1])
     }
 
     private fun measurePreparedOutput(
@@ -396,7 +434,11 @@ internal object ImageBitmapIO {
             else -> options.quality
         }
         val bounded = BoundedOutputStream(output, maxOutputBytes)
-        val compressed = if (options.format == ImageOutputFormat.PNG && pngPalettePlan != null) {
+        val pngLossyLevel = options.pngLossyLevel
+        val compressed = if (pngLossyLevel != null) {
+            PngLossyEncoder.encode(bitmap, pngLossyLevel, bounded)
+            true
+        } else if (options.format == ImageOutputFormat.PNG && pngPalettePlan != null) {
             PngOutputOptimizer.encode(bitmap, pngPalettePlan, bounded)
             true
         } else {
@@ -430,7 +472,8 @@ internal object ImageBitmapIO {
     private fun preparePngPalettePlan(
         bitmap: Bitmap,
         options: ImageConversionOptions,
-    ): PngOutputOptimizer.PalettePlan? = if (options.format == ImageOutputFormat.PNG) {
+    ): PngOutputOptimizer.PalettePlan? = if (options.format == ImageOutputFormat.PNG && options.pngLossyLevel == null) {
+        // Lossy PNG output looks for a palette itself, and accepts near-identical colors while doing so.
         PngOutputOptimizer.plan(bitmap)
     } else {
         null

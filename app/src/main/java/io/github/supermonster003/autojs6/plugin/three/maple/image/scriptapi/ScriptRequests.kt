@@ -94,7 +94,7 @@ internal object ScriptRequests {
         val targetBytes = if (options?.containsKey(GalleryContract.KEY_TARGET_BYTES) == true) options.getLong(GalleryContract.KEY_TARGET_BYTES) else null
         if (targetBytes != null) {
             if (targetBytes < 1) invalid("targetBytes must be positive, got $targetBytes")
-            if (encode.format == GalleryContract.FORMAT_PNG || lossless) invalid("targetBytes applies to JPEG and lossy WebP output")
+            if (lossless) invalid("targetBytes does not apply to lossless output")
         }
         val sizeMode = options?.getString(GalleryContract.KEY_SIZE_MODE) ?: GalleryContract.SIZE_ORIGINAL
         if (sizeMode !in GalleryContract.SIZE_MODES) invalid("sizeMode must be one of ${GalleryContract.SIZE_MODES.joinToString()}, got $sizeMode")

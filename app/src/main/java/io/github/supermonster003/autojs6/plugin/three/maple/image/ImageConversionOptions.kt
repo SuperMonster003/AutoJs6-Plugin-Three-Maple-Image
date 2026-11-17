@@ -59,6 +59,8 @@ internal data class ImageConversionOptions(
     val targetSize: ImagePixelSize,
     val jpegBackgroundColor: Int = DEFAULT_JPEG_BACKGROUND_COLOR,
     val webpLossless: Boolean = false,
+    /** PNG only: [quality] below 100 lets pixels change slightly for a smaller file (see [PngLossyPolicy]). */
+    val pngLossy: Boolean = false,
     val pngPaletteColorCountHint: Int? = null,
     val targetFileSizeBytes: Long? = null,
     val preservedExifMetadata: PreservedExifMetadata? = null,
@@ -67,6 +69,9 @@ internal data class ImageConversionOptions(
         require(quality in MIN_QUALITY..MAX_QUALITY) { "Quality must be between $MIN_QUALITY and $MAX_QUALITY" }
         require(!webpLossless || format == ImageOutputFormat.WEBP) {
             "Lossless WebP can only be enabled for WebP output"
+        }
+        require(!pngLossy || format == ImageOutputFormat.PNG) {
+            "Lossy PNG can only be enabled for PNG output"
         }
         require(pngPaletteColorCountHint == null || format == ImageOutputFormat.PNG) {
             "A PNG palette estimate can only be used for PNG output"
@@ -80,11 +85,16 @@ internal data class ImageConversionOptions(
         require(
             targetFileSizeBytes == null ||
                 format == ImageOutputFormat.JPEG ||
-                format == ImageOutputFormat.WEBP && !webpLossless,
+                format == ImageOutputFormat.WEBP && !webpLossless ||
+                format == ImageOutputFormat.PNG && pngLossy,
         ) {
-            "Target file size is available only for JPEG and lossy WebP output"
+            "Target file size is available only for JPEG, lossy WebP and lossy PNG output"
         }
     }
+
+    /** How lossy PNG output treats pixels, or null when the output is not a PNG or is lossless. */
+    val pngLossyLevel: PngLossyLevel?
+        get() = if (format == ImageOutputFormat.PNG && pngLossy) PngLossyPolicy.level(quality) else null
 
     companion object {
         const val MIN_QUALITY = 1
@@ -106,12 +116,17 @@ internal object ImageOutputEncodingPolicy {
         sdkInt: Int,
     ): Boolean = format == ImageOutputFormat.WEBP && requested && isWebpLosslessAvailable(sdkInt)
 
+    /** PNG has a quality only once "Lossy compression" is on; it is lossless otherwise. */
+    fun usesPngLossy(format: ImageOutputFormat, requested: Boolean): Boolean =
+        format == ImageOutputFormat.PNG && requested
+
     fun qualityEnabled(
         format: ImageOutputFormat,
         webpLosslessRequested: Boolean,
         sdkInt: Int,
         targetFileSizeRequested: Boolean = false,
-    ): Boolean = format.supportsQuality &&
+        pngLossyRequested: Boolean = false,
+    ): Boolean = (format.supportsQuality || usesPngLossy(format, pngLossyRequested)) &&
         !usesWebpLossless(format, webpLosslessRequested, sdkInt) &&
         !targetFileSizeRequested
 
@@ -119,9 +134,10 @@ internal object ImageOutputEncodingPolicy {
         format: ImageOutputFormat,
         webpLosslessRequested: Boolean,
         sdkInt: Int,
+        pngLossyRequested: Boolean = false,
     ): Boolean = when (format) {
         ImageOutputFormat.JPEG -> true
-        ImageOutputFormat.PNG -> false
+        ImageOutputFormat.PNG -> pngLossyRequested
         ImageOutputFormat.WEBP -> !usesWebpLossless(format, webpLosslessRequested, sdkInt)
     }
 
@@ -219,7 +235,11 @@ internal object ImageConversionSizing {
         } else {
             val bytesPerPixel = when (options.format) {
                 ImageOutputFormat.JPEG -> 0.10 + options.quality * 0.006
-                ImageOutputFormat.PNG -> 1.75
+                ImageOutputFormat.PNG -> if (options.pngLossy) {
+                    PNG_ESTIMATED_BYTES_PER_PIXEL * PngLossyPolicy.estimatedSizeFactor(options.quality)
+                } else {
+                    PNG_ESTIMATED_BYTES_PER_PIXEL
+                }
                 ImageOutputFormat.WEBP -> if (options.webpLossless) {
                     WEBP_LOSSLESS_ESTIMATED_BYTES_PER_PIXEL
                 } else {
@@ -284,6 +304,7 @@ internal object ImageConversionSizing {
         if (this > Long.MAX_VALUE - value) Long.MAX_VALUE else this + value
 
     private const val WEBP_LOSSLESS_ESTIMATED_BYTES_PER_PIXEL = 1.35
+    private const val PNG_ESTIMATED_BYTES_PER_PIXEL = 1.75
     private const val BITS_PER_BYTE = 8L
     private const val PNG_FILTER_BYTE_COUNT = 1L
     private const val DEFLATE_OVERHEAD_DIVISOR = 1000L

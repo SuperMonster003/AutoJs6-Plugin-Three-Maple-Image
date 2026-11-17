@@ -6,6 +6,8 @@ internal data class ConverterFormEvaluation(
     val resizeMode: ImageResizeMode,
     val losslessVisible: Boolean,
     val losslessActive: Boolean,
+    /** The output is a PNG, which offers "Lossy compression". */
+    val pngLossyVisible: Boolean,
     val targetFileSizeVisible: Boolean,
     val targetFileSizeActive: Boolean,
     val targetFileSizeBytes: Long?,
@@ -84,11 +86,13 @@ internal class ConverterFormEvaluator(
         val losslessVisible = format == ImageOutputFormat.WEBP &&
             ImageOutputEncodingPolicy.isWebpLosslessAvailable(sdkInt)
         val losslessActive = ImageOutputEncodingPolicy.usesWebpLossless(format, draft.webpLossless, sdkInt)
+        val pngLossyActive = ImageOutputEncodingPolicy.usesPngLossy(format, draft.pngLossy)
         val targetFileSizeVisible = ImageTargetFileSizePolicy.isAvailable(
             format = format,
             webpLosslessRequested = draft.webpLossless,
             sdkInt = sdkInt,
             maxOutputBytes = maxOutputBytes,
+            pngLossyRequested = pngLossyActive,
         )
         val targetFileSizeActive = targetFileSizeVisible && draft.targetFileSizeEnabled
         val qualityEnabled = ImageOutputEncodingPolicy.qualityEnabled(
@@ -96,6 +100,7 @@ internal class ConverterFormEvaluator(
             webpLosslessRequested = draft.webpLossless,
             sdkInt = sdkInt,
             targetFileSizeRequested = targetFileSizeActive,
+            pngLossyRequested = pngLossyActive,
         )
         val resize = resolveResize(draft)
         val targetFileSizeBytes = if (targetFileSizeActive) {
@@ -116,6 +121,7 @@ internal class ConverterFormEvaluator(
             resizeMode = draft.resizeMode,
             losslessVisible = losslessVisible,
             losslessActive = losslessActive,
+            pngLossyVisible = format == ImageOutputFormat.PNG,
             targetFileSizeVisible = targetFileSizeVisible,
             targetFileSizeActive = targetFileSizeActive,
             targetFileSizeBytes = targetFileSizeBytes,
@@ -166,6 +172,7 @@ internal class ConverterFormEvaluator(
         targetSize = targetSize,
         jpegBackgroundColor = if (draft.jpegBackgroundBlack) JPEG_BACKGROUND_BLACK else ImageConversionOptions.DEFAULT_JPEG_BACKGROUND_COLOR,
         webpLossless = ImageOutputEncodingPolicy.usesWebpLossless(format, draft.webpLossless, sdkInt),
+        pngLossy = ImageOutputEncodingPolicy.usesPngLossy(format, draft.pngLossy),
         pngPaletteColorCountHint = ImageConversionSizing.pngPaletteColorCountHint(
             format = format,
             sourceSize = sourceInfo.displaySize,

@@ -67,6 +67,7 @@ internal class EditorSaveDialogState(
     formatIndex: Int,
     quality: Int,
     webpLossless: Boolean,
+    pngLossy: Boolean = false,
     keepExif: Boolean = false,
     /** The original can be replaced (ROADMAP 8.2); the switch is hidden otherwise. */
     val overwriteAvailable: Boolean = false,
@@ -80,6 +81,10 @@ internal class EditorSaveDialogState(
     var quality by mutableIntStateOf(quality)
     var webpLossless by mutableStateOf(webpLossless)
     var losslessAvailable by mutableStateOf(false)
+    var pngLossy by mutableStateOf(pngLossy)
+
+    /** The file will be a PNG, which offers "Lossy compression". */
+    var pngLossyAvailable by mutableStateOf(false)
     var qualityEnabled by mutableStateOf(true)
     var keepExif by mutableStateOf(keepExif)
 
@@ -225,6 +230,15 @@ internal fun EditorSaveDialog(
                 checked = state.webpLossless,
                 onToggle = { state.webpLossless = it; state.onChanged() },
                 modifier = Modifier.testTag("maple.editor.save.lossless"),
+            )
+        }
+        if (state.pngLossyAvailable) {
+            MapleSwitchRow(
+                title = stringResource(R.string.text_image_conversion_png_lossy),
+                summary = stringResource(R.string.text_image_conversion_png_lossy_summary),
+                checked = state.pngLossy,
+                onToggle = { state.pngLossy = it; state.onChanged() },
+                modifier = Modifier.testTag("maple.editor.save.pngLossy"),
             )
         }
         if (state.keepExifAvailable) {

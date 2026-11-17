@@ -55,6 +55,7 @@ internal class ConverterFormState(draft: ConversionDialogDraft) {
     var lockAspectRatio by mutableStateOf(draft.lockAspectRatio)
     var jpegBackgroundBlack by mutableStateOf(draft.jpegBackgroundBlack)
     var webpLossless by mutableStateOf(draft.webpLossless)
+    var pngLossy by mutableStateOf(draft.pngLossy)
     var targetFileSizeEnabled by mutableStateOf(draft.targetFileSizeEnabled)
     var targetFileSizeKibibytes by mutableStateOf(draft.targetFileSizeKibibytes)
     var preserveExifMetadata by mutableStateOf(draft.preserveExifMetadata)
@@ -72,6 +73,7 @@ internal class ConverterFormState(draft: ConversionDialogDraft) {
         lockAspectRatio = lockAspectRatio,
         jpegBackgroundBlack = jpegBackgroundBlack,
         webpLossless = webpLossless,
+        pngLossy = pngLossy,
         targetFileSizeEnabled = targetFileSizeEnabled,
         targetFileSizeKibibytes = targetFileSizeKibibytes,
         longEdge = longEdge,
@@ -215,6 +217,7 @@ private fun Form(
     Spacer(Modifier.height(8.dp))
     ConversionQualityRow(form.quality, { form.quality = it }, enabled && evaluation.qualityEnabled, tag)
     if (evaluation.losslessVisible) ConversionLosslessRow(form.webpLossless, callbacks.onWebpLossless, enabled, tag)
+    if (evaluation.pngLossyVisible) ConversionPngLossyRow(form.pngLossy, { form.pngLossy = it }, enabled, tag)
     if (evaluation.targetFileSizeVisible) {
         MapleSwitchRow(
             title = stringResource(R.string.text_image_conversion_target_file_size),

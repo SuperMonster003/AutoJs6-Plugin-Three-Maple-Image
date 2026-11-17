@@ -505,6 +505,8 @@
     <string name="text_image_conversion_output_resolution_unavailable">Output resolution: -</string>
     <string name="text_image_conversion_percentage">Percentage</string>
     <string name="text_image_conversion_percentage_hint">Percentage</string>
+    <string name="text_image_conversion_png_lossy">Lossy compression</string>
+    <string name="text_image_conversion_png_lossy_summary">Allows slight color differences for a smaller file</string>
     <string name="text_image_conversion_preserve_exif">Preserve safe EXIF metadata</string>
     <string name="text_image_conversion_preserve_exif_helper">Camera and capture details are kept. Orientation is normalized; GPS location, embedded previews, and metadata that cannot be safely inspected are always removed.</string>
     <string name="text_image_conversion_preserve_exif_helper_short">Camera and capture details are kept. Orientation is normalized; embedded previews and metadata that cannot be safely inspected are always removed.</string>

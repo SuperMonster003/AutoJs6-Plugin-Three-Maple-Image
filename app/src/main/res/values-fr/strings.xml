@@ -505,6 +505,8 @@
     <string name="text_image_conversion_output_resolution_unavailable">Résolution de sortie: -</string>
     <string name="text_image_conversion_percentage">Pourcentage</string>
     <string name="text_image_conversion_percentage_hint">Pourcentage</string>
+    <string name="text_image_conversion_png_lossy">Compression avec perte</string>
+    <string name="text_image_conversion_png_lossy_summary">Autorise de légères différences de couleur pour réduire la taille du fichier</string>
     <string name="text_image_conversion_preserve_exif">Conserver les métadonnées EXIF sûres</string>
     <string name="text_image_conversion_preserve_exif_helper">Les données de l\'appareil et de prise de vue sont conservées. L\'orientation est normalisée; la position GPS, les aperçus intégrés et les métadonnées qui ne peuvent pas être contrôlées de manière sûre sont toujours supprimés.</string>
     <string name="text_image_conversion_preserve_exif_helper_short">Les données de l\'appareil et de prise de vue sont conservées. L\'orientation est normalisée; les aperçus intégrés et les métadonnées qui ne peuvent pas être contrôlées de manière sûre sont toujours supprimés.</string>

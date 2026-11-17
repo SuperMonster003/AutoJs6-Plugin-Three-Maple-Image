@@ -2,12 +2,17 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image
 
 import android.content.Intent
 import android.graphics.Bitmap
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
@@ -113,6 +118,39 @@ class ImageConverterComposeInstrumentationTest {
             compose.onNodeWithTag("maple.converter.format.0").performScrollTo().assertIsSelected()
             compose.onNodeWithTag("maple.converter.targetFileSize").performScrollTo().assert(hasText("64"))
             scenario.onActivity { assertEquals(false, it.isFinishing) }
+        }
+    }
+
+    @Test fun lossyCompressionUnlocksPngQualityAndTargetSizeAndSurvivesRecreation() {
+        val qualitySlider = SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo) and
+            hasAnyAncestor(hasTestTag("maple.converter.quality"))
+        launch().use { scenario ->
+            compose.onNodeWithTag("maple.converter.format.1").performScrollTo().assertIsSelected()
+            compose.onNodeWithTag("maple.converter.pngLossy").performScrollTo().assertIsDisplayed().assertIsOff()
+            compose.onNode(qualitySlider).assertIsNotEnabled()
+            compose.onNodeWithTag("maple.converter.targetEnabled").assertDoesNotExist()
+
+            compose.onNodeWithTag("maple.converter.pngLossy").performScrollTo().performClick()
+            compose.onNodeWithTag("maple.converter.pngLossy").assertIsOn()
+            compose.onNode(qualitySlider).assertIsEnabled()
+            // The target size chooses the quality itself, as for JPEG and WebP.
+            compose.onNodeWithTag("maple.converter.targetEnabled").performScrollTo().performClick()
+            compose.onNodeWithTag("maple.converter.targetFileSize").performScrollTo().assertIsDisplayed()
+            compose.onNode(qualitySlider).assertIsNotEnabled()
+            compose.onNodeWithTag("maple.converter.convert").assertIsEnabled()
+
+            scenario.recreate()
+            compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag("maple.converter.targetFileSize")).fetchSemanticsNodes().isNotEmpty() }
+            compose.onNodeWithTag("maple.converter.pngLossy").performScrollTo().assertIsOn()
+
+            // The switch belongs to PNG output alone.
+            compose.onNodeWithTag("maple.converter.format.0").performScrollTo().performClick()
+            compose.onNodeWithTag("maple.converter.pngLossy").assertDoesNotExist()
+            compose.onNodeWithTag("maple.converter.format.1").performScrollTo().performClick()
+            compose.onNodeWithTag("maple.converter.pngLossy").performScrollTo().assertIsOn()
+            compose.onNodeWithTag("maple.converter.pngLossy").performClick()
+            compose.onNodeWithTag("maple.converter.targetEnabled").assertDoesNotExist()
+            compose.onNode(qualitySlider).assertIsNotEnabled()
         }
     }
 }

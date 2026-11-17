@@ -6,7 +6,13 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -92,6 +98,51 @@ class HostToolOverwriteInstrumentationTest {
         assertEquals(20 to 40, size(File(directory, "wide_edited.png")))
         assertEquals(40 to 20, size(target))
         assertEquals(listOf("prepareOutput", "openOutput", "openPendingOutput", "commitOutput", "close"), session.calls.distinct())
+    }
+
+    @Test fun lossyCompressionInTheSaveDialogUnlocksTheQualityAndWritesASmallerPng() {
+        // A photograph-like image: a flat one fits a palette and is written the same way with or without the switch.
+        val width = 320
+        val height = 200
+        val pixels = IntArray(width * height)
+        var seed = 20261117L
+        for (index in pixels.indices) {
+            seed = seed * 6364136223846793005L + 1442695040888963407L
+            val noise = (seed ushr 33).toInt()
+            pixels[index] = Color.rgb(
+                (index % width * 255 / width + (noise and 7) - 4).coerceIn(0, 255),
+                (index / width * 255 / height + ((noise ushr 3) and 7) - 4).coerceIn(0, 255),
+                ((noise ushr 6) and 0xFF),
+            )
+        }
+        Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888).let { bitmap ->
+            target.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            bitmap.recycle()
+        }
+        val edited = File(directory, "wide_edited.png")
+        val qualitySlider = SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo) and
+            hasAnyAncestor(hasTestTag("maple.editor.save.quality"))
+
+        launchEditor(FakeManagedSession(directory, target)).use { scenario ->
+            // The format follows the PNG source: the switch is offered, and the quality stays locked while it is off.
+            compose.onNodeWithTag("maple.editor.save.pngLossy").performScrollTo().assertIsOff()
+            compose.onNode(qualitySlider).assertIsNotEnabled()
+            compose.onNodeWithTag("maple.dialog.confirm").performClick()
+            compose.waitUntil(TIMEOUT) { scenario.state == androidx.lifecycle.Lifecycle.State.DESTROYED }
+        }
+        assertEquals(height to width, size(edited))
+        val losslessBytes = edited.length()
+        assertTrue(edited.delete())
+
+        launchEditor(FakeManagedSession(directory, target)).use { scenario ->
+            compose.onNodeWithTag("maple.editor.save.pngLossy").performScrollTo().performClick()
+            compose.onNodeWithTag("maple.editor.save.pngLossy").assertIsOn()
+            compose.onNode(qualitySlider).assertIsEnabled()
+            compose.onNodeWithTag("maple.dialog.confirm").performClick()
+            compose.waitUntil(TIMEOUT) { scenario.state == androidx.lifecycle.Lifecycle.State.DESTROYED }
+        }
+        assertEquals(height to width, size(edited))
+        assertTrue("lossless $losslessBytes, lossy ${edited.length()}", edited.length() < losslessBytes * 9 / 10)
     }
 
     @Test fun anOverwriteReplacesTheTargetAndItsUndoRestoresIt() {

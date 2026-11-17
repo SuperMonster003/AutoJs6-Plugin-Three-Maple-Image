@@ -581,6 +581,8 @@ internal data class ConversionDialogDraft(
     val lockAspectRatio: Boolean,
     val jpegBackgroundBlack: Boolean,
     val webpLossless: Boolean = false,
+    /** "Lossy compression" of PNG output; the quality only applies to PNG while it is on. */
+    val pngLossy: Boolean = false,
     val targetFileSizeEnabled: Boolean = false,
     val targetFileSizeKibibytes: String = ImageTargetFileSizePolicy.DEFAULT_TARGET_KIBIBYTES.toString(),
     val longEdge: String = ImageConversionSizing.DEFAULT_LONG_EDGE.toString(),

@@ -242,18 +242,6 @@ class GallerySessionActivity : ComponentActivity(), SessionUi {
         if (written) current.editResult(mimeType, bounds.outWidth, bounds.outHeight, size)
     }
 
-    private fun saveDefaults(encode: EncodeRequest): EditorSaveOptions = EditorSaveOptions(
-        format = when (encode.format) {
-            GalleryContract.FORMAT_JPEG -> EditorSaveFormat.JPEG
-            GalleryContract.FORMAT_PNG -> EditorSaveFormat.PNG
-            GalleryContract.FORMAT_WEBP -> EditorSaveFormat.WEBP
-            else -> EditorSaveFormat.FOLLOW_SOURCE
-        },
-        quality = encode.quality ?: ImageConversionOptions.DEFAULT_QUALITY,
-        keepExif = encode.keepExif,
-        keepLocation = encode.keepExif && encode.keepLocation,
-    )
-
     private inline fun finishWith(block: () -> Unit) {
         block()
         finish()
@@ -279,6 +267,21 @@ class GallerySessionActivity : ComponentActivity(), SessionUi {
         private const val STATE_LAUNCHED = "gallery.launched"
         private const val STATE_START_PAGE = "gallery.startPage"
         private const val DEFAULT_EDIT_NAME = "image"
+
+        /** What the editor's save dialog starts from for the script's encoding options. */
+        internal fun saveDefaults(encode: EncodeRequest): EditorSaveOptions = EditorSaveOptions(
+            format = when (encode.format) {
+                GalleryContract.FORMAT_JPEG -> EditorSaveFormat.JPEG
+                GalleryContract.FORMAT_PNG -> EditorSaveFormat.PNG
+                GalleryContract.FORMAT_WEBP -> EditorSaveFormat.WEBP
+                else -> EditorSaveFormat.FOLLOW_SOURCE
+            },
+            quality = encode.quality ?: ImageConversionOptions.DEFAULT_QUALITY,
+            // A quality asks for lossy output wherever the result is a PNG, as in `convert`; other formats ignore the switch.
+            pngLossy = encode.quality != null,
+            keepExif = encode.keepExif,
+            keepLocation = encode.keepExif && encode.keepLocation,
+        )
 
         /** The viewer's page hook: a viewer started for a script session reports its page to the host. */
         internal fun onViewerPage(intent: Intent?, index: Int) {
