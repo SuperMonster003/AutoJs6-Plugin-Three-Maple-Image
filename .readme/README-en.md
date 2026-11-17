@@ -87,8 +87,8 @@ Viewing uses read-only inputs. Editing and conversion create a new file by defau
 - 14 filters (such as `Mono`, `Sepia`, `Vintage` and `Film`) with adjustable intensity combine with the adjustments; `Annotate` draws rectangles, ellipses, arrows and lines by dragging, then moves and resizes them, with outlined or filled rectangles and ellipses; long-press the canvas to pick a color with a magnifier that shows its HEX value.
 - Brush types include pen, highlighter, privacy-preserving mosaic, and eraser with remembered color and width; text supports multiline content, size, color, outline, shadow, and drag placement.
 - Undo and redo keep up to 8 history snapshots within a 192 MiB budget; `Restore original` is reversible, and leaving with unsaved changes requires confirmation.
-- The save dialog can follow the source format or choose JPEG, PNG, or WebP, adjust lossy quality, and enable lossless WebP on Android 11+; by default it saves a new file and previews its name, and it can also `Overwrite the original` (keeping the format) and `Keep capture details` (location is removed by default; with `Show location` on, `Keep location` can be chosen as well). An overwrite can be undone once from its notice.
-- The converter supports JPEG / PNG / WebP, quality 1-100 (default 92), target file size for JPEG and lossy WebP, lossless WebP on Android 11+, and automatic indexed PNG optimization when the image has at most 256 colors.
+- The save dialog can follow the source format or choose JPEG, PNG, or WebP, adjust lossy quality, enable lossless WebP on Android 11+, and turn on `Lossy compression` for PNG; by default it saves a new file and previews its name, and it can also `Overwrite the original` (keeping the format) and `Keep capture details` (location is removed by default; with `Show location` on, `Keep location` can be chosen as well). An overwrite can be undone once from its notice.
+- The converter supports JPEG / PNG / WebP, quality 1-100 (default 92), target file size for JPEG, lossy WebP and lossy PNG, lossless WebP on Android 11+, `Lossy compression` for PNG (off by default; allows slight color differences for a smaller file without reducing the image to 256 colors), and automatic indexed PNG optimization when the image has at most 256 colors.
 - Four sizing modes cover `Original`, `Percentage` (1-1000), `Custom` with aspect-ratio locking, and `Long edge` (1920 px by default and never upscales); JPEG can fill transparency with white or black.
 - The converter and batch conversion share one form that previews the output resolution, estimated size and the file name to be saved in real time at the bottom, and the converter can also `Overwrite the original`. Safe EXIF preservation is off by default; when enabled it keeps bounded camera fields, normalizes orientation, and always removes embedded previews; GPS is removed by default, and with `Show location` on, `Keep location` can be chosen.
 - Configuration changes preserve the canvas, dialog drafts, undo/redo history, and running tasks. From AutoJs6, new files and overwrites are written through the host session: staged, read back and verified, and only then published, so a failure leaves nothing half-written; an overwrite can be undone within 8 seconds.
@@ -307,6 +307,15 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v3.5.0
+
+###### 2026/11/17
+
+* `Hint` With PNG output, gallery.convert in scripts now writes a lossily compressed PNG when quality is given (quality used to be ignored and PNG was always lossless); leave quality out or set it to 100 for a lossless PNG
+* `Added` Lossy PNG compression: with PNG as the format, the converter, batch conversion and the editor's save dialog offer a "Lossy compression" switch (off by default); turning it on enables the quality slider and allows slight color differences for a smaller file. The difference is bounded (at most 1 level per color channel at quality 90 and above), transparency is unchanged, and the image is not reduced to 256 colors
+* `Added` Lossily compressed PNG can use "Target file size", which picks the highest quality that stays within the target
+* `Improved` gallery.convert in scripts accepts targetBytes for PNG output (AutoJs6 6.8.1 or later when the options name format "png"); with quality given and PNG as the save format, gallery.edit opens the save dialog with "Lossy compression" on
+
 #### v3.4.4
 
 ###### 2026/11/16
@@ -318,12 +327,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 ###### 2026/11/07
 
 * `Fixed` In the AutoJs6 file manager, the options "View as album" and "Convert images" of this plugin no longer appear in English in other interface languages
-
-#### v3.4.2
-
-###### 2026/11/07
-
-* `Improved` The AutoJs6 file manager groups the menu options of this plugin under the submenu "3-Maple Image", named as in the Plugin Center (requires AutoJs6 6.8.1 or later)
 
 ##### Full history
 

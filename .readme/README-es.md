@@ -87,8 +87,8 @@ La visualización usa entradas de solo lectura. La edición y la conversión cre
 - 14 filtros (como `Mono`, `Sepia`, `Vintage` y `Película`) con intensidad ajustable se combinan con los ajustes; `Anotar` dibuja rectángulos, elipses, flechas y líneas arrastrando y luego permite moverlos y cambiar su tamaño, con rectángulos y elipses de contorno o rellenos; al mantener pulsado el lienzo, una lupa toma el color y muestra su valor HEX.
 - Los tipos de pincel incluyen lápiz, resaltador, mosaico para privacidad y borrador, y recuerdan el color y el grosor; el texto admite varias líneas, tamaño, color, contorno, sombra y posición mediante arrastre.
 - Deshacer y rehacer conservan hasta 8 instantáneas dentro de un presupuesto de 192 MiB; `Restaurar original` también es reversible y salir con cambios sin guardar exige confirmación.
-- El diálogo de guardado puede seguir el formato de origen o elegir JPEG, PNG o WebP, ajustar la calidad con pérdida y activar WebP sin pérdida en Android 11+; por defecto guarda un archivo nuevo y muestra su nombre, y también ofrece `Sobrescribir el original` (con el mismo formato) y `Conservar los datos de captura` (la ubicación se quita de forma predeterminada; con `Mostrar ubicación` activado también se puede elegir `Conservar la ubicación`). Una sobrescritura se puede deshacer una vez desde su aviso.
-- El conversor admite JPEG / PNG / WebP, calidad 1-100 (92 por defecto), tamaño objetivo para JPEG y WebP con pérdida, WebP sin pérdida en Android 11+ y optimización automática de PNG indexado cuando la imagen tiene como máximo 256 colores.
+- El diálogo de guardado puede seguir el formato de origen o elegir JPEG, PNG o WebP, ajustar la calidad con pérdida, activar WebP sin pérdida en Android 11+ y activar `Compresión con pérdida` para PNG; por defecto guarda un archivo nuevo y muestra su nombre, y también ofrece `Sobrescribir el original` (con el mismo formato) y `Conservar los datos de captura` (la ubicación se quita de forma predeterminada; con `Mostrar ubicación` activado también se puede elegir `Conservar la ubicación`). Una sobrescritura se puede deshacer una vez desde su aviso.
+- El conversor admite JPEG / PNG / WebP, calidad 1-100 (92 por defecto), tamaño objetivo para JPEG, WebP con pérdida y PNG con pérdida, WebP sin pérdida en Android 11+, la `Compresión con pérdida` de PNG (desactivada por defecto; admite ligeras diferencias de color a cambio de un archivo más pequeño, sin reducir la imagen a 256 colores) y optimización automática de PNG indexado cuando la imagen tiene como máximo 256 colores.
 - Cuatro modos de tamaño cubren `Original`, `Porcentaje` (1-1000), `Personalizado` con bloqueo de proporción y `Lado largo` (1920 px por defecto, sin ampliar); JPEG puede rellenar la transparencia con blanco o negro.
 - El conversor y la conversión por lotes comparten un mismo formulario que muestra en tiempo real, en la parte inferior, la resolución de salida, el tamaño estimado y el nombre del archivo que se guardará; el conversor también puede `Sobrescribir el original`. La conservación segura de EXIF está desactivada por defecto; al activarla conserva campos de cámara limitados, normaliza la orientación y siempre elimina las vistas previas incrustadas; el GPS se elimina de forma predeterminada y, con `Mostrar ubicación` activado, se puede elegir `Conservar la ubicación`.
 - Los cambios de configuración conservan el lienzo, los borradores, el historial de deshacer/rehacer y las tareas en curso. Desde AutoJs6, los archivos nuevos y las sobrescrituras se escriben mediante la sesión del anfitrión: se preparan, se releen para verificarlos y solo entonces se publican, de modo que un fallo no deja archivos a medias; una sobrescritura se puede deshacer durante 8 segundos.
@@ -307,6 +307,15 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v3.5.0
+
+###### 2026/11/17
+
+* `Aviso` Con salida PNG, gallery.convert en los scripts ahora escribe un PNG comprimido con pérdida cuando se indica quality (antes quality se ignoraba y el PNG era siempre sin pérdida); omita quality o póngalo en 100 para obtener un PNG sin pérdida
+* `Función` Compresión PNG con pérdida: cuando el formato es PNG, el convertidor, la conversión por lotes y el diálogo de guardado del editor ofrecen un interruptor "Compresión con pérdida" (desactivado por defecto); al activarlo se puede usar el control de calidad y se admiten ligeras diferencias de color a cambio de un archivo más pequeño. La diferencia está acotada (como máximo 1 nivel por canal de color con calidad 90 o superior), la transparencia no cambia y la imagen no se reduce a 256 colores
+* `Función` Un PNG comprimido con pérdida puede usar "Tamaño de archivo objetivo", que elige la calidad más alta que no supera el objetivo
+* `Mejora` gallery.convert en los scripts acepta targetBytes para la salida PNG (AutoJs6 6.8.1 o posterior cuando las opciones indican format "png"); con quality indicado y PNG como formato de guardado, gallery.edit abre el diálogo de guardado con "Compresión con pérdida" activado
+
 #### v3.4.4
 
 ###### 2026/11/16
@@ -318,12 +327,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 ###### 2026/11/07
 
 * `Corrección` En el administrador de archivos de AutoJs6, las opciones "Ver como álbum" y "Convertir imágenes" de este plugin ya no aparecen en inglés en los demás idiomas de la interfaz
-
-#### v3.4.2
-
-###### 2026/11/07
-
-* `Mejora` El administrador de archivos de AutoJs6 agrupa las opciones de menú de este plugin en el submenú "3-Maple Image", con el mismo nombre que en el Centro de plugins (requiere AutoJs6 6.8.1 o posterior)
 
 ##### Historial completo
 

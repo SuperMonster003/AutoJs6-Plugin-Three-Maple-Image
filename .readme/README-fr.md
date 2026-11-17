@@ -87,8 +87,8 @@ La lecture utilise des entrées en lecture seule. La retouche et la conversion c
 - 14 filtres (par exemple `Mono`, `Sépia`, `Vintage` et `Pellicule`) à intensité réglable se combinent avec les réglages; `Annoter` trace rectangles, ellipses, flèches et lignes en faisant glisser, puis permet de les déplacer et de les redimensionner, avec rectangles et ellipses en contour ou pleins; un appui long sur le canevas prélève une couleur avec une loupe qui affiche sa valeur HEX.
 - Les pinceaux comprennent stylo, surligneur, mosaïque de confidentialité et gomme, avec mémorisation de la couleur et de l'épaisseur; le texte accepte plusieurs lignes, taille, couleur, contour, ombre et placement par glissement.
 - Annuler et rétablir conservent jusqu'à 8 instantanés dans un budget de 192 MiB; `Restaurer l'original` est lui-même réversible et quitter avec des modifications non enregistrées exige une confirmation.
-- Le dialogue d'enregistrement peut conserver le format source ou choisir JPEG, PNG ou WebP, régler la qualité avec perte et activer WebP sans perte sous Android 11+; par défaut il enregistre un nouveau fichier dont il affiche le nom, et propose aussi `Remplacer l'original` (même format) et `Conserver les infos de prise de vue` (la position est retirée par défaut; avec `Afficher la position` activé, `Conserver la position` peut aussi être choisi). Un remplacement peut être annulé une fois depuis sa notification.
-- Le convertisseur prend en charge JPEG / PNG / WebP, la qualité 1-100 (92 par défaut), une taille cible pour JPEG et WebP avec perte, WebP sans perte sous Android 11+, et l'optimisation PNG indexée automatique lorsque l'image compte au plus 256 couleurs.
+- Le dialogue d'enregistrement peut conserver le format source ou choisir JPEG, PNG ou WebP, régler la qualité avec perte, activer WebP sans perte sous Android 11+ et activer `Compression avec perte` pour le PNG; par défaut il enregistre un nouveau fichier dont il affiche le nom, et propose aussi `Remplacer l'original` (même format) et `Conserver les infos de prise de vue` (la position est retirée par défaut; avec `Afficher la position` activé, `Conserver la position` peut aussi être choisi). Un remplacement peut être annulé une fois depuis sa notification.
+- Le convertisseur prend en charge JPEG / PNG / WebP, la qualité 1-100 (92 par défaut), une taille cible pour JPEG, WebP avec perte et PNG avec perte, WebP sans perte sous Android 11+, la `Compression avec perte` du PNG (désactivée par défaut; elle admet de légers écarts de couleur pour un fichier plus petit, sans réduire l'image à 256 couleurs), et l'optimisation PNG indexée automatique lorsque l'image compte au plus 256 couleurs.
 - Quatre modes de taille couvrent `Original`, `Pourcentage` (1-1000), `Personnalisé` avec verrouillage des proportions et `Côté long` (1920 px par défaut, sans agrandissement); JPEG peut remplir la transparence en blanc ou noir.
 - Le convertisseur et la conversion par lots partagent un même formulaire qui affiche en temps réel, en bas, la résolution de sortie, la taille estimée et le nom du fichier qui sera enregistré; le convertisseur peut aussi `Remplacer l'original`. La conservation EXIF sûre est désactivée par défaut; activée, elle garde des champs d'appareil bornés, normalise l'orientation et supprime toujours les aperçus intégrés; le GPS est retiré par défaut et, avec `Afficher la position` activé, `Conserver la position` peut être choisi.
 - Les changements de configuration conservent le canevas, les brouillons, l'historique annuler/rétablir et les tâches en cours. Depuis AutoJs6, les nouveaux fichiers et les remplacements passent par la session de l'hôte: ils sont préparés, relus pour vérification et publiés seulement ensuite, si bien qu'un échec ne laisse aucun fichier à moitié écrit; un remplacement peut être annulé pendant 8 secondes.
@@ -307,6 +307,15 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
+#### v3.5.0
+
+###### 2026/11/17
+
+* `Note` Avec une sortie PNG, gallery.convert dans les scripts écrit désormais un PNG compressé avec perte lorsque quality est indiqué (quality était auparavant ignoré et le PNG toujours sans perte); omettez quality ou réglez-le sur 100 pour un PNG sans perte
+* `Fonctionnalité` Compression PNG avec perte: lorsque le format est PNG, le convertisseur, la conversion par lot et le dialogue d'enregistrement de l'éditeur proposent un interrupteur "Compression avec perte" (désactivé par défaut); une fois activé, le curseur de qualité devient utilisable et de légers écarts de couleur sont admis pour un fichier plus petit. L'écart est borné (au plus 1 niveau par canal de couleur à partir de la qualité 90), la transparence est inchangée et l'image n'est pas réduite à 256 couleurs
+* `Fonctionnalité` Un PNG compressé avec perte peut utiliser "Taille de fichier cible", qui choisit la qualité la plus élevée ne dépassant pas la cible
+* `Amélioration` gallery.convert dans les scripts accepte targetBytes pour une sortie PNG (AutoJs6 6.8.1 ou plus récent lorsque les options indiquent format "png"); avec quality indiqué et un enregistrement en PNG, gallery.edit ouvre le dialogue d'enregistrement avec "Compression avec perte" activé
+
 #### v3.4.4
 
 ###### 2026/11/16
@@ -318,12 +327,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 ###### 2026/11/07
 
 * `Correctif` Dans le gestionnaire de fichiers d'AutoJs6, les options "Afficher comme album" et "Convertir les images" de ce plugin ne s'affichent plus en anglais dans les autres langues de l'interface
-
-#### v3.4.2
-
-###### 2026/11/07
-
-* `Amélioration` Le gestionnaire de fichiers d'AutoJs6 regroupe les options de menu de ce plugin dans le sous-menu "3-Maple Image", nommé comme dans le Centre des plugins (AutoJs6 6.8.1 ou ultérieur requis)
 
 ##### Historique complet
 

@@ -5,6 +5,19 @@
   "changelog_label_improvement": "优化",
   "changelog_label_dependency": "依赖",
   "$data": {
+    "v3.5.0": {
+      "released_date": "2026/11/17",
+      "hint": [
+        "脚本用 gallery.convert 输出 PNG 时, 指定了 quality 就得到有损压缩的 PNG (此前忽略 quality, 始终无损); 需要无损 PNG 时去掉 quality 或设为 100"
+      ],
+      "feature": [
+        "PNG 有损压缩: 转换器, 批量转换和编辑器的保存对话框在格式为 PNG 时增加 \"有损压缩\" 开关 (默认关闭), 打开后可用质量滑块调节, 允许细微色差以减小文件体积; 颜色偏差有上限 (质量 90 及以上时每个颜色通道不超过 1 级), 透明度不变, 不会把图片降到 256 色",
+        "有损压缩的 PNG 可使用 \"目标文件大小\", 自动选出不超过目标大小的最高质量"
+      ],
+      "improvement": [
+        "脚本的 gallery.convert 可对 PNG 输出使用 targetBytes (选项中写明 format 为 \"png\" 时需要 AutoJs6 6.8.1 及以上版本); gallery.edit 指定了 quality 且保存为 PNG 时, 保存对话框的 \"有损压缩\" 开关初始为开"
+      ]
+    },
     "v3.4.4": {
       "released_date": "2026/11/16",
       "fix": [

@@ -4,6 +4,15 @@
 
 ******
 
+## v3.5.0
+
+###### 2026/11/17
+
+* `Hint` With PNG output, gallery.convert in scripts now writes a lossily compressed PNG when quality is given (quality used to be ignored and PNG was always lossless); leave quality out or set it to 100 for a lossless PNG
+* `Added` Lossy PNG compression: with PNG as the format, the converter, batch conversion and the editor's save dialog offer a "Lossy compression" switch (off by default); turning it on enables the quality slider and allows slight color differences for a smaller file. The difference is bounded (at most 1 level per color channel at quality 90 and above), transparency is unchanged, and the image is not reduced to 256 colors
+* `Added` Lossily compressed PNG can use "Target file size", which picks the highest quality that stays within the target
+* `Improved` gallery.convert in scripts accepts targetBytes for PNG output (AutoJs6 6.8.1 or later when the options name format "png"); with quality given and PNG as the save format, gallery.edit opens the save dialog with "Lossy compression" on
+
 ## v3.4.4
 
 ###### 2026/11/16

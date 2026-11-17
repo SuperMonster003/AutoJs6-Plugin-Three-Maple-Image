@@ -5,6 +5,19 @@
   "changelog_label_improvement": "Amélioration",
   "changelog_label_dependency": "Dépendance",
   "$data": {
+    "v3.5.0": {
+      "released_date": "2026/11/17",
+      "hint": [
+        "Avec une sortie PNG, gallery.convert dans les scripts écrit désormais un PNG compressé avec perte lorsque quality est indiqué (quality était auparavant ignoré et le PNG toujours sans perte); omettez quality ou réglez-le sur 100 pour un PNG sans perte"
+      ],
+      "feature": [
+        "Compression PNG avec perte: lorsque le format est PNG, le convertisseur, la conversion par lot et le dialogue d'enregistrement de l'éditeur proposent un interrupteur \"Compression avec perte\" (désactivé par défaut); une fois activé, le curseur de qualité devient utilisable et de légers écarts de couleur sont admis pour un fichier plus petit. L'écart est borné (au plus 1 niveau par canal de couleur à partir de la qualité 90), la transparence est inchangée et l'image n'est pas réduite à 256 couleurs",
+        "Un PNG compressé avec perte peut utiliser \"Taille de fichier cible\", qui choisit la qualité la plus élevée ne dépassant pas la cible"
+      ],
+      "improvement": [
+        "gallery.convert dans les scripts accepte targetBytes pour une sortie PNG (AutoJs6 6.8.1 ou plus récent lorsque les options indiquent format \"png\"); avec quality indiqué et un enregistrement en PNG, gallery.edit ouvre le dialogue d'enregistrement avec \"Compression avec perte\" activé"
+      ]
+    },
     "v3.4.4": {
       "released_date": "2026/11/16",
       "fix": [

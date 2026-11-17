@@ -4,6 +4,15 @@
 
 ******
 
+## v3.5.0
+
+###### 2026/11/17
+
+* `Aviso` Con salida PNG, gallery.convert en los scripts ahora escribe un PNG comprimido con pérdida cuando se indica quality (antes quality se ignoraba y el PNG era siempre sin pérdida); omita quality o póngalo en 100 para obtener un PNG sin pérdida
+* `Función` Compresión PNG con pérdida: cuando el formato es PNG, el convertidor, la conversión por lotes y el diálogo de guardado del editor ofrecen un interruptor "Compresión con pérdida" (desactivado por defecto); al activarlo se puede usar el control de calidad y se admiten ligeras diferencias de color a cambio de un archivo más pequeño. La diferencia está acotada (como máximo 1 nivel por canal de color con calidad 90 o superior), la transparencia no cambia y la imagen no se reduce a 256 colores
+* `Función` Un PNG comprimido con pérdida puede usar "Tamaño de archivo objetivo", que elige la calidad más alta que no supera el objetivo
+* `Mejora` gallery.convert en los scripts acepta targetBytes para la salida PNG (AutoJs6 6.8.1 o posterior cuando las opciones indican format "png"); con quality indicado y PNG como formato de guardado, gallery.edit abre el diálogo de guardado con "Compresión con pérdida" activado
+
 ## v3.4.4
 
 ###### 2026/11/16
