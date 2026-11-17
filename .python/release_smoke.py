@@ -64,7 +64,9 @@ def start(serial: str) -> tuple[bool, str]:
     if "/" not in component:
         return False, "no launcher activity resolves"
     # A fresh task: a permission dialog left over from an earlier start would otherwise come back to the front alone.
+    began = time.monotonic()
     output = adb(serial, "shell", "am", "start", "-W", "--activity-clear-task", "-n", component)
+    elapsed = int((time.monotonic() - began) * 1000)
     total = re.search(r"TotalTime: (\d+)", output)
     wait = re.search(r"WaitTime: (\d+)", output)
     activity = re.search(r"Activity: (\S+)/", output)
@@ -75,6 +77,9 @@ def start(serial: str) -> tuple[bool, str]:
     if activity and activity.group(1) != PACKAGE and wait:
         # A first start that asks for photo access reports the system dialog; its TotalTime means nothing.
         detail = f"start {wait.group(1)} ms (wait time; a dialog of {activity.group(1)} is on top)"
+    elif total and wait and int(total.group(1)) > elapsed + 1000:
+        # Seen on API 28 right after an update: a TotalTime of minutes although the command returned within a second.
+        detail = f"start {wait.group(1)} ms (wait time; the reported total of {total.group(1)} ms exceeds the {elapsed} ms the command took)"
     else:
         detail = f"start {total.group(1)} ms" if total else "start time unknown"
     if crashed:

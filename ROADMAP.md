@@ -89,7 +89,7 @@
 | M4 | v3.2.0 | 编辑与输出: 编辑器重做与五项扩展, 覆盖保存与撤销, 手势旋转保存, 转换器重做, 协议升级 | 已发布 v3.2.0 (2026-10-15, tag `90800e3`, versionCode 173) |
 | M5 | v3.3.0 | 查看器与设置全集: 幻灯片, 壁纸/分享副本, GPS 与地图, 手势与显示选项, 扩展详情, 平板/横屏, 无障碍与性能 | 已发布 v3.3.0 (2026-10-15, tag `12c9fe8`, versionCode 193) |
 | M6 | v3.4.0 | 脚本 API `gallery`: 宿主契约, 插件服务, augment, 四仓库文档 | 已发布 v3.4.0 (2026-10-15, tag `c8e7e9c`, versionCode 198); 宿主侧为本地提交, 待维护者推送 |
-| M7 | v3.5.0 | PNG 有损压缩: 近无损真彩色编码, `有损压缩` 开关, 脚本 `quality` / `targetBytes` 对 PNG 生效 | 发布候选已就绪 (2026-11-17, `20c4acd`, versionCode 214), 尚未推送与发布; 记录 `docs/release/v3.5.0.md`, P4 / P5 等维护者同意 |
+| M7 | v3.5.0 | PNG 有损压缩: 近无损真彩色编码, `有损压缩` 开关, 脚本 `quality` / `targetBytes` 对 PNG 生效 | 已发布 v3.5.0 (2026-11-17, tag `20c4acd`, versionCode 214, 索引提交 `2267749`); 记录 `docs/release/v3.5.0.md`; 宿主, 文档站与声明仓库侧为本地提交, 待维护者推送 |
 
 依赖顺序:
 
@@ -443,7 +443,7 @@ XQ-AT72 上 3.1 MP 为无损 1.3 s, 有损 2.6 / 1.5 / 0.6 s, 目标文件大小
 
 - [x] (测试) 真机耗时. 完成 (2026-11-17): XQ-AT72 与 G8441 (两台原先都没装本插件), 数字见 11.4.
 - [x] (测试) 宿主加插件端到端: 宿主 `GalleryScriptApiTest` 加 PNG `quality` / `targetBytes` 用例并在模拟器上跑通. 完成 (2026-11-17, 宿主本地提交 `81c744add`): AVD API 33 上宿主 debug 6640 + 3.5.0 release 候选包 (同签名), 4 项通过 (新用例: 不带质量无损, 质量 100 无损, 质量 50 小于 80% 且每通道偏差不超过 4 级, `format: "png"` 加 `targetBytes` 不超过目标), 缺插件一项按设计跳过.
-- [~] (发布) 按 P1-P6 发布 v3.5.0. 进度 (2026-11-17, 维护者同意准备发布): P1 / P2 在 `20c4acd` (`VERSION_NAME=3.5.0`, versionCode 214, changelog 与 README 亮点 10 种语言; README 的截图集里没有转换页, 不重采截图); P3 门禁 6/6, 候选包 `autojs6-plugin-three-maple-image-v3.5.0-c16f95bf.apk` 的升级冒烟 (AVD API 33, 3.4.4 -> 3.5.0) 与三台真机的安装冷启动冒烟通过 (`.python/release_smoke.py`), 宿主端到端通过; 记录在 `docs/release/v3.5.0.md`. 剩 P4 (推送, tag, GitHub Release) 与 P5 (索引), 等维护者同意; 已装 3.4.4 的在线真机尚未覆盖安装候选包.
+- [x] (发布) 按 P1-P6 发布 v3.5.0. 完成 (2026-11-17, 维护者同意准备发布, 再经选择题同意 "推送, 发布并登记索引" 与 "4 台真机都覆盖安装候选包"): P1 / P2 在 `20c4acd` (`VERSION_NAME=3.5.0`, versionCode 214, changelog 与 README 亮点 10 种语言; README 的截图集里没有转换页, 不重采截图); P3 门禁 6/6, 候选包 `autojs6-plugin-three-maple-image-v3.5.0-c16f95bf.apk` 的升级冒烟 (AVD API 33, 3.4.4 -> 3.5.0) 与三台真机的安装冷启动冒烟通过 (`.python/release_smoke.py`), 宿主端到端通过; 记录在 `docs/release/v3.5.0.md`. P4: 4 台装着旧版的真机覆盖安装候选包的升级冒烟通过 (小米平板, G8441 BH900ASK9E, Redmi 为 3.4.0 -> 3.5.0, OPD2413 为 3.4.3 -> 3.5.0), 推送 master, tag `v3.5.0` = `20c4acd`, GitHub Release `3.5.0` (APK 与 `SHA256SUMS`, Latest), 下载产物哈希复核通过. P5: 官方索引 `214.json`, 索引提交 `2267749`. P6: 宿主 `23e84ebff` / `a074eb80c` / `81c744add` 随 6.8.1, 仍只在本地.
 
 验收条件: 开关关闭时 PNG 输出仍走原有的无损路径 (质量 100 与它逐字节相同); 打开后每个颜色通道的误差不超过当前质量档的最大容差, 透明度不变, 质量越低文件越小; 脚本未指定 `quality` 与 `targetBytes` 时 PNG 仍无损.
 
