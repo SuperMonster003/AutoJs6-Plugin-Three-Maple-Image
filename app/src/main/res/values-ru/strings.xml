@@ -338,7 +338,10 @@
     <string name="recycle_bin_empty_title">Корзина пуста</string>
     <string name="recycle_bin_title">Корзина</string>
     <string name="release_history">История выпусков</string>
-    <string name="release_history_unavailable">История выпусков недоступна</string>
+    <string name="release_history_collapse_all">Свернуть всё</string>
+    <string name="release_history_collapsed">Свёрнуто</string>
+    <string name="release_history_expand_all">Развернуть всё</string>
+    <string name="release_history_expanded">Развёрнуто</string>
     <string name="rename_album_failed">Не удалось переименовать альбом. Для альбомов вне DCIM и Pictures сначала нужен доступ ко всем файлам.</string>
     <string name="rename_album_images_only">Без доступа ко всем файлам под новое имя перемещаются только изображения альбома; другие файлы папки (например, видео) остаются на месте.</string>
     <string name="rename_album_taken">Папка с таким именем уже есть</string>
@@ -441,8 +444,7 @@
     <string name="standalone_language_zh_hant_hk">繁體中文 (香港)</string>
     <string name="standalone_language_zh_hant_tw">繁體中文 (台灣)</string>
     <string name="standalone_navigation_back">Назад</string>
-    <string name="standalone_release_history_load_failed">Не удалось загрузить историю версий</string>
-    <string name="standalone_release_history_title">История версий</string>
+    <string name="standalone_release_history_load_failed">Не удалось загрузить историю выпусков</string>
     <string name="standalone_settings_dark_mode">Темная тема</string>
     <string name="standalone_settings_language">Язык</string>
     <string name="standalone_settings_saved">Настройки приложения сохранены</string>
@@ -451,7 +453,7 @@
     <string name="standalone_settings_section_viewer">Просмотр</string>
     <string name="standalone_settings_theme_color">Цвет темы</string>
     <string name="standalone_settings_title">Настройки</string>
-    <string name="standalone_update_release_history_summary">Открыть встроенную историю версий приложения</string>
+    <string name="standalone_update_release_history_summary">Открыть встроенную историю выпусков приложения</string>
     <string name="storage_add_folder">Добавить папку</string>
     <string name="storage_all_files_access">Доступ ко всем файлам</string>
     <string name="storage_all_files_access_summary">Нужен для скрытых папок (.nomedia), просмотра файловой системы и массовых действий без подтверждения; открывает системную страницу</string>

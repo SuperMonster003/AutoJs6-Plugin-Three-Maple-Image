@@ -89,7 +89,8 @@ internal fun MapleTopBar(
                 if (!subtitle.isNullOrEmpty()) {
                     Text(
                         subtitle,
-                        style = MaterialTheme.typography.bodySmall,
+                        // Content direction too: the plugin name as the subtitle (release history) stays "3-Maple Image".
+                        style = MaterialTheme.typography.bodySmall.copy(textDirection = TextDirection.Content),
                         // Full white over the image: the muted white is not readable on the plain scrim over a bright image.
                         color = if (overlay) canvas.onScrim else MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,

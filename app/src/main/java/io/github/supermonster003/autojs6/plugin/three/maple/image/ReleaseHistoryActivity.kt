@@ -25,6 +25,12 @@ internal object ReleaseHistoryAssetPolicy {
         "ru" -> "CHANGELOG-ru.md"
         else -> "CHANGELOG-en.md"
     }
+
+    /** The asset paths to try in order: the one for [locale], then English. */
+    fun candidatesFor(locale: Locale): List<String> =
+        listOf(assetFor(locale), FALLBACK).distinct().map { "doc/$it" }
+
+    private const val FALLBACK = "CHANGELOG-en.md"
 }
 
 internal data class ReleaseHistoryItem(val tag: String?, val text: String)
@@ -33,7 +39,17 @@ internal data class ReleaseHistoryEntry(
     val version: String,
     val date: String?,
     val items: List<ReleaseHistoryItem>,
-)
+) {
+    /** The items by category, each category once, in the order the categories first appear (untagged: tag null). */
+    val groups: List<ReleaseHistoryGroup>
+        get() = items.groupBy { it.tag }.map { (tag, grouped) -> ReleaseHistoryGroup(tag, grouped.map { it.text }) }
+
+    /** How many items each category has, in the same order; untagged items are not counted. */
+    val categoryCounts: List<Pair<String, Int>>
+        get() = groups.mapNotNull { group -> group.tag?.let { it to group.items.size } }
+}
+
+internal data class ReleaseHistoryGroup(val tag: String?, val items: List<String>)
 
 /**
  * Parses the narrow markdown dialect used by the bundled changelogs: `# vX.Y.Z` or `## vX.Y.Z` version
@@ -81,23 +97,22 @@ internal object ReleaseHistoryParser {
     }
 }
 
-/** Renders the bundled changelog for the current locale as one group per released version. */
+/**
+ * Renders the bundled changelog for the current locale (English when that one is missing) as one group per released
+ * version, under the title "Release history" with the plugin name as the subtitle.
+ */
 internal class ReleaseHistoryActivity : ConfiguredActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val entries = loadReleaseHistory()?.let(ReleaseHistoryParser::parse).orEmpty()
+        val candidates = ReleaseHistoryAssetPolicy.candidatesFor(resources.configuration.locales[0])
+        val entries = loadReleaseHistory(candidates) { path ->
+            assets.open(path).use { stream -> stream.readBytes().toString(Charsets.UTF_8) }
+        }
         setContent {
             MapleTheme(palette = appPalette) {
                 ReleaseHistoryScreen(entries = entries, onBack = ::finish)
             }
         }
     }
-
-    private fun loadReleaseHistory(): String? = runCatching {
-        val assetName = ReleaseHistoryAssetPolicy.assetFor(resources.configuration.locales[0])
-        assets.open("doc/$assetName").use { stream ->
-            stream.readBytes().toString(Charsets.UTF_8)
-        }
-    }.getOrNull()
 }

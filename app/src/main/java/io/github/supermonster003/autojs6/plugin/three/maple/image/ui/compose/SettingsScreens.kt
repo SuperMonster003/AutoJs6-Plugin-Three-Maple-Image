@@ -2,26 +2,18 @@ package io.github.supermonster003.autojs6.plugin.three.maple.image.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.indication
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -29,8 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
@@ -43,7 +33,6 @@ import io.github.supermonster003.autojs6.plugin.three.maple.image.ViewerDoubleTa
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ViewerMaxZoom
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ViewerOrientation
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ViewerSettings
-import io.github.supermonster003.autojs6.plugin.three.maple.image.ReleaseHistoryEntry
 
 /** Current-value summaries of the four appearance rows (Three settings specification section 2). */
 internal data class SettingsSummaries(
@@ -316,7 +305,7 @@ internal fun SettingsScreen(
             )
             MapleSectionHeader(stringResource(R.string.settings_section_about))
             MapleSettingsRow(
-                title = stringResource(R.string.standalone_release_history_title),
+                title = stringResource(R.string.release_history),
                 summary = stringResource(R.string.standalone_update_release_history_summary),
                 iconResource = R.drawable.ic_article_24,
                 onClick = onReleaseHistory,
@@ -381,82 +370,6 @@ internal fun AboutScreen(versionName: String, onBack: () -> Unit, onSources: () 
                 onClick = onSources,
                 modifier = Modifier.testTag("maple.about.sources"),
             )
-        }
-    }
-}
-
-/** Release history: one group per version (version + date header), bullets with a tinted category chip. */
-@Composable
-internal fun ReleaseHistoryScreen(entries: List<ReleaseHistoryEntry>, onBack: () -> Unit) {
-    MapleScreen(title = stringResource(R.string.standalone_release_history_title), onBack = onBack) { padding ->
-        if (entries.isEmpty()) {
-            Column(modifier = Modifier.fillMaxSize().padding(padding), horizontalAlignment = Alignment.CenterHorizontally) {
-                Spacer(Modifier.height(48.dp))
-                MapleEmptyState(
-                    title = stringResource(R.string.standalone_release_history_load_failed),
-                    icon = painterResource(R.drawable.ic_warning_24),
-                )
-            }
-            return@MapleScreen
-        }
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding).testTag("maple.releaseHistory.list")) {
-            itemsIndexed(entries, key = { _, entry -> entry.version }) { index, entry ->
-                if (index > 0) MapleHairline(insetStart = 24.dp)
-                ReleaseEntry(entry, Modifier.testTag("maple.releaseHistory.entry.${entry.version}"))
-            }
-        }
-    }
-}
-
-@Composable
-private fun ReleaseEntry(entry: ReleaseHistoryEntry, modifier: Modifier = Modifier) {
-    // One focus stop per release: Tab and the arrow keys walk the history (the list scrolls to the focused release)
-    // and a screen reader reads a release in one go.
-    val interaction = remember { MutableInteractionSource() }
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .semantics(mergeDescendants = true) {}
-            .indication(interaction, ripple())
-            .focusable(interactionSource = interaction)
-            .padding(horizontal = 24.dp, vertical = 16.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = entry.version,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f),
-            )
-            if (entry.date != null) {
-                Text(
-                    text = entry.date,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-        entry.items.forEach { item ->
-            Row(modifier = Modifier.padding(top = 10.dp), verticalAlignment = Alignment.Top) {
-                if (item.tag != null) {
-                    Text(
-                        text = item.tag,
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .padding(top = 1.dp)
-                            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(10.dp))
-                            .padding(horizontal = 8.dp, vertical = 2.dp),
-                    )
-                    Spacer(Modifier.width(8.dp))
-                }
-                Text(
-                    text = item.text,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f),
-                )
-            }
         }
     }
 }

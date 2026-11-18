@@ -38,7 +38,7 @@ class AppSettingsComposeInstrumentationTest {
         for (resource in listOf(
             R.string.standalone_settings_language, R.string.standalone_settings_dark_mode,
             R.string.standalone_settings_theme_color, R.string.launcher_icon_title, R.string.viewer_rotation_gesture_title,
-            R.string.standalone_release_history_title, R.string.standalone_about_title,
+            R.string.release_history, R.string.standalone_about_title,
         )) {
             compose.onNodeWithText(context.getString(resource)).performScrollTo().assertIsDisplayed()
         }

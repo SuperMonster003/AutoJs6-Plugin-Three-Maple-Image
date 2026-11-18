@@ -1,44 +1,26 @@
 package io.github.supermonster003.autojs6.plugin.three.maple.image
 
-import android.app.Activity
-import android.app.AlertDialog
-import android.widget.ScrollView
-import android.widget.TextView
+import android.content.Context
+import android.content.Intent
 import java.io.IOException
 
-internal fun releaseHistoryCandidates(language: String, country: String, script: String): List<String> {
-    val code = when {
-        language == "zh" && country == "HK" -> "zh-Hant-HK"
-        language == "zh" && (country == "TW" || script == "Hant") -> "zh-Hant-TW"
-        language == "zh" -> "zh-Hans"
-        language in setOf("en", "ar", "es", "fr", "ja", "ko", "ru") -> language
-        else -> "en"
-    }
-    return listOf("doc/CHANGELOG-$code.md", "doc/CHANGELOG-en.md").distinct()
+/**
+ * Opens the release history page. The settings row and the menus of the viewer and the editor all lead here; the
+ * page replaced the old dialog that showed the raw markdown.
+ */
+internal fun Context.openReleaseHistory() {
+    startActivity(Intent(this, ReleaseHistoryActivity::class.java))
 }
 
-internal fun loadReleaseHistory(candidates: List<String>, loader: (String) -> String): String? {
+/**
+ * Returns the releases of the first candidate asset that holds at least one, so a missing, blank or unparsable
+ * localized changelog falls back to the English one; empty when none of them does (the page shows its empty state).
+ */
+internal fun loadReleaseHistory(candidates: List<String>, loader: (String) -> String): List<ReleaseHistoryEntry> {
     for (path in candidates) {
-        try { loader(path).takeIf { it.isNotBlank() }?.let { return it } } catch (_: IOException) { }
+        val markdown = try { loader(path) } catch (_: IOException) { continue }
+        val entries = ReleaseHistoryParser.parse(markdown)
+        if (entries.isNotEmpty()) return entries
     }
-    return null
-}
-
-internal fun Activity.showReleaseHistory() {
-    val locale = resources.configuration.locales[0]
-    val history = loadReleaseHistory(releaseHistoryCandidates(locale.language, locale.country, locale.script)) { path ->
-        assets.open(path).bufferedReader(Charsets.UTF_8).use { it.readText() }
-    } ?: getString(R.string.release_history_unavailable)
-    val content = TextView(this).apply {
-        text = history
-        textSize = 14f
-        setTextIsSelectable(true)
-        val padding = (20 * resources.displayMetrics.density).toInt()
-        setPadding(padding, padding, padding, padding)
-    }
-    AlertDialog.Builder(this)
-        .setTitle(R.string.release_history)
-        .setView(ScrollView(this).apply { addView(content) })
-        .setPositiveButton(android.R.string.ok, null)
-        .show()
+    return emptyList()
 }

@@ -153,7 +153,7 @@ open class ImageEditorActivity : ConfiguredActivity() {
             onUndoReplacement = { model.undoReplacement() },
             onCompare = ::onCompare,
             onRestoreOriginal = ::restoreOriginal,
-            onReleaseHistory = ::showReleaseHistory,
+            onReleaseHistory = ::openReleaseHistory,
             onGroup = { group ->
                 ui = ui.copy(group = group)
                 if (group == EditorGroup.FILTER) ensureFilterThumbnails()

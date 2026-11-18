@@ -338,7 +338,10 @@
     <string name="recycle_bin_empty_title">The recycle bin is empty</string>
     <string name="recycle_bin_title">Recycle bin</string>
     <string name="release_history">Release history</string>
-    <string name="release_history_unavailable">Release history is unavailable</string>
+    <string name="release_history_collapse_all">Collapse all</string>
+    <string name="release_history_collapsed">Collapsed</string>
+    <string name="release_history_expand_all">Expand all</string>
+    <string name="release_history_expanded">Expanded</string>
     <string name="rename_album_failed">This album could not be renamed. Albums outside DCIM and Pictures need all files access first.</string>
     <string name="rename_album_images_only">Without all files access only the album\'s images move to the new name; other files in the folder (videos, for example) stay where they are.</string>
     <string name="rename_album_taken">A folder with this name already exists</string>
@@ -441,8 +444,7 @@
     <string name="standalone_language_zh_hant_hk">繁體中文 (香港)</string>
     <string name="standalone_language_zh_hant_tw">繁體中文 (台灣)</string>
     <string name="standalone_navigation_back">Back</string>
-    <string name="standalone_release_history_load_failed">Unable to load the version history</string>
-    <string name="standalone_release_history_title">Version history</string>
+    <string name="standalone_release_history_load_failed">Unable to load the release history</string>
     <string name="standalone_settings_dark_mode">Dark mode</string>
     <string name="standalone_settings_language">Language</string>
     <string name="standalone_settings_saved">Application settings saved</string>
@@ -451,7 +453,7 @@
     <string name="standalone_settings_section_viewer">Viewer</string>
     <string name="standalone_settings_theme_color">Theme color</string>
     <string name="standalone_settings_title">Settings</string>
-    <string name="standalone_update_release_history_summary">Read the version history included with this app</string>
+    <string name="standalone_update_release_history_summary">Read the release history included with this app</string>
     <string name="storage_add_folder">Add folder</string>
     <string name="storage_all_files_access">All files access</string>
     <string name="storage_all_files_access_summary">Used for hidden folders (.nomedia), file system browsing and bulk actions without confirmation; opens the system page</string>

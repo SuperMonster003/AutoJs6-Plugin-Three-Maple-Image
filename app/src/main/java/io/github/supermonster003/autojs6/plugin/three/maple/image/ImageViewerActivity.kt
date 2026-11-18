@@ -198,7 +198,7 @@ class ImageViewerActivity : ConfiguredActivity() {
             onSetWallpaper = ::setAsWallpaper,
             onResumeSlideshow = ::resumeSlideshow,
             onStopSlideshow = ::stopSlideshow,
-            onReleaseHistory = ::showReleaseHistory,
+            onReleaseHistory = ::openReleaseHistory,
             onToggleAnimation = { currentHost()?.animation?.toggle() },
             onPageChanged = ::onPagerPageChanged,
             onSelectPage = ::jumpToPage,
