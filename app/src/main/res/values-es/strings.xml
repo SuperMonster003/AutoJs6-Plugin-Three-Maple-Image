@@ -530,7 +530,7 @@
     <string name="text_save">Guardar</string>
     <string name="text_should_not_be_empty">El texto no puede estar vacío</string>
     <string name="text_size">Tamaño</string>
-    <string name="text_undo">Revocar</string>
+    <string name="text_undo">Deshacer</string>
     <string name="text_unsaved_changes">Cambios sin guardar</string>
     <string name="theme_picker_custom">Color personalizado</string>
     <string name="theme_picker_input">HEX / RGB</string>

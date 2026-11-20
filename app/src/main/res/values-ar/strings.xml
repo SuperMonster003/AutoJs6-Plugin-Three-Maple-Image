@@ -530,7 +530,7 @@
     <string name="text_save">حفظ</string>
     <string name="text_should_not_be_empty">النص لا يمكن أن يكون فارغًا</string>
     <string name="text_size">مقاس</string>
-    <string name="text_undo">الغاء التحميل</string>
+    <string name="text_undo">تراجع</string>
     <string name="text_unsaved_changes">تغييرات غير محفوظة</string>
     <string name="theme_picker_custom">لون مخصص</string>
     <string name="theme_picker_input">HEX / RGB</string>

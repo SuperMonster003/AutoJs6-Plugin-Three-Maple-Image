@@ -530,7 +530,7 @@
     <string name="text_save">Сохранить</string>
     <string name="text_should_not_be_empty">Текст не может быть пустым</string>
     <string name="text_size">Размер</string>
-    <string name="text_undo">Отозвать</string>
+    <string name="text_undo">Отменить</string>
     <string name="text_unsaved_changes">Несохраненные изменения</string>
     <string name="theme_picker_custom">Свой цвет</string>
     <string name="theme_picker_input">HEX / RGB</string>
