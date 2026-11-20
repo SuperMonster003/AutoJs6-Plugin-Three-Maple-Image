@@ -40,6 +40,28 @@ ANDROID_RESOURCE_QUALIFIERS = {
     "ru": "ru",
     "ar": "ar",
 }
+# Raw resource directory of the generated plugin instruction (plugin_instruction.md) per language.
+# The unqualified raw directory receives the English output as well.
+ANDROID_INSTRUCTION_DIRECTORIES = {
+    code: f"raw-{qualifier}" for code, qualifier in ANDROID_RESOURCE_QUALIFIERS.items()
+}
+ANDROID_INSTRUCTION_DEFAULT_LANGUAGE = "en"
+INSTRUCTION_KEY_PREFIX = "instruction_"
+INSTRUCTION_LIST_KEYS = {
+    "instruction_start_steps",
+    "instruction_features",
+    "instruction_script_notes",
+    "instruction_requirements",
+}
+INSTRUCTION_NUMBERED_KEYS = {"instruction_start_steps"}
+INSTRUCTION_FAQ_KEY = "instruction_faq"
+INSTRUCTION_REQUIRED_KEYS = (
+    "instruction_p_what",
+    "instruction_h3_start",
+    "instruction_start_steps",
+    "instruction_h3_requirements",
+    "instruction_requirements",
+)
 PROHIBITED_SYMBOL_PATTERN = re.compile(
     r"[‐-‧　-〿・︐-﹯＀-￯]",
 )
@@ -198,6 +220,78 @@ def faq_block(items):
     return "\n\n".join(blocks)
 
 
+def instruction_faq(items):
+    return "\n\n".join(f"**{item['q']}**\n\n{item['a']}" for item in items)
+
+
+def shape_of(value):
+    if isinstance(value, list):
+        return ("list", len(value), tuple(shape_of(item) for item in value))
+    if isinstance(value, dict):
+        return ("dict", tuple(sorted(value)))
+    return type(value).__name__
+
+
+def instruction_texts(value):
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, list):
+        for item in value:
+            yield from instruction_texts(item)
+    elif isinstance(value, dict):
+        for item in value.values():
+            yield from instruction_texts(item)
+
+
+def validate_instruction_sources(raw_languages):
+    reference = {
+        key: value
+        for key, value in raw_languages[LANGUAGE_CODE_DEFAULT].items()
+        if key.startswith(INSTRUCTION_KEY_PREFIX)
+    }
+    for code, content in raw_languages.items():
+        instruction = {key: value for key, value in content.items() if key.startswith(INSTRUCTION_KEY_PREFIX)}
+        for key in INSTRUCTION_REQUIRED_KEYS:
+            if key not in instruction:
+                raise ValueError(f"Instruction language {code!r} is missing {key!r}")
+        if set(instruction) != set(reference):
+            raise ValueError(
+                f"Instruction keys of {code!r} differ from {LANGUAGE_CODE_DEFAULT!r}: "
+                f"{sorted(set(instruction) ^ set(reference))}",
+            )
+        for key, value in instruction.items():
+            if shape_of(value) != shape_of(reference[key]):
+                raise ValueError(f"Instruction {key!r} of {code!r} differs in shape from {LANGUAGE_CODE_DEFAULT!r}")
+            if key in INSTRUCTION_LIST_KEYS:
+                if not isinstance(value, list) or not value or not all(isinstance(item, str) and item for item in value):
+                    raise ValueError(f"Instruction {key!r} of {code!r} must be a non-empty list of strings")
+            elif key == INSTRUCTION_FAQ_KEY:
+                if not isinstance(value, list) or not value or not all(
+                    isinstance(item, dict)
+                    and set(item) == {"q", "a"}
+                    and all(isinstance(text, str) and text for text in item.values())
+                    for item in value
+                ):
+                    raise ValueError(f"Instruction {key!r} of {code!r} must be a non-empty list of {{q, a}} items")
+            elif not isinstance(value, str) or not value:
+                raise ValueError(f"Instruction {key!r} of {code!r} must be a non-empty string")
+            for text in instruction_texts(value):
+                if text.count('"') % 2:
+                    raise ValueError(f"Instruction {key!r} of {code!r} has an unpaired double quote: {text!r}")
+
+
+def build_instruction_values(code, languages):
+    content = languages[code]
+    values = {key: value for key, value in content.items() if key.startswith(INSTRUCTION_KEY_PREFIX)}
+    for key in INSTRUCTION_LIST_KEYS:
+        if key in values:
+            render = numbered_list if key in INSTRUCTION_NUMBERED_KEYS else bullet_list
+            values[f"placeholder_{key}"] = render(values[key])
+    if INSTRUCTION_FAQ_KEY in values:
+        values[f"placeholder_{INSTRUCTION_FAQ_KEY}"] = instruction_faq(values[INSTRUCTION_FAQ_KEY])
+    return values
+
+
 def changelog_version_name() -> str:
     properties = {}
     for line in VERSION_PROPERTIES.read_text(encoding="utf-8").splitlines():
@@ -217,8 +311,10 @@ def load_languages():
     changelogs = {}
     expected_version = changelog_version_name()
     expected_version_names = None
+    raw_languages = {code: load_json(README_DIR / f"lang_{code}.json") for code in LANGUAGE_CODES}
+    validate_instruction_sources(raw_languages)
     for code in LANGUAGE_CODES:
-        raw_lang = load_json(README_DIR / f"lang_{code}.json")
+        raw_lang = raw_languages[code]
         merged_lang = {**common, **raw_lang}
         languages[code] = render_dynamic(merged_lang, merged_lang)
 
@@ -252,14 +348,11 @@ def android_string_value(value: str) -> str:
     return value.replace("\\'", "'").replace('\\"', '"').replace("\\n", "\n")
 
 
-def validate_android_resource_pair(code: str, languages, values_dir: str, raw_dir: str):
+def validate_android_resource_pair(code: str, languages, values_dir: str):
     strings_path = ANDROID_RES_DIR / values_dir / "strings.xml"
-    instruction_path = ANDROID_RES_DIR / raw_dir / "plugin_instruction.md"
 
     strings_text = strings_path.read_text(encoding="utf-8")
-    instruction_text = instruction_path.read_text(encoding="utf-8")
     validate_symbols(strings_text, strings_path.relative_to(ROOT))
-    validate_symbols(instruction_text, instruction_path.relative_to(ROOT))
 
     root = ElementTree.fromstring(strings_text)
     element = next(
@@ -279,8 +372,8 @@ def validate_android_resource_pair(code: str, languages, values_dir: str, raw_di
 
 def validate_android_resources(languages):
     for code, qualifier in ANDROID_RESOURCE_QUALIFIERS.items():
-        validate_android_resource_pair(code, languages, f"values-{qualifier}", f"raw-{qualifier}")
-    validate_android_resource_pair("en", languages, "values", "raw")
+        validate_android_resource_pair(code, languages, f"values-{qualifier}")
+    validate_android_resource_pair("en", languages, "values")
 
 
 def format_changelog_items(changelog, limit=None, heading_level=1):
@@ -378,6 +471,15 @@ def generate_changelogs(languages, changelogs):
             write_text(ANDROID_CHANGELOG_DIR / "CHANGELOG.md", output)
 
 
+def generate_instructions(languages):
+    template = load_template(README_DIR / "template_plugin_instruction.md")
+    for code in LANGUAGE_CODES:
+        output = render_template(template, build_instruction_values(code, languages))
+        write_text(ANDROID_RES_DIR / ANDROID_INSTRUCTION_DIRECTORIES[code] / "plugin_instruction.md", output)
+        if code == ANDROID_INSTRUCTION_DEFAULT_LANGUAGE:
+            write_text(ANDROID_RES_DIR / "raw" / "plugin_instruction.md", output)
+
+
 def main():
     if LANGUAGE_CODE_DEFAULT not in LANGUAGE_CODES:
         raise ValueError(f"Default language code {LANGUAGE_CODE_DEFAULT!r} is not in LANGUAGE_CODES")
@@ -387,6 +489,7 @@ def main():
     validate_android_resources(languages)
     generate_changelogs(languages, changelogs)
     generate_readmes(languages, changelogs)
+    generate_instructions(languages)
 
 
 

@@ -1,41 +1,59 @@
-# AutoJs6 3-Maple Image
+3-Maple Image views and edits images and converts image formats. It can be opened on its own to browse and organize the images on the device by album; tapping an image file in the AutoJs6 file explorer also opens it in 3-Maple Image, and the file menu offers editing and conversion. AutoJs6 scripts can call it through the `gallery` module.
 
-Image Viewer and Image Tools are combined in 3-Maple Image, with viewing, editing and format conversion in one app.
-Language, dark mode, theme color and four launcher icon choices are available in the shared settings layout.
-The application ID changes from io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools to io.github.supermonster003.autojs6.plugin.three.maple.image. Android installs this as a separate app; existing apps and data can remain, and settings are not migrated automatically.
+### Getting started
 
+1. Open 3-Maple Image and grant photo access when prompted; the home page then lists the images on the device by album. Without that access, use "Choose image" or "Choose folder" to open images through the system picker.
+2. Enable 3-Maple Image in the "Plugin center" of AutoJs6. Tapping an image file in the AutoJs6 file explorer then opens it, and "Edit image" and "Convert image" in the file menu edit and convert it.
 
-3-Maple Image supplies the primary image action in the file manager for AVIF, BMP, GIF, HEIC, HEIF, JFIF, JPE, JPEG, JPG, PNG, and WEBP files.
+### Main features
 
-HEIC and HEIF require Android 9 or later, while AVIF requires Android 12 or later. If the platform decoder is unavailable, the viewer shows the exact requirement instead of failing silently.
+- **Albums**: the home page lists images by album, with "Favorites" first. You can search album names and file names and change the sort order, the column count and grouping by date; long-press an album to "Pin", "Exclude" or "Hide" it.
+- **Viewer**: zoom, paging, a thumbnail strip and "Rotate", with GIF animations looping. The menu at the top right offers "Slideshow", "Set as wallpaper", "Share a copy", "Print / Save PDF" and more.
+- **Details**: tap "Details" to see the file name, size, resolution and EXIF capture information.
+- **Organizing**: long-press in the image grid to select several images, then share, favorite, move, copy or delete them. Deleted images go to the "Recycle bin" first, and the message offers an undo.
+- **Editing**: the editor tools come in six groups such as "Transform", "Adjust", "Filters" and "Text", with undo and redo. Editing and converting save a new file by default and leave the original unchanged; only with "Overwrite the original" turned on is the original replaced, and the replacement can be undone.
+- **Conversion**: "Convert image" changes the format (JPEG, PNG, WebP), quality and size, and previews the output size. Select several images in an album or in the AutoJs6 file explorer to convert them in a batch.
 
-Oversized JPEG, PNG, and static HEIC/HEIF images use a bounded sampled preview and decode only visible high-resolution regions while zoomed. Tile caches are released on page changes and memory pressure.
+### Using it in scripts
 
-To open only an explicit group, enter selection mode in AutoJs6, select 1 to 128 supported images from one folder, and tap `View image`. The viewer preserves selection order and left/right paging stays inside that group; every selected URI is independently validated and remains read-only. Each selected image can be moved to the AutoJs6 Trash with `Delete` in the bottom bar and restored with undo; the image opened by tapping a single file can be deleted the same way, but not the other images of its folder.
+AutoJs6 scripts use this plugin through the `gallery` module. The example below lets the user choose up to 5 images, converts them to WebP with a long edge of 1080 pixels, and shows the results in the viewer:
 
-The viewer fits the image to the screen and supports left/right same-folder paging at 1x, focal pinch zoom, panning, a double-tap toggle between fit and 2.5x around the touch point, and per-page metadata. The current multiplier appears while pinching and briefly after a double-tap. Animated GIFs loop with a pause/resume control that stays hidden for static images. The image fills the whole screen under translucent overlay bars; tap the image to hide or show them, and the title bar adds a `3 / 12` page counter when several images are open. Sharing and opening with another app are available for the originally opened image and disabled on session-only sibling pages. Double-tap and maximum zoom, one-finger zoom, tapping the edges to turn pages and swiping down to close can be adjusted in 3-Maple Image's `Settings` > `Viewer`.
+```js
+let images = gallery.pick({ multiple: true, maxCount: 5 });
+if (images) {
+    let outputs = images.map((image) => gallery.convert(image.path, { format: 'webp', longEdge: 1080 }).path);
+    gallery.view(outputs);
+}
+```
 
-`Rotate` turns only the current view and preserves an active zoom. `Reset zoom` in the top-right menu restores both the original orientation and fitted size.
+- Every method also has an asynchronous form that returns a Promise, such as `gallery.pickAsync`. The synchronous `pick`, `edit` and `convert` can wait a long time and must not be called on the UI thread.
+- Images are given by file path, and relative paths are resolved against the working directory of the script. Output is written next to the original by default (the file name gets `_converted` or `_edited`), and the `output` option sets another location.
+- Picking images needs the photo access of the plugin, which the picker requests first. Picking, viewing and editing open the plugin screens, so scripts run more reliably while the AutoJs6 screen is visible.
+- Call `gallery.isAvailable()` before running to check that the plugin is available. See [AutoJs6 docs > gallery](https://docs.autojs6.com/#/gallery) for all options and error codes.
 
-Use `Details` to open a bottom sheet with the file name, MIME type, size, resolution, and the available EXIF capture time, device, exposure, and orientation. If GPS metadata exists, the viewer by default only reports its presence; with `Settings` > `Viewer` > `Show location` on, it shows the coordinates of where the photo was taken (decimal and degrees, minutes, seconds) and offers `Open in map`.
+### Requirements
 
-The information bar always shows MIME type, file size, and decoded resolution. On Android 8.0 or later, it also shows decoded pixel depth (bpp) and output color space when the decoder exposes them.
+- Android 7.0 or later. HEIC and HEIF images need Android 9 or later, and AVIF images need Android 12 or later.
+- Using it in AutoJs6 (the file explorer and the `gallery` module) needs AutoJs6 6.8.0 or later with this plugin enabled in the "Plugin center"; it does not need AutoJs6 when used on its own.
+- Photo access is used to browse images by album on the home page and to let scripts pick images; opening images from the AutoJs6 file explorer or other apps requests no permission.
+- "All files access" and "Media management" are optional permissions that let the plugin hide albums and delete or move images without asking each time; turn them on in "Settings" > "Storage permission".
 
-Photos are automatically rotated or mirrored to their EXIF orientation. `Rotate` then adds a view-only turn on top of that corrected display.
+### FAQ
 
-`Print / Save PDF` in the top-right menu sends the full current image to Android's system print sheet, preserving EXIF correction and manual view rotation. Animated GIFs use the frame visible when tapped. Zoom and panning do not crop the result, and the plugin creates no temporary image or PDF file.
+**Using it without photo access**
 
-In the file manager, `View as album` in a directory's menu opens that directory as an album through the host session: subfolders up to 8 levels deep appear as folder cells, images open in the viewer with left/right paging inside that folder, and only the first 4096 entries of a folder are listed. This mode needs no storage permission and never discloses file paths; management actions are not available in it.
+The home page shows "Choose image" and "Choose folder", so images can still be viewed, edited and converted through the system picker. Access can be granted later in "Settings" > "Storage permission"; on Android 14 and later, if only some photos are allowed, the home page shows only those photos, and "Manage selected photos" adds or removes photos.
 
-`Edit image` and `Convert image` in the file menu save a new file next to the original by default; with `Overwrite the original` turned on in the save dialog or on the converter page they replace the original (same format), and the replacement can be undone within 8 seconds. Every output is staged and read back before it is published, so a failure leaves no partial file.
+**"Edit image" and "Convert image" missing from the file menu**
 
-Host build 5352 or later is required.
+AutoJs6 6.8.1 and later put these two items in the 3-Maple Image submenu of the file menu. If they still cannot be found, check that the plugin is enabled in the "Plugin center" and that the file is in a supported image format, and update AutoJs6 to the latest version.
 
-AutoJs6 scripts can also use 3-Maple Image through the `gallery` object: `gallery.pick` opens the picker and returns the images you choose, `gallery.view` shows images in the viewer, `gallery.edit` opens the editor and AutoJs6 saves the result, and `gallery.convert` converts images without showing anything. AutoJs6 opens the images and writes the results itself, so a script only reaches files it can access; picking needs the plugin's photo access, which the picker asks for first. This requires AutoJs6 6.8.0 host build 5439 or later.
+**Restoring deleted images**
 
-Safety and privacy limits:
+Images deleted in an album first go to the "Recycle bin" in the menu at the top right of the home page, where they can be restored; they are removed automatically after about 30 days. Images deleted after opening them from AutoJs6 go to the AutoJs6 trash and are restored in AutoJs6.
 
-- The selected source uses a temporary read-only `content` URI; direct siblings are opened only through the scoped host `readSiblings` session.
-- Files larger than 8 TiB are rejected.
-- Opened from AutoJs6, the plugin requests no permission, and it declares no network permission.
-- Deleting moves only the files you selected, into the AutoJs6 Trash; moving, renaming and file details remain host features.
+**Showing and keeping photo location**
+
+Coordinates are not shown by default, and images produced by editing, converting and "Share a copy" have their location removed. With "Show location" turned on in "Settings", the details show the coordinates and offer "Open in map", and "Keep location" can be checked when saving or converting. This plugin has no network permission.
+
+See the [project page](https://github.com/SuperMonster003/AutoJs6-Plugin-Three-Maple-Image) for the full feature description, supported formats and FAQ.

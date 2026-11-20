@@ -151,5 +151,55 @@
   "p_standalone": "獨立首頁可選擇本機圖片進行檢視, 編輯或轉換, 並將處理結果另存至指定位置. 統一設定頁提供語言, 夜間模式, 主題色及四種啟動器圖示選項.",
   "p_migration": "應用程式 ID 從 `io.github.supermonster003.autojs6.plugin.imageviewer / io.github.supermonster003.autojs6.plugin.imagetools` 改為 `io.github.supermonster003.autojs6.plugin.three.maple.image`. Android 將其視為獨立應用程式, 原應用程式與資料可以保留, 設定不會自動遷移.",
   "h3_sources": "來源與致謝",
-  "p_sources": "[THIRD_PARTY_NOTICES.md]({{ repo_url }}/blob/master/THIRD_PARTY_NOTICES.md) · [RIGHTS_AND_TAKEDOWN.md]({{ repo_url }}/blob/master/RIGHTS_AND_TAKEDOWN.md)"
+  "p_sources": "[THIRD_PARTY_NOTICES.md]({{ repo_url }}/blob/master/THIRD_PARTY_NOTICES.md) · [RIGHTS_AND_TAKEDOWN.md]({{ repo_url }}/blob/master/RIGHTS_AND_TAKEDOWN.md)",
+  "instruction_p_what": "3-Maple Image 用於檢視, 編輯圖像和轉換圖像格式. 它可以單獨開啟, 按相簿瀏覽和整理裝置上的圖像; 在 AutoJs6 文件管理器中點擊圖像檔案也會用它檢視, 檔案選單還提供編輯與轉換. AutoJs6 腳本可以透過 `gallery` 模組調用它.",
+  "instruction_h3_start": "開始使用",
+  "instruction_start_steps": [
+    "開啟 3-Maple Image, 按提示授予相片存取權限, 首頁隨即按相簿列出裝置上的圖像. 不授予時, 可以用 \"選擇圖像\" 或 \"選擇資料夾\" 經系統選擇器開啟圖像.",
+    "在 AutoJs6 的 \"插件中心\" 啟用 3-Maple Image. 之後在 AutoJs6 文件管理器中點擊圖像檔案即可檢視, 檔案選單中的 \"編輯圖像\" 與 \"轉換圖像\" 用於編輯和轉換."
+  ],
+  "instruction_h3_features": "主要功能",
+  "instruction_features": [
+    "**相簿**: 首頁按相簿列出圖像, \"收藏\" 相簿排在最前. 可以搜尋相簿名稱與檔案名稱, 調整排序, 欄數與按日期分組; 長按相簿可以 \"置頂\", \"排除\" 或 \"隱藏\".",
+    "**檢視器**: 支援縮放, 翻頁, 縮圖列與 \"旋轉\", GIF 動圖循環播放. 右上角選單提供 \"幻燈片\", \"設為牆紙\", \"分享副本\", \"列印 / 儲存 PDF\" 等.",
+    "**詳情**: 點按 \"詳情\" 查看檔案名稱, 大小, 解像度與 EXIF 拍攝資訊.",
+    "**整理**: 在圖像網格中長按進入多選, 可以分享, 收藏, 移動, 複製或刪除. 刪除的圖像先進入 \"回收筒\", 提示中可以復原.",
+    "**編輯**: 編輯器的工具分為 \"變換\", \"調整\", \"濾鏡\", \"文字\" 等六組, 支援復原與重做. 編輯與轉換預設另存為新檔案, 原圖不變; 開啟 \"覆蓋原圖\" 後才取代原圖, 取代後可以復原.",
+    "**轉換**: \"轉換圖像\" 可以更改格式 (JPEG, PNG, WebP), 質素與尺寸, 並預覽輸出的大小. 在相簿或 AutoJs6 文件管理器中多選圖像後可以批量轉換."
+  ],
+  "instruction_h3_script": "在腳本中使用",
+  "instruction_p_script": "在 AutoJs6 腳本中透過 `gallery` 模組調用本插件. 下例讓用戶選擇最多 5 張圖像, 轉換為長邊 1080 像素的 WebP, 再用檢視器顯示結果:",
+  "instruction_script_notes": [
+    "每個方法都有返回 Promise 的非同步形態, 例如 `gallery.pickAsync`. 同步的 `pick`, `edit` 與 `convert` 會等待較長時間, 不能在 UI 線程調用.",
+    "圖像用檔案路徑指定, 相對路徑按腳本的工作目錄解析. 輸出預設寫在原圖旁 (檔案名稱加 `_converted` 或 `_edited`), 也可以用 `output` 選項指定位置.",
+    "選圖需要插件的相片存取權限, 選圖介面會先請求. 選圖, 檢視與編輯會開啟插件介面, 在 AutoJs6 介面可見時運行腳本更可靠.",
+    "運行前可以用 `gallery.isAvailable()` 確認插件可用. 完整的選項與錯誤代碼見 [AutoJs6 文檔 > gallery]({{ docs_autojs6_url }}/#/gallery)."
+  ],
+  "instruction_h3_requirements": "運行要求",
+  "instruction_requirements": [
+    "Android 7.0 或更高版本. HEIC 與 HEIF 圖像需要 Android 9 或更高版本, AVIF 圖像需要 Android 12 或更高版本.",
+    "在 AutoJs6 中使用 (文件管理器與 `gallery` 模組) 需要 AutoJs6 6.8.0 或更高版本, 並在 \"插件中心\" 啟用本插件; 單獨使用時不需要 AutoJs6.",
+    "相片存取權限用於在首頁按相簿瀏覽圖像和供腳本選圖; 從 AutoJs6 文件管理器或其他應用程式開啟圖像時不請求權限.",
+    "\"所有檔案存取\" 與 \"媒體管理\" 是可選權限, 用於隱藏相簿以及刪除, 移動圖像時免去逐次確認, 在 \"設定\" > \"儲存權限\" 中開啟."
+  ],
+  "instruction_h3_faq": "常見問題",
+  "instruction_faq": [
+    {
+      "q": "未授予相片存取權限時的使用方式",
+      "a": "首頁顯示 \"選擇圖像\" 與 \"選擇資料夾\", 仍可經系統選擇器檢視, 編輯和轉換圖像. 之後可以在 \"設定\" > \"儲存權限\" 中重新授權; Android 14 及以上只授權部分相片時, 首頁只顯示這些相片, 點按 \"管理所選相片\" 可以增減."
+    },
+    {
+      "q": "檔案選單中沒有 \"編輯圖像\" 與 \"轉換圖像\" 的處理",
+      "a": "AutoJs6 6.8.1 及以上版本把這兩項放在檔案選單的 3-Maple Image 子選單中. 仍然找不到時, 確認插件已在 \"插件中心\" 啟用, 檔案是受支援的圖像格式, 並把 AutoJs6 更新到最新版本."
+    },
+    {
+      "q": "已刪除圖像的還原",
+      "a": "在相簿中刪除的圖像先進入首頁右上角選單中的 \"回收筒\", 可以還原, 約 30 天後自動清除. 從 AutoJs6 開啟後刪除的圖像進入 AutoJs6 的回收站, 在 AutoJs6 中還原."
+    },
+    {
+      "q": "相片位置資訊的顯示與保留",
+      "a": "座標預設不顯示, 編輯, 轉換與 \"分享副本\" 生成的圖像也會移除位置資訊. 在 \"設定\" 中開啟 \"顯示位置資訊\" 後, 詳情中顯示座標並可 \"在地圖中開啟\", 儲存與轉換時可以勾選 \"保留位置資訊\". 本插件沒有網絡權限."
+    }
+  ],
+  "instruction_p_more": "完整的功能說明, 支援的格式與常見問題見 [項目主頁]({{ repo_url }})."
 }
