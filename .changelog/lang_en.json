@@ -5,6 +5,14 @@
   "changelog_label_improvement": "Improved",
   "changelog_label_dependency": "Dependency",
   "$data": {
+    "v3.5.1": {
+      "released_date": "2026/11/20",
+      "improvement": [
+        "The release history page expands and collapses by version: a collapsed version shows its date and the number of entries per category, an expanded one names each category once; all versions can be expanded or collapsed at once, and the newest one opens expanded",
+        "The release history page is titled \"Release history\" with the plugin name as the subtitle; \"Release history\" in the menus of the viewer and the editor opens this page (it used to show the raw text in a dialog)",
+        "Rewrote the instructions shown in Plugin Center in five parts: getting started, main features, using it in scripts, requirements and FAQ"
+      ]
+    },
     "v3.5.0": {
       "released_date": "2026/11/17",
       "hint": [

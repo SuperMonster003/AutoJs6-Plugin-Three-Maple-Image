@@ -307,6 +307,14 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 
 ******
 
+#### v3.5.1
+
+###### 2026/11/20
+
+* `Mejora` La página Historial de versiones se expande y contrae por versión: una versión contraída muestra su fecha y el número de entradas por categoría, una expandida nombra cada categoría una sola vez; todas las versiones se pueden expandir o contraer a la vez y la más reciente se abre expandida
+* `Mejora` La página Historial de versiones tiene el título "Historial de versiones" y el nombre del plugin como subtítulo; "Historial de versiones" en los menús del visor y del editor abre esta página (antes mostraba el texto sin formato en un diálogo)
+* `Mejora` Se reescribieron las instrucciones del Centro de plugins en cinco partes: primeros pasos, funciones principales, uso en scripts, requisitos y preguntas frecuentes
+
 #### v3.5.0
 
 ###### 2026/11/17
@@ -321,12 +329,6 @@ Las capacidades completadas y los planes futuros se mantienen como una lista mar
 ###### 2026/11/16
 
 * `Corrección` Los ajustes de apariencia indicaban que AutoJs6 no estaba disponible aunque estuviera instalado y habilitado, lo que impedía seguir su idioma, modo nocturno y color del tema
-
-#### v3.4.3
-
-###### 2026/11/07
-
-* `Corrección` En el administrador de archivos de AutoJs6, las opciones "Ver como álbum" y "Convertir imágenes" de este plugin ya no aparecen en inglés en los demás idiomas de la interfaz
 
 ##### Historial completo
 

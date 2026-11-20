@@ -97,6 +97,38 @@ internal object ReleaseHistoryParser {
     }
 }
 
+/** A link of a release note, as the range of its text in [ReleaseHistoryInline.text] (Q160 A). */
+internal data class ReleaseHistoryLink(val start: Int, val end: Int, val url: String)
+
+/** The text of a release note without the link markup, with its links. */
+internal data class ReleaseHistoryInline(val text: String, val links: List<ReleaseHistoryLink>)
+
+/**
+ * Turns the markdown links of a release note (`[text](https://...)`) into their text (plugin-center Q160 A). A pair of
+ * `_` around a link (the italic spelling of the issue links) and a pair of backticks around its text go too, so
+ * `` _[`issue #575`](url)_ `` reads "issue #575". Only http and https links count; a note without one stays as it is.
+ */
+internal object ReleaseHistoryInlineParser {
+    private val LINK_PATTERN = Regex("""([_`]?)\[(`?)([^\]]+?)\2\]\((https?://[^\s)]+)\)\1""")
+
+    fun parse(text: String): ReleaseHistoryInline {
+        val matches = LINK_PATTERN.findAll(text).toList()
+        if (matches.isEmpty()) return ReleaseHistoryInline(text, emptyList())
+        val plain = StringBuilder()
+        val links = mutableListOf<ReleaseHistoryLink>()
+        var last = 0
+        for (match in matches) {
+            plain.append(text, last, match.range.first)
+            val start = plain.length
+            plain.append(match.groupValues[3])
+            links.add(ReleaseHistoryLink(start, plain.length, match.groupValues[4]))
+            last = match.range.last + 1
+        }
+        plain.append(text, last, text.length)
+        return ReleaseHistoryInline(plain.toString(), links)
+    }
+}
+
 /**
  * Renders the bundled changelog for the current locale (English when that one is missing) as one group per released
  * version, under the title "Release history" with the plugin name as the subtitle.

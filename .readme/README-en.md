@@ -307,6 +307,14 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 
 ******
 
+#### v3.5.1
+
+###### 2026/11/20
+
+* `Improved` The release history page expands and collapses by version: a collapsed version shows its date and the number of entries per category, an expanded one names each category once; all versions can be expanded or collapsed at once, and the newest one opens expanded
+* `Improved` The release history page is titled "Release history" with the plugin name as the subtitle; "Release history" in the menus of the viewer and the editor opens this page (it used to show the raw text in a dialog)
+* `Improved` Rewrote the instructions shown in Plugin Center in five parts: getting started, main features, using it in scripts, requirements and FAQ
+
 #### v3.5.0
 
 ###### 2026/11/17
@@ -321,12 +329,6 @@ Completed capabilities and upcoming plans are maintained as a checkable list in 
 ###### 2026/11/16
 
 * `Fixed` Appearance settings reported AutoJs6 as unavailable even when installed and enabled, preventing its language, night mode and theme color from being followed
-
-#### v3.4.3
-
-###### 2026/11/07
-
-* `Fixed` In the AutoJs6 file manager, the options "View as album" and "Convert images" of this plugin no longer appear in English in other interface languages
 
 ##### Full history
 

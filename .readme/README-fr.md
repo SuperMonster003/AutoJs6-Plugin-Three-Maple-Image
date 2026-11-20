@@ -307,6 +307,14 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 
 ******
 
+#### v3.5.1
+
+###### 2026/11/20
+
+* `Amélioration` La page Historique des versions se développe et se réduit par version: une version réduite affiche sa date et le nombre d'entrées par catégorie, une version développée ne nomme chaque catégorie qu'une fois; toutes les versions peuvent être développées ou réduites d'un coup, et la plus récente s'ouvre développée
+* `Amélioration` La page Historique des versions a pour titre "Historique des versions" et pour sous-titre le nom du plugin; "Historique des versions" dans les menus de la visionneuse et de l'éditeur ouvre cette page (auparavant une boîte de dialogue affichait le texte brut)
+* `Amélioration` Réécriture des instructions affichées dans le Centre des plugins en cinq parties: prise en main, fonctionnalités principales, utilisation dans les scripts, prérequis et questions fréquentes
+
 #### v3.5.0
 
 ###### 2026/11/17
@@ -321,12 +329,6 @@ Les capacités achevées et les projets à venir sont tenus sous forme de liste 
 ###### 2026/11/16
 
 * `Correctif` Les paramètres d'apparence indiquaient qu'AutoJs6 était indisponible même après son installation et son activation, empêchant de suivre sa langue, son mode nuit et sa couleur de thème
-
-#### v3.4.3
-
-###### 2026/11/07
-
-* `Correctif` Dans le gestionnaire de fichiers d'AutoJs6, les options "Afficher comme album" et "Convertir les images" de ce plugin ne s'affichent plus en anglais dans les autres langues de l'interface
 
 ##### Historique complet
 
