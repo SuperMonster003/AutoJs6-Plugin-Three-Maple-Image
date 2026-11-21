@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.activity.ComponentActivity
 import androidx.core.content.FileProvider
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -44,14 +43,14 @@ class ImageOverwriteInstrumentationTest {
 
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
     private val folder = "MapleOverwrite${System.currentTimeMillis()}"
-    private lateinit var scenario: ActivityScenario<ComponentActivity>
+    private lateinit var scenario: ActivityScenario<ComposeTestActivity>
     private lateinit var coordinator: MediaWriteCoordinator
     private val backup by lazy { OverwriteBackup(context) }
     private val files = mutableListOf<File>()
 
     @Before
     fun setUp() {
-        scenario = ActivityScenario.launch(ComponentActivity::class.java)
+        scenario = ActivityScenario.launch(ComposeTestActivity::class.java)
         scenario.onActivity { coordinator = MediaWriteCoordinator(it) }
     }
 

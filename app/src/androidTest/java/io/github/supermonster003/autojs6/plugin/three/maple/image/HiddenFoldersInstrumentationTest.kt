@@ -6,7 +6,6 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import androidx.activity.ComponentActivity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -43,13 +42,13 @@ class HiddenFoldersInstrumentationTest {
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
     private val folder = "MapleHidden${System.currentTimeMillis()}"
     private val path = AlbumPath(MediaCatalog.PRIMARY_VOLUME, "${Environment.DIRECTORY_PICTURES}/$folder/")
-    private lateinit var scenario: ActivityScenario<ComponentActivity>
+    private lateinit var scenario: ActivityScenario<ComposeTestActivity>
     private lateinit var coordinator: MediaWriteCoordinator
 
     @Before
     fun setUp() {
         assumeTrue("hiding needs file system access", HiddenFolders(context).available())
-        scenario = ActivityScenario.launch(ComponentActivity::class.java)
+        scenario = ActivityScenario.launch(ComposeTestActivity::class.java)
         scenario.onActivity { coordinator = MediaWriteCoordinator(it) }
         MediaStoreTestImages.insert(context, folder, "a.png", Color.RED)
         MediaStoreTestImages.insert(context, folder, "b.png", Color.GREEN)

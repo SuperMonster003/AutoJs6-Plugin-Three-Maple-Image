@@ -165,7 +165,9 @@ dependencies {
     implementation(libs.compose.activity)
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
-    debugImplementation(libs.compose.ui.test.manifest)
+    // No ui-test-manifest: the Compose tests that set their own content run in ComposeTestActivity, a non-exported
+    // activity of the debug source set, while ui-test-manifest would merge an exported
+    // androidx.activity.ComponentActivity into the debug APK.
     // ROADMAP T3: Glide stays the single image pipeline; its Compose integration drives grids and thumbnail strips.
     implementation(libs.glide.compose)
     // The app's Glide module (thumbnail disk cache sized by free space, ROADMAP 9.4).

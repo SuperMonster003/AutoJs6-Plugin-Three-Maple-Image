@@ -6,7 +6,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.activity.ComponentActivity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -41,12 +40,12 @@ class MediaWriteCoordinatorInstrumentationTest {
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
     private val folder = "MapleWrite${System.currentTimeMillis()}"
     private val target = "${folder}Target"
-    private lateinit var scenario: ActivityScenario<ComponentActivity>
+    private lateinit var scenario: ActivityScenario<ComposeTestActivity>
     private lateinit var coordinator: MediaWriteCoordinator
 
     @Before
     fun setUp() {
-        scenario = ActivityScenario.launch(ComponentActivity::class.java)
+        scenario = ActivityScenario.launch(ComposeTestActivity::class.java)
         scenario.onActivity { coordinator = MediaWriteCoordinator(it) }
     }
 

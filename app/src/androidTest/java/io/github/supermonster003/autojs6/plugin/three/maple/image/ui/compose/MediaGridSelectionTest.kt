@@ -6,13 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import io.github.supermonster003.autojs6.plugin.three.maple.image.AlbumKind
 import io.github.supermonster003.autojs6.plugin.three.maple.image.AlbumSummary
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ComposeTestActivity
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaGridUiState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaItem
 import io.github.supermonster003.autojs6.plugin.three.maple.image.MediaSelection
@@ -25,7 +26,7 @@ import org.junit.Test
 class MediaGridSelectionTest {
 
     @get:Rule
-    val compose = createComposeRule()
+    val compose = createAndroidComposeRule<ComposeTestActivity>()
 
     private val items = (1L..60L).map { id ->
         MediaItem(

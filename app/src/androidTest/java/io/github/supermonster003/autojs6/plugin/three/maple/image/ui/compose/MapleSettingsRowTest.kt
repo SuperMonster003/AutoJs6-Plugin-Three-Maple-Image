@@ -6,13 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import io.github.supermonster003.autojs6.plugin.three.maple.image.AppThemePalette
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ComposeTestActivity
 import io.github.supermonster003.autojs6.plugin.three.maple.image.R
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ThemeAccentRoles
 import org.junit.Assert.assertEquals
@@ -23,7 +24,7 @@ import org.junit.Test
 class MapleSettingsRowTest {
 
     @get:Rule
-    val compose = createComposeRule()
+    val compose = createAndroidComposeRule<ComposeTestActivity>()
 
     @Test
     fun switchRowTogglesOncePerTapAndExposesSwitchState() {

@@ -10,7 +10,6 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.os.storage.StorageManager
 import android.provider.MediaStore
-import androidx.activity.ComponentActivity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -52,7 +51,7 @@ class StorageCardInstrumentationTest {
     private val folder = "MapleCard${System.currentTimeMillis()}"
     private val relativePath = "${Environment.DIRECTORY_PICTURES}/$folder/"
     private lateinit var card: Card
-    private lateinit var scenario: ActivityScenario<ComponentActivity>
+    private lateinit var scenario: ActivityScenario<ComposeTestActivity>
     private lateinit var coordinator: MediaWriteCoordinator
 
     private class Card(val volume: String, val directory: File)
@@ -67,7 +66,7 @@ class StorageCardInstrumentationTest {
         val free = requireNotNull(found).directory.usableSpace
         assumeTrue("the storage card is full ($free bytes free)", free >= MIN_FREE_BYTES)
         card = found
-        scenario = ActivityScenario.launch(ComponentActivity::class.java)
+        scenario = ActivityScenario.launch(ComposeTestActivity::class.java)
         scenario.onActivity { coordinator = MediaWriteCoordinator(it) }
     }
 

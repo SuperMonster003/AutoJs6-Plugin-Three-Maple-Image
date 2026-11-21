@@ -14,13 +14,14 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performFirstLinkClick
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.test.platform.app.InstrumentationRegistry
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ComposeTestActivity
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ReleaseHistoryEntry
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ReleaseHistoryItem
 import org.junit.Assert.assertEquals
@@ -38,7 +39,7 @@ import java.io.File
 class ReleaseHistoryLinkInstrumentationTest {
 
     @get:Rule
-    val compose = createComposeRule()
+    val compose = createAndroidComposeRule<ComposeTestActivity>()
 
     private val instrumentation get() = InstrumentationRegistry.getInstrumentation()
 

@@ -6,9 +6,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.getBoundsInRoot
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
+import io.github.supermonster003.autojs6.plugin.three.maple.image.ComposeTestActivity
 import io.github.supermonster003.autojs6.plugin.three.maple.image.EditorToolState
 import io.github.supermonster003.autojs6.plugin.three.maple.image.ImageEditingView
 import org.junit.Assert.assertTrue
@@ -22,7 +23,7 @@ import org.junit.Test
 class EditorPanelHeightTest {
 
     @get:Rule
-    val compose = createComposeRule()
+    val compose = createAndroidComposeRule<ComposeTestActivity>()
 
     @Test fun theShapesPanelLeavesTheCanvasAndItsButtonsOnALandscapePhone() {
         compose.setContent {

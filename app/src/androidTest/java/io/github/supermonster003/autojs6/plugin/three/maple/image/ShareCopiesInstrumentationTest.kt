@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -36,7 +36,7 @@ import java.util.UUID
 class ShareCopiesInstrumentationTest {
 
     @get:Rule
-    val compose = createComposeRule()
+    val compose = createAndroidComposeRule<ComposeTestActivity>()
 
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
     private val fixtures = mutableListOf<File>()

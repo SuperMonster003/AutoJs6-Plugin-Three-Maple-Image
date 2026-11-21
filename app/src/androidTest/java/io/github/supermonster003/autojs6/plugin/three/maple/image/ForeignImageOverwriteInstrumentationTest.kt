@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.activity.ComponentActivity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -52,14 +51,14 @@ class ForeignImageOverwriteInstrumentationTest {
 
     @Suppress("DEPRECATION")
     private val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MapleForeign${System.currentTimeMillis()}")
-    private lateinit var scenario: ActivityScenario<ComponentActivity>
+    private lateinit var scenario: ActivityScenario<ComposeTestActivity>
     private lateinit var coordinator: MediaWriteCoordinator
     private val files = mutableListOf<File>()
 
     @Before fun setUp() {
         assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
         TestScreen.awake()
-        scenario = ActivityScenario.launch(ComponentActivity::class.java)
+        scenario = ActivityScenario.launch(ComposeTestActivity::class.java)
         scenario.onActivity { coordinator = MediaWriteCoordinator(it) }
     }
 
